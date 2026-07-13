@@ -1174,7 +1174,8 @@
                 try {
                     const { data, error } = await localSupabase.auth.signUp({ email, password });
                     if (error) {
-                        if (signupError) { signupError.textContent = error.message || "Failed to create account."; signupError.style.display = "block"; }
+                        const errMsg = error.message && typeof error.message === "string" && error.message.trim() ? error.message : "Failed to create account.";
+                        if (signupError) { signupError.textContent = errMsg; signupError.style.display = "block"; }
                         return;
                     }
 
