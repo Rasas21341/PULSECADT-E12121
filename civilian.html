@@ -134,6 +134,152 @@
             font-size: 14px;
             display: none;
         }
+
+        .plate-lookup-btn {
+            position: fixed;
+            right: 24px;
+            bottom: 24px;
+            padding: 12px 20px;
+            border-radius: 12px;
+            border: 1px solid #2563eb;
+            background: #ffffff;
+            color: #2563eb;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            z-index: 700;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15);
+        }
+
+        .plate-lookup-btn:hover {
+            background: #eff6ff;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.45);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 16px;
+        }
+
+        .modal-overlay.open {
+            display: flex;
+        }
+
+        .modal {
+            background: #ffffff;
+            border-radius: 20px;
+            border: 1px solid #e2e8f0;
+            padding: 22px;
+            width: 100%;
+            max-width: 420px;
+            box-shadow: 0 20px 50px rgba(15, 23, 42, 0.18);
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 14px;
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .modal-close {
+            border: none;
+            background: transparent;
+            color: #64748b;
+            font-size: 20px;
+            cursor: pointer;
+            line-height: 1;
+            padding: 4px;
+            border-radius: 999px;
+        }
+
+        .modal-close:hover {
+            background: #f1f5f9;
+            color: #0f172a;
+        }
+
+        .lookup-field {
+            margin-bottom: 14px;
+        }
+
+        .lookup-field label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: #334155;
+            margin-bottom: 6px;
+        }
+
+        .lookup-field input {
+            width: 100%;
+            padding: 12px 14px;
+            border-radius: 12px;
+            border: 1px solid #cbd5e1;
+            font-size: 15px;
+            color: #0f172a;
+            outline: none;
+            transition: border-color .15s ease, box-shadow .15s ease;
+        }
+
+        .lookup-field input:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+        }
+
+        .lookup-submit {
+            width: 100%;
+            padding: 12px 14px;
+            border-radius: 12px;
+            border: none;
+            background: #2563eb;
+            color: #ffffff;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform .05s ease, background .15s ease;
+        }
+
+        .lookup-submit:hover {
+            background: #1d4ed8;
+        }
+
+        .lookup-submit:active {
+            transform: translateY(1px);
+        }
+
+        .lookup-error {
+            margin-top: 10px;
+            padding: 10px 12px;
+            border-radius: 10px;
+            background: #fef2f2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+            font-size: 14px;
+            display: none;
+        }
+
+        .lookup-result {
+            margin-top: 10px;
+            padding: 10px 12px;
+            border-radius: 10px;
+            background: #f0fdf4;
+            color: #166534;
+            border: 1px solid #bbf7d0;
+            font-size: 14px;
+            display: none;
+            word-break: break-word;
+        }
     </style>
 </head>
 <body>
@@ -172,6 +318,24 @@
         </form>
     </div>
 
+    <button type="button" class="plate-lookup-btn" id="plateLookupBtn">Plate Lookup</button>
+
+    <div class="modal-overlay" id="lookupModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">Plate Lookup</div>
+                <button class="modal-close" id="lookupModalClose" type="button" aria-label="Close">×</button>
+            </div>
+            <div class="lookup-field">
+                <label for="plateInput">Plate number</label>
+                <input type="text" id="plateInput" placeholder="e.g. ABC 123" />
+            </div>
+            <button type="button" class="lookup-submit" id="plateSubmitBtn">Search</button>
+            <div class="lookup-error" id="plateError"></div>
+            <div class="lookup-result" id="plateResult"></div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         const SUPABASE_URL = "https://zwdogalwbczdtvxvhrfd.supabase.co";
@@ -191,6 +355,92 @@
         const form = document.getElementById("createCivilianForm");
         const formError = document.getElementById("formError");
         const formSuccess = document.getElementById("formSuccess");
+
+        const lookupModal = document.getElementById("lookupModal");
+        const lookupModalClose = document.getElementById("lookupModalClose");
+        const plateInput = document.getElementById("plateInput");
+        const plateSubmitBtn = document.getElementById("plateSubmitBtn");
+        const plateError = document.getElementById("plateError");
+        const plateResult = document.getElementById("plateResult");
+
+        if (lookupModalClose) {
+            lookupModalClose.addEventListener("click", () => {
+                if (lookupModal) lookupModal.classList.remove("open");
+            });
+        }
+
+        if (lookupModal) {
+            lookupModal.addEventListener("click", (e) => {
+                if (e.target === lookupModal) {
+                    lookupModal.classList.remove("open");
+                }
+            });
+        }
+
+        const plateLookupBtn = document.getElementById("plateLookupBtn");
+        if (plateLookupBtn) {
+            plateLookupBtn.addEventListener("click", () => {
+                if (!lookupModal) return;
+                if (plateInput) plateInput.value = "";
+                if (plateError) { plateError.textContent = ""; plateError.style.display = "none"; }
+                if (plateResult) { plateResult.textContent = ""; plateResult.style.display = "none"; }
+                lookupModal.classList.add("open");
+                if (plateInput) plateInput.focus();
+            });
+        }
+
+        if (plateSubmitBtn) {
+            plateSubmitBtn.addEventListener("click", async () => {
+                const query = plateInput ? plateInput.value.trim() : "";
+                if (!query) {
+                    if (plateError) { plateError.textContent = "Enter a plate number."; plateError.style.display = "block"; }
+                    return;
+                }
+                if (!localSupabase) {
+                    if (plateError) { plateError.textContent = "Database unavailable."; plateError.style.display = "block"; }
+                    return;
+                }
+                if (plateError) { plateError.textContent = ""; plateError.style.display = "none"; }
+                if (plateResult) { plateResult.textContent = ""; plateResult.style.display = "none"; }
+
+                try {
+                    const { data, error } = await localSupabase
+                        .from("plates")
+                        .select("*")
+                        .ilike("plate", query)
+                        .limit(5);
+
+                    if (error) {
+                        if (plateResult) {
+                            plateResult.style.display = "block";
+                            plateResult.textContent = "Result not found.";
+                        }
+                        return;
+                    }
+
+                    if (!Array.isArray(data) || data.length === 0) {
+                        if (plateResult) {
+                            plateResult.style.display = "block";
+                            plateResult.textContent = "No records found.";
+                        }
+                        return;
+                    }
+
+                    const rows = data.map((row) => {
+                        const info = [row.plate, row.owner, row.vehicle, row.status, row.notes].filter(Boolean).join(" | ");
+                        return info || "Record";
+                    });
+
+                    if (plateResult) {
+                        plateResult.style.display = "block";
+                        plateResult.textContent = rows.join("\n");
+                    }
+                } catch (err) {
+                    if (plateError) { plateError.textContent = "Lookup failed."; plateError.style.display = "block"; }
+                    console.error(err);
+                }
+            });
+        }
 
         if (form) {
             form.addEventListener("submit", async (e) => {

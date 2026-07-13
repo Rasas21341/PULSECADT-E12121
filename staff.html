@@ -330,6 +330,128 @@
         .switch input:checked + .slider::before {
             transform: translateX(22px);
         }
+
+        .codes-section {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .codes-section h2 {
+            font-size: 18px;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 6px;
+        }
+
+        .codes-section p {
+            font-size: 14px;
+            color: #64748b;
+            margin-bottom: 16px;
+        }
+
+        .premium-key-display {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .premium-key-input {
+            flex: 1;
+            min-width: 200px;
+            padding: 10px 12px;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+            font-size: 14px;
+            color: #1a202c;
+            background: #f8fafc;
+            font-family: monospace;
+        }
+
+        .codes-search-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 16px;
+            flex-wrap: wrap;
+        }
+
+        .codes-search-input {
+            flex: 1;
+            min-width: 200px;
+            padding: 10px 12px;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+            font-size: 14px;
+            color: #1a202c;
+            background: #ffffff;
+        }
+
+        .codes-list-section {
+            margin-top: 20px;
+        }
+
+        .codes-list-section h3 {
+            font-size: 16px;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 10px;
+        }
+
+        .codes-count {
+            font-size: 13px;
+            color: #64748b;
+            margin-bottom: 10px;
+        }
+
+        .codes-list-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        .codes-list-table th,
+        .codes-list-table td {
+            text-align: left;
+            padding: 10px 12px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .codes-list-table th {
+            background: #f8fafc;
+            color: #64748b;
+            font-weight: 600;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        .codes-list-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .codes-list-table td {
+            color: #334155;
+            word-break: break-all;
+            font-family: monospace;
+        }
+
+        .codes-used-no {
+            color: #16a34a;
+            font-weight: 700;
+        }
+
+        .codes-used-yes {
+            color: #dc2626;
+            font-weight: 700;
+        }
     </style>
 </head>
 <body>
@@ -338,6 +460,7 @@
         <button class="sidebar-btn" id="serversBtn">Servers</button>
         <button class="sidebar-btn" id="staffUsersBtn">Users</button>
         <button class="sidebar-btn" id="applicationsBtn">Applications</button>
+        <button class="sidebar-btn" id="codesBtn" style="display:none;">CODES</button>
         <button class="sidebar-btn" id="masterActionsBtn" style="display:none;">Master Actions</button>
     </div>
     <div class="main">
@@ -358,6 +481,7 @@
         const serversBtn = document.getElementById("serversBtn");
         const staffUsersBtn = document.getElementById("staffUsersBtn");
         const applicationsBtn = document.getElementById("applicationsBtn");
+        const codesBtn = document.getElementById("codesBtn");
         const masterActionsBtn = document.getElementById("masterActionsBtn");
 
         let localSupabase = null;
@@ -576,6 +700,9 @@
             if (applicationsBtn && dept === "Support Team") {
                 applicationsBtn.style.display = "none";
             }
+            if (codesBtn && (dept === "Management" || dept === "Support Team")) {
+                codesBtn.style.display = "block";
+            }
             if (masterActionsBtn && dept === "Management") {
                 masterActionsBtn.style.display = "block";
             }
@@ -595,6 +722,10 @@
 
         if (masterActionsBtn) {
             masterActionsBtn.addEventListener("click", loadMasterActions);
+        }
+
+        if (codesBtn) {
+            codesBtn.addEventListener("click", loadCodes);
         }
 
         initSidebar();
@@ -643,6 +774,124 @@
             }
         }
 
+        async function loadCodes() {
+            const staff = await ensureStaff();
+            if (!staff.allowed) return;
+            if (staff.department !== "Management" && staff.department !== "Support Team") {
+                showStatus("Access denied.", "error");
+                return;
+            }
+            pageTitle.textContent = "Codes";
+            contentEl.innerHTML = `
+                <div class="codes-section">
+                    <h2>Premium Key Generator</h2>
+                    <p>Generate a new premium key for PulseCAD. Keys start with MDT and are one-time use.</p>
+                    <div class="premium-key-display">
+                        <input type="text" class="premium-key-input" id="generatedPremiumKey" readonly />
+                        <button type="button" class="verified-btn" id="generatePremiumKeyBtn">Generate</button>
+                        <button type="button" class="verified-btn" id="copyPremiumKeyBtn">Copy</button>
+                    </div>
+                </div>
+                <div class="codes-list-section">
+                    <h3>Existing Keys</h3>
+                    <div class="codes-search-row">
+                        <input type="text" class="codes-search-input" id="codesSearchInput" placeholder="Search codes..." />
+                    </div>
+                    <div class="codes-count" id="codesCount"></div>
+                    <table class="codes-list-table">
+                        <tr><th>Key</th><th>Used</th><th>Created</th></tr>
+                        <tbody id="codesListBody"><tr><td colspan="3"><div class="empty">Loading...</div></td></tr></tbody>
+                    </table>
+                </div>
+            `;
+
+            const generateKeyBtn = document.getElementById("generatePremiumKeyBtn");
+            const copyKeyBtn = document.getElementById("copyPremiumKeyBtn");
+            const keyInput = document.getElementById("generatedPremiumKey");
+            const searchInput = document.getElementById("codesSearchInput");
+            const codesListBody = document.getElementById("codesListBody");
+            const codesCount = document.getElementById("codesCount");
+
+            async function renderCodes(filterText = "") {
+                if (!codesListBody || !localSupabase) return;
+                try {
+                    const { data, error } = await localSupabase
+                        .from("premium_keys")
+                        .select("*")
+                        .order("created_at", { ascending: false });
+                    if (error) {
+                        codesListBody.innerHTML = `<tr><td colspan="3"><div class="empty">Failed to load codes: ${error.message}</div></td></tr>`;
+                        return;
+                    }
+                    const rows = Array.isArray(data) ? data : [];
+                    const filtered = filterText
+                        ? rows.filter((row) => (row.key || "").toLowerCase().includes(filterText.toLowerCase()))
+                        : rows;
+                    if (codesCount) codesCount.textContent = `${filtered.length} code${filtered.length === 1 ? '' : 's'} found`;
+                    if (filtered.length === 0) {
+                        codesListBody.innerHTML = `<tr><td colspan="3"><div class="empty">No codes found.</div></td></tr>`;
+                        return;
+                    }
+                    codesListBody.innerHTML = filtered.map((row) => {
+                        const usedText = row.used ? "Yes" : "No";
+                        const usedClass = row.used ? "codes-used-yes" : "codes-used-no";
+                        const created = row.created_at ? new Date(row.created_at).toLocaleString() : "";
+                        return `<tr><td>${(row.key || "").replace(/</g, "&lt;").replace(/>/g, "&gt;")}</td><td class="${usedClass}">${usedText}</td><td>${created}</td></tr>`;
+                    }).join("");
+                } catch (err) {
+                    codesListBody.innerHTML = `<tr><td colspan="3"><div class="empty">An unexpected error occurred.</div></td></tr>`;
+                    console.error(err);
+                }
+            }
+
+            renderCodes();
+
+            if (searchInput) {
+                searchInput.addEventListener("input", () => {
+                    renderCodes(searchInput.value.trim());
+                });
+            }
+
+            if (generateKeyBtn && localSupabase) {
+                generateKeyBtn.addEventListener("click", async () => {
+                    try {
+                        const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+                        let key = "MDT-";
+                        for (let i = 0; i < 16; i++) {
+                            key += chars.charAt(Math.floor(Math.random() * chars.length));
+                        }
+                        const { error } = await localSupabase
+                            .from("premium_keys")
+                            .insert([{ key: key, used: false, created_at: new Date().toISOString() }]);
+                        if (error) {
+                            alert("Failed to generate premium key: " + error.message);
+                            return;
+                        }
+                        if (keyInput) keyInput.value = key;
+                        if (searchInput) renderCodes(searchInput.value.trim());
+                    } catch (err) {
+                        alert("An unexpected error occurred.");
+                        console.error(err);
+                    }
+                });
+            }
+
+            if (copyKeyBtn && keyInput) {
+                copyKeyBtn.addEventListener("click", async () => {
+                    if (!keyInput.value) {
+                        alert("Generate a key first.");
+                        return;
+                    }
+                    try {
+                        await navigator.clipboard.writeText(keyInput.value);
+                        alert("Key copied to clipboard.");
+                    } catch (err) {
+                        alert("Failed to copy key.");
+                    }
+                });
+            }
+        }
+
         async function loadMasterActions() {
             const staff = await ensureStaff();
             if (!staff.allowed) return;
@@ -664,6 +913,13 @@
                             <input type="checkbox" id="devModeToggle" />
                             <span class="slider"></span>
                         </label>
+                    </div>
+                    <div class="master-row">
+                        <div>
+                            <div class="master-row-label">Restart Servers</div>
+                            <div class="master-row-sub">Restart all PulseCAD servers globally.</div>
+                        </div>
+                        <button type="button" class="verified-btn" id="restartServersBtn">Restart</button>
                     </div>
                 </div>
             `;
@@ -693,6 +949,11 @@
                         console.error(err);
                     }
                 });
+            }
+
+            const restartBtn = document.getElementById("restartServersBtn");
+            if (restartBtn) {
+                restartBtn.addEventListener("click", triggerRestart);
             }
         }
 
@@ -730,6 +991,13 @@
         }
 
         loadServers();
+
+        async function triggerRestart() {
+            if (!confirm("Are you sure you want to restart all servers? This will temporarily make the site unavailable.")) {
+                return;
+            }
+            location.reload();
+        }
     </script>
 </body>
 </html>

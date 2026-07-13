@@ -29,30 +29,34 @@
 
         .button-row {
             position: fixed;
-            bottom: 24px;
-            left: 50%;
-            transform: translateX(-50%);
+            left: 24px;
+            top: 50%;
+            transform: translateY(-50%);
             display: flex;
             gap: 14px;
             justify-content: center;
-            width: 100%;
-            max-width: 480px;
         }
 
         .lookup-btn {
-            width: 220px;
-            padding: 14px 18px;
-            border-radius: 12px;
-            border: 1px solid #e2e8f0;
-            background: #f8fafc;
+            background: transparent;
+            border: none;
             color: #0f172a;
-            font-size: 15px;
-            font-weight: 700;
             cursor: pointer;
+            padding: 8px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .lookup-btn:hover {
-            background: #f1f5f9;
+            background: transparent;
+            opacity: 0.75;
+        }
+
+        .lookup-btn svg {
+            width: 26px;
+            height: 26px;
+            display: block;
         }
 
         .back-btn {
@@ -75,40 +79,17 @@
 
         .status-bar {
             position: fixed;
-            top: 24px;
-            left: 50%;
-            transform: translateX(-50%);
+            top: 0;
+            left: 0;
+            right: 0;
             z-index: 500;
             display: flex;
-            flex-direction: column;
             align-items: center;
-            gap: 10px;
-            width: 100%;
-            max-width: 480px;
-        }
-
-        .duty-pill {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 6px 14px;
-            border-radius: 999px;
-            background: #eff6ff;
-            border: 1px solid #bfdbfe;
-            color: #1d4ed8;
-            font-size: 13px;
-            font-weight: 700;
-        }
-
-        .duty-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: #22c55e;
-        }
-
-        .duty-dot.offline {
-            background: #94a3b8;
+            justify-content: center;
+            gap: 12px;
+            padding: 12px 16px;
+            background: #ffffff;
+            border-bottom: 1px solid #e2e8f0;
         }
 
         .officer-info {
@@ -117,12 +98,6 @@
             color: #0f172a;
             text-align: center;
             line-height: 1.4;
-        }
-
-        .officer-info .officer-callsign {
-            font-size: 12px;
-            font-weight: 600;
-            color: #64748b;
         }
 
         .status-label {
@@ -371,19 +346,175 @@
         .report-submit:active {
             transform: translateY(1px);
         }
+
+        .tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 10px 12px;
+            border-radius: 10px;
+            border: 1px solid #cbd5e1;
+            background: #ffffff;
+            color: #0f172a;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .tab-btn.active {
+            background: #eff6ff;
+            border-color: #2563eb;
+            color: #1d4ed8;
+        }
+
+        .tab-panel {
+            display: none;
+        }
+
+        .tab-panel.active {
+            display: block;
+        }
+
+        .record-item {
+            padding: 10px 12px;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+            background: #f8fafc;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 8px;
+        }
+
+        .record-item strong {
+            display: block;
+            color: #0f172a;
+            margin-bottom: 4px;
+        }
+
+        .record-item span {
+            color: #475569;
+            font-size: 13px;
+        }
+
+        .record-text {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .record-actions {
+            margin-top: 10px;
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .record-action-btn {
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 1px solid #cbd5e1;
+            background: #ffffff;
+            color: #0f172a;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .record-action-btn:hover {
+            background: #f1f5f9;
+        }
+
+        .record-action-btn.citation {
+            background: #fef9c3;
+            border-color: #fde68a;
+            color: #854d0e;
+        }
+
+        .record-action-btn.arrest {
+            background: #fee2e2;
+            border-color: #fecaca;
+            color: #991b1b;
+        }
+
+        .record-delete-btn {
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 6px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: #94a3b8;
+        }
+
+        .record-delete-btn:hover {
+            background: #fee2e2;
+            color: #ef4444;
+        }
+
+        .modal-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .modal-tab {
+            flex: 1;
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 1px solid #cbd5e1;
+            background: #ffffff;
+            color: #0f172a;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .modal-tab.active {
+            background: #eff6ff;
+            border-color: #2563eb;
+            color: #1d4ed8;
+        }
+
+        .modal-tab-panel {
+            display: none;
+        }
+
+        .modal-tab-panel.active {
+            display: block;
+        }
+
+
+        .plate-lookup-btn {
+            position: fixed;
+            right: 24px;
+            bottom: 24px;
+            padding: 12px 20px;
+            border-radius: 12px;
+            border: 1px solid #2563eb;
+            background: #ffffff;
+            color: #2563eb;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            z-index: 700;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15);
+        }
+
+        .plate-lookup-btn:hover {
+            background: #eff6ff;
+        }
+
     </style>
 </head>
 <body>
-    <button class="back-btn" id="backBtn">← Back</button>
-    <div class="button-row">
-        <button type="button" class="lookup-btn" id="lookupPlateBtn">Lookup plate</button>
-        <button type="button" class="lookup-btn" id="lookupCivilianBtn">Lookup Civilian</button>
-    </div>
-
     <div class="status-bar">
-        <div class="duty-pill"><span class="duty-dot" id="dutyDot"></span><span id="dutyText">Officers on Duty: 1</span></div>
-        <div class="officer-info" id="officerInfo"></div>
-        <div class="status-label">Your Status</div>
         <div class="status-current">
             <span class="status-dot" id="statusDot"></span>
             <span id="statusText">Available</span>
@@ -395,35 +526,64 @@
         </div>
     </div>
 
-    <div class="modal-overlay" id="plateModal">
-        <div class="modal">
-            <div class="modal-header">
-                <div class="modal-title">Lookup Plate</div>
-                <button class="modal-close" id="plateModalClose" type="button" aria-label="Close">×</button>
-            </div>
-            <div class="lookup-field">
-                <label for="plateInput">Plate number</label>
-                <input type="text" id="plateInput" placeholder="e.g. ABC 123" />
-            </div>
-            <button type="button" class="lookup-submit" id="plateSubmitBtn">Search</button>
-            <div class="lookup-error" id="plateError"></div>
-            <div class="lookup-result" id="plateResult"></div>
-        </div>
+
+    <button class="back-btn" id="backBtn">← Back</button>
+    <div class="button-row">
+        <button type="button" class="lookup-btn" id="lookupBtn" aria-label="Lookup">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+        </button>
     </div>
 
-    <div class="modal-overlay" id="civilianModal">
+    <button type="button" class="plate-lookup-btn" id="plateLookupBtn">Plate Lookup</button>
+
+    <div class="modal-overlay" id="lookupModal">
         <div class="modal">
             <div class="modal-header">
-                <div class="modal-title">Lookup Civilian</div>
-                <button class="modal-close" id="civilianModalClose" type="button" aria-label="Close">×</button>
+                <div class="modal-title">Lookup</div>
+                <button class="modal-close" id="lookupModalClose" type="button" aria-label="Close">×</button>
             </div>
-            <div class="lookup-field">
-                <label for="civilianInput">Name or ID</label>
-                <input type="text" id="civilianInput" placeholder="e.g. John Doe" />
+            <div class="modal-tabs">
+                <button type="button" class="modal-tab active" data-tab="plate" data-target="lookupPlatePanel">Plate</button>
+                <button type="button" class="modal-tab" data-tab="civilian" data-target="lookupCivilianPanel">Civilian</button>
             </div>
-            <button type="button" class="lookup-submit" id="civilianSubmitBtn">Search</button>
-            <div class="lookup-error" id="civilianError"></div>
-            <div class="lookup-result" id="civilianResult"></div>
+            <div class="modal-tab-panel active" id="lookupPlatePanel">
+                <div class="lookup-field">
+                    <label for="plateInput">Plate number</label>
+                    <input type="text" id="plateInput" placeholder="e.g. ABC 123" />
+                </div>
+                <button type="button" class="lookup-submit" id="plateSubmitBtn">Search</button>
+                <div class="lookup-error" id="plateError"></div>
+                <div class="lookup-result" id="plateResult"></div>
+            </div>
+            <div class="modal-tab-panel" id="lookupCivilianPanel">
+                <div class="lookup-field">
+                    <label for="civilianInput">Name or ID</label>
+                    <input type="text" id="civilianInput" placeholder="e.g. John Doe" />
+                </div>
+                <button type="button" class="lookup-submit" id="civilianSubmitBtn">Search</button>
+                <div class="lookup-error" id="civilianError"></div>
+                <div class="lookup-result" id="civilianResult"></div>
+                <div id="civilianDetails" style="display:none; margin-top:14px;">
+                    <div class="tabs">
+                        <button type="button" class="tab-btn active" data-tab="details" data-target="civilianDetailsPanel">Details</button>
+                        <button type="button" class="tab-btn" data-tab="records" data-target="civilianRecordsPanel">Records</button>
+                    </div>
+                    <div class="tab-panel active" id="civilianDetailsPanel">
+                        <div class="record-item" id="selectedCivilianInfo"></div>
+                        <div class="record-actions">
+                            <button type="button" class="record-action-btn" id="openTrafficStopBtn">Traffic Stop</button>
+                            <button type="button" class="record-action-btn citation" id="openCitationBtn">Citation</button>
+                            <button type="button" class="record-action-btn arrest" id="openArrestBtn">Arrest</button>
+                        </div>
+                    </div>
+                    <div class="tab-panel" id="civilianRecordsPanel">
+                        <div id="civilianRecordsList"><div class="empty">Loading records...</div></div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -454,12 +614,80 @@
                 <textarea id="tsNotes" placeholder="Any details..."></textarea>
             </div>
             <button type="button" class="report-submit" id="tsSubmitBtn">Submit Report</button>
+            <button type="button" class="report-submit" id="tsDownloadPdfBtn" style="background:#334155;">Download PDF</button>
             <div class="lookup-error" id="tsError"></div>
             <div class="lookup-result" id="tsSuccess"></div>
         </div>
     </div>
 
+    <div class="modal-overlay" id="citationModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">Issue Citation</div>
+                <button class="modal-close" id="citationModalClose" type="button" aria-label="Close">×</button>
+            </div>
+            <div class="report-field">
+                <label for="citationCivilianId">Civilian ID</label>
+                <input type="text" id="citationCivilianId" readonly />
+            </div>
+            <div class="report-field">
+                <label for="citationCivilianName">Civilian Name</label>
+                <input type="text" id="citationCivilianName" readonly />
+            </div>
+            <div class="report-field">
+                <label for="citationReason">Violation</label>
+                <input type="text" id="citationReason" placeholder="e.g. Speeding, Parking violation" />
+            </div>
+            <div class="report-field">
+                <label for="citationLocation">Location</label>
+                <input type="text" id="citationLocation" placeholder="e.g. Highway 1" />
+            </div>
+            <div class="report-field">
+                <label for="citationNotes">Notes</label>
+                <textarea id="citationNotes" placeholder="Any details..."></textarea>
+            </div>
+            <button type="button" class="report-submit" id="citationSubmitBtn">Issue Citation</button>
+            <button type="button" class="report-submit" id="citationDownloadPdfBtn" style="background:#334155;">Download PDF</button>
+            <div class="lookup-error" id="citationError"></div>
+            <div class="lookup-result" id="citationSuccess"></div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="arrestModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">Make Arrest</div>
+                <button class="modal-close" id="arrestModalClose" type="button" aria-label="Close">×</button>
+            </div>
+            <div class="report-field">
+                <label for="arrestCivilianId">Civilian ID</label>
+                <input type="text" id="arrestCivilianId" readonly />
+            </div>
+            <div class="report-field">
+                <label for="arrestCivilianName">Civilian Name</label>
+                <input type="text" id="arrestCivilianName" readonly />
+            </div>
+            <div class="report-field">
+                <label for="arrestCharges">Charges</label>
+                <input type="text" id="arrestCharges" placeholder="e.g. Grand Theft Auto" />
+            </div>
+            <div class="report-field">
+                <label for="arrestLocation">Location</label>
+                <input type="text" id="arrestLocation" placeholder="e.g. Downtown" />
+            </div>
+            <div class="report-field">
+                <label for="arrestNotes">Notes</label>
+                <textarea id="arrestNotes" placeholder="Any details..."></textarea>
+            </div>
+            <button type="button" class="report-submit" id="arrestSubmitBtn">Make Arrest</button>
+            <button type="button" class="report-submit" id="arrestDownloadPdfBtn" style="background:#334155;">Download PDF</button>
+            <div class="lookup-error" id="arrestError"></div>
+            <div class="lookup-result" id="arrestSuccess"></div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script>
         const SUPABASE_URL = "https://zwdogalwbczdtvxvhrfd.supabase.co";
         const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp3ZG9nYWx3YmN6ZHR2eHZocmZkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM2NTA2MjQsImV4cCI6MjA5OTIyNjYyNH0.baPVVTtW0d3FDC2pTd1P3d5aoIc2FZkaD-6bBvDPFWw";
@@ -486,22 +714,18 @@
 
         let officerName = "Officer";
         let officerRank = "";
-        let officerCallsign = "";
 
         (function loadOfficerDetails() {
             const officerInfo = document.getElementById("officerInfo");
             const params = new URLSearchParams(window.location.search);
             const pName = params.get("name");
             const pRank = params.get("rank");
-            const pCallsign = params.get("callsign");
             if (pName) {
                 officerName = pName;
                 officerRank = pRank || "";
-                officerCallsign = pCallsign || "";
                 try {
                     localStorage.setItem("policeOfficerName", officerName);
                     localStorage.setItem("policeOfficerRank", officerRank);
-                    localStorage.setItem("policeOfficerCallsign", officerCallsign);
                 } catch (err) {
                     console.error("Could not save officer details:", err);
                 }
@@ -509,64 +733,15 @@
                 try {
                     officerName = localStorage.getItem("policeOfficerName") || "Officer";
                     officerRank = localStorage.getItem("policeOfficerRank") || "";
-                    officerCallsign = localStorage.getItem("policeOfficerCallsign") || "";
                 } catch (err) {
                     console.error("Could not read officer details:", err);
                 }
             }
             if (officerInfo) {
                 const display = (officerRank ? officerRank + " " : "") + officerName;
-                officerInfo.innerHTML = display + (officerCallsign ? `<br><span class="officer-callsign">Callsign: ${officerCallsign.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</span>` : "");
+                officerInfo.innerHTML = display;
             }
         })();
-
-        const dutyDot = document.getElementById("dutyDot");
-        const dutyText = document.getElementById("dutyText");
-
-        async function broadcastOfficerStatus(status) {
-            if (!localSupabase) return;
-            try {
-                await localSupabase
-                    .from("officer_status")
-                    .upsert({
-                        officer_id: officerId,
-                        officer_name: officerName,
-                        status,
-                        updated_at: new Date().toISOString()
-                    }, { onConflict: "officer_id" });
-            } catch (err) {
-                console.error("Could not broadcast status:", err);
-            }
-        }
-
-        async function refreshDutyCount() {
-            if (!localSupabase || !dutyText) return;
-            try {
-                const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString();
-                const { count, error } = await localSupabase
-                    .from("officer_status")
-                    .select("*", { count: "exact", head: true })
-                    .gte("updated_at", fiveMinutesAgo);
-                if (error) {
-                    if (dutyDot) dutyDot.classList.add("offline");
-                    return;
-                }
-                const total = count || 0;
-                dutyText.textContent = "Officers on Duty: " + total;
-                if (dutyDot) dutyDot.classList.toggle("offline", total === 0);
-            } catch (err) {
-                console.error("Could not load duty count:", err);
-                if (dutyDot) dutyDot.classList.add("offline");
-            }
-        }
-
-        setInterval(() => {
-            const current = (typeof getCurrentStatus === "function") ? getCurrentStatus() : "available";
-            broadcastOfficerStatus(current);
-        }, 30000);
-
-        setInterval(refreshDutyCount, 15000);
-        refreshDutyCount();
 
         const STATUS_LABELS = {
             available: "Available",
@@ -599,7 +774,6 @@
             } catch (err) {
                 console.error("Could not save status:", err);
             }
-            broadcastOfficerStatus(status);
         }
 
         statusButtons.forEach((btn) => {
@@ -616,35 +790,73 @@
         }
         setStatus(savedStatus);
 
-        const plateModal = document.getElementById("plateModal");
-        const plateModalClose = document.getElementById("plateModalClose");
+        const lookupModal = document.getElementById("lookupModal");
+        const lookupModalClose = document.getElementById("lookupModalClose");
+        const lookupBtn = document.getElementById("lookupBtn");
         const plateInput = document.getElementById("plateInput");
         const plateSubmitBtn = document.getElementById("plateSubmitBtn");
         const plateError = document.getElementById("plateError");
         const plateResult = document.getElementById("plateResult");
+        const civilianInput = document.getElementById("civilianInput");
+        const civilianSubmitBtn = document.getElementById("civilianSubmitBtn");
+        const civilianError = document.getElementById("civilianError");
+        const civilianResult = document.getElementById("civilianResult");
 
-        if (plateModalClose) {
-            plateModalClose.addEventListener("click", () => {
-                if (plateModal) plateModal.classList.remove("open");
+        function switchLookupTab(activeTabBtn) {
+            document.querySelectorAll('.modal-tab').forEach((btn) => btn.classList.remove('active'));
+            document.querySelectorAll('.modal-tab-panel').forEach((panel) => panel.classList.remove('active'));
+            if (activeTabBtn) activeTabBtn.classList.add('active');
+            const targetId = activeTabBtn ? activeTabBtn.getAttribute('data-target') : null;
+            const targetPanel = targetId ? document.getElementById(targetId) : null;
+            if (targetPanel) targetPanel.classList.add('active');
+        }
+
+        document.querySelectorAll('.modal-tab').forEach((btn) => {
+            btn.addEventListener('click', () => switchLookupTab(btn));
+        });
+
+        if (lookupModalClose) {
+            lookupModalClose.addEventListener("click", () => {
+                if (lookupModal) lookupModal.classList.remove("open");
             });
         }
 
-        if (plateModal) {
-            plateModal.addEventListener("click", (e) => {
-                if (e.target === plateModal) {
-                    plateModal.classList.remove("open");
+        if (lookupModal) {
+            lookupModal.addEventListener("click", (e) => {
+                if (e.target === lookupModal) {
+                    lookupModal.classList.remove("open");
                 }
             });
         }
 
-        document.getElementById("lookupPlateBtn").addEventListener("click", async () => {
-            if (!plateModal) return;
-            if (plateInput) plateInput.value = "";
-            if (plateError) { plateError.textContent = ""; plateError.style.display = "none"; }
-            if (plateResult) { plateResult.textContent = ""; plateResult.style.display = "none"; }
-            plateModal.classList.add("open");
-            if (plateInput) plateInput.focus();
-        });
+        if (lookupBtn) {
+            lookupBtn.addEventListener("click", async () => {
+                if (!lookupModal) return;
+                if (plateInput) plateInput.value = "";
+                if (plateError) { plateError.textContent = ""; plateError.style.display = "none"; }
+                if (plateResult) { plateResult.textContent = ""; plateResult.style.display = "none"; }
+                if (civilianInput) civilianInput.value = "";
+                if (civilianError) { civilianError.textContent = ""; civilianError.style.display = "none"; }
+                if (civilianResult) { civilianResult.textContent = ""; civilianResult.style.display = "none"; }
+                lookupModal.classList.add("open");
+                switchLookupTab(document.querySelector('.modal-tab.active'));
+                if (plateInput) plateInput.focus();
+            });
+        }
+
+        const plateLookupBtn = document.getElementById("plateLookupBtn");
+        if (plateLookupBtn) {
+            plateLookupBtn.addEventListener("click", () => {
+                if (!lookupModal) return;
+                if (plateInput) plateInput.value = "";
+                if (plateError) { plateError.textContent = ""; plateError.style.display = "none"; }
+                if (plateResult) { plateResult.textContent = ""; plateResult.style.display = "none"; }
+                lookupModal.classList.add("open");
+                const plateTab = document.querySelector('.modal-tab[data-tab="plate"]');
+                switchLookupTab(plateTab);
+                if (plateInput) plateInput.focus();
+            });
+        }
 
         if (plateSubmitBtn) {
             plateSubmitBtn.addEventListener("click", async () => {
@@ -699,36 +911,6 @@
             });
         }
 
-        const civilianModal = document.getElementById("civilianModal");
-        const civilianModalClose = document.getElementById("civilianModalClose");
-        const civilianInput = document.getElementById("civilianInput");
-        const civilianSubmitBtn = document.getElementById("civilianSubmitBtn");
-        const civilianError = document.getElementById("civilianError");
-        const civilianResult = document.getElementById("civilianResult");
-
-        if (civilianModalClose) {
-            civilianModalClose.addEventListener("click", () => {
-                if (civilianModal) civilianModal.classList.remove("open");
-            });
-        }
-
-        if (civilianModal) {
-            civilianModal.addEventListener("click", (e) => {
-                if (e.target === civilianModal) {
-                    civilianModal.classList.remove("open");
-                }
-            });
-        }
-
-        document.getElementById("lookupCivilianBtn").addEventListener("click", async () => {
-            if (!civilianModal) return;
-            if (civilianInput) civilianInput.value = "";
-            if (civilianError) { civilianError.textContent = ""; civilianError.style.display = "none"; }
-            if (civilianResult) { civilianResult.textContent = ""; civilianResult.style.display = "none"; }
-            civilianModal.classList.add("open");
-            if (civilianInput) civilianInput.focus();
-        });
-
         if (civilianSubmitBtn) {
             civilianSubmitBtn.addEventListener("click", async () => {
                 const query = civilianInput ? civilianInput.value.trim() : "";
@@ -782,42 +964,191 @@
                         return;
                     }
 
-                    const rows = data.map((row) => {
-                        const info = [row.id, row.name, row.age, row.gender, row.address, row.notes].filter(Boolean).join(" | ");
-                        const reportBtn = `<br><button type=\"button\" class=\"lookup-submit civilian-report-btn\" data-id=\"${row.id}\" data-name=\"${(row.name || '').replace(/"/g, '&quot;')}\" style=\"margin-top:8px;\">Traffic Stop</button>`;
-                        return info + reportBtn;
-                    });
-
-                    if (civilianResult) {
-                        civilianResult.style.display = "block";
-                        civilianResult.innerHTML = rows.join("<br><br>");
-                    }
-
-                    civilianResult.querySelectorAll(".civilian-report-btn").forEach((btn) => {
-                        btn.addEventListener("click", () => {
-                            const id = btn.getAttribute("data-id");
-                            const name = btn.getAttribute("data-name");
-                            const tsCivilianId = document.getElementById("tsCivilianId");
-                            const tsCivilianName = document.getElementById("tsCivilianName");
-                            const tsReason = document.getElementById("tsReason");
-                            const tsLocation = document.getElementById("tsLocation");
-                            const tsNotes = document.getElementById("tsNotes");
-                            const tsError = document.getElementById("tsError");
-                            const tsSuccess = document.getElementById("tsSuccess");
-                            if (tsCivilianId) tsCivilianId.value = id;
-                            if (tsCivilianName) tsCivilianName.value = name;
-                            if (tsReason) tsReason.value = "";
-                            if (tsLocation) tsLocation.value = "";
-                            if (tsNotes) tsNotes.value = "";
-                            if (tsError) { tsError.textContent = ""; tsError.style.display = "none"; }
-                            if (tsSuccess) { tsSuccess.textContent = ""; tsSuccess.style.display = "none"; }
-                            if (trafficStopModal) trafficStopModal.classList.add("open");
+                    if (data.length === 1) {
+                        selectCivilian(data[0]);
+                    } else {
+                        const rows = data.map((row) => {
+                            return `<button type="button" class="lookup-submit civilian-select-btn" data-id="${row.id}" data-name="${(row.name || '').replace(/"/g, '&quot;')}">${row.name || row.id}</button>`;
                         });
-                    });
+                        if (civilianResult) {
+                            civilianResult.style.display = "block";
+                            civilianResult.innerHTML = rows.join("<br><br>");
+                        }
+                        civilianResult.querySelectorAll(".civilian-select-btn").forEach((btn) => {
+                            btn.addEventListener("click", () => {
+                                const id = btn.getAttribute("data-id");
+                                const name = btn.getAttribute("data-name");
+                                const civilian = data.find((r) => r.id === id);
+                                if (civilian) selectCivilian(civilian);
+                            });
+                        });
+                    }
                 } catch (err) {
                     if (civilianError) { civilianError.textContent = "Lookup failed."; civilianError.style.display = "block"; }
                     console.error(err);
                 }
+            });
+        }
+
+        let selectedCivilian = null;
+        const civilianDetails = document.getElementById("civilianDetails");
+        const selectedCivilianInfo = document.getElementById("selectedCivilianInfo");
+        const civilianRecordsList = document.getElementById("civilianRecordsList");
+
+        function selectCivilian(civilian) {
+            selectedCivilian = civilian;
+            if (civilianResult) civilianResult.style.display = "none";
+            if (civilianDetails) civilianDetails.style.display = "block";
+            if (selectedCivilianInfo) {
+                selectedCivilianInfo.innerHTML = `
+                    <strong>${(civilian.name || 'N/A').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</strong>
+                    <span>ID: ${civilian.id} | Age: ${civilian.age || 'N/A'} | Gender: ${civilian.gender || 'N/A'}</span><br>
+                    <span>Address: ${(civilian.address || 'N/A').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</span><br>
+                    <span>Notes: ${(civilian.notes || 'N/A').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</span>
+                `;
+            }
+            loadCivilianRecords(civilian.id);
+            switchTab(document.querySelector('.tab-btn.active'));
+        }
+
+        function switchTab(activeTabBtn) {
+            document.querySelectorAll('.tab-btn').forEach((btn) => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-panel').forEach((panel) => panel.classList.remove('active'));
+            if (activeTabBtn) activeTabBtn.classList.add('active');
+            const targetId = activeTabBtn ? activeTabBtn.getAttribute('data-target') : null;
+            const targetPanel = targetId ? document.getElementById(targetId) : null;
+            if (targetPanel) targetPanel.classList.add('active');
+        }
+
+        document.querySelectorAll('.tab-btn').forEach((btn) => {
+            btn.addEventListener('click', () => switchTab(btn));
+        });
+
+        async function loadCivilianRecords(civilianId) {
+            if (!civilianRecordsList || !localSupabase) return;
+            civilianRecordsList.innerHTML = '<div class="empty">Loading records...</div>';
+            try {
+                const [stopsRes, citationsRes, arrestsRes] = await Promise.all([
+                    localSupabase.from('traffic_stops').select('*').eq('civilian_id', civilianId).order('created_at', { ascending: false }),
+                    localSupabase.from('citations').select('*').eq('civilian_id', civilianId).order('created_at', { ascending: false }),
+                    localSupabase.from('arrests').select('*').eq('civilian_id', civilianId).order('created_at', { ascending: false })
+                ]);
+
+                const records = [];
+                (stopsRes.data || []).forEach((row) => records.push({ table: 'traffic_stops', type: 'Traffic Stop', row }));
+                (citationsRes.data || []).forEach((row) => records.push({ table: 'citations', type: 'Citation', row }));
+                (arrestsRes.data || []).forEach((row) => records.push({ table: 'arrests', type: 'Arrest', row }));
+
+                if (records.length === 0) {
+                    civilianRecordsList.innerHTML = '<div class="empty">No records found.</div>';
+                    return;
+                }
+
+                civilianRecordsList.innerHTML = records.map((record) => {
+                    const date = record.row.created_at ? new Date(record.row.created_at).toLocaleString() : '';
+                    const details = [record.row.reason, record.row.charges, record.row.location, record.row.notes].filter(Boolean).join(' | ');
+                    return `<div class="record-item">
+                        <div class="record-text">
+                            <strong>${record.type} - ${date}</strong>
+                            <span>${details || 'No details'}</span>
+                        </div>
+                        <button type="button" class="record-delete-btn" data-table="${record.table}" data-id="${record.row.id}" title="Delete record">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="3 6 5 6 21 6"></polyline>
+                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                            </svg>
+                        </button>
+                    </div>`;
+                }).join('');
+
+                civilianRecordsList.querySelectorAll('.record-delete-btn').forEach((btn) => {
+                    btn.addEventListener('click', async (e) => {
+                        const table = btn.getAttribute('data-table');
+                        const id = btn.getAttribute('data-id');
+                        if (!confirm('Delete this record?')) return;
+                        try {
+                            const { error } = await localSupabase.from(table).delete().eq('id', id);
+                            if (error) {
+                                alert('Failed to delete: ' + error.message);
+                                return;
+                            }
+                            loadCivilianRecords(civilianId);
+                        } catch (err) {
+                            alert('Failed to delete record.');
+                            console.error(err);
+                        }
+                    });
+                });
+            } catch (err) {
+                civilianRecordsList.innerHTML = '<div class="empty">Failed to load records.</div>';
+                console.error(err);
+            }
+        }
+
+        const openTrafficStopBtn = document.getElementById("openTrafficStopBtn");
+        const openCitationBtn = document.getElementById("openCitationBtn");
+        const openArrestBtn = document.getElementById("openArrestBtn");
+
+        if (openTrafficStopBtn) {
+            openTrafficStopBtn.addEventListener("click", () => {
+                if (!selectedCivilian) return;
+                const tsCivilianId = document.getElementById("tsCivilianId");
+                const tsCivilianName = document.getElementById("tsCivilianName");
+                const tsReason = document.getElementById("tsReason");
+                const tsLocation = document.getElementById("tsLocation");
+                const tsNotes = document.getElementById("tsNotes");
+                const tsError = document.getElementById("tsError");
+                const tsSuccess = document.getElementById("tsSuccess");
+                if (tsCivilianId) tsCivilianId.value = selectedCivilian.id || "";
+                if (tsCivilianName) tsCivilianName.value = selectedCivilian.name || "";
+                if (tsReason) tsReason.value = "";
+                if (tsLocation) tsLocation.value = "";
+                if (tsNotes) tsNotes.value = "";
+                if (tsError) { tsError.textContent = ""; tsError.style.display = "none"; }
+                if (tsSuccess) { tsSuccess.textContent = ""; tsSuccess.style.display = "none"; }
+                if (trafficStopModal) trafficStopModal.classList.add("open");
+            });
+        }
+
+        if (openCitationBtn) {
+            openCitationBtn.addEventListener("click", () => {
+                if (!selectedCivilian) return;
+                const citationCivilianId = document.getElementById("citationCivilianId");
+                const citationCivilianName = document.getElementById("citationCivilianName");
+                const citationReason = document.getElementById("citationReason");
+                const citationLocation = document.getElementById("citationLocation");
+                const citationNotes = document.getElementById("citationNotes");
+                const citationError = document.getElementById("citationError");
+                const citationSuccess = document.getElementById("citationSuccess");
+                if (citationCivilianId) citationCivilianId.value = selectedCivilian.id || "";
+                if (citationCivilianName) citationCivilianName.value = selectedCivilian.name || "";
+                if (citationReason) citationReason.value = "";
+                if (citationLocation) citationLocation.value = "";
+                if (citationNotes) citationNotes.value = "";
+                if (citationError) { citationError.textContent = ""; citationError.style.display = "none"; }
+                if (citationSuccess) { citationSuccess.textContent = ""; citationSuccess.style.display = "none"; }
+                if (citationModal) citationModal.classList.add("open");
+            });
+        }
+
+        if (openArrestBtn) {
+            openArrestBtn.addEventListener("click", () => {
+                if (!selectedCivilian) return;
+                const arrestCivilianId = document.getElementById("arrestCivilianId");
+                const arrestCivilianName = document.getElementById("arrestCivilianName");
+                const arrestCharges = document.getElementById("arrestCharges");
+                const arrestLocation = document.getElementById("arrestLocation");
+                const arrestNotes = document.getElementById("arrestNotes");
+                const arrestError = document.getElementById("arrestError");
+                const arrestSuccess = document.getElementById("arrestSuccess");
+                if (arrestCivilianId) arrestCivilianId.value = selectedCivilian.id || "";
+                if (arrestCivilianName) arrestCivilianName.value = selectedCivilian.name || "";
+                if (arrestCharges) arrestCharges.value = "";
+                if (arrestLocation) arrestLocation.value = "";
+                if (arrestNotes) arrestNotes.value = "";
+                if (arrestError) { arrestError.textContent = ""; arrestError.style.display = "none"; }
+                if (arrestSuccess) { arrestSuccess.textContent = ""; arrestSuccess.style.display = "none"; }
+                if (arrestModal) arrestModal.classList.add("open");
             });
         }
         const trafficStopModal = document.getElementById("trafficStopModal");
@@ -883,12 +1214,338 @@
                         tsSuccess.textContent = "Traffic stop report submitted.";
                         tsSuccess.style.display = "block";
                     }
+                    if (selectedCivilian && selectedCivilian.id) loadCivilianRecords(selectedCivilian.id);
                 } catch (err) {
                     if (tsError) { tsError.textContent = "Failed to submit report."; tsError.style.display = "block"; }
                     console.error(err);
                 }
             });
         }
+
+        const citationModal = document.getElementById("citationModal");
+        const citationModalClose = document.getElementById("citationModalClose");
+        const citationSubmitBtn = document.getElementById("citationSubmitBtn");
+
+        if (citationModalClose) {
+            citationModalClose.addEventListener("click", () => {
+                if (citationModal) citationModal.classList.remove("open");
+            });
+        }
+
+        if (citationModal) {
+            citationModal.addEventListener("click", (e) => {
+                if (e.target === citationModal) {
+                    citationModal.classList.remove("open");
+                }
+            });
+        }
+
+        if (citationSubmitBtn) {
+            citationSubmitBtn.addEventListener("click", async () => {
+                const civilianId = document.getElementById("citationCivilianId")?.value.trim() || "";
+                const civilianName = document.getElementById("citationCivilianName")?.value.trim() || "";
+                const reason = document.getElementById("citationReason")?.value.trim() || "";
+                const location = document.getElementById("citationLocation")?.value.trim() || "";
+                const notes = document.getElementById("citationNotes")?.value.trim() || "";
+                const citationError = document.getElementById("citationError");
+                const citationSuccess = document.getElementById("citationSuccess");
+
+                if (!reason || !location) {
+                    if (citationError) { citationError.textContent = "Violation and location are required."; citationError.style.display = "block"; }
+                    return;
+                }
+
+                if (!localSupabase) {
+                    if (citationError) { citationError.textContent = "Database unavailable."; citationError.style.display = "block"; }
+                    return;
+                }
+
+                if (citationError) { citationError.textContent = ""; citationError.style.display = "none"; }
+                if (citationSuccess) { citationSuccess.textContent = ""; citationSuccess.style.display = "none"; }
+
+                try {
+                    const { error } = await localSupabase
+                        .from("citations")
+                        .insert([{
+                            civilian_id: civilianId || null,
+                            civilian_name: civilianName || null,
+                            officer_id: officerId,
+                            officer_name: officerName,
+                            reason,
+                            location,
+                            notes: notes || null,
+                            created_at: new Date().toISOString()
+                        }]);
+
+                    if (error) {
+                        if (citationError) { citationError.textContent = error.message || "Failed to issue citation."; citationError.style.display = "block"; }
+                        console.error("Insert failed:", error);
+                        return;
+                    }
+
+                    if (citationSuccess) {
+                        citationSuccess.textContent = "Citation issued.";
+                        citationSuccess.style.display = "block";
+                    }
+                    if (selectedCivilian && selectedCivilian.id) loadCivilianRecords(selectedCivilian.id);
+                } catch (err) {
+                    if (citationError) { citationError.textContent = "Failed to issue citation."; citationError.style.display = "block"; }
+                    console.error(err);
+                }
+            });
+        }
+
+        const arrestModal = document.getElementById("arrestModal");
+        const arrestModalClose = document.getElementById("arrestModalClose");
+        const arrestSubmitBtn = document.getElementById("arrestSubmitBtn");
+
+        if (arrestModalClose) {
+            arrestModalClose.addEventListener("click", () => {
+                if (arrestModal) arrestModal.classList.remove("open");
+            });
+        }
+
+        if (arrestModal) {
+            arrestModal.addEventListener("click", (e) => {
+                if (e.target === arrestModal) {
+                    arrestModal.classList.remove("open");
+                }
+            });
+        }
+
+        if (arrestSubmitBtn) {
+            arrestSubmitBtn.addEventListener("click", async () => {
+                const civilianId = document.getElementById("arrestCivilianId")?.value.trim() || "";
+                const civilianName = document.getElementById("arrestCivilianName")?.value.trim() || "";
+                const charges = document.getElementById("arrestCharges")?.value.trim() || "";
+                const location = document.getElementById("arrestLocation")?.value.trim() || "";
+                const notes = document.getElementById("arrestNotes")?.value.trim() || "";
+                const arrestError = document.getElementById("arrestError");
+                const arrestSuccess = document.getElementById("arrestSuccess");
+
+                if (!charges || !location) {
+                    if (arrestError) { arrestError.textContent = "Charges and location are required."; arrestError.style.display = "block"; }
+                    return;
+                }
+
+                if (!localSupabase) {
+                    if (arrestError) { arrestError.textContent = "Database unavailable."; arrestError.style.display = "block"; }
+                    return;
+                }
+
+                if (arrestError) { arrestError.textContent = ""; arrestError.style.display = "none"; }
+                if (arrestSuccess) { arrestSuccess.textContent = ""; arrestSuccess.style.display = "none"; }
+
+                try {
+                    const { error } = await localSupabase
+                        .from("arrests")
+                        .insert([{
+                            civilian_id: civilianId || null,
+                            civilian_name: civilianName || null,
+                            officer_id: officerId,
+                            officer_name: officerName,
+                            charges,
+                            location,
+                            notes: notes || null,
+                            created_at: new Date().toISOString()
+                        }]);
+
+                    if (error) {
+                        if (arrestError) { arrestError.textContent = error.message || "Failed to record arrest."; arrestError.style.display = "block"; }
+                        console.error("Insert failed:", error);
+                        return;
+                    }
+
+                    if (arrestSuccess) {
+                        arrestSuccess.textContent = "Arrest recorded.";
+                        arrestSuccess.style.display = "block";
+                    }
+                    if (selectedCivilian && selectedCivilian.id) loadCivilianRecords(selectedCivilian.id);
+                } catch (err) {
+                    if (arrestError) { arrestError.textContent = "Failed to record arrest."; arrestError.style.display = "block"; }
+                    console.error(err);
+                }
+            });
+        }
+
+        function getText(id) {
+            const el = document.getElementById(id);
+            return el ? el.value.trim() : "";
+        }
+
+        async function generateTrafficStopPdf() {
+            try {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+                doc.setFontSize(20);
+                doc.setFont(undefined, "bold");
+                doc.text("Traffic Stop Report", 14, 16);
+                doc.setFont(undefined, "normal");
+                doc.setFontSize(11);
+                doc.text("PulseCAD Police Records", 14, 22);
+                doc.setLineWidth(0.3);
+                doc.line(14, 24, 196, 24);
+
+                const fields = [
+                    ["Officer", (officerRank ? officerRank + " " : "") + officerName],
+                    ["Date", new Date().toLocaleString()],
+                    ["Civilian ID", getText("tsCivilianId")],
+                    ["Civilian Name", getText("tsCivilianName")],
+                    ["Reason for Stop", getText("tsReason")],
+                    ["Location", getText("tsLocation")],
+                    ["Notes", getText("tsNotes")]
+                ];
+
+                let y = 30;
+                const lineHeight = 7;
+                const labelX = 14;
+                const fieldX = 60;
+
+                fields.forEach(([label, value], index) => {
+                    if (y > 280) {
+                        doc.addPage();
+                        y = 20;
+                    }
+                    doc.setFont(undefined, "bold");
+                    doc.text(label + ":", labelX, y);
+                    doc.setFont(undefined, "normal");
+                    const lines = doc.splitTextToSize(value || "", 120);
+                    doc.text(lines, fieldX, y);
+                    y += Math.max(lineHeight, lines.length * lineHeight);
+                    if (index < fields.length - 1) {
+                        doc.setDrawColor(220, 220, 220);
+                        doc.line(labelX, y + 1, 196, y + 1);
+                        y += 4;
+                    }
+                });
+
+                doc.save("traffic-stop-" + Date.now() + ".pdf");
+            } catch (err) {
+                alert("Failed to generate PDF.");
+                console.error(err);
+            }
+        }
+
+        async function generateCitationPdf() {
+            try {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+                doc.setFontSize(20);
+                doc.setFont(undefined, "bold");
+                doc.text("Citation", 14, 16);
+                doc.setFont(undefined, "normal");
+                doc.setFontSize(11);
+                doc.text("PulseCAD Police Records", 14, 22);
+                doc.setLineWidth(0.3);
+                doc.line(14, 24, 196, 24);
+
+                const fields = [
+                    ["Officer", (officerRank ? officerRank + " " : "") + officerName],
+                    ["Date", new Date().toLocaleString()],
+                    ["Civilian ID", getText("citationCivilianId")],
+                    ["Civilian Name", getText("citationCivilianName")],
+                    ["Violation", getText("citationReason")],
+                    ["Location", getText("citationLocation")],
+                    ["Notes", getText("citationNotes")]
+                ];
+
+                let y = 30;
+                const lineHeight = 7;
+                const labelX = 14;
+                const fieldX = 60;
+
+                fields.forEach(([label, value], index) => {
+                    if (y > 280) {
+                        doc.addPage();
+                        y = 20;
+                    }
+                    doc.setFont(undefined, "bold");
+                    doc.text(label + ":", labelX, y);
+                    doc.setFont(undefined, "normal");
+                    const lines = doc.splitTextToSize(value || "", 120);
+                    doc.text(lines, fieldX, y);
+                    y += Math.max(lineHeight, lines.length * lineHeight);
+                    if (index < fields.length - 1) {
+                        doc.setDrawColor(220, 220, 220);
+                        doc.line(labelX, y + 1, 196, y + 1);
+                        y += 4;
+                    }
+                });
+
+                doc.save("citation-" + Date.now() + ".pdf");
+            } catch (err) {
+                alert("Failed to generate PDF.");
+                console.error(err);
+            }
+        }
+
+        async function generateArrestPdf() {
+            try {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+                doc.setFontSize(20);
+                doc.setFont(undefined, "bold");
+                doc.text("Arrest Report", 14, 16);
+                doc.setFont(undefined, "normal");
+                doc.setFontSize(11);
+                doc.text("PulseCAD Police Records", 14, 22);
+                doc.setLineWidth(0.3);
+                doc.line(14, 24, 196, 24);
+
+                const fields = [
+                    ["Officer", (officerRank ? officerRank + " " : "") + officerName],
+                    ["Date", new Date().toLocaleString()],
+                    ["Civilian ID", getText("arrestCivilianId")],
+                    ["Civilian Name", getText("arrestCivilianName")],
+                    ["Charges", getText("arrestCharges")],
+                    ["Location", getText("arrestLocation")],
+                    ["Notes", getText("arrestNotes")]
+                ];
+
+                let y = 30;
+                const lineHeight = 7;
+                const labelX = 14;
+                const fieldX = 60;
+
+                fields.forEach(([label, value], index) => {
+                    if (y > 280) {
+                        doc.addPage();
+                        y = 20;
+                    }
+                    doc.setFont(undefined, "bold");
+                    doc.text(label + ":", labelX, y);
+                    doc.setFont(undefined, "normal");
+                    const lines = doc.splitTextToSize(value || "", 120);
+                    doc.text(lines, fieldX, y);
+                    y += Math.max(lineHeight, lines.length * lineHeight);
+                    if (index < fields.length - 1) {
+                        doc.setDrawColor(220, 220, 240);
+                        doc.line(labelX, y + 1, 196, y + 1);
+                        y += 4;
+                    }
+                });
+
+                doc.save("arrest-" + Date.now() + ".pdf");
+            } catch (err) {
+                alert("Failed to generate PDF.");
+                console.error(err);
+            }
+        }
+
+        const tsDownloadPdfBtn = document.getElementById("tsDownloadPdfBtn");
+        if (tsDownloadPdfBtn) {
+            tsDownloadPdfBtn.addEventListener("click", generateTrafficStopPdf);
+        }
+
+        const citationDownloadPdfBtn = document.getElementById("citationDownloadPdfBtn");
+        if (citationDownloadPdfBtn) {
+            citationDownloadPdfBtn.addEventListener("click", generateCitationPdf);
+        }
+
+        const arrestDownloadPdfBtn = document.getElementById("arrestDownloadPdfBtn");
+        if (arrestDownloadPdfBtn) {
+            arrestDownloadPdfBtn.addEventListener("click", generateArrestPdf);
+        }
     </script>
 </body>
-</html>
+</html>s

@@ -144,7 +144,10 @@
 
         .user-dropdown {
             position: relative;
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: nowrap;
         }
 
         .user-email {
@@ -162,6 +165,23 @@
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
+            flex: 0 1 auto;
+            min-width: 0;
+        }
+
+        .premium-count {
+            display: inline-flex;
+            align-items: center;
+            font-size: 13px;
+            font-weight: 700;
+            color: #854d0e;
+            background: #fef9c3;
+            border: 1px solid #fde68a;
+            padding: 6px 12px;
+            border-radius: 999px;
+            user-select: none;
+            flex: 0 0 auto;
+            line-height: 1;
         }
 
         .dropdown-menu {
@@ -522,6 +542,23 @@
             white-space: nowrap;
         }
 
+        .community-list-dashboard {
+            padding: 6px 12px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 700;
+            color: #ffffff;
+            background: #0f172a;
+            border: 1px solid #0f172a;
+            cursor: pointer;
+            white-space: nowrap;
+            text-decoration: none;
+        }
+
+        .community-list-dashboard:hover {
+            background: #1e293b;
+        }
+
         .community-list-verified {
             padding: 6px 12px;
             border-radius: 999px;
@@ -693,6 +730,12 @@
             border: 1px solid #e9d5ff;
         }
 
+        .badge-gold {
+            background: #fef9c3;
+            color: #854d0e;
+            border: 1px solid #fde68a;
+        }
+
         .lockdown {
             display: none;
             position: fixed;
@@ -762,7 +805,6 @@
 <body>
     <div class="topbar" id="topbar">
         <span class="pill">
-            <img src="https://cdn.discordapp.com/icons/1498000979101093999/c96c547fbd94e68254d8335dadb2e437.webp?size=1024" alt="PulseCAD">
             <a href="/changelogs" class="changelogs-btn">Changelogs</a>
             <button type="button" class="app-btn" id="appBtn">App</button>
             <button type="button" class="login-btn" id="topbarLoginBtn">Login</button>
@@ -771,9 +813,10 @@
     <div class="topbar-right">
         <div class="user-dropdown" id="userDropdown" style="display:none;">
             <div class="user-email" id="userEmailDisplay"></div>
+            <div class="premium-count" id="premiumCountDisplay" style="display:none;"><span id="premiumCountText"></span></div>
             <div class="dropdown-menu" id="dropdownMenu">
                 <button type="button" class="dropdown-item" id="dropdownSettingsBtn">Settings</button>
-                <button type="button" class="dropdown-item" id="dropdownJoinCommunityBtn">Join Community</button>
+                <button type="button" class="dropdown-item" id="dropdownJoinCommunityBtn">Redeem</button>
                 <button type="button" class="dropdown-item danger" id="dropdownLogoutBtn">Logout</button>
             </div>
         </div>
@@ -862,6 +905,7 @@
                 <div class="settings-value">
                     <span class="badge badge-blue">PulseCAD Supporter</span>
                     <span class="badge badge-purple">PulseCAD Management</span>
+                    <span class="badge badge-gold" id="settingsPremiumBadge" style="display:none;">Premium</span>
                 </div>
             </div>
         </div>
@@ -903,6 +947,67 @@
             } catch (err) {
                 console.error("Failed to get department:", err);
                 return "";
+            }
+        }
+
+        async function checkPremiumStatus() {
+            if (!localSupabase) return false;
+            try {
+                const { data: { user } } = await localSupabase.auth.getUser();
+                if (!user) return false;
+                const { data } = await localSupabase
+                    .from("users")
+                    .select("premium")
+                    .eq("email", user.email)
+                    .maybeSingle();
+                return !!(data && data.premium === true);
+            } catch (err) {
+                console.error("Failed to check premium status:", err);
+                return false;
+            }
+        }
+
+        async function getUserRedeemedCount() {
+            if (!localSupabase) return 0;
+            try {
+                const { data: { user } } = await localSupabase.auth.getUser();
+                if (!user) return 0;
+                const { count, error } = await localSupabase
+                    .from("premium_keys")
+                    .select("*", { count: "exact", head: true })
+                    .eq("used_by", user.email)
+                    .eq("used", true)
+                    .eq("used_for_community", false);
+                if (error) return 0;
+                return count || 0;
+            } catch (err) {
+                console.error("Failed to get redeemed count:", err);
+                return 0;
+            }
+        }
+
+        async function updatePremiumUI() {
+            const count = await getUserRedeemedCount();
+            const premiumBadge = document.getElementById("settingsPremiumBadge");
+            if (premiumBadge) {
+                premiumBadge.style.display = count > 0 ? "inline-block" : "none";
+                premiumBadge.textContent = count > 0 ? `Premium (${count})` : "Premium";
+            }
+            const createBtn = document.getElementById("createCommunityCenteredBtn");
+            if (createBtn) {
+                createBtn.disabled = count === 0;
+                createBtn.style.opacity = count === 0 ? "0.5" : "1";
+                createBtn.style.cursor = count === 0 ? "not-allowed" : "pointer";
+            }
+            const premiumCountDisplay = document.getElementById("premiumCountDisplay");
+            const premiumCountText = document.getElementById("premiumCountText");
+            if (premiumCountDisplay && premiumCountText) {
+                if (count > 0) {
+                    premiumCountDisplay.style.display = "inline-flex";
+                    premiumCountText.textContent = `${count} Redeemed`;
+                } else {
+                    premiumCountDisplay.style.display = "none";
+                }
             }
         }
 
@@ -1011,7 +1116,7 @@
                     if (userEmailDisplay && email) {
                         userEmailDisplay.textContent = email;
                     }
-                    if (userDropdown) userDropdown.style.display = "inline-block";
+                     if (userDropdown) userDropdown.style.display = "inline-flex";
                     if (loginAccount) { loginAccount.style.display = "block"; loginAccount.textContent = "Session active. You can close this tab safely."; }
                     loginForm.reset();
 
@@ -1021,6 +1126,7 @@
                     if (loggedInScreen) loggedInScreen.classList.add("open");
                     if (container) container.style.display = "none";
                     if (authModal) authModal.classList.remove("open");
+                    updatePremiumUI();
                 } catch (err) {
                     if (loginError) { loginError.textContent = "An unexpected error occurred."; loginError.style.display = "block"; }
                     console.error(err);
@@ -1092,7 +1198,7 @@
                      if (userEmailDisplay && email) {
                          userEmailDisplay.textContent = email;
                      }
-                     if (userDropdown) userDropdown.style.display = "inline-block";
+                     if (userDropdown) userDropdown.style.display = "inline-flex";
                      if (signupAccount) { signupAccount.style.display = "block"; signupAccount.textContent = "Session active. You can close this tab safely."; }
                      signupForm.reset();
                      enableCreateAccount();
@@ -1100,10 +1206,11 @@
                         const loggedInScreen = document.getElementById("loggedInScreen");
                         const container = document.querySelector(".container");
                         const authModal = document.getElementById("authModal");
-                        if (loggedInScreen) loggedInScreen.classList.add("open");
-                        if (container) container.style.display = "none";
-                        if (authModal) authModal.classList.remove("open");
-                        return;
+                         if (loggedInScreen) loggedInScreen.classList.add("open");
+                         if (container) container.style.display = "none";
+                         if (authModal) authModal.classList.remove("open");
+                         updatePremiumUI();
+                         return;
                     }
 
                     if (signupSuccess) { signupSuccess.textContent = "Check your email to confirm your account, then log in."; signupSuccess.style.display = "block"; }
@@ -1245,11 +1352,44 @@
         const dropdownJoinCommunityBtn = document.getElementById("dropdownJoinCommunityBtn");
 
         if (dropdownJoinCommunityBtn) {
-            dropdownJoinCommunityBtn.addEventListener("click", () => {
+            dropdownJoinCommunityBtn.addEventListener("click", async () => {
                 if (dropdownMenu) dropdownMenu.classList.remove("open");
-                const code = prompt("Enter community join code or name:");
-                if (code && code.trim()) {
-                    addCommunityCard(code.trim(), "Joined community", false, null, null, false);
+                if (!localSupabase) {
+                    alert("Service unavailable.");
+                    return;
+                }
+                const { data: { user } } = await localSupabase.auth.getUser();
+                if (!user) {
+                    alert("You must be logged in to redeem a key.");
+                    return;
+                }
+                const code = prompt("Enter premium key:");
+                if (!code || !code.trim()) return;
+                const key = code.trim();
+                try {
+                    const { data, error } = await localSupabase
+                        .from("premium_keys")
+                        .select("*")
+                        .eq("key", key)
+                        .eq("used", false)
+                        .maybeSingle();
+                    if (error || !data) {
+                        alert("Invalid or already used key.");
+                        return;
+                    }
+                    const { error: updateError } = await localSupabase
+                        .from("premium_keys")
+                        .update({ used: true, used_by: user.email, used_at: new Date().toISOString() })
+                        .eq("id", data.id);
+                    if (updateError) {
+                        alert("Failed to redeem: " + updateError.message);
+                        return;
+                    }
+                    alert("Key redeemed successfully!");
+                    updatePremiumUI();
+                } catch (err) {
+                    alert("An unexpected error occurred.");
+                    console.error(err);
                 }
             });
         }
@@ -1293,14 +1433,15 @@
             localSupabase.auth.onAuthStateChange(() => {
                 loadCommunities();
                 refreshLockdown();
+                updatePremiumUI();
             });
         }
 
         refreshLockdown();
 
         function saveCommunity(name, meta, joined) {
-            if (!localSupabase) return;
-            localSupabase.auth.getUser().then(({ data }) => {
+            if (!localSupabase) return Promise.resolve(null);
+            return localSupabase.auth.getUser().then(({ data }) => {
                 const payload = {
                     user_id: data?.user?.id,
                     creator_email: data?.user?.email || "",
@@ -1309,21 +1450,26 @@
                     joined: !!joined,
                     verification_requested: false,
                 };
-                localSupabase
+                return localSupabase
                     .from("communities")
                     .insert([payload])
                     .then(({ data: insertData, error }) => {
                         if (error) {
                             alert("Failed to save community: " + error.message);
-                            return;
+                            return null;
                         }
                         if (Array.isArray(insertData) && insertData[0]) {
                                 addCommunityCard(name, insertData[0].description || "Community", !!joined, insertData[0].id, insertData[0].creator_email, !!insertData[0].verification_requested);
                         }
+                        return insertData ? insertData[0] : null;
                     })
-                    .catch((err) => alert("Failed to save community: " + (err.message || err)));
+                    .catch((err) => {
+                        alert("Failed to save community: " + (err.message || err));
+                        return null;
+                    });
             }).catch(() => {
                 alert("You must be logged in to save a community.");
+                return Promise.resolve(null);
             });
         }
 
@@ -1361,12 +1507,14 @@
             if (isSuspended) badges.push('<span class="community-list-suspended">Suspended</span>');
             if (isJoined) badges.push('<span class="community-list-joined">Joined</span>');
             const badgesHtml = badges.length ? `<div class="community-list-badges">${badges.join("")}</div>` : "";
-            card.innerHTML = `<div class="community-list-info"${communityId}><div class="community-list-name">${escapedName}</div>${creatorText}${isSuspended ? '<div class="community-list-meta" style="color:#dc2626;font-weight:700;">This community has been suspended.</div>' : ''}<div class="community-list-meta">${isJoined ? "" : ""}</div></div>${badgesHtml}${(!isJoined && !isCreator && !isSuspended) ? '<button type="button" class="community-list-join">Join</button>' : ""}`;
+            const dashboardBtn = isCreator ? `<button type="button" class="community-list-dashboard" data-id="${id || ''}">Dashboard</button>` : "";
+            card.innerHTML = `<div class="community-list-info"${communityId}><div class="community-list-name">${escapedName}</div>${creatorText}${isSuspended ? '<div class="community-list-meta" style="color:#dc2626;font-weight:700;">This community has been suspended.</div>' : ''}<div class="community-list-meta">${isJoined ? "" : ""}</div></div>${badgesHtml}${dashboardBtn}${(!isJoined && !isCreator && !isSuspended) ? '<button type="button" class="community-list-join">Join</button>' : ""}`;
             loggedInCommunities.appendChild(card);
 
             card.style.cursor = isSuspended ? "default" : "pointer";
             card.addEventListener("click", (e) => {
                 if (e.target.closest(".community-list-join")) return;
+                if (e.target.closest(".community-list-dashboard")) return;
                 if (isSuspended) return;
                 const rowId = card.querySelector(".community-list-info")?.getAttribute("data-id");
                 if (rowId) {
@@ -1387,16 +1535,68 @@
                     });
                 }
             }
+
+            if (isCreator) {
+                const dashboardBtnEl = card.querySelector(".community-list-dashboard");
+                if (dashboardBtnEl) {
+                    dashboardBtnEl.addEventListener("click", (e) => {
+                        e.stopPropagation();
+                        const rowId = dashboardBtnEl.getAttribute("data-id");
+                        if (rowId) {
+                            window.open("community.html?id=" + encodeURIComponent(rowId) + "&dashboard=1", "_blank");
+                        }
+                    });
+                }
+            }
+        }
+
+        async function consumeRedeemedKey() {
+            if (!localSupabase) return false;
+            try {
+                const { data: { user } } = await localSupabase.auth.getUser();
+                if (!user) return false;
+                const { data, error } = await localSupabase
+                    .from("premium_keys")
+                    .select("id")
+                    .eq("used_by", user.email)
+                    .eq("used", true)
+                    .eq("used_for_community", false)
+                    .limit(1)
+                    .maybeSingle();
+                if (error || !data) return false;
+                const { error: updateError } = await localSupabase
+                    .from("premium_keys")
+                    .update({ used_for_community: true })
+                    .eq("id", data.id);
+                return !updateError;
+            } catch (err) {
+                console.error("Failed to consume redeemed key:", err);
+                return false;
+            }
         }
 
         loadCommunities();
 
         if (createCommunityCenteredBtn) {
-            createCommunityCenteredBtn.addEventListener("click", () => {
+            createCommunityCenteredBtn.addEventListener("click", async () => {
                 const name = prompt("Enter community name:");
-                if (name && name.trim()) {
-                    saveCommunity(name.trim(), "", false);
+                if (!name || !name.trim()) return;
+                if (!localSupabase) {
+                    alert("Service unavailable.");
+                    return;
                 }
+                const count = await getUserRedeemedCount();
+                if (count <= 0) {
+                    alert("You need to redeem a premium key before creating a community.");
+                    return;
+                }
+                const consumed = await consumeRedeemedKey();
+                if (!consumed) {
+                    alert("Failed to apply credit. Please try again.");
+                    return;
+                }
+                await saveCommunity(name.trim(), "", false);
+                updatePremiumUI();
             });
         }
 

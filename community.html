@@ -214,6 +214,27 @@
             transform: translateY(1px);
         }
 
+        .submit-btn {
+            width: 100%;
+            padding: 12px 14px;
+            border-radius: 12px;
+            border: none;
+            background: #2563eb;
+            color: #ffffff;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform .05s ease, background .15s ease;
+        }
+
+        .submit-btn:hover {
+            background: #1d4ed8;
+        }
+
+        .submit-btn:active {
+            transform: translateY(1px);
+        }
+
         .modal-error {
             margin-top: 10px;
             padding: 10px 12px;
@@ -223,6 +244,175 @@
             border: 1px solid #fecaca;
             font-size: 14px;
             display: none;
+        }
+
+        .dashboard {
+            position: relative;
+            width: 100%;
+            min-height: 100vh;
+        }
+
+        .dashboard-general-tab {
+            position: fixed;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #0f172a;
+            color: #ffffff;
+            padding: 10px 16px;
+            border-radius: 0 10px 10px 0;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            z-index: 600;
+            border: 1px solid #e2e8f0;
+            border-left: none;
+        }
+
+        .dashboard-general-tab:hover {
+            background: #1e293b;
+        }
+
+        .dashboard-panel {
+            position: fixed;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 320px;
+            max-height: 80vh;
+            overflow-y: auto;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 0 12px 12px 0;
+            box-shadow: 10px 0 30px rgba(0,0,0,0.08);
+            padding: 20px;
+            z-index: 601;
+            display: none;
+        }
+
+        .dashboard-panel.open {
+            display: block;
+        }
+
+        .dashboard-panel-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 16px;
+        }
+
+        .approval-options {
+            display: flex;
+            gap: 8px;
+        }
+
+        .approval-btn {
+            flex: 1;
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 1px solid #cbd5e1;
+            background: #ffffff;
+            color: #0f172a;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .approval-btn.active {
+            background: #0f172a;
+            color: #ffffff;
+            border-color: #0f172a;
+        }
+
+        .dashboard-dropdown {
+            margin-top: 12px;
+            border-top: 1px solid #f1f5f9;
+            padding-top: 12px;
+        }
+
+        .dropdown-toggle {
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: 8px;
+            border: 1px solid #cbd5e1;
+            background: #f8fafc;
+            color: #0f172a;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            text-align: left;
+        }
+
+        .dropdown-toggle:hover {
+            background: #f1f5f9;
+        }
+
+        .dropdown-menu {
+            margin-top: 6px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            background: #ffffff;
+            padding: 8px;
+            display: none;
+        }
+
+        .dropdown-menu.open {
+            display: block;
+        }
+
+        .dropdown-item {
+            padding: 8px 10px;
+            border-radius: 6px;
+            font-size: 13px;
+            color: #334155;
+            cursor: pointer;
+        }
+
+        .dropdown-item:hover {
+            background: #f1f5f9;
+        }
+
+        .member-item {
+            padding: 8px 10px;
+            border-radius: 6px;
+            font-size: 13px;
+            color: #334155;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .request-item {
+            padding: 8px 10px;
+            border-radius: 6px;
+            font-size: 13px;
+            color: #334155;
+            border-bottom: 1px solid #f1f5f9;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .request-item button {
+            padding: 4px 8px;
+            border-radius: 6px;
+            border: 1px solid #cbd5e1;
+            background: #ffffff;
+            color: #0f172a;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .request-item button.approve {
+            background: #f0fdf4;
+            border-color: #bbf7d0;
+            color: #166534;
+        }
+
+        .request-item button.deny {
+            background: #fef2f2;
+            border-color: #fecaca;
+            color: #991b1b;
         }
     </style>
 </head>
@@ -252,6 +442,21 @@
         </div>
     </div>
 
+    <div class="modal-overlay" id="departmentPasscodeModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title" id="deptPasscodeTitle">Department Passcode</div>
+                <button class="modal-close" id="deptPasscodeModalClose" type="button" aria-label="Close">×</button>
+            </div>
+            <div class="field">
+                <label for="deptPasscodeInput">Enter passcode</label>
+                <input type="text" id="deptPasscodeInput" placeholder="Passcode" />
+            </div>
+            <button type="button" class="submit-btn" id="deptPasscodeSubmitBtn">Enter</button>
+            <div class="modal-error" id="deptPasscodeError"></div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         const SUPABASE_URL = "https://zwdogalwbczdtvxvhrfd.supabase.co";
@@ -263,61 +468,485 @@
         document.getElementById("backBtn").addEventListener("click", () => window.close());
 
         async function loadCommunity() {
-            const params = new URLSearchParams(window.location.search);
-            const id = params.get("id");
-            if (!id) {
-                contentEl.innerHTML = `<div class="empty">No community specified.</div>`;
-                return;
-            }
+            try {
+                const params = new URLSearchParams(window.location.search);
+                const id = params.get("id");
+                const dashboard = params.get("dashboard");
+                if (!id) {
+                    contentEl.innerHTML = `<div class="empty">No community specified.</div>`;
+                    return;
+                }
 
-            const { data, error } = await localSupabase
-                .from("communities")
-                .select("*")
-                .eq("id", id)
-                .maybeSingle();
+                const { data, error } = await localSupabase
+                    .from("communities")
+                    .select("*")
+                    .eq("id", id)
+                    .maybeSingle();
 
-            if (error) {
-                contentEl.innerHTML = `<div class="empty">Failed to load community: ${error.message}</div>`;
-                return;
-            }
-            if (!data) {
-                contentEl.innerHTML = `<div class="empty">Community not found.</div>`;
-                return;
-            }
+                if (error) {
+                    contentEl.innerHTML = `<div class="empty">Failed to load community: ${error.message}</div>`;
+                    return;
+                }
+                if (!data) {
+                    contentEl.innerHTML = `<div class="empty">Community not found.</div>`;
+                    return;
+                }
 
-            const name = (data.name || "N/A").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-            const description = (data.description || "No description.").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-            const creator = (data.creator_email || "Unknown").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-            const created = data.created_at ? new Date(data.created_at).toLocaleString() : "";
-            const suspended = !!data.suspended;
-            const joined = !!data.joined;
-            const verified = !!data.verification_requested;
+                const name = (data.name || "N/A").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+                const description = (data.description || "No description.").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+                const creator = (data.creator_email || "Unknown").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+                const created = data.created_at ? new Date(data.created_at).toLocaleString() : "";
+                const suspended = !!data.suspended;
+                const joined = !!data.joined;
+                const verified = !!data.verification_requested;
 
-            const badges = [];
-            if (verified) badges.push('<span class="badge badge-verified">Verified</span>');
-            if (suspended) badges.push('<span class="badge badge-suspended">Suspended</span>');
-            if (joined) badges.push('<span class="badge badge-joined">Joined</span>');
+                const badges = [];
+                if (verified) badges.push('<span class="badge badge-verified">Verified</span>');
+                if (suspended) badges.push('<span class="badge badge-suspended">Suspended</span>');
+                if (joined) badges.push('<span class="badge badge-joined">Joined</span>');
 
-            contentEl.innerHTML = `
-                <div class="community-screen">
-                    <button type="button" class="role-btn" data-role="Police">Police</button>
-                    <button type="button" class="role-btn" data-role="Civilian">Civilian</button>
-                    <button type="button" class="role-btn" data-role="Admin">Admin</button>
-                </div>
-            `;
+                const communityPasscode = data?.passcode || "";
 
-            contentEl.querySelectorAll(".role-btn").forEach((btn) => {
-                btn.addEventListener("click", () => {
-                    const role = btn.getAttribute("data-role");
-                    if (role === "Police") {
-                        openPoliceModal();
-                    } else if (role === "Civilian") {
-                        window.open("civilian.html", "_blank");
-                    } else {
-                        alert("Selected role: " + role);
+                if (dashboard === "1") {
+                    try {
+                        let currentEmail = "";
+                        try {
+                            const userData = await localSupabase.auth.getUser();
+                            currentEmail = userData?.data?.user?.email || "";
+                        } catch (authErr) {
+                            console.error("Auth check failed:", authErr);
+                        }
+                        const { data: communityData } = await localSupabase
+                            .from("communities")
+                            .select("*")
+                            .eq("id", id)
+                            .maybeSingle();
+                        if (!communityData || communityData.creator_email !== currentEmail) {
+                            contentEl.innerHTML = `<div class="empty">Access denied. Community creator only.</div>`;
+                            return;
+                        }
+                        const serverName = (communityData.name || "").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+                        const approvalMode = communityData.join_approval === "manual" ? "manual" : "automatic";
+
+                        contentEl.innerHTML = `
+                            <div class="dashboard">
+                                <div class="dashboard-general-tab" id="generalTabBtn">General</div>
+                                <div class="dashboard-panel" id="generalPanel">
+                                    <div class="dashboard-panel-title">General</div>
+                                    <div class="field">
+                                        <label>Server Name</label>
+                                        <input type="text" id="serverNameInput" value="${serverName}" />
+                                    </div>
+                                    <div class="field">
+                                        <label>Join Approval</label>
+                                        <div class="approval-options">
+                                            <button type="button" class="approval-btn ${approvalMode === 'automatic' ? 'active' : ''}" data-value="automatic">Automatic</button>
+                                            <button type="button" class="approval-btn ${approvalMode === 'manual' ? 'active' : ''}" data-value="manual">Manual Approval</button>
+                                        </div>
+                                    </div>
+                                    <div class="field">
+                                        <label>Community Passcode</label>
+                                        <input type="text" id="communityPasscodeInput" placeholder="Leave blank for no passcode" value="${(communityData.passcode || '').replace(/</g, '&lt;').replace(/>/g, '&gt;')}" />
+                                    </div>
+                                    <div class="dashboard-dropdown">
+                                        <button type="button" class="dropdown-toggle" id="membersDropdownToggle">Members</button>
+                                        <div class="dropdown-menu" id="membersDropdownMenu"></div>
+                                        <button type="button" class="dropdown-toggle" id="requestsDropdownToggle" style="margin-top:8px;">Requests</button>
+                                        <div class="dropdown-menu" id="requestsDropdownMenu">
+                                            <div class="empty" id="requestsStatus">Requests turned off</div>
+                                            <div id="requestsList"></div>
+                                        </div>
+                                        <button type="button" class="dropdown-toggle" id="departmentsDropdownToggle" style="margin-top:8px;">Departments</button>
+                                        <div class="dropdown-menu" id="departmentsDropdownMenu">
+                                            <div id="departmentsList"></div>
+                                            <div class="field" style="margin-top:10px;">
+                                                <input type="text" id="newDepartmentInput" placeholder="New department..." />
+                                                <input type="text" id="newDepartmentPasscode" placeholder="Passcode (optional)" style="margin-top:8px;" />
+                                                <button type="button" class="submit-btn" id="addDepartmentBtn" style="margin-top:8px; padding:8px 12px; font-size:13px;">Add</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+
+                        const generalTabBtn = document.getElementById("generalTabBtn");
+                        const generalPanel = document.getElementById("generalPanel");
+                        const serverNameInput = document.getElementById("serverNameInput");
+                        const approvalBtns = generalPanel.querySelectorAll(".approval-btn");
+                        const membersDropdownToggle = document.getElementById("membersDropdownToggle");
+                        const membersDropdownMenu = document.getElementById("membersDropdownMenu");
+                        const requestsDropdownToggle = document.getElementById("requestsDropdownToggle");
+                        const requestsDropdownMenu = document.getElementById("requestsDropdownMenu");
+                        const requestsStatus = document.getElementById("requestsStatus");
+                        const requestsList = document.getElementById("requestsList");
+
+                        if (generalTabBtn && generalPanel) {
+                            generalTabBtn.addEventListener("click", () => {
+                                generalPanel.classList.toggle("open");
+                            });
+                        }
+
+                        if (serverNameInput) {
+                            serverNameInput.addEventListener("blur", async () => {
+                                const newName = serverNameInput.value.trim();
+                                if (!newName) return;
+                                try {
+                                    await localSupabase
+                                        .from("communities")
+                                        .update({ name: newName })
+                                        .eq("id", id);
+                                } catch (err) {
+                                    alert("Failed to save server name.");
+                                }
+                            });
+                        }
+
+                        const communityPasscodeInput = document.getElementById("communityPasscodeInput");
+                        if (communityPasscodeInput) {
+                            communityPasscodeInput.addEventListener("blur", async () => {
+                                const newPasscode = communityPasscodeInput.value.trim();
+                                try {
+                                    await localSupabase
+                                        .from("communities")
+                                        .update({ passcode: newPasscode || null })
+                                        .eq("id", id);
+                                } catch (err) {
+                                    alert("Failed to save community passcode.");
+                                }
+                            });
+                        }
+
+                        approvalBtns.forEach((btn) => {
+                            btn.addEventListener("click", async () => {
+                                const mode = btn.getAttribute("data-value");
+                                approvalBtns.forEach((b) => b.classList.remove("active"));
+                                btn.classList.add("active");
+                                try {
+                                    await localSupabase
+                                        .from("communities")
+                                        .update({ join_approval: mode })
+                                        .eq("id", id);
+                                    if (mode === "automatic") {
+                                        if (requestsStatus) requestsStatus.style.display = "block";
+                                        if (requestsList) requestsList.innerHTML = "";
+                                    } else {
+                                        if (requestsStatus) requestsStatus.style.display = "none";
+                                        loadRequests();
+                                    }
+                                } catch (err) {
+                                    alert("Failed to update approval mode.");
+                                }
+                            });
+                        });
+
+                        async function loadMembers() {
+                            if (!membersDropdownMenu) return;
+                            try {
+                                const { data } = await localSupabase
+                                    .from("communities")
+                                    .select("*")
+                                    .eq("id", id);
+                                const members = Array.isArray(data) ? data : [];
+                                membersDropdownMenu.innerHTML = members.map((m) => `
+                                    <div class="member-item">${(m.creator_email || 'Member').replace(/</g, '&lt;').replace(/>/g, '&gt;')} ${m.joined ? '(Joined)' : ''}</div>
+                                `).join('');
+                            } catch (err) {
+                                membersDropdownMenu.innerHTML = '<div class="empty">Failed to load members.</div>';
+                            }
+                        }
+
+                        async function loadRequests() {
+                            if (!requestsList) return;
+                            try {
+                                const { data } = await localSupabase
+                                    .from("join_requests")
+                                    .select("*")
+                                    .eq("community_id", id)
+                                    .eq("status", "pending");
+                                const requests = Array.isArray(data) ? data : [];
+                                if (requests.length === 0) {
+                                    requestsList.innerHTML = '<div class="empty">No pending requests.</div>';
+                                    return;
+                                }
+                                requestsList.innerHTML = requests.map((r) => `
+                                    <div class="request-item" data-request-id="${r.id}">
+                                        <span>${(r.user_email || 'Unknown').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</span>
+                                        <div>
+                                            <button type="button" class="approve">Approve</button>
+                                            <button type="button" class="deny">Deny</button>
+                                        </div>
+                                    </div>
+                                `).join('');
+                                requestsList.querySelectorAll(".approve").forEach((btn) => {
+                                    btn.addEventListener("click", async (e) => {
+                                        const item = e.target.closest(".request-item");
+                                        const requestId = item.getAttribute("data-request-id");
+                                        await handleRequest(requestId, "approved");
+                                    });
+                                });
+                                requestsList.querySelectorAll(".deny").forEach((btn) => {
+                                    btn.addEventListener("click", async (e) => {
+                                        const item = e.target.closest(".request-item");
+                                        const requestId = item.getAttribute("data-request-id");
+                                        await handleRequest(requestId, "denied");
+                                    });
+                                });
+                            } catch (err) {
+                                requestsList.innerHTML = '<div class="empty">Failed to load requests.</div>';
+                            }
+                        }
+
+                        async function handleRequest(requestId, status) {
+                            try {
+                                await localSupabase
+                                    .from("join_requests")
+                                    .update({ status })
+                                    .eq("id", requestId);
+                                if (status === "approved") {
+                                    await localSupabase
+                                        .from("communities")
+                                        .update({ joined: true })
+                                        .eq("id", id)
+                                        .eq("creator_email", currentEmail);
+                                }
+                                loadRequests();
+                            } catch (err) {
+                                alert("Failed to update request.");
+                            }
+                        }
+
+                        if (membersDropdownToggle && membersDropdownMenu) {
+                            membersDropdownToggle.addEventListener("click", () => {
+                                membersDropdownMenu.classList.toggle("open");
+                                loadMembers();
+                            });
+                        }
+
+                        if (requestsDropdownToggle && requestsDropdownMenu) {
+                            requestsDropdownToggle.addEventListener("click", () => {
+                                requestsDropdownMenu.classList.toggle("open");
+                                if (approvalMode === "manual") {
+                                    loadRequests();
+                                }
+                            });
+                        }
+
+                        const departmentsDropdownToggle = document.getElementById("departmentsDropdownToggle");
+                        const departmentsDropdownMenu = document.getElementById("departmentsDropdownMenu");
+                        const departmentsList = document.getElementById("departmentsList");
+                        const newDepartmentInput = document.getElementById("newDepartmentInput");
+                        const addDepartmentBtn = document.getElementById("addDepartmentBtn");
+
+                        async function loadDepartments() {
+                            if (!departmentsList || !localSupabase) return;
+                            try {
+                                const { data } = await localSupabase
+                                    .from("departments")
+                                    .select("*")
+                                    .eq("community_id", id)
+                                    .order("created_at", { ascending: true });
+                                const departments = Array.isArray(data) ? data : [];
+                                if (departments.length === 0) {
+                                    departmentsList.innerHTML = '<div class="empty">No departments yet.</div>';
+                                    return;
+                                }
+                                departmentsList.innerHTML = departments.map((d) => `
+                                    <div class="request-item" data-department-id="${d.id}">
+                                        <span>${(d.name || 'Department').replace(/</g, '&lt;').replace(/>/g, '&gt;')} ${d.passcode ? '🔒' : ''}</span>
+                                        <div>
+                                            <button type="button" class="approve" style="background:#fef9c3; border-color:#fde68a; color:#854d0e;" data-action="edit" data-department-id="${d.id}">Edit</button>
+                                            <button type="button" class="deny" style="background:#fef2f2; border-color:#fecaca; color:#991b1b;" data-action="delete" data-department-id="${d.id}">Delete</button>
+                                        </div>
+                                    </div>
+                                `).join('');
+                                departmentsList.querySelectorAll("[data-action='delete']").forEach((btn) => {
+                                    btn.addEventListener("click", async (e) => {
+                                        const item = e.target.closest(".request-item");
+                                        const departmentId = item.getAttribute("data-department-id");
+                                        await deleteDepartment(departmentId);
+                                    });
+                                });
+                                departmentsList.querySelectorAll("[data-action='edit']").forEach((btn) => {
+                                    btn.addEventListener("click", async (e) => {
+                                        const item = e.target.closest(".request-item");
+                                        const departmentId = item.getAttribute("data-department-id");
+                                        const department = departments.find((d) => d.id === departmentId);
+                                        if (department) {
+                                            await editDepartment(department);
+                                        }
+                                    });
+                                });
+                            } catch (err) {
+                                departmentsList.innerHTML = '<div class="empty">Failed to load departments.</div>';
+                            }
+                        }
+
+                        async function addDepartment(name, passcode) {
+                            if (!name || !localSupabase) return;
+                            try {
+                                const payload = { community_id: id, name: name.trim() };
+                                if (passcode && passcode.trim()) payload.passcode = passcode.trim();
+                                await localSupabase
+                                    .from("departments")
+                                    .insert([payload]);
+                                loadDepartments();
+                                if (newDepartmentInput) newDepartmentInput.value = "";
+                                if (newDepartmentPasscode) newDepartmentPasscode.value = "";
+                            } catch (err) {
+                                alert("Failed to add department.");
+                            }
+                        }
+
+                        async function editDepartment(department) {
+                            if (!department || !localSupabase) return;
+                            const newName = prompt("Department name:", department.name);
+                            if (newName === null) return;
+                            const newPasscode = prompt("Department passcode (leave blank to remove):", department.passcode || "");
+                            try {
+                                const payload = { name: newName.trim() || department.name };
+                                if (newPasscode && newPasscode.trim()) payload.passcode = newPasscode.trim();
+                                else payload.passcode = null;
+                                await localSupabase
+                                    .from("departments")
+                                    .update(payload)
+                                    .eq("id", department.id);
+                                loadDepartments();
+                            } catch (err) {
+                                alert("Failed to edit department.");
+                            }
+                        }
+
+                        async function deleteDepartment(departmentId) {
+                            if (!confirm("Delete this department?")) return;
+                            try {
+                                await localSupabase
+                                    .from("departments")
+                                    .delete()
+                                    .eq("id", departmentId);
+                                loadDepartments();
+                            } catch (err) {
+                                alert("Failed to delete department.");
+                            }
+                        }
+
+                        if (departmentsDropdownToggle && departmentsDropdownMenu) {
+                            departmentsDropdownToggle.addEventListener("click", () => {
+                                departmentsDropdownMenu.classList.toggle("open");
+                                loadDepartments();
+                            });
+                        }
+
+                        if (addDepartmentBtn) {
+                            addDepartmentBtn.addEventListener("click", () => {
+                                const name = newDepartmentInput ? newDepartmentInput.value.trim() : "";
+                                if (!name) return;
+                                const passcode = newDepartmentPasscode ? newDepartmentPasscode.value : "";
+                                addDepartment(name, passcode);
+                            });
+                        }
+
+                        if (newDepartmentInput) {
+                            newDepartmentInput.addEventListener("keydown", (e) => {
+                                if (e.key === "Enter") {
+                                    const name = newDepartmentInput.value.trim();
+                                    if (!name) return;
+                                    const passcode = newDepartmentPasscode ? newDepartmentPasscode.value : "";
+                                    addDepartment(name, passcode);
+                                }
+                            });
+                        }
+
+                        if (approvalMode === "manual") {
+                            if (requestsStatus) requestsStatus.style.display = "none";
+                            loadRequests();
+                        }
+                    } catch (err) {
+                        contentEl.innerHTML = `<div class="empty">Failed to load dashboard: ${err?.message || err}</div>`;
+                        console.error("Dashboard load failed:", err);
                     }
+                    return;
+                }
+
+                if (communityPasscode) {
+                    const sessionPasscode = sessionStorage.getItem("community_passcode_" + id);
+                    if (sessionPasscode !== communityPasscode) {
+                        contentEl.innerHTML = `
+                            <div class="community-name">${name}</div>
+                            <div class="community-meta">This community is passcode protected.</div>
+                            <div class="field" style="max-width: 320px; margin-top: 16px;">
+                                <input type="text" id="communityPasscodeEntry" placeholder="Enter passcode" />
+                            </div>
+                            <button type="button" class="submit-btn" id="communityPasscodeSubmit" style="max-width: 320px; margin-top: 8px;">Enter</button>
+                            <div class="modal-error" id="communityPasscodeError"></div>
+                        `;
+                        const communityPasscodeEntry = document.getElementById("communityPasscodeEntry");
+                        const communityPasscodeSubmit = document.getElementById("communityPasscodeSubmit");
+                        const communityPasscodeError = document.getElementById("communityPasscodeError");
+                        if (communityPasscodeSubmit) {
+                            communityPasscodeSubmit.addEventListener("click", () => {
+                                const entered = communityPasscodeEntry ? communityPasscodeEntry.value.trim() : "";
+                                if (entered === communityPasscode) {
+                                    sessionStorage.setItem("community_passcode_" + id, entered);
+                                    loadCommunity();
+                                } else {
+                                    if (communityPasscodeError) { communityPasscodeError.textContent = "Incorrect passcode."; communityPasscodeError.style.display = "block"; }
+                                }
+                            });
+                        }
+                        if (communityPasscodeEntry) {
+                            communityPasscodeEntry.addEventListener("keydown", (e) => {
+                                if (e.key === "Enter") {
+                                    const entered = communityPasscodeEntry.value.trim();
+                                    if (entered === communityPasscode) {
+                                        sessionStorage.setItem("community_passcode_" + id, entered);
+                                        loadCommunity();
+                                    } else {
+                                        if (communityPasscodeError) { communityPasscodeError.textContent = "Incorrect passcode."; communityPasscodeError.style.display = "block"; }
+                                    }
+                                }
+                            });
+                        }
+                        return;
+                    }
+                }
+
+                contentEl.innerHTML = `
+                    <button type="button" class="role-btn" data-role="Civilian">Civilian</button>
+                    <div id="communityDepartments"></div>
+                `;
+
+                const communityDepartments = document.getElementById("communityDepartments");
+                if (communityDepartments && localSupabase) {
+                    localSupabase
+                        .from("departments")
+                        .select("*")
+                        .eq("community_id", id)
+                        .order("created_at", { ascending: true })
+                        .then(({ data }) => {
+                            const departments = Array.isArray(data) ? data : [];
+                            departments.forEach((dept) => {
+                                const btn = document.createElement("button");
+                                btn.type = "button";
+                                btn.className = "role-btn";
+                                btn.textContent = dept.name;
+                                btn.setAttribute("data-department-id", dept.id);
+                                btn.setAttribute("data-passcode", dept.passcode || "");
+                                communityDepartments.appendChild(btn);
+                                btn.addEventListener("click", () => handleDepartmentClick(dept));
+                            });
+                        });
+                }
+
+                contentEl.querySelectorAll(".role-btn[data-role='Civilian']").forEach((btn) => {
+                    btn.addEventListener("click", () => {
+                        window.open("civilian.html", "_blank");
+                    });
                 });
-            });
+            } catch (err) {
+                contentEl.innerHTML = `<div class="empty">An unexpected error occurred: ${err?.message || err}</div>`;
+                console.error("loadCommunity failed:", err);
+            }
         }
 
         const policeModal = document.getElementById("policeModal");
@@ -351,6 +980,61 @@
                 const params = new URLSearchParams({ name, rank, callsign });
                 window.open("police.html?" + params.toString(), "_blank");
                 if (policeModal) policeModal.classList.remove("open");
+            });
+        }
+
+        const deptPasscodeModal = document.getElementById("departmentPasscodeModal");
+        const deptPasscodeModalClose = document.getElementById("deptPasscodeModalClose");
+        const deptPasscodeInput = document.getElementById("deptPasscodeInput");
+        const deptPasscodeSubmitBtn = document.getElementById("deptPasscodeSubmitBtn");
+        const deptPasscodeError = document.getElementById("deptPasscodeError");
+        const deptPasscodeTitle = document.getElementById("deptPasscodeTitle");
+        let pendingDepartment = null;
+
+        function openDeptPasscodeModal(department) {
+            pendingDepartment = department;
+            if (deptPasscodeTitle) deptPasscodeTitle.textContent = department.name + " - Passcode";
+            if (deptPasscodeInput) deptPasscodeInput.value = "";
+            if (deptPasscodeError) { deptPasscodeError.textContent = ""; deptPasscodeError.style.display = "none"; }
+            if (deptPasscodeModal) deptPasscodeModal.classList.add("open");
+            if (deptPasscodeInput) deptPasscodeInput.focus();
+        }
+
+        function handleDepartmentClick(department) {
+            if (!department.passcode) {
+                window.open("police.html", "_blank");
+                return;
+            }
+            openDeptPasscodeModal(department);
+        }
+
+        if (deptPasscodeModalClose) {
+            deptPasscodeModalClose.addEventListener("click", () => {
+                if (deptPasscodeModal) deptPasscodeModal.classList.remove("open");
+                pendingDepartment = null;
+            });
+        }
+
+        if (deptPasscodeModal) {
+            deptPasscodeModal.addEventListener("click", (e) => {
+                if (e.target === deptPasscodeModal) {
+                    deptPasscodeModal.classList.remove("open");
+                    pendingDepartment = null;
+                }
+            });
+        }
+
+        if (deptPasscodeSubmitBtn) {
+            deptPasscodeSubmitBtn.addEventListener("click", () => {
+                if (!pendingDepartment) return;
+                const entered = deptPasscodeInput ? deptPasscodeInput.value.trim() : "";
+                if (entered === pendingDepartment.passcode) {
+                    if (deptPasscodeModal) deptPasscodeModal.classList.remove("open");
+                    window.open("police.html", "_blank");
+                    pendingDepartment = null;
+                } else {
+                    if (deptPasscodeError) { deptPasscodeError.textContent = "Incorrect passcode."; deptPasscodeError.style.display = "block"; }
+                }
             });
         }
 
