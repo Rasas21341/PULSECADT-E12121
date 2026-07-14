@@ -937,6 +937,10 @@
                 <div class="settings-value" id="settingsEmail"></div>
             </div>
             <div class="settings-row">
+                <div class="settings-label">Username</div>
+                <div class="settings-value" id="settingsUsernameDisplay"></div>
+            </div>
+            <div class="settings-row">
                 <div class="settings-label">Joined</div>
                 <div class="settings-value" id="settingsJoined">--</div>
             </div>
@@ -1111,18 +1115,28 @@
             }
         }
 
-        async function syncUserToUsersTable(userId, email) {
+        async function syncUserToUsersTable(userId, email, username) {
             if (!localSupabase || !userId || !email) return false;
             try {
                 const { data: existing } = await localSupabase
                     .from("users")
-                    .select("id")
+                    .select("id, username")
                     .eq("id", userId)
                     .maybeSingle();
-                if (existing) return true;
+                if (existing) {
+                    if (username && !existing.username) {
+                        await localSupabase
+                            .from("users")
+                            .update({ username: username })
+                            .eq("id", userId);
+                    }
+                    return true;
+                }
+                const payload = { id: userId, email: email, department: "Unassigned", created_at: new Date().toISOString() };
+                if (username) payload.username = username;
                 const { error } = await localSupabase
                     .from("users")
-                    .insert([{ id: userId, email: email, department: "Unassigned", created_at: new Date().toISOString() }]);
+                    .insert([payload]);
                 if (error) {
                     console.error("Failed to sync user to users table:", error);
                     return false;
@@ -1207,7 +1221,21 @@
                 localStorage.setItem("discord_token", tokenData.access_token);
                 localStorage.setItem("discord_refresh_token", tokenData.refresh_token || "");
 
-                updateDiscordUserUI(userData);
+                const discordUsername = userData.global_name || userData.username || "";
+                const displayName = discordUsername + (userData.discriminator && userData.discriminator !== "0" ? "#" + userData.discriminator : "");
+
+                updateDiscordUserUI(userData, displayName);
+
+                if (localSupabase && userData.id) {
+                    try {
+                        const { data: { user } } = await localSupabase.auth.getUser();
+                        if (user?.id) {
+                            await syncUserToUsersTable(user.id, user.email || "", discordUsername);
+                        }
+                    } catch (err) {
+                        console.error("Failed to sync Discord user to users table:", err);
+                    }
+                }
             } catch (err) {
                 console.error("Discord OAuth callback failed:", err);
                 alert("Discord login failed. Please try again.");
@@ -1216,7 +1244,7 @@
             window.history.replaceState({}, document.title, DISCORD_REDIRECT_URI);
         }
 
-        function updateDiscordUserUI(userData) {
+        function updateDiscordUserUI(userData, displayName) {
             const topbar = document.getElementById("topbar");
             const userDropdown = document.getElementById("userDropdown");
             const userEmailDisplay = document.getElementById("userEmailDisplay");
@@ -1229,6 +1257,16 @@
             if (container) container.style.display = "none";
             if (loggedInScreen) loggedInScreen.classList.add("open");
             if (authModal) authModal.classList.remove("open");
+
+            if (userEmailDisplay) {
+                if (displayName) {
+                    userEmailDisplay.textContent = displayName;
+                } else if (userData) {
+                    const name = userData.global_name || userData.username || "";
+                    const discriminator = userData.discriminator && userData.discriminator !== "0" ? "#" + userData.discriminator : "";
+                    userEmailDisplay.textContent = name + discriminator;
+                }
+            }
 
             const loginSuccess = document.getElementById("loginSuccess");
             if (loginSuccess) {
@@ -1345,16 +1383,30 @@
                     if (topbar) topbar.style.display = "none";
                      if (loginBtn) loginBtn.textContent = "Logout";
                      const userEmailDisplay = document.getElementById("userEmailDisplay");
-                    const userDropdown = document.getElementById("userDropdown");
-                    if (userEmailDisplay && email) {
-                        userEmailDisplay.textContent = email;
-                    }
+                     const userDropdown = document.getElementById("userDropdown");
+                     if (userEmailDisplay && email) {
+                         userEmailDisplay.textContent = email;
+                     }
                      if (userDropdown) userDropdown.style.display = "inline-flex";
-                    if (loginAccount) { loginAccount.style.display = "block"; loginAccount.textContent = "Session active. You can close this tab safely."; }
-                    loginForm.reset();
-                    if (data.user) {
-                        syncUserToUsersTable(data.user.id, email);
-                    }
+                     if (loginAccount) { loginAccount.style.display = "block"; loginAccount.textContent = "Session active. You can close this tab safely."; }
+                     loginForm.reset();
+                     if (data.user) {
+                         syncUserToUsersTable(data.user.id, email);
+                         if (localSupabase) {
+                             try {
+                                 const { data: userData } = await localSupabase
+                                     .from("users")
+                                     .select("username")
+                                     .eq("id", data.user.id)
+                                     .maybeSingle();
+                                 if (userData?.username && userEmailDisplay) {
+                                     userEmailDisplay.textContent = userData.username;
+                                 }
+                             } catch (err) {
+                                 console.error("Failed to load username:", err);
+                             }
+                         }
+                     }
 
                     const loggedInScreen = document.getElementById("loggedInScreen");
                     const container = document.querySelector(".container");
@@ -1549,6 +1601,7 @@
                 const settingsScreen = document.getElementById("settingsScreen");
                 const settingsJoined = document.getElementById("settingsJoined");
                 const settingsEmail = document.getElementById("settingsEmail");
+                const settingsUsernameDisplay = document.getElementById("settingsUsernameDisplay");
                 const joinedDate = localStorage.getItem("pulsecad_joined") || new Date().toLocaleDateString();
                 localStorage.setItem("pulsecad_joined", joinedDate);
                 if (settingsJoined) settingsJoined.textContent = joinedDate;
@@ -1556,6 +1609,23 @@
                     try {
                         const { data: { user } } = await localSupabase.auth.getUser();
                         if (user?.email) settingsEmail.textContent = user.email;
+                        if (settingsUsernameDisplay && user?.id) {
+                            try {
+                                const { data: userData } = await localSupabase
+                                    .from("users")
+                                    .select("username")
+                                    .eq("id", user.id)
+                                    .maybeSingle();
+                                if (userData?.username) {
+                                    settingsUsernameDisplay.textContent = userData.username;
+                                } else {
+                                    settingsUsernameDisplay.textContent = "Not set";
+                                }
+                            } catch (err) {
+                                console.error("Failed to load username:", err);
+                                settingsUsernameDisplay.textContent = "Not set";
+                            }
+                        }
                     } catch (err) {
                         console.error("Failed to load user email:", err);
                     }
@@ -1764,7 +1834,9 @@
 
         const storedDiscordUser = getStoredDiscordUser();
         if (storedDiscordUser) {
-            updateDiscordUserUI(storedDiscordUser);
+            const discordUsername = storedDiscordUser.global_name || storedDiscordUser.username || "";
+            const displayName = discordUsername + (storedDiscordUser.discriminator && storedDiscordUser.discriminator !== "0" ? "#" + storedDiscordUser.discriminator : "");
+            updateDiscordUserUI(storedDiscordUser, displayName);
         }
 
         function saveCommunity(name, meta, passcode, membersOnly) {

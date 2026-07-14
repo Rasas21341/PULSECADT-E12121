@@ -124,49 +124,320 @@
             display: none;
         }
 
-        .form-success {
-            margin-top: 10px;
-            padding: 10px 12px;
-            border-radius: 10px;
-            background: #f0fdf4;
-            color: #166534;
-            border: 1px solid #bbf7d0;
-            font-size: 14px;
-            display: none;
-        }
+         .form-success {
+             margin-top: 10px;
+             padding: 10px 12px;
+             border-radius: 10px;
+             background: #f0fdf4;
+             color: #166534;
+             border: 1px solid #bbf7d0;
+             font-size: 14px;
+             display: none;
+         }
 
-        .plate-lookup-btn {
-            position: fixed;
-            right: 24px;
-            bottom: 24px;
-            padding: 12px 20px;
-            border-radius: 12px;
-            border: 1px solid #2563eb;
-            background: #ffffff;
-            color: #2563eb;
-            font-size: 14px;
-            font-weight: 700;
-            cursor: pointer;
-            z-index: 700;
-            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15);
-        }
+          .my-civilians-section {
+              margin-top: 30px;
+          }
 
-        .plate-lookup-btn:hover {
-            background: #eff6ff;
-        }
+         .my-civilians-title {
+             font-size: 18px;
+             font-weight: 700;
+             color: #0f172a;
+             margin-bottom: 12px;
+         }
 
-        .modal-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(15, 23, 42, 0.45);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            padding: 16px;
-        }
+         .civilian-card {
+             background: #ffffff;
+             border: 1px solid #e2e8f0;
+             border-radius: 12px;
+             padding: 14px;
+             margin-bottom: 10px;
+             box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+         }
 
-        .modal-overlay.open {
+         .civilian-card.selected {
+             border-color: #2563eb;
+             box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
+         }
+
+         .civilian-card-name {
+             font-size: 15px;
+             font-weight: 700;
+             color: #0f172a;
+             margin-bottom: 4px;
+         }
+
+         .civilian-card-meta {
+             font-size: 13px;
+             color: #475569;
+             margin-bottom: 8px;
+         }
+
+         .civilian-card-actions {
+             display: flex;
+             gap: 8px;
+             flex-wrap: wrap;
+         }
+
+         .civilian-action-btn {
+             padding: 6px 12px;
+             border-radius: 999px;
+             font-size: 12px;
+             font-weight: 700;
+             cursor: pointer;
+             border: 1px solid;
+         }
+
+         .civilian-action-btn.primary {
+             color: #2563eb;
+             background: #ffffff;
+             border-color: #2563eb;
+         }
+
+         .civilian-action-btn.primary:hover {
+             background: #eff6ff;
+         }
+
+         .civilian-action-btn.danger {
+             color: #dc2626;
+             background: #ffffff;
+             border-color: #dc2626;
+         }
+
+         .civilian-action-btn.danger:hover {
+             background: #fef2f2;
+         }
+
+         .empty-state {
+             font-size: 14px;
+             color: #64748b;
+             padding: 20px;
+             text-align: center;
+             background: #f8fafc;
+             border-radius: 12px;
+             border: 1px dashed #e2e8f0;
+         }
+
+         .license-list {
+             margin-top: 8px;
+         }
+
+         .license-item {
+             font-size: 13px;
+             color: #334155;
+             padding: 4px 0;
+             border-bottom: 1px solid #f1f5f9;
+         }
+
+         .license-item:last-child {
+             border-bottom: none;
+         }
+
+         .license-download-btn {
+             padding: 4px 10px;
+             border-radius: 999px;
+             font-size: 11px;
+             font-weight: 700;
+             color: #2563eb;
+             background: #eff6ff;
+             border: 1px solid #bfdbfe;
+             cursor: pointer;
+             margin-left: 8px;
+         }
+
+         .license-download-btn:hover {
+             background: #dbeafe;
+         }
+
+         @media print {
+             body * {
+                 visibility: hidden;
+             }
+             #licensePrintArea, #licensePrintArea * {
+                 visibility: visible;
+             }
+             #licensePrintArea {
+                 position: absolute;
+                 left: 0;
+                 top: 0;
+                 width: 100%;
+             }
+         }
+
+         .license-card {
+             display: none;
+             position: fixed;
+             inset: 0;
+             background: #ffffff;
+             z-index: 2000;
+             padding: 40px;
+             overflow-y: auto;
+         }
+
+         .license-card.open {
+             display: flex;
+             align-items: flex-start;
+             justify-content: center;
+         }
+
+         .license-card-inner {
+             background: #ffffff;
+             border: 3px double #0f172a;
+             border-radius: 16px;
+             padding: 32px;
+             max-width: 500px;
+             width: 100%;
+             box-shadow: 0 20px 50px rgba(15, 23, 42, 0.15);
+             position: relative;
+         }
+
+         .license-card-header {
+             text-align: center;
+             border-bottom: 2px solid #e2e8f0;
+             padding-bottom: 16px;
+             margin-bottom: 16px;
+         }
+
+         .license-card-title {
+             font-size: 22px;
+             font-weight: 700;
+             color: #0f172a;
+             text-transform: uppercase;
+             letter-spacing: 2px;
+         }
+
+         .license-card-subtitle {
+             font-size: 13px;
+             color: #475569;
+             margin-top: 4px;
+         }
+
+         .license-card-body {
+             margin-bottom: 16px;
+         }
+
+         .license-card-row {
+             display: flex;
+             justify-content: space-between;
+             padding: 8px 0;
+             border-bottom: 1px solid #f1f5f9;
+         }
+
+         .license-card-row:last-child {
+             border-bottom: none;
+         }
+
+         .license-card-label {
+             font-size: 13px;
+             font-weight: 600;
+             color: #475569;
+         }
+
+         .license-card-value {
+             font-size: 14px;
+             font-weight: 700;
+             color: #0f172a;
+             text-align: right;
+         }
+
+         .license-card-footer {
+             text-align: center;
+             border-top: 2px solid #e2e8f0;
+             padding-top: 12px;
+             margin-top: 12px;
+         }
+
+         .license-card-badge {
+             display: inline-block;
+             padding: 6px 16px;
+             border-radius: 999px;
+             font-size: 12px;
+             font-weight: 700;
+             background: #f0fdf4;
+             color: #166534;
+             border: 1px solid #bbf7d0;
+         }
+
+         .license-card-actions {
+             display: flex;
+             gap: 10px;
+             justify-content: center;
+             margin-top: 20px;
+         }
+
+         .license-card-btn {
+             padding: 10px 20px;
+             border-radius: 999px;
+             font-size: 14px;
+             font-weight: 700;
+             cursor: pointer;
+             border: 1px solid;
+         }
+
+         .license-card-btn.primary {
+             color: #ffffff;
+             background: #2563eb;
+             border-color: #2563eb;
+         }
+
+         .license-card-btn.primary:hover {
+             background: #1d4ed8;
+         }
+
+         .license-card-btn.secondary {
+             color: #334155;
+             background: #ffffff;
+             border-color: #e2e8f0;
+         }
+
+         .license-card-btn.secondary:hover {
+             background: #f8fafc;
+         }
+
+         .my-civilians-header {
+             display: flex;
+             align-items: center;
+             justify-content: space-between;
+             margin-bottom: 12px;
+             gap: 10px;
+             flex-wrap: wrap;
+         }
+
+         .my-civilians-actions {
+             display: flex;
+             gap: 8px;
+         }
+
+         .my-civilians-action-btn {
+             padding: 6px 12px;
+             border-radius: 999px;
+             font-size: 12px;
+             font-weight: 700;
+             cursor: pointer;
+             border: 1px solid;
+         }
+
+         .my-civilians-action-btn.primary {
+             color: #2563eb;
+             background: #ffffff;
+             border-color: #2563eb;
+         }
+
+         .my-civilians-action-btn.primary:hover {
+             background: #eff6ff;
+         }
+
+         .my-civilians-action-btn.danger {
+             color: #dc2626;
+             background: #ffffff;
+             border-color: #dc2626;
+         }
+
+         .my-civilians-action-btn.danger:hover {
+             background: #fef2f2;
+         }
+
+         .modal-overlay {
             display: flex;
         }
 
@@ -269,79 +540,215 @@
             display: none;
         }
 
-        .lookup-result {
-            margin-top: 10px;
-            padding: 10px 12px;
-            border-radius: 10px;
-            background: #f0fdf4;
-            color: #166534;
-            border: 1px solid #bbf7d0;
-            font-size: 14px;
-            display: none;
-            word-break: break-word;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <button class="back-btn" id="backBtn">← Back</button>
-        <div class="page-title">Create Civilian</div>
-        <form class="create-form" id="createCivilianForm">
-            <div class="form-field">
-                <label for="civilianName">Full Name</label>
-                <input type="text" id="civilianName" placeholder="John Doe" required />
-            </div>
-            <div class="form-field">
-                <label for="civilianAge">Age</label>
-                <input type="number" id="civilianAge" placeholder="25" min="0" max="120" />
-            </div>
-            <div class="form-field">
-                <label for="civilianGender">Gender</label>
-                <select id="civilianGender">
-                    <option value="">Select</option>
-                    <option value="Male">Male</option>
-                    <option value="Female">Female</option>
-                    <option value="Other">Other</option>
-                </select>
-            </div>
-            <div class="form-field">
-                <label for="civilianAddress">Address</label>
-                <input type="text" id="civilianAddress" placeholder="123 Main St" />
-            </div>
-            <div class="form-field">
-                <label for="civilianNotes">Notes</label>
-                <textarea id="civilianNotes" placeholder="Any relevant details..."></textarea>
-            </div>
-            <button type="submit" class="submit-btn">Create Civilian</button>
-            <div class="form-error" id="formError"></div>
-            <div class="form-success" id="formSuccess"></div>
-        </form>
-    </div>
+          .lookup-result {
+               margin-top: 10px;
+               padding: 10px 12px;
+               border-radius: 10px;
+               background: #f0fdf4;
+               color: #166534;
+               border: 1px solid #bbf7d0;
+               font-size: 14px;
+               display: none;
+               word-break: break-word;
+           }
 
-    <button type="button" class="plate-lookup-btn" id="plateLookupBtn">Plate Lookup</button>
+         .modal-overlay.open {
+             display: flex;
+         }
 
-    <div class="modal-overlay" id="lookupModal">
-        <div class="modal">
-            <div class="modal-header">
-                <div class="modal-title">Plate Lookup</div>
-                <button class="modal-close" id="lookupModalClose" type="button" aria-label="Close">×</button>
-            </div>
-            <div class="lookup-field">
-                <label for="plateInput">Plate number</label>
-                <input type="text" id="plateInput" placeholder="e.g. ABC 123" />
-            </div>
-            <button type="button" class="lookup-submit" id="plateSubmitBtn">Search</button>
-            <div class="lookup-error" id="plateError"></div>
-            <div class="lookup-result" id="plateResult"></div>
-        </div>
-    </div>
+         .modal {
+             background: #ffffff;
+             border-radius: 20px;
+             border: 1px solid #e2e8f0;
+             padding: 22px;
+             width: 100%;
+             max-width: 420px;
+             box-shadow: 0 20px 50px rgba(15, 23, 42, 0.18);
+         }
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+         .modal-header {
+             display: flex;
+             align-items: center;
+             justify-content: space-between;
+             margin-bottom: 14px;
+         }
+
+         .modal-title {
+             font-size: 18px;
+             font-weight: 700;
+             color: #0f172a;
+         }
+
+         .modal-close {
+             border: none;
+             background: transparent;
+             color: #64748b;
+             font-size: 20px;
+             cursor: pointer;
+             line-height: 1;
+             padding: 4px;
+             border-radius: 999px;
+         }
+
+         .modal-close:hover {
+             background: #f1f5f9;
+             color: #0f172a;
+         }
+     </style>
+ </head>
+ <body>
+     <div class="container">
+         <button class="back-btn" id="backBtn">← Back</button>
+         <div class="page-title">Create Civilian</div>
+         <form class="create-form" id="createCivilianForm">
+             <div class="form-field">
+                 <label for="civilianName">Full Name</label>
+                 <input type="text" id="civilianName" placeholder="John Doe" required />
+             </div>
+             <div class="form-field">
+                 <label for="civilianAge">Age</label>
+                 <input type="number" id="civilianAge" placeholder="25" min="0" max="120" />
+             </div>
+             <div class="form-field">
+                 <label for="civilianGender">Gender</label>
+                 <select id="civilianGender">
+                     <option value="">Select</option>
+                     <option value="Male">Male</option>
+                     <option value="Female">Female</option>
+                     <option value="Other">Other</option>
+                 </select>
+             </div>
+             <div class="form-field">
+                 <label for="civilianAddress">Address</label>
+                 <input type="text" id="civilianAddress" placeholder="123 Main St" />
+             </div>
+              <div class="form-field">
+                  <label for="civilianNotes">Notes</label>
+                  <textarea id="civilianNotes" placeholder="Any relevant details..."></textarea>
+              </div>
+              <div class="form-field">
+                  <label>Photo</label>
+                  <input type="file" id="civilianPhoto" accept="image/*" />
+                  <img id="civilianPhotoPreview" style="max-width: 120px; max-height: 120px; margin-top: 8px; border-radius: 8px; border: 1px solid #e2e8f0; display: none;" />
+              </div>
+              <button type="submit" class="submit-btn">Create Civilian</button>
+             <div class="form-error" id="formError"></div>
+             <div class="form-success" id="formSuccess"></div>
+         </form>
+
+            <div class="my-civilians-section" id="myCiviliansSection">
+                <div class="my-civilians-header">
+                    <div class="my-civilians-title">My Civilians</div>
+                    <div class="my-civilians-actions">
+                        <button type="button" class="my-civilians-action-btn primary" id="sectionEditBtn" disabled>Edit Selected</button>
+                        <button type="button" class="my-civilians-action-btn primary" id="sectionLicenseBtn" disabled>Create License</button>
+                        <button type="button" class="my-civilians-action-btn danger" id="sectionDeleteBtn" disabled>Delete Selected</button>
+                    </div>
+                </div>
+                <div id="myCiviliansList" style="padding: 20px; background: #f8fafc; border-radius: 12px;">Loading...</div>
+            </div>
+     </div>
+
+      <div class="modal-overlay" id="editCivilianModal">
+          <div class="modal">
+              <div class="modal-header">
+                  <div class="modal-title">Edit Civilian</div>
+                  <button class="modal-close" id="editModalClose" type="button" aria-label="Close">×</button>
+              </div>
+              <div class="form-field">
+                  <label for="editCivilianName">Full Name</label>
+                  <input type="text" id="editCivilianName" placeholder="John Doe" required />
+              </div>
+              <div class="form-field">
+                  <label for="editCivilianAge">Age</label>
+                  <input type="number" id="editCivilianAge" placeholder="25" min="0" max="120" />
+              </div>
+              <div class="form-field">
+                  <label for="editCivilianGender">Gender</label>
+                  <select id="editCivilianGender">
+                      <option value="">Select</option>
+                      <option value="Male">Male</option>
+                      <option value="Female">Female</option>
+                      <option value="Other">Other</option>
+                  </select>
+              </div>
+              <div class="form-field">
+                  <label for="editCivilianAddress">Address</label>
+                  <input type="text" id="editCivilianAddress" placeholder="123 Main St" />
+              </div>
+              <div class="form-field">
+                  <label for="editCivilianNotes">Notes</label>
+                  <textarea id="editCivilianNotes" placeholder="Any relevant details..."></textarea>
+              </div>
+              <div class="form-field">
+                  <label>Photo</label>
+                  <input type="file" id="editCivilianPhoto" accept="image/*" />
+                  <img id="editCivilianPhotoPreview" style="max-width: 120px; max-height: 120px; margin-top: 8px; border-radius: 8px; border: 1px solid #e2e8f0; display: none;" />
+              </div>
+              <button type="button" class="submit-btn" id="editCivilianSubmitBtn">Save Changes</button>
+              <div class="form-error" id="editCivilianError"></div>
+              <div class="form-success" id="editCivilianSuccess"></div>
+          </div>
+      </div>
+
+     <div class="modal-overlay" id="licenseModal">
+         <div class="modal">
+             <div class="modal-header">
+                 <div class="modal-title">Create License</div>
+                 <button class="modal-close" id="licenseModalClose" type="button" aria-label="Close">×</button>
+             </div>
+             <div class="form-field">
+                 <label for="licenseType">License Type</label>
+                  <select id="licenseType">
+                      <option value="">Select</option>
+                      <option value="Driver's License">Driver's License</option>
+                      <option value="Weapon License">Weapon License</option>
+                      <option value="Fishing License">Fishing License</option>
+                      <option value="Boating License">Boating License</option>
+                      <option value="Other">Other</option>
+                  </select>
+              </div>
+              <div class="form-field">
+                  <label for="licenseNumber">License Number</label>
+                  <input type="text" id="licenseNumber" placeholder="Auto-generated on type select" readonly />
+             </div>
+             <div class="form-field">
+                 <label for="licenseExpiry">Expiry Date</label>
+                 <input type="date" id="licenseExpiry" />
+             </div>
+             <button type="button" class="submit-btn" id="licenseSubmitBtn">Create License</button>
+             <div class="form-error" id="licenseError"></div>
+             <div class="form-success" id="licenseSuccess"></div>
+          </div>
+      </div>
+
+      <div class="license-card" id="licenseCard">
+          <div class="license-card-inner" id="licenseCardInner">
+              <div class="license-card-header">
+                  <div class="license-card-title" id="lcTitle">LICENSE</div>
+                  <div class="license-card-subtitle">PulseCAD Official Document</div>
+              </div>
+              <div class="license-card-body" id="lcBody"></div>
+              <div class="license-card-footer">
+                  <span class="license-card-badge" id="lcStatus">Active</span>
+              </div>
+              <div class="license-card-actions">
+                  <button type="button" class="license-card-btn primary" id="lcPrintBtn">Download / Print</button>
+                  <button type="button" class="license-card-btn secondary" id="lcCloseBtn">Close</button>
+              </div>
+          </div>
+      </div>
+
+     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         const SUPABASE_URL = "https://zwdogalwbczdtvxvhrfd.supabase.co";
         const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp3ZG9nYWx3YmN6ZHR2eHZocmZkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM2NTA2MjQsImV4cCI6MjA5OTIyNjYyNH0.baPVVTtW0d3FDC2pTd1P3d5aoIc2FZkaD-6bBvDPFWw";
 
         let localSupabase = null;
+        let currentUserId = null;
+        let currentCivilianId = null;
+        let selectedCivilianId = null;
+
         try {
             if (typeof window.supabase !== "undefined") {
                 localSupabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -350,95 +757,501 @@
             console.error("Supabase init failed:", err);
         }
 
+        async function getCurrentUser() {
+            if (!localSupabase) return null;
+            try {
+                const { data: { user } } = await localSupabase.auth.getUser();
+                return user;
+            } catch (err) {
+                console.error("Auth check failed:", err);
+                return null;
+            }
+        }
+
+        async function loadMyCivilians() {
+            const listEl = document.getElementById("myCiviliansList");
+            const sectionEl = document.getElementById("myCiviliansSection");
+
+            if (!localSupabase || !listEl) {
+                if (listEl) listEl.innerHTML = '<div class="empty-state">Database not loaded. Check console for errors.</div>';
+                return;
+            }
+
+            try {
+                const { data, error } = await localSupabase
+                    .from("civilians")
+                    .select("*")
+                    .order("created_at", { ascending: false });
+
+                if (error) {
+                    listEl.innerHTML = `<div class="empty-state">Error loading civilians: ${escapeHtml(error.message)}</div>`;
+                    return;
+                }
+
+                if (!Array.isArray(data) || data.length === 0) {
+                    listEl.innerHTML = '<div class="empty-state">No civilians created yet.</div>';
+                    return;
+                }
+
+            try {
+                const { data, error } = await localSupabase
+                    .from("civilians")
+                    .select("*")
+                    .order("created_at", { ascending: false });
+
+                if (error) {
+                    listEl.innerHTML = `<div class="empty-state">Error loading civilians: ${escapeHtml(error.message)}</div>`;
+                    return;
+                }
+
+                if (!Array.isArray(data) || data.length === 0) {
+                    listEl.innerHTML = '<div class="empty-state">No civilians created yet.</div>';
+                    return;
+                }
+
+                listEl.innerHTML = "";
+                for (const civilian of data) {
+                    const card = document.createElement("div");
+                    card.className = "civilian-card";
+                    card.setAttribute("data-id", civilian.id);
+
+                    const meta = [civilian.age, civilian.gender, civilian.address].filter(Boolean).join(" | ") || "No additional details";
+
+                    card.innerHTML = `
+                        <div class="civilian-card-name">${escapeHtml(civilian.name)}</div>
+                        <div class="civilian-card-meta">${escapeHtml(meta)}</div>
+                        ${civilian.photo_url ? `<img src="${escapeHtml(civilian.photo_url)}" style="max-width: 80px; max-height: 80px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 8px; display: block;" />` : ""}
+                        <div class="license-list" id="licenseList-${civilian.id}"></div>
+                    `;
+
+                    card.addEventListener("click", (e) => {
+                        selectCivilianCard(civilian.id, card);
+                    });
+
+                    listEl.appendChild(card);
+
+                    loadLicenses(civilian.id);
+                }
+            } catch (err) {
+                console.error("Failed to load civilians:", err);
+                if (listEl) listEl.innerHTML = '<div class="empty-state">Failed to load civilians.</div>';
+            }
+        }
+
+        function selectCivilianCard(civilianId, cardElement) {
+            selectedCivilianId = civilianId;
+            currentCivilianId = civilianId;
+
+            document.querySelectorAll(".civilian-card").forEach((c) => c.classList.remove("selected"));
+            if (cardElement) cardElement.classList.add("selected");
+
+            const sectionEditBtn = document.getElementById("sectionEditBtn");
+            const sectionLicenseBtn = document.getElementById("sectionLicenseBtn");
+            const sectionDeleteBtn = document.getElementById("sectionDeleteBtn");
+            if (sectionEditBtn) sectionEditBtn.disabled = false;
+            if (sectionLicenseBtn) sectionLicenseBtn.disabled = false;
+            if (sectionDeleteBtn) sectionDeleteBtn.disabled = false;
+        }
+
+        async function loadLicenses(civilianId) {
+            const listEl = document.getElementById(`licenseList-${civilianId}`);
+            if (!listEl || !localSupabase) return;
+
+            try {
+                const { data, error } = await localSupabase
+                    .from("licenses")
+                    .select("*")
+                    .eq("civilian_id", civilianId)
+                    .order("created_at", { ascending: false });
+
+                if (error || !Array.isArray(data) || data.length === 0) {
+                    listEl.innerHTML = "";
+                    return;
+                }
+
+                listEl.innerHTML = data.map((lic) => `
+                    <div class="license-item">
+                        <strong>${escapeHtml(lic.license_type)}</strong> — ${escapeHtml(lic.license_number || "No number")}
+                        ${lic.expiry_date ? `<br>Expires: ${escapeHtml(lic.expiry_date)}` : ""}
+                        <button type="button" class="license-download-btn" data-id="${lic.id}" data-type="${escapeHtml(lic.license_type)}" data-number="${escapeHtml(lic.license_number || "")}" data-expiry="${escapeHtml(lic.expiry_date || "")}">View License</button>
+                    </div>
+                `).join("");
+
+                listEl.querySelectorAll(".license-download-btn").forEach((btn) => {
+                    btn.addEventListener("click", () => {
+                        openLicenseCard({
+                            type: btn.getAttribute("data-type"),
+                            number: btn.getAttribute("data-number"),
+                            expiry: btn.getAttribute("data-expiry")
+                        });
+                    });
+                });
+            } catch (err) {
+                console.error("Failed to load licenses:", err);
+            }
+        }
+
+        function escapeHtml(text) {
+            if (!text) return "";
+            const div = document.createElement("div");
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        const editModal = document.getElementById("editCivilianModal");
+        const editModalClose = document.getElementById("editModalClose");
+        const editSubmitBtn = document.getElementById("editCivilianSubmitBtn");
+        const editError = document.getElementById("editCivilianError");
+        const editSuccess = document.getElementById("editCivilianSuccess");
+        const editPhotoInput = document.getElementById("editCivilianPhoto");
+        const editPhotoPreview = document.getElementById("editCivilianPhotoPreview");
+        let currentEditCivilianId = null;
+        let currentEditPhotoBase64 = null;
+
+        if (editModalClose) {
+            editModalClose.addEventListener("click", () => {
+                if (editModal) editModal.classList.remove("open");
+            });
+        }
+
+        if (editModal) {
+            editModal.addEventListener("click", (e) => {
+                if (e.target === editModal) {
+                    editModal.classList.remove("open");
+                }
+            });
+        }
+
+        if (editPhotoInput) {
+            editPhotoInput.addEventListener("change", (e) => {
+                const file = e.target.files[0];
+                if (!file) {
+                    if (editPhotoPreview) editPhotoPreview.style.display = "none";
+                    currentEditPhotoBase64 = null;
+                    return;
+                }
+                if (!file.type.startsWith("image/")) {
+                    if (editError) { editError.textContent = "Please select an image file."; editError.style.display = "block"; }
+                    return;
+                }
+                const reader = new FileReader();
+                reader.onload = (ev) => {
+                    currentEditPhotoBase64 = ev.target.result;
+                    if (editPhotoPreview) {
+                        editPhotoPreview.src = currentEditPhotoBase64;
+                        editPhotoPreview.style.display = "block";
+                    }
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        async function openEditModal(civilianId) {
+            if (!editModal || !localSupabase) return;
+            currentEditCivilianId = civilianId;
+            currentEditPhotoBase64 = null;
+            if (editError) { editError.textContent = ""; editError.style.display = "none"; }
+            if (editSuccess) { editSuccess.textContent = ""; editSuccess.style.display = "none"; }
+            if (editPhotoPreview) editPhotoPreview.style.display = "none";
+            if (editPhotoInput) editPhotoInput.value = "";
+
+                try {
+                    const { data, error } = await localSupabase
+                        .from("civilians")
+                        .select("*")
+                        .eq("id", civilianId)
+                        .maybeSingle();
+
+                    if (error || !data) {
+                        if (editError) { editError.textContent = "Failed to load civilian."; editError.style.display = "block"; }
+                        return;
+                    }
+
+                    document.getElementById("editCivilianName").value = data.name || "";
+                    document.getElementById("editCivilianAge").value = data.age || "";
+                    document.getElementById("editCivilianGender").value = data.gender || "";
+                    document.getElementById("editCivilianAddress").value = data.address || "";
+                    document.getElementById("editCivilianNotes").value = data.notes || "";
+
+                    const photoUrl = data.photo_url || data.photo || "";
+                    if (photoUrl && editPhotoPreview) {
+                        editPhotoPreview.src = photoUrl;
+                        editPhotoPreview.style.display = "block";
+                        currentEditPhotoBase64 = photoUrl;
+                    } else {
+                        if (editPhotoPreview) editPhotoPreview.style.display = "none";
+                        currentEditPhotoBase64 = null;
+                    }
+
+                editModal.classList.add("open");
+            } catch (err) {
+                console.error("Failed to load civilian for edit:", err);
+                if (editError) { editError.textContent = "Failed to load civilian."; editError.style.display = "block"; }
+            }
+        }
+
+        if (editSubmitBtn) {
+            editSubmitBtn.addEventListener("click", async () => {
+                if (!currentEditCivilianId) {
+                    if (editError) { editError.textContent = "No civilian selected."; editError.style.display = "block"; }
+                    return;
+                }
+
+                const name = document.getElementById("editCivilianName")?.value.trim() || "";
+                const age = document.getElementById("editCivilianAge")?.value.trim() || "";
+                const gender = document.getElementById("editCivilianGender")?.value || "";
+                const address = document.getElementById("editCivilianAddress")?.value.trim() || "";
+                const notes = document.getElementById("editCivilianNotes")?.value.trim() || "";
+
+                if (!name) {
+                    if (editError) { editError.textContent = "Name is required."; editError.style.display = "block"; }
+                    return;
+                }
+
+                if (!localSupabase) {
+                    if (editError) { editError.textContent = "Database unavailable."; editError.style.display = "block"; }
+                    return;
+                }
+
+                if (editError) { editError.textContent = ""; editError.style.display = "none"; }
+                if (editSuccess) { editSuccess.textContent = ""; editSuccess.style.display = "none"; }
+
+                try {
+                    const payload = {
+                        name,
+                        age: age ? parseInt(age, 10) : null,
+                        gender: gender || null,
+                        address: address || null,
+                        notes: notes || null,
+                    };
+                    if (currentEditPhotoBase64 !== null) {
+                        payload.photo_url = currentEditPhotoBase64;
+                    }
+
+                    const { error } = await localSupabase
+                        .from("civilians")
+                        .update(payload)
+                        .eq("id", currentEditCivilianId);
+
+                    if (error) {
+                        if (editError) { editError.textContent = error.message || "Failed to update civilian."; editError.style.display = "block"; }
+                        console.error("Update failed:", error);
+                        return;
+                    }
+
+                    if (editSuccess) { editSuccess.textContent = "Civilian updated successfully."; editSuccess.style.display = "block"; }
+
+                    setTimeout(() => {
+                        if (editModal) editModal.classList.remove("open");
+                        loadMyCivilians();
+                    }, 600);
+                } catch (err) {
+                    if (editError) { editError.textContent = "Failed to update civilian."; editError.style.display = "block"; }
+                    console.error(err);
+                }
+            });
+        }
+
+        const licenseCard = document.getElementById("licenseCard");
+        const lcTitle = document.getElementById("lcTitle");
+        const lcBody = document.getElementById("lcBody");
+        const lcStatus = document.getElementById("lcStatus");
+        const lcPrintBtn = document.getElementById("lcPrintBtn");
+        const lcCloseBtn = document.getElementById("lcCloseBtn");
+
+        function openLicenseCard({ type, number, expiry }) {
+            if (!licenseCard) return;
+            if (lcTitle) lcTitle.textContent = type || "LICENSE";
+            if (lcStatus) {
+                lcStatus.textContent = expiry && new Date(expiry) < new Date() ? "Expired" : "Active";
+                lcStatus.style.background = expiry && new Date(expiry) < new Date() ? "#fef2f2" : "#f0fdf4";
+                lcStatus.style.color = expiry && new Date(expiry) < new Date() ? "#991b1b" : "#166534";
+                lcStatus.style.borderColor = expiry && new Date(expiry) < new Date() ? "#fecaca" : "#bbf7d0";
+            }
+            const issueDate = new Date().toLocaleDateString();
+            if (lcBody) {
+                lcBody.innerHTML = `
+                    <div class="license-card-row">
+                        <span class="license-card-label">License Type</span>
+                        <span class="license-card-value">${escapeHtml(type)}</span>
+                    </div>
+                    <div class="license-card-row">
+                        <span class="license-card-label">License Number</span>
+                        <span class="license-card-value">${escapeHtml(number || "N/A")}</span>
+                    </div>
+                    <div class="license-card-row">
+                        <span class="license-card-label">Issued Date</span>
+                        <span class="license-card-value">${issueDate}</span>
+                    </div>
+                    <div class="license-card-row">
+                        <span class="license-card-label">Expiry Date</span>
+                        <span class="license-card-value">${expiry ? escapeHtml(expiry) : "N/A"}</span>
+                    </div>
+                `;
+            }
+            licenseCard.classList.add("open");
+        }
+
+        if (lcCloseBtn) {
+            lcCloseBtn.addEventListener("click", () => {
+                if (licenseCard) licenseCard.classList.remove("open");
+            });
+        }
+
+        if (lcPrintBtn) {
+            lcPrintBtn.addEventListener("click", () => {
+                window.print();
+            });
+        }
+
+        const licenseModal = document.getElementById("licenseModal");
+        const licenseModalClose = document.getElementById("licenseModalClose");
+        const licenseSubmitBtn = document.getElementById("licenseSubmitBtn");
+        const licenseError = document.getElementById("licenseError");
+        const licenseSuccess = document.getElementById("licenseSuccess");
+
+        if (licenseModalClose) {
+            licenseModalClose.addEventListener("click", () => {
+                if (licenseModal) licenseModal.classList.remove("open");
+            });
+        }
+
+        if (licenseModal) {
+            licenseModal.addEventListener("click", (e) => {
+                if (e.target === licenseModal) {
+                    licenseModal.classList.remove("open");
+                }
+            });
+        }
+
+        function openLicenseModal() {
+            if (!licenseModal) return;
+            if (licenseError) { licenseError.textContent = ""; licenseError.style.display = "none"; }
+            if (licenseSuccess) { licenseSuccess.textContent = ""; licenseSuccess.style.display = "none"; }
+            licenseModal.classList.add("open");
+        }
+
+        function generateLicenseNumber(type) {
+            const prefixMap = {
+                "Driver's License": "DL",
+                "Weapon License": "WL",
+                "Fishing License": "FL",
+                "Boating License": "BL",
+                "Other": "LIC"
+            };
+            const prefix = prefixMap[type] || "LIC";
+            const random = Math.floor(100000 + Math.random() * 900000);
+            return `${prefix}-${random}`;
+        }
+
+        const licenseTypeSelect = document.getElementById("licenseType");
+        const licenseNumberInput = document.getElementById("licenseNumber");
+        if (licenseTypeSelect && licenseNumberInput) {
+            licenseTypeSelect.addEventListener("change", () => {
+                if (licenseTypeSelect.value) {
+                    licenseNumberInput.value = generateLicenseNumber(licenseTypeSelect.value);
+                } else {
+                    licenseNumberInput.value = "";
+                }
+            });
+        }
+
+        if (licenseSubmitBtn) {
+            licenseSubmitBtn.addEventListener("click", async () => {
+                if (!currentCivilianId) {
+                    if (licenseError) { licenseError.textContent = "No civilian selected."; licenseError.style.display = "block"; }
+                    return;
+                }
+
+                const user = await getCurrentUser();
+                if (!user) {
+                    if (licenseError) { licenseError.textContent = "You must be logged in."; licenseError.style.display = "block"; }
+                    return;
+                }
+
+                const licenseType = document.getElementById("licenseType")?.value || "";
+                const licenseNumber = document.getElementById("licenseNumber")?.value.trim() || "";
+                const licenseExpiry = document.getElementById("licenseExpiry")?.value || "";
+
+                if (!licenseType) {
+                    if (licenseError) { licenseError.textContent = "Select a license type."; licenseError.style.display = "block"; }
+                    return;
+                }
+
+                if (!localSupabase) {
+                    if (licenseError) { licenseError.textContent = "Database unavailable."; licenseError.style.display = "block"; }
+                    return;
+                }
+
+                if (licenseError) { licenseError.textContent = ""; licenseError.style.display = "none"; }
+                if (licenseSuccess) { licenseSuccess.textContent = ""; licenseSuccess.style.display = "none"; }
+
+                try {
+                    const { error } = await localSupabase
+                        .from("licenses")
+                        .insert([{
+                            civilian_id: currentCivilianId,
+                            user_id: user.id,
+                            license_type: licenseType,
+                            license_number: licenseNumber || null,
+                            expiry_date: licenseExpiry || null,
+                            created_at: new Date().toISOString()
+                        }]);
+
+                    if (error) {
+                        if (licenseError) { licenseError.textContent = error.message || "Failed to create license."; licenseError.style.display = "block"; }
+                        console.error("License insert failed:", error);
+                        return;
+                    }
+
+                    if (licenseSuccess) { licenseSuccess.textContent = "License created successfully."; licenseSuccess.style.display = "block"; }
+
+                    document.getElementById("licenseType").value = "";
+                    document.getElementById("licenseNumber").value = "";
+                    document.getElementById("licenseExpiry").value = "";
+
+                    loadLicenses(currentCivilianId);
+
+                    setTimeout(() => {
+                        if (licenseModal) licenseModal.classList.remove("open");
+                    }, 800);
+                } catch (err) {
+                    if (licenseError) { licenseError.textContent = "Failed to create license."; licenseError.style.display = "block"; }
+                    console.error(err);
+                }
+            });
+        }
+
         document.getElementById("backBtn").addEventListener("click", () => history.back());
 
         const form = document.getElementById("createCivilianForm");
         const formError = document.getElementById("formError");
         const formSuccess = document.getElementById("formSuccess");
+        const civilianPhotoInput = document.getElementById("civilianPhoto");
+        const civilianPhotoPreview = document.getElementById("civilianPhotoPreview");
+        let createPhotoBase64 = null;
 
-        const lookupModal = document.getElementById("lookupModal");
-        const lookupModalClose = document.getElementById("lookupModalClose");
-        const plateInput = document.getElementById("plateInput");
-        const plateSubmitBtn = document.getElementById("plateSubmitBtn");
-        const plateError = document.getElementById("plateError");
-        const plateResult = document.getElementById("plateResult");
-
-        if (lookupModalClose) {
-            lookupModalClose.addEventListener("click", () => {
-                if (lookupModal) lookupModal.classList.remove("open");
-            });
-        }
-
-        if (lookupModal) {
-            lookupModal.addEventListener("click", (e) => {
-                if (e.target === lookupModal) {
-                    lookupModal.classList.remove("open");
-                }
-            });
-        }
-
-        const plateLookupBtn = document.getElementById("plateLookupBtn");
-        if (plateLookupBtn) {
-            plateLookupBtn.addEventListener("click", () => {
-                if (!lookupModal) return;
-                if (plateInput) plateInput.value = "";
-                if (plateError) { plateError.textContent = ""; plateError.style.display = "none"; }
-                if (plateResult) { plateResult.textContent = ""; plateResult.style.display = "none"; }
-                lookupModal.classList.add("open");
-                if (plateInput) plateInput.focus();
-            });
-        }
-
-        if (plateSubmitBtn) {
-            plateSubmitBtn.addEventListener("click", async () => {
-                const query = plateInput ? plateInput.value.trim() : "";
-                if (!query) {
-                    if (plateError) { plateError.textContent = "Enter a plate number."; plateError.style.display = "block"; }
+        if (civilianPhotoInput) {
+            civilianPhotoInput.addEventListener("change", (e) => {
+                const file = e.target.files[0];
+                if (!file) {
+                    if (civilianPhotoPreview) civilianPhotoPreview.style.display = "none";
+                    createPhotoBase64 = null;
                     return;
                 }
-                if (!localSupabase) {
-                    if (plateError) { plateError.textContent = "Database unavailable."; plateError.style.display = "block"; }
+                if (!file.type.startsWith("image/")) {
+                    if (formError) { formError.textContent = "Please select an image file."; formError.style.display = "block"; }
                     return;
                 }
-                if (plateError) { plateError.textContent = ""; plateError.style.display = "none"; }
-                if (plateResult) { plateResult.textContent = ""; plateResult.style.display = "none"; }
-
-                try {
-                    const { data, error } = await localSupabase
-                        .from("plates")
-                        .select("*")
-                        .ilike("plate", query)
-                        .limit(5);
-
-                    if (error) {
-                        if (plateResult) {
-                            plateResult.style.display = "block";
-                            plateResult.textContent = "Result not found.";
-                        }
-                        return;
+                const reader = new FileReader();
+                reader.onload = (ev) => {
+                    createPhotoBase64 = ev.target.result;
+                    if (civilianPhotoPreview) {
+                        civilianPhotoPreview.src = createPhotoBase64;
+                        civilianPhotoPreview.style.display = "block";
                     }
-
-                    if (!Array.isArray(data) || data.length === 0) {
-                        if (plateResult) {
-                            plateResult.style.display = "block";
-                            plateResult.textContent = "No records found.";
-                        }
-                        return;
-                    }
-
-                    const rows = data.map((row) => {
-                        const info = [row.plate, row.owner, row.vehicle, row.status, row.notes].filter(Boolean).join(" | ");
-                        return info || "Record";
-                    });
-
-                    if (plateResult) {
-                        plateResult.style.display = "block";
-                        plateResult.textContent = rows.join("\n");
-                    }
-                } catch (err) {
-                    if (plateError) { plateError.textContent = "Lookup failed."; plateError.style.display = "block"; }
-                    console.error(err);
-                }
+                };
+                reader.readAsDataURL(file);
             });
         }
 
@@ -465,16 +1278,25 @@
                 }
 
                 try {
+                    const user = await getCurrentUser();
+                    const payload = {
+                        name,
+                        age: age ? parseInt(age, 10) : null,
+                        gender: gender || null,
+                        address: address || null,
+                        notes: notes || null,
+                        created_at: new Date().toISOString()
+                    };
+                    if (user) {
+                        payload.user_id = user.id;
+                    }
+                    if (createPhotoBase64) {
+                        payload.photo_url = createPhotoBase64;
+                    }
+
                     const { error } = await localSupabase
                         .from("civilians")
-                        .insert([{
-                            name,
-                            age: age ? parseInt(age, 10) : null,
-                            gender: gender || null,
-                            address: address || null,
-                            notes: notes || null,
-                            created_at: new Date().toISOString()
-                        }]);
+                        .insert([payload]);
 
                     if (error) {
                         if (formError) {
@@ -490,12 +1312,72 @@
                         formSuccess.style.display = "block";
                     }
                     form.reset();
+                    createPhotoBase64 = null;
+                    if (civilianPhotoPreview) civilianPhotoPreview.style.display = "none";
+                    loadMyCivilians();
                 } catch (err) {
                     if (formError) { formError.textContent = "Failed to create civilian."; formError.style.display = "block"; }
                     console.error(err);
                 }
             });
         }
+
+        const sectionEditBtn = document.getElementById("sectionEditBtn");
+        const sectionLicenseBtn = document.getElementById("sectionLicenseBtn");
+
+        if (sectionEditBtn) {
+            sectionEditBtn.addEventListener("click", () => {
+                if (!selectedCivilianId) {
+                    alert("Select a civilian first by clicking on their card.");
+                    return;
+                }
+                openEditModal(selectedCivilianId);
+            });
+        }
+
+        if (sectionLicenseBtn) {
+            sectionLicenseBtn.addEventListener("click", () => {
+                if (!selectedCivilianId) {
+                    alert("Select a civilian first by clicking on their card.");
+                    return;
+                }
+                currentCivilianId = selectedCivilianId;
+                openLicenseModal();
+            });
+        }
+
+        const sectionDeleteBtn = document.getElementById("sectionDeleteBtn");
+        if (sectionDeleteBtn) {
+            sectionDeleteBtn.addEventListener("click", async () => {
+                if (!selectedCivilianId) {
+                    alert("Select a civilian first by clicking on their card.");
+                    return;
+                }
+                if (!confirm("Delete this civilian and all associated licenses?")) return;
+                if (!localSupabase) return;
+                try {
+                    await localSupabase.from("licenses").delete().eq("civilian_id", selectedCivilianId);
+                    await localSupabase.from("civilians").delete().eq("id", selectedCivilianId);
+                    selectedCivilianId = null;
+                    document.querySelectorAll(".civilian-card").forEach((c) => c.classList.remove("selected"));
+                    if (sectionEditBtn) sectionEditBtn.disabled = true;
+                    if (sectionLicenseBtn) sectionLicenseBtn.disabled = true;
+                    if (sectionDeleteBtn) sectionDeleteBtn.disabled = true;
+                    loadMyCivilians();
+                } catch (err) {
+                    console.error("Delete failed:", err);
+                    alert("Failed to delete civilian.");
+                }
+            });
+        }
+
+        loadMyCivilians();
+
+        document.querySelectorAll(".modal-overlay").forEach((overlay) => {
+            overlay.classList.remove("open");
+        });
+        const licenseCard = document.getElementById("licenseCard");
+        if (licenseCard) licenseCard.classList.remove("open");
     </script>
 </body>
 </html>

@@ -87,6 +87,21 @@
         .back-btn:hover {
             background: #f1f5f9;
         }
+
+        .delete-btn {
+            background: #dc2626;
+            color: #ffffff;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .delete-btn:hover {
+            background: #b91c1c;
+        }
     </style>
 </head>
 <body>
@@ -101,10 +116,63 @@
         const SUPABASE_URL = "https://zwdogalwbczdtvxvhrfd.supabase.co";
         const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp3ZG9nYWx3YmN6ZHR2eHZocmZkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM2NTA2MjQsImV4cCI6MjA5OTIyNjYyNH0.baPVVTtW0d3FDC2pTd1P3d5aoIc2FZkaD-6bBvDPFWw";
 
-        const localSupabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        let localSupabase = null;
+        try {
+            if (typeof window.supabase !== "undefined") {
+                localSupabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            }
+        } catch (err) {
+            console.error("Supabase init failed:", err);
+        }
+
         const contentEl = document.getElementById("content");
 
+        async function ensureStaff() {
+            if (!localSupabase) {
+                contentEl.innerHTML = `<div class="empty">Authentication service unavailable.</div>`;
+                return { allowed: false };
+            }
+            try {
+                const { data: { user } } = await localSupabase.auth.getUser();
+                if (!user) {
+                    contentEl.innerHTML = `<div class="empty">Access denied. Staff only.</div>`;
+                    return { allowed: false };
+                }
+                if (user.email === "oceanviewrp1@gmail.com") {
+                    return { allowed: true, department: "Management" };
+                }
+                const { data, error } = await localSupabase
+                    .from("users")
+                    .select("department")
+                    .eq("email", user.email)
+                    .maybeSingle();
+                if (error) {
+                    contentEl.innerHTML = `<div class="empty">Access denied. Staff only.</div>`;
+                    return { allowed: false };
+                }
+                const department = data?.department || "";
+                if (department === "Management" || department === "Support Team") {
+                    return { allowed: true, department };
+                }
+                contentEl.innerHTML = `<div class="empty">Access denied. Staff only.</div>`;
+                return { allowed: false };
+            } catch (err) {
+                contentEl.innerHTML = `<div class="empty">An unexpected error occurred.</div>`;
+                console.error(err);
+                return { allowed: false };
+            }
+        }
+
         async function loadSubmissions() {
+            const staff = await ensureStaff();
+            if (!staff.allowed) return;
+            contentEl.innerHTML = '<div class="empty">Loading submissions...</div>';
+
+            if (!localSupabase) {
+                contentEl.innerHTML = `<div class="empty">Database unavailable.</div>`;
+                return;
+            }
+
             try {
                 const { data, error } = await localSupabase
                     .from("application_submissions")
@@ -113,6 +181,7 @@
 
                 if (error) {
                     contentEl.innerHTML = `<div class="empty">Failed to load submissions: ${error.message}</div>`;
+                    console.error("Submissions query error:", error);
                     return;
                 }
 

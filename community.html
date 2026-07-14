@@ -414,6 +414,48 @@
             border-color: #fecaca;
             color: #991b1b;
         }
+
+        .role-btn {
+            width: 220px;
+            padding: 0;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            background: #f8fafc;
+            color: #0f172a;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .role-btn:hover {
+            background: #f1f5f9;
+        }
+
+        .role-btn-banner {
+            width: 100%;
+            height: 80px;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-color: #e2e8f0;
+        }
+
+        .role-btn-name {
+            padding: 10px 16px;
+            text-align: center;
+        }
+
+        .dept-banner-preview {
+            width: 100%;
+            max-height: 120px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-top: 8px;
+            display: none;
+            border: 1px solid #e2e8f0;
+        }
     </style>
 </head>
 <body>
@@ -454,6 +496,30 @@
             </div>
             <button type="button" class="submit-btn" id="deptPasscodeSubmitBtn">Enter</button>
             <div class="modal-error" id="deptPasscodeError"></div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="editDepartmentModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">Edit Department</div>
+                <button class="modal-close" id="editDeptModalClose" type="button" aria-label="Close">×</button>
+            </div>
+            <div class="field">
+                <label for="editDeptName">Department Name</label>
+                <input type="text" id="editDeptName" placeholder="Department name" />
+            </div>
+            <div class="field">
+                <label for="editDeptPasscode">Passcode (leave blank to remove)</label>
+                <input type="text" id="editDeptPasscode" placeholder="Passcode" />
+            </div>
+            <div class="field">
+                <label>Banner Image</label>
+                <input type="file" id="editDeptBanner" accept="image/*" />
+                <img id="editDeptBannerPreview" class="dept-banner-preview" />
+            </div>
+            <button type="button" class="submit-btn" id="editDeptSubmitBtn">Save Changes</button>
+            <div class="modal-error" id="editDeptError"></div>
         </div>
     </div>
 
@@ -753,7 +819,10 @@
                                 }
                                 departmentsList.innerHTML = departments.map((d) => `
                                     <div class="request-item" data-department-id="${d.id}">
-                                        <span>${(d.name || 'Department').replace(/</g, '&lt;').replace(/>/g, '&gt;')} ${d.passcode ? '🔒' : ''}</span>
+                                        <div>
+                                            ${d.banner ? `<img src="${d.banner}" style="width:100%; max-height:60px; object-fit:cover; border-radius:6px; margin-bottom:6px; display:block;" />` : ""}
+                                            <span>${(d.name || 'Department').replace(/</g, '&lt;').replace(/>/g, '&gt;')} ${d.passcode ? '🔒' : ''}</span>
+                                        </div>
                                         <div>
                                             <button type="button" class="approve" style="background:#fef9c3; border-color:#fde68a; color:#854d0e;" data-action="edit" data-department-id="${d.id}">Edit</button>
                                             <button type="button" class="deny" style="background:#fef2f2; border-color:#fecaca; color:#991b1b;" data-action="delete" data-department-id="${d.id}">Delete</button>
@@ -800,20 +869,87 @@
 
                         async function editDepartment(department) {
                             if (!department || !localSupabase) return;
-                            const newName = prompt("Department name:", department.name);
-                            if (newName === null) return;
-                            const newPasscode = prompt("Department passcode (leave blank to remove):", department.passcode || "");
-                            try {
-                                const payload = { name: newName.trim() || department.name };
-                                if (newPasscode && newPasscode.trim()) payload.passcode = newPasscode.trim();
-                                else payload.passcode = null;
-                                await localSupabase
-                                    .from("departments")
-                                    .update(payload)
-                                    .eq("id", department.id);
-                                loadDepartments();
-                            } catch (err) {
-                                alert("Failed to edit department.");
+                            const editModal = document.getElementById("editDepartmentModal");
+                            const editDeptName = document.getElementById("editDeptName");
+                            const editDeptPasscode = document.getElementById("editDeptPasscode");
+                            const editDeptBanner = document.getElementById("editDeptBanner");
+                            const editDeptBannerPreview = document.getElementById("editDeptBannerPreview");
+                            const editDeptSubmitBtn = document.getElementById("editDeptSubmitBtn");
+                            const editDeptError = document.getElementById("editDeptError");
+                            const editDeptModalClose = document.getElementById("editDeptModalClose");
+                            
+                            if (!editModal) return;
+                            
+                            let currentBanner = department.banner || null;
+                            
+                            if (editDeptName) editDeptName.value = department.name || "";
+                            if (editDeptPasscode) editDeptPasscode.value = department.passcode || "";
+                            if (editDeptBannerPreview) {
+                                if (currentBanner) {
+                                    editDeptBannerPreview.src = currentBanner;
+                                    editDeptBannerPreview.style.display = "block";
+                                } else {
+                                    editDeptBannerPreview.style.display = "none";
+                                }
+                            }
+                            if (editDeptError) { editDeptError.textContent = ""; editDeptError.style.display = "none"; }
+                            
+                            editModal.classList.add("open");
+                            
+                            const handleEditDeptBannerChange = (e) => {
+                                const file = e.target.files[0];
+                                if (!file) return;
+                                if (!file.type.startsWith("image/")) {
+                                    if (editDeptError) { editDeptError.textContent = "Please select an image file."; editDeptError.style.display = "block"; }
+                                    return;
+                                }
+                                const reader = new FileReader();
+                                reader.onload = (ev) => {
+                                    currentBanner = ev.target.result;
+                                    if (editDeptBannerPreview) {
+                                        editDeptBannerPreview.src = currentBanner;
+                                        editDeptBannerPreview.style.display = "block";
+                                    }
+                                };
+                                reader.readAsDataURL(file);
+                            };
+                            
+                            if (editDeptBanner) {
+                                editDeptBanner.onchange = handleEditDeptBannerChange;
+                            }
+                            
+                            const handleEditDeptSubmit = async () => {
+                                const newName = editDeptName ? editDeptName.value.trim() : "";
+                                const newPasscode = editDeptPasscode ? editDeptPasscode.value.trim() : "";
+                                
+                                if (!newName) {
+                                    if (editDeptError) { editDeptError.textContent = "Department name is required."; editDeptError.style.display = "block"; }
+                                    return;
+                                }
+                                
+                                try {
+                                    const payload = { name: newName };
+                                    if (newPasscode) payload.passcode = newPasscode;
+                                    else payload.passcode = null;
+                                    if (currentBanner !== null) payload.banner = currentBanner;
+                                    
+                                    console.log("Saving department:", payload);
+                                    
+                                    await localSupabase
+                                        .from("departments")
+                                        .update(payload)
+                                        .eq("id", department.id);
+                                    
+                                    editModal.classList.remove("open");
+                                    loadDepartments();
+                                } catch (err) {
+                                    console.error("Failed to update department:", err);
+                                    if (editDeptError) { editDeptError.textContent = "Failed to update department."; editDeptError.style.display = "block"; }
+                                }
+                            };
+                            
+                            if (editDeptSubmitBtn) {
+                                editDeptSubmitBtn.onclick = handleEditDeptSubmit;
                             }
                         }
 
@@ -929,7 +1065,17 @@
                                 const btn = document.createElement("button");
                                 btn.type = "button";
                                 btn.className = "role-btn";
-                                btn.textContent = dept.name;
+                                const bannerDiv = document.createElement("div");
+                                bannerDiv.className = "role-btn-banner";
+                                console.log("Department banner:", dept.name, dept.banner ? "has banner" : "no banner");
+                                if (dept.banner) {
+                                    bannerDiv.style.backgroundImage = `url(${dept.banner})`;
+                                }
+                                const nameSpan = document.createElement("div");
+                                nameSpan.className = "role-btn-name";
+                                nameSpan.textContent = dept.name;
+                                btn.appendChild(bannerDiv);
+                                btn.appendChild(nameSpan);
                                 btn.setAttribute("data-department-id", dept.id);
                                 btn.setAttribute("data-passcode", dept.passcode || "");
                                 communityDepartments.appendChild(btn);
@@ -1020,6 +1166,23 @@
                 if (e.target === deptPasscodeModal) {
                     deptPasscodeModal.classList.remove("open");
                     pendingDepartment = null;
+                }
+            });
+        }
+
+        const editDepartmentModal = document.getElementById("editDepartmentModal");
+        const editDeptModalClose = document.getElementById("editDeptModalClose");
+        
+        if (editDeptModalClose && editDepartmentModal) {
+            editDeptModalClose.addEventListener("click", () => {
+                editDepartmentModal.classList.remove("open");
+            });
+        }
+        
+        if (editDepartmentModal) {
+            editDepartmentModal.addEventListener("click", (e) => {
+                if (e.target === editDepartmentModal) {
+                    editDepartmentModal.classList.remove("open");
                 }
             });
         }
