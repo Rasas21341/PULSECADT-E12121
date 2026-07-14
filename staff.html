@@ -994,6 +994,202 @@
                         <button type="button" class="verified-btn" id="restartServersBtn">Restart</button>
                     </div>
                 </div>
+                <div class="master-actions" style="margin-top:20px;">
+                    <h2>Management</h2>
+                    <p>Ban and unban user emails from accessing PulseCAD.</p>
+                    <div class="master-row">
+                        <div>
+                            <div class="master-row-label">Banned IDs</div>
+                            <div class="master-row-sub">Manage banned email addresses.</div>
+                        </div>
+                        <button type="button" class="verified-btn" id="bannedIdsBtn" style="background:#dc2626;">Banned IDs</button>
+                    </div>
+                </div>
+            `;
+
+            const devToggle = document.getElementById("devModeToggle");
+            if (devToggle && localSupabase) {
+                try {
+                    const { data } = await localSupabase
+                        .from("site_settings")
+                        .select("value")
+                        .eq("key", "dev_mode")
+                        .maybeSingle();
+                    devToggle.checked = !!(data && data.value === true);
+                } catch (err) {
+                    console.error("Could not load dev mode:", err);
+                }
+                devToggle.addEventListener("change", async () => {
+                    try {
+                        const { error } = await localSupabase
+                            .from("site_settings")
+                            .upsert({ key: "dev_mode", value: devToggle.checked }, { onConflict: "key" });
+                        if (error) {
+                            alert("Failed to update development mode: " + error.message);
+                            devToggle.checked = !devToggle.checked;
+                        }
+                    } catch (err) {
+                        console.error(err);
+                    }
+                });
+            }
+
+            const restartBtn = document.getElementById("restartServersBtn");
+            if (restartBtn) {
+                restartBtn.addEventListener("click", triggerRestart);
+            }
+
+            const bannedIdsBtn = document.getElementById("bannedIdsBtn");
+            if (bannedIdsBtn) {
+                bannedIdsBtn.addEventListener("click", loadBannedIds);
+            }
+        }
+
+        async function loadBannedIds() {
+            const staff = await ensureStaff();
+            if (!staff.allowed) return;
+            pageTitle.textContent = "Banned IDs";
+            contentEl.innerHTML = `
+                <div class="codes-section">
+                    <h2>Banned Email Addresses</h2>
+                    <p>Ban an email address to prevent them from logging into PulseCAD.</p>
+                    <div class="premium-key-display">
+                        <input type="email" class="premium-key-input" id="banEmailInput" placeholder="Enter email to ban..." />
+                        <button type="button" class="verified-btn" id="banEmailBtn" style="background:#dc2626;">Ban Email</button>
+                    </div>
+                </div>
+                <div class="codes-list-section">
+                    <h3>Banned Emails</h3>
+                    <div class="codes-count" id="bannedCount"></div>
+                    <table class="codes-list-table">
+                        <tr><th>Email</th><th>Banned At</th><th>Actions</th></tr>
+                        <tbody id="bannedListBody"><tr><td colspan="3"><div class="empty">Loading...</div></td></tr></tbody>
+                    </table>
+                </div>
+            `;
+
+            const banEmailInput = document.getElementById("banEmailInput");
+            const banEmailBtn = document.getElementById("banEmailBtn");
+            const bannedListBody = document.getElementById("bannedListBody");
+            const bannedCount = document.getElementById("bannedCount");
+
+            async function renderBanned() {
+                if (!bannedListBody || !localSupabase) return;
+                try {
+                    const { data, error } = await localSupabase
+                        .from("site_settings")
+                        .select("value")
+                        .eq("key", "banned_emails")
+                        .maybeSingle();
+                    let banned = [];
+                    if (data && Array.isArray(data.value)) {
+                        banned = data.value;
+                    }
+                    if (bannedCount) bannedCount.textContent = `${banned.length} banned email${banned.length === 1 ? '' : 's'}`;
+                    if (banned.length === 0) {
+                        bannedListBody.innerHTML = `<tr><td colspan="3"><div class="empty">No banned emails.</div></td></tr>`;
+                        return;
+                    }
+                    bannedListBody.innerHTML = banned.map((item, index) => {
+                        const email = (item.email || "").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+                        const bannedAt = item.banned_at ? new Date(item.banned_at).toLocaleString() : "";
+                        return `<tr><td>${email}</td><td>${bannedAt}</td><td><button type="button" class="delete-code-btn" data-index="${index}">Unban</button></td></tr>`;
+                    }).join("");
+
+                    bannedListBody.querySelectorAll(".delete-code-btn").forEach((btn) => {
+                        btn.addEventListener("click", async () => {
+                            const idx = parseInt(btn.getAttribute("data-index"), 10);
+                            const newBanned = banned.filter((_, i) => i !== idx);
+                            const { error } = await localSupabase
+                                .from("site_settings")
+                                .upsert({ key: "banned_emails", value: newBanned }, { onConflict: "key" });
+                            if (error) {
+                                alert("Failed to unban: " + error.message);
+                                return;
+                            }
+                            renderBanned();
+                        });
+                    });
+                } catch (err) {
+                    bannedListBody.innerHTML = `<tr><td colspan="3"><div class="empty">An unexpected error occurred.</div></td></tr>`;
+                    console.error(err);
+                }
+            }
+
+            renderBanned();
+
+            if (banEmailBtn && banEmailInput && localSupabase) {
+                banEmailBtn.addEventListener("click", async () => {
+                    const email = banEmailInput.value.trim();
+                    if (!email) {
+                        alert("Please enter an email to ban.");
+                        return;
+                    }
+                    try {
+                        const { data, error } = await localSupabase
+                            .from("site_settings")
+                            .select("value")
+                            .eq("key", "banned_emails")
+                            .maybeSingle();
+                        let banned = [];
+                        if (data && Array.isArray(data.value)) {
+                            banned = data.value;
+                        }
+                        if (banned.some((item) => (item.email || "").toLowerCase() === email.toLowerCase())) {
+                            alert("This email is already banned.");
+                            return;
+                        }
+                        banned.push({ email: email, banned_at: new Date().toISOString() });
+                        const { error: updateError } = await localSupabase
+                            .from("site_settings")
+                            .upsert({ key: "banned_emails", value: banned }, { onConflict: "key" });
+                        if (updateError) {
+                            alert("Failed to ban email: " + updateError.message);
+                            return;
+                        }
+                        banEmailInput.value = "";
+                        renderBanned();
+                    } catch (err) {
+                        alert("An unexpected error occurred.");
+                        console.error(err);
+                    }
+                });
+            }
+        }
+            pageTitle.textContent = "Master Actions";
+            contentEl.innerHTML = `
+                <div class="master-actions">
+                    <h2>Master Actions</h2>
+                    <p>Global controls for the PulseCAD website. Management only.</p>
+                    <div class="master-row">
+                        <div>
+                            <div class="master-row-label">Development Mode</div>
+                            <div class="master-row-sub">Enables development features across the website.</div>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" id="devModeToggle" />
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <div class="master-row">
+                        <div>
+                            <div class="master-row-label">Restart Servers</div>
+                            <div class="master-row-sub">Restart all PulseCAD servers globally.</div>
+                        </div>
+                        <button type="button" class="verified-btn" id="restartServersBtn">Restart</button>
+                    </div>
+                </div>
+                <div class="master-actions" style="margin-top:20px;">
+                    <h2>Management</h2>
+                    <p>Ban and unban user emails from accessing PulseCAD.</p>
+                    <div class="master-row">
+                        <div>
+                            <div class="master-row-label">Banned IDs</div>
+                            <div class="master-row-sub">Manage banned email addresses.</div>
+                        </div>
+                        <button type="button" class="verified-btn" id="bannedIdsBtn" style="background:#dc2626;">Banned IDs</button>
+                    </div>
+                </div>
             `;
 
             const devToggle = document.getElementById("devModeToggle");

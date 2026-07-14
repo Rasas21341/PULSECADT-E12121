@@ -985,6 +985,22 @@
             }
         }
 
+        async function isEmailBanned(email) {
+            if (!localSupabase || !email) return false;
+            try {
+                const { data } = await localSupabase
+                    .from("site_settings")
+                    .select("value")
+                    .eq("key", "banned_emails")
+                    .maybeSingle();
+                if (!data || !Array.isArray(data.value)) return false;
+                return data.value.some((item) => (item.email || "").toLowerCase() === email.toLowerCase());
+            } catch (err) {
+                console.error("Failed to check banned email:", err);
+                return false;
+            }
+        }
+
         async function updatePremiumUI() {
             const count = await getUserRedeemedCount();
             const premiumBadge = document.getElementById("settingsPremiumBadge");
@@ -1121,6 +1137,13 @@
                     return;
                 }
 
+                const banned = await isEmailBanned(email);
+                if (banned) {
+                    if (loginError) { loginError.textContent = "This account has been banned."; loginError.style.display = "block"; }
+                    if (loginBtn) { loginBtn.disabled = false; loginBtn.textContent = "Login"; }
+                    return;
+                }
+
                 if (loginBtn) { loginBtn.disabled = true; loginBtn.textContent = "Logging in..."; }
 
                 try {
@@ -1194,6 +1217,12 @@
 
                 if (!localSupabase) {
                     if (signupError) { signupError.textContent = "Authentication service unavailable."; signupError.style.display = "block"; }
+                    return;
+                }
+
+                const banned = await isEmailBanned(email);
+                if (banned) {
+                    if (signupError) { signupError.textContent = "This email address is banned from creating an account."; signupError.style.display = "block"; }
                     return;
                 }
 
