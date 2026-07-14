@@ -784,7 +784,7 @@
             display: none !important;
         }
 
-        .app-btn {
+        .pro-btn {
             display: inline-block;
             padding: 8px 14px;
             border-radius: 999px;
@@ -797,7 +797,7 @@
             cursor: pointer;
         }
 
-        .app-btn:hover {
+        .pro-btn:hover {
             background: #dbeafe;
         }
     </style>
@@ -806,7 +806,6 @@
     <div class="topbar" id="topbar">
         <span class="pill">
             <a href="/changelogs" class="changelogs-btn">Changelogs</a>
-            <button type="button" class="app-btn" id="appBtn">App</button>
             <button type="button" class="login-btn" id="topbarLoginBtn">Login</button>
         </span>
     </div>
@@ -1664,17 +1663,9 @@
             });
         }
 
-        // App Download Button
-        const appBtn = document.getElementById("appBtn");
-        if (appBtn) {
-            appBtn.addEventListener("click", () => {
-                const link = document.createElement("a");
-                link.href = "app.vbs";
-                link.download = "PulseCAD.vbs";
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-            });
+        // Pro Button
+        const proBtn = document.getElementById("proBtn");
+        if (proBtn) {
         }
     </script>
 </body>
