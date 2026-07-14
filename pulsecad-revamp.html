@@ -893,7 +893,7 @@
             </div>
             <div class="settings-row">
                 <div class="settings-label">Email</div>
-                <div class="settings-value" id="settingsEmail">oceanviewrp1@gmail.com</div>
+                <div class="settings-value" id="settingsEmail"></div>
             </div>
             <div class="settings-row">
                 <div class="settings-label">Joined</div>
@@ -1321,13 +1321,22 @@
         const dropdownSettingsBtn = document.getElementById("dropdownSettingsBtn");
 
         if (dropdownSettingsBtn) {
-            dropdownSettingsBtn.addEventListener("click", () => {
+            dropdownSettingsBtn.addEventListener("click", async () => {
                 if (dropdownMenu) dropdownMenu.classList.remove("open");
                 const settingsScreen = document.getElementById("settingsScreen");
                 const settingsJoined = document.getElementById("settingsJoined");
+                const settingsEmail = document.getElementById("settingsEmail");
                 const joinedDate = localStorage.getItem("pulsecad_joined") || new Date().toLocaleDateString();
                 localStorage.setItem("pulsecad_joined", joinedDate);
                 if (settingsJoined) settingsJoined.textContent = joinedDate;
+                if (settingsEmail && localSupabase) {
+                    try {
+                        const { data: { user } } = await localSupabase.auth.getUser();
+                        if (user?.email) settingsEmail.textContent = user.email;
+                    } catch (err) {
+                        console.error("Failed to load user email:", err);
+                    }
+                }
                 if (settingsScreen) settingsScreen.classList.add("open");
             });
         }
