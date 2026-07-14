@@ -111,18 +111,46 @@
         <div id="content"><div class="empty">Loading submissions...</div></div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         document.getElementById("backBtn").addEventListener("click", () => window.close());
         const SUPABASE_URL = "https://zwdogalwbczdtvxvhrfd.supabase.co";
         const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp3ZG9nYWx3YmN6ZHR2eHZocmZkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM2NTA2MjQsImV4cCI6MjA5OTIyNjYyNH0.baPVVTtW0d3FDC2pTd1P3d5aoIc2FZkaD-6bBvDPFWw";
 
         let localSupabase = null;
-        try {
+        
+        async function initSupabase() {
+            console.log("initSupabase called, window.supabase:", typeof window.supabase);
+            if (localSupabase) return true;
             if (typeof window.supabase !== "undefined") {
+                console.log("Creating Supabase client...");
                 localSupabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                console.log("Supabase client created:", !!localSupabase);
+                return !!localSupabase;
             }
-        } catch (err) {
-            console.error("Supabase init failed:", err);
+            console.log("window.supabase not defined, trying to load script dynamically...");
+            
+            try {
+                await new Promise((resolve, reject) => {
+                    const script = document.createElement("script");
+                    script.src = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2";
+                    script.onload = resolve;
+                    script.onerror = reject;
+                    document.head.appendChild(script);
+                });
+                
+                if (typeof window.supabase !== "undefined") {
+                    console.log("Dynamic script loaded, creating client...");
+                    localSupabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                    console.log("Supabase client created from dynamic load:", !!localSupabase);
+                    return !!localSupabase;
+                }
+            } catch (err) {
+                console.error("Failed to dynamically load Supabase:", err);
+            }
+            
+            console.error("Supabase SDK not available");
+            return false;
         }
 
         const contentEl = document.getElementById("content");
@@ -164,14 +192,16 @@
         }
 
         async function loadSubmissions() {
-            const staff = await ensureStaff();
-            if (!staff.allowed) return;
-            contentEl.innerHTML = '<div class="empty">Loading submissions...</div>';
-
             if (!localSupabase) {
-                contentEl.innerHTML = `<div class="empty">Database unavailable.</div>`;
+                await initSupabase();
+            }
+            if (!localSupabase) {
+                contentEl.innerHTML = `<div class="empty">Authentication service unavailable. Please refresh the page.</div>`;
                 return;
             }
+
+            const staff = await ensureStaff();
+            if (!staff.allowed) return;
 
             try {
                 const { data, error } = await localSupabase
@@ -221,7 +251,12 @@
             }
         }
 
-        loadSubmissions();
+        (async () => {
+            await initSupabase();
+            if (localSupabase) {
+                loadSubmissions();
+            }
+        })();
     </script>
 </body>
 </html>
