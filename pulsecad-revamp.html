@@ -876,7 +876,6 @@
     <div class="logged-in-screen" id="loggedInScreen">
         <div class="logged-in-actions">
             <button type="button" class="create-community-centered-btn" id="createCommunityCenteredBtn">Create Community</button>
-            <button type="button" class="join-community-centered-btn" id="joinCommunityCenteredBtn">Join Community</button>
             <button type="button" class="join-community-centered-btn" id="staffDashboardBtn">Staff Dashboard</button>
         </div>
         <div class="logged-in-communities" id="loggedInCommunities"></div>
@@ -1459,7 +1458,6 @@
         }
 
         const createCommunityCenteredBtn = document.getElementById("createCommunityCenteredBtn");
-        const joinCommunityCenteredBtn = document.getElementById("joinCommunityCenteredBtn");
         const loggedInCommunities = document.getElementById("loggedInCommunities");
 
         function loadCommunities() {
@@ -1483,7 +1481,7 @@
                         }
                         if (Array.isArray(data)) {
                             data.forEach((row) => {
-                                addCommunityCard(row.name, row.description || "Community", !!row.joined, row.id, row.creator_email, !!row.verification_requested, !!row.suspended);
+                                addCommunityCard(row.name, row.description || "Community", row.id, row.creator_email, !!row.verification_requested, !!row.suspended);
                             });
                         }
                     })
@@ -1503,7 +1501,7 @@
 
         refreshLockdown();
 
-        function saveCommunity(name, meta, joined) {
+        function saveCommunity(name, meta) {
             if (!localSupabase) return Promise.resolve(null);
             return localSupabase.auth.getUser().then(({ data }) => {
                 const payload = {
@@ -1511,7 +1509,6 @@
                     creator_email: data?.user?.email || "",
                     name,
                     description: meta || "",
-                    joined: !!joined,
                     verification_requested: false,
                 };
                 return localSupabase
@@ -1523,7 +1520,7 @@
                             return null;
                         }
                         if (Array.isArray(insertData) && insertData[0]) {
-                                addCommunityCard(name, insertData[0].description || "Community", !!joined, insertData[0].id, insertData[0].creator_email, !!insertData[0].verification_requested);
+                                addCommunityCard(name, insertData[0].description || "Community", insertData[0].id, insertData[0].creator_email, !!insertData[0].verification_requested);
                         }
                         return insertData ? insertData[0] : null;
                     })
@@ -1537,21 +1534,7 @@
             });
         }
 
-        function markJoined(id) {
-            if (!localSupabase || !id) return;
-            localSupabase
-                .from("communities")
-                .update({ joined: true })
-                .eq("id", id)
-                .then(({ error }) => {
-                    if (error) {
-                        alert("Failed to join community: " + error.message);
-                    }
-                })
-                .catch((err) => alert("Failed to join community: " + (err.message || err)));
-        }
-
-        function addCommunityCard(name, meta, joined, id, creatorEmail, verified, suspended) {
+        function addCommunityCard(name, meta, id, creatorEmail, verified, suspended) {
             if (!loggedInCommunities) return;
             if (id && loggedInCommunities.querySelector(`[data-id="${id}"]`)) {
                 return;
@@ -1560,7 +1543,6 @@
             card.className = "community-list-card";
             const escapedName = name.replace(/</g, "&lt;").replace(/>/g, "&gt;");
             const escapedMeta = (meta || "").replace(/</g, "&lt;").replace(/>/g, "&gt;") || "Community";
-            const isJoined = !!joined;
             const isCreator = !!creatorEmail;
             const isVerified = !!verified;
             const isSuspended = !!suspended;
@@ -1569,15 +1551,13 @@
             const badges = [];
             if (isVerified) badges.push('<span class="community-list-verified">Verified</span>');
             if (isSuspended) badges.push('<span class="community-list-suspended">Suspended</span>');
-            if (isJoined) badges.push('<span class="community-list-joined">Joined</span>');
             const badgesHtml = badges.length ? `<div class="community-list-badges">${badges.join("")}</div>` : "";
             const dashboardBtn = isCreator ? `<button type="button" class="community-list-dashboard" data-id="${id || ''}">Dashboard</button>` : "";
-            card.innerHTML = `<div class="community-list-info"${communityId}><div class="community-list-name">${escapedName}</div>${creatorText}${isSuspended ? '<div class="community-list-meta" style="color:#dc2626;font-weight:700;">This community has been suspended.</div>' : ''}<div class="community-list-meta">${isJoined ? "" : ""}</div></div>${badgesHtml}${dashboardBtn}${(!isJoined && !isCreator && !isSuspended) ? '<button type="button" class="community-list-join">Join</button>' : ""}`;
+            card.innerHTML = `<div class="community-list-info"${communityId}><div class="community-list-name">${escapedName}</div>${creatorText}${isSuspended ? '<div class="community-list-meta" style="color:#dc2626;font-weight:700;">This community has been suspended.</div>' : ''}<div class="community-list-meta"></div></div>${badgesHtml}${dashboardBtn}`;
             loggedInCommunities.appendChild(card);
 
             card.style.cursor = isSuspended ? "default" : "pointer";
             card.addEventListener("click", (e) => {
-                if (e.target.closest(".community-list-join")) return;
                 if (e.target.closest(".community-list-dashboard")) return;
                 if (isSuspended) return;
                 const rowId = card.querySelector(".community-list-info")?.getAttribute("data-id");
@@ -1585,20 +1565,6 @@
                     window.open("community.html?id=" + encodeURIComponent(rowId), "_blank");
                 }
             });
-
-            if (!isJoined && !isCreator && !isSuspended) {
-                const joinBtn = card.querySelector(".community-list-join");
-                if (joinBtn) {
-                    joinBtn.addEventListener("click", () => {
-                        const rowId = card.querySelector(".community-list-info")?.getAttribute("data-id");
-                        markJoined(rowId);
-                        const span = document.createElement("span");
-                        span.className = "community-list-joined";
-                        span.textContent = "Joined";
-                        joinBtn.replaceWith(span);
-                    });
-                }
-            }
 
             if (isCreator) {
                 const dashboardBtnEl = card.querySelector(".community-list-dashboard");
@@ -1659,17 +1625,8 @@
                     alert("Failed to apply credit. Please try again.");
                     return;
                 }
-                await saveCommunity(name.trim(), "", false);
+                await saveCommunity(name.trim(), "");
                 updatePremiumUI();
-            });
-        }
-
-        if (joinCommunityCenteredBtn) {
-            joinCommunityCenteredBtn.addEventListener("click", () => {
-                const code = prompt("Enter community join code or name:");
-                if (code && code.trim()) {
-                    addCommunityCard(code.trim(), "Joined community", false, null, null, false);
-                }
             });
         }
 
