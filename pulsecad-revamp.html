@@ -377,6 +377,28 @@
             transform: translateY(1px);
         }
 
+        .discord-login-btn {
+            width: 100%;
+            padding: 12px 14px;
+            border-radius: 12px;
+            border: 1px solid #5865F2;
+            background: #5865F2;
+            color: #ffffff;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: transform .05s ease, background .15s ease;
+        }
+
+        .discord-login-btn:hover {
+            background: #4752C4;
+        }
+
+        .discord-login-btn:active {
+            transform: translateY(1px);
+        }
+
         .auth-error {
             margin-top: 10px;
             padding: 10px 12px;
@@ -531,6 +553,22 @@
             background: #eff6ff;
         }
 
+        .community-list-leave {
+            padding: 6px 12px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 700;
+            color: #ffffff;
+            background: #dc2626;
+            border: 1px solid #dc2626;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .community-list-leave:hover {
+            background: #b91c1c;
+        }
+
         .community-list-joined {
             padding: 6px 12px;
             border-radius: 999px;
@@ -557,6 +595,15 @@
 
         .community-list-dashboard:hover {
             background: #1e293b;
+        }
+
+        .community-lock-icon {
+            display: inline-flex;
+            align-items: center;
+            font-size: 13px;
+            margin-left: 6px;
+            cursor: default;
+            user-select: none;
         }
 
         .community-list-verified {
@@ -841,8 +888,9 @@
                         <label for="loginPassword">Password</label>
                         <input type="password" id="loginPassword" placeholder="Your password" required minlength="6" />
                     </div>
-                    <button type="submit" class="auth-submit">Login</button>
-                    <div class="auth-error" id="loginError"></div>
+                     <button type="submit" class="auth-submit">Login</button>
+                     <button type="button" class="discord-login-btn" id="discordLoginBtn">Login with Discord</button>
+                     <div class="auth-error" id="loginError"></div>
                     <div class="auth-success" id="loginSuccess"></div>
                     <div class="auth-account" id="loginAccount"></div>
                 </form>
@@ -876,6 +924,7 @@
     <div class="logged-in-screen" id="loggedInScreen">
         <div class="logged-in-actions">
             <button type="button" class="create-community-centered-btn" id="createCommunityCenteredBtn">Create Community</button>
+            <button type="button" class="join-community-centered-btn" id="joinCommunityCenteredBtn">Join Community</button>
             <button type="button" class="join-community-centered-btn" id="staffDashboardBtn">Staff Dashboard</button>
         </div>
         <div class="logged-in-communities" id="loggedInCommunities"></div>
@@ -919,6 +968,12 @@
     <script>
         const SUPABASE_URL = "https://zwdogalwbczdtvxvhrfd.supabase.co";
         const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp3ZG9nYWx3YmN6ZHR2eHZocmZkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM2NTA2MjQsImV4cCI6MjA5OTIyNjYyNH0.baPVVTtW0d3FDC2pTd1P3d5aoIc2FZkaD-6bBvDPFWw";
+
+        const DISCORD_CLIENT_ID = "1526488253237170227";
+        const DISCORD_CLIENT_SECRET = "e5Zy7taZdimD11PRkqr8wYh0QCVF_Bhb";
+        const DISCORD_REDIRECT_URI = "https://pulsecad.xyz";
+        const DISCORD_SCOPES = "identify email";
+
         let localSupabase = null;
         try {
             if (typeof window.supabase !== "undefined") {
@@ -1080,6 +1135,146 @@
             }
         }
 
+        function generateRandomString(length) {
+            const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+            let result = "";
+            for (let i = 0; i < length; i++) {
+                result += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return result;
+        }
+
+        async function exchangeDiscordCode(code) {
+            const params = new URLSearchParams();
+            params.append("client_id", DISCORD_CLIENT_ID);
+            params.append("client_secret", DISCORD_CLIENT_SECRET);
+            params.append("grant_type", "authorization_code");
+            params.append("code", code);
+            params.append("redirect_uri", DISCORD_REDIRECT_URI);
+            params.append("scope", DISCORD_SCOPES);
+
+            const response = await fetch("https://discord.com/api/oauth2/token", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                },
+                body: params,
+            });
+
+            if (!response.ok) {
+                const text = await response.text();
+                throw new Error("Token exchange failed: " + response.status + " " + text);
+            }
+
+            return response.json();
+        }
+
+        async function getDiscordUser(accessToken) {
+            const response = await fetch("https://discord.com/api/users/@me", {
+                headers: {
+                    Authorization: "Bearer " + accessToken,
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error("Failed to fetch Discord user: " + response.status);
+            }
+
+            return response.json();
+        }
+
+        async function handleDiscordCallback() {
+            const params = new URLSearchParams(window.location.search);
+            const code = params.get("code");
+            const state = params.get("state");
+            const storedState = sessionStorage.getItem("discord_oauth_state");
+
+            if (!code) return;
+
+            if (!state || state !== storedState) {
+                console.error("Invalid Discord OAuth state");
+                sessionStorage.removeItem("discord_oauth_state");
+                window.history.replaceState({}, document.title, DISCORD_REDIRECT_URI);
+                return;
+            }
+
+            sessionStorage.removeItem("discord_oauth_state");
+
+            try {
+                const tokenData = await exchangeDiscordCode(code);
+                const userData = await getDiscordUser(tokenData.access_token);
+
+                localStorage.setItem("discord_user", JSON.stringify(userData));
+                localStorage.setItem("discord_token", tokenData.access_token);
+                localStorage.setItem("discord_refresh_token", tokenData.refresh_token || "");
+
+                updateDiscordUserUI(userData);
+            } catch (err) {
+                console.error("Discord OAuth callback failed:", err);
+                alert("Discord login failed. Please try again.");
+            }
+
+            window.history.replaceState({}, document.title, DISCORD_REDIRECT_URI);
+        }
+
+        function updateDiscordUserUI(userData) {
+            const topbar = document.getElementById("topbar");
+            const userDropdown = document.getElementById("userDropdown");
+            const userEmailDisplay = document.getElementById("userEmailDisplay");
+            const container = document.querySelector(".container");
+            const loggedInScreen = document.getElementById("loggedInScreen");
+            const authModal = document.getElementById("authModal");
+
+            const displayName = userData.global_name || userData.username;
+            const discriminator = userData.discriminator !== "0" ? "#" + userData.discriminator : "";
+
+            if (topbar) topbar.style.display = "none";
+            if (userEmailDisplay) {
+                userEmailDisplay.textContent = displayName + discriminator;
+            }
+            if (userDropdown) userDropdown.style.display = "inline-flex";
+            if (container) container.style.display = "none";
+            if (loggedInScreen) loggedInScreen.classList.add("open");
+            if (authModal) authModal.classList.remove("open");
+
+            const loginSuccess = document.getElementById("loginSuccess");
+            if (loginSuccess) {
+                loginSuccess.textContent = "Logged in with Discord as " + displayName + ".";
+                loginSuccess.style.display = "block";
+            }
+        }
+
+        function getStoredDiscordUser() {
+            const data = localStorage.getItem("discord_user");
+            return data ? JSON.parse(data) : null;
+        }
+
+        function clearDiscordSession() {
+            localStorage.removeItem("discord_user");
+            localStorage.removeItem("discord_token");
+            localStorage.removeItem("discord_refresh_token");
+        }
+
+        async function discordLogin() {
+            if (!DISCORD_CLIENT_ID) {
+                alert("Discord login is not configured.");
+                return;
+            }
+
+            const state = generateRandomString(32);
+            sessionStorage.setItem("discord_oauth_state", state);
+
+            const params = new URLSearchParams();
+            params.append("client_id", DISCORD_CLIENT_ID);
+            params.append("redirect_uri", DISCORD_REDIRECT_URI);
+            params.append("response_type", "code");
+            params.append("scope", DISCORD_SCOPES);
+            params.append("state", state);
+            params.append("prompt", "consent");
+
+            window.location.href = "https://discord.com/api/oauth2/authorize?" + params.toString();
+        }
+
         window.switchTab = function(tab) {
             const loginTab = document.getElementById("loginTab");
             const signupTab = document.getElementById("signupTab");
@@ -1181,6 +1376,13 @@
                 } finally {
                     if (loginBtn) { loginBtn.disabled = false; }
                 }
+            });
+        }
+
+        const discordLoginBtn = document.getElementById("discordLoginBtn");
+        if (discordLoginBtn) {
+            discordLoginBtn.addEventListener("click", () => {
+                discordLogin();
             });
         }
 
@@ -1395,6 +1597,7 @@
                         console.error("Logout failed:", err);
                     }
                 }
+                clearDiscordSession();
                 const topbarLoginBtn = document.getElementById("topbarLoginBtn");
                 const userDropdown = document.getElementById("userDropdown");
                 const container = document.querySelector(".container");
@@ -1458,6 +1661,7 @@
         }
 
         const createCommunityCenteredBtn = document.getElementById("createCommunityCenteredBtn");
+        const joinCommunityCenteredBtn = document.getElementById("joinCommunityCenteredBtn");
         const loggedInCommunities = document.getElementById("loggedInCommunities");
 
         function loadCommunities() {
@@ -1472,23 +1676,85 @@
                 localSupabase
                     .from("communities")
                     .select("*")
-                    .eq("user_id", userId)
                     .order("created_at", { ascending: false })
-                    .then(({ data, error }) => {
+                    .then(async ({ data, error }) => {
                         if (error) {
                             alert("Failed to load communities: " + error.message);
                             return;
                         }
                         if (Array.isArray(data)) {
-                            data.forEach((row) => {
-                                addCommunityCard(row.name, row.description || "Community", row.id, row.creator_email, !!row.verification_requested, !!row.suspended);
-                            });
+                            for (const row of data) {
+                                const isCreator = row.creator_email === data?.user?.email;
+                                const joined = isCreator || await checkUserJoined(userId, row.id);
+                                if (row.members_only && !joined) continue;
+                                addCommunityCard(row.name, row.description || "Community", joined, row.id, row.creator_email, !!row.verification_requested, !!row.suspended, !!row.members_only);
+                            }
                         }
                     })
                     .catch((err) => alert("Failed to load communities: " + (err.message || err)));
             }).catch((err) => {
                 console.error("Auth error in loadCommunities:", err);
             });
+        }
+
+        async function checkUserJoined(userId, communityId) {
+            if (!localSupabase || !userId || !communityId) return false;
+            try {
+                const { data, error } = await localSupabase
+                    .from("user_communities")
+                    .select("id")
+                    .eq("user_id", userId)
+                    .eq("community_id", communityId)
+                    .maybeSingle();
+                return !error && !!data;
+            } catch (err) {
+                console.error("Failed to check user join status:", err);
+                return false;
+            }
+        }
+
+        async function joinCommunity(communityId) {
+            if (!localSupabase) return;
+            try {
+                const { data: { user } } = await localSupabase.auth.getUser();
+                if (!user) {
+                    alert("You must be logged in to join.");
+                    return;
+                }
+                const { error } = await localSupabase
+                    .from("user_communities")
+                    .insert([{ user_id: user.id, community_id: communityId, joined_at: new Date().toISOString() }]);
+                if (error) {
+                    alert("Failed to join community: " + error.message);
+                    return;
+                }
+                loadCommunities();
+            } catch (err) {
+                alert("Failed to join community: " + (err.message || err));
+            }
+        }
+
+        async function leaveCommunity(communityId) {
+            if (!localSupabase || !communityId) return;
+            try {
+                const { data: { user } } = await localSupabase.auth.getUser();
+                if (!user) {
+                    alert("You must be logged in to leave.");
+                    return;
+                }
+                const { error } = await localSupabase
+                    .from("user_communities")
+                    .delete()
+                    .eq("user_id", user.id)
+                    .eq("community_id", communityId);
+                if (error) {
+                    alert("Failed to leave community: " + error.message);
+                    return;
+                }
+                loadCommunities();
+            } catch (err) {
+                alert("Failed to leave community: " + (err.message || err));
+            }
         }
 
         if (localSupabase) {
@@ -1501,7 +1767,14 @@
 
         refreshLockdown();
 
-        function saveCommunity(name, meta) {
+        handleDiscordCallback();
+
+        const storedDiscordUser = getStoredDiscordUser();
+        if (storedDiscordUser) {
+            updateDiscordUserUI(storedDiscordUser);
+        }
+
+        function saveCommunity(name, meta, passcode, membersOnly) {
             if (!localSupabase) return Promise.resolve(null);
             return localSupabase.auth.getUser().then(({ data }) => {
                 const payload = {
@@ -1511,6 +1784,8 @@
                     description: meta || "",
                     verification_requested: false,
                 };
+                if (passcode && passcode.trim()) payload.passcode = passcode.trim();
+                if (membersOnly) payload.members_only = true;
                 return localSupabase
                     .from("communities")
                     .insert([payload])
@@ -1520,7 +1795,7 @@
                             return null;
                         }
                         if (Array.isArray(insertData) && insertData[0]) {
-                                addCommunityCard(name, insertData[0].description || "Community", insertData[0].id, insertData[0].creator_email, !!insertData[0].verification_requested);
+                                addCommunityCard(name, insertData[0].description || "Community", false, insertData[0].id, insertData[0].creator_email, !!insertData[0].verification_requested, !!insertData[0].suspended, !!insertData[0].members_only);
                         }
                         return insertData ? insertData[0] : null;
                     })
@@ -1534,7 +1809,7 @@
             });
         }
 
-        function addCommunityCard(name, meta, id, creatorEmail, verified, suspended) {
+        function addCommunityCard(name, meta, joined, id, creatorEmail, verified, suspended, membersOnly) {
             if (!loggedInCommunities) return;
             if (id && loggedInCommunities.querySelector(`[data-id="${id}"]`)) {
                 return;
@@ -1543,21 +1818,28 @@
             card.className = "community-list-card";
             const escapedName = name.replace(/</g, "&lt;").replace(/>/g, "&gt;");
             const escapedMeta = (meta || "").replace(/</g, "&lt;").replace(/>/g, "&gt;") || "Community";
+            const isJoined = !!joined;
             const isCreator = !!creatorEmail;
             const isVerified = !!verified;
             const isSuspended = !!suspended;
+            const isMembersOnly = !!membersOnly;
             const communityId = id ? ` data-id="${id}"` : "";
             const creatorText = isCreator ? `<div class="community-list-meta">Created by ${escapedMeta}</div>` : "";
             const badges = [];
             if (isVerified) badges.push('<span class="community-list-verified">Verified</span>');
             if (isSuspended) badges.push('<span class="community-list-suspended">Suspended</span>');
+            if (isJoined) badges.push('<span class="community-list-joined">Joined</span>');
             const badgesHtml = badges.length ? `<div class="community-list-badges">${badges.join("")}</div>` : "";
+            const lockIcon = isMembersOnly ? '<span class="community-lock-icon"> →</span>' : "";
             const dashboardBtn = isCreator ? `<button type="button" class="community-list-dashboard" data-id="${id || ''}">Dashboard</button>` : "";
-            card.innerHTML = `<div class="community-list-info"${communityId}><div class="community-list-name">${escapedName}</div>${creatorText}${isSuspended ? '<div class="community-list-meta" style="color:#dc2626;font-weight:700;">This community has been suspended.</div>' : ''}<div class="community-list-meta"></div></div>${badgesHtml}${dashboardBtn}`;
+            const leaveBtn = (isJoined && !isCreator) ? `<button type="button" class="community-list-leave" data-id="${id || ''}">Leave</button>` : "";
+            card.innerHTML = `<div class="community-list-info"${communityId}><div class="community-list-name">${escapedName}</div>${creatorText}${isSuspended ? '<div class="community-list-meta" style="color:#dc2626;font-weight:700;">This community has been suspended.</div>' : ''}<div class="community-list-meta"></div></div>${badgesHtml}${lockIcon}${dashboardBtn}${leaveBtn}${(!isJoined && !isCreator && !isSuspended) ? '<button type="button" class="community-list-join">Join</button>' : ""}`;
             loggedInCommunities.appendChild(card);
 
             card.style.cursor = isSuspended ? "default" : "pointer";
             card.addEventListener("click", (e) => {
+                if (e.target.closest(".community-list-join")) return;
+                if (e.target.closest(".community-list-leave")) return;
                 if (e.target.closest(".community-list-dashboard")) return;
                 if (isSuspended) return;
                 const rowId = card.querySelector(".community-list-info")?.getAttribute("data-id");
@@ -1565,6 +1847,44 @@
                     window.open("community.html?id=" + encodeURIComponent(rowId), "_blank");
                 }
             });
+
+            if (!isJoined && !isCreator && !isSuspended) {
+                const joinBtn = card.querySelector(".community-list-join");
+                if (joinBtn) {
+                    joinBtn.addEventListener("click", async () => {
+                        const rowId = card.querySelector(".community-list-info")?.getAttribute("data-id");
+                        if (!rowId || !localSupabase) return;
+                        const { data: community } = await localSupabase
+                            .from("communities")
+                            .select("passcode, name")
+                            .eq("id", rowId)
+                            .maybeSingle();
+                        const passcode = prompt("Enter community passcode for " + (community?.name || "this community") + ":");
+                        if (!passcode || !passcode.trim()) return;
+                        if (community?.passcode && passcode.trim() !== community.passcode) {
+                            alert("Incorrect passcode.");
+                            return;
+                        }
+                        await joinCommunity(rowId);
+                        const span = document.createElement("span");
+                        span.className = "community-list-joined";
+                        span.textContent = "Joined";
+                        joinBtn.replaceWith(span);
+                    });
+                }
+            }
+
+            if (isJoined && !isCreator) {
+                const leaveBtn = card.querySelector(".community-list-leave");
+                if (leaveBtn) {
+                    leaveBtn.addEventListener("click", async (e) => {
+                        e.stopPropagation();
+                        const rowId = leaveBtn.getAttribute("data-id");
+                        if (!confirm("Are you sure you want to leave this community?")) return;
+                        await leaveCommunity(rowId);
+                    });
+                }
+            }
 
             if (isCreator) {
                 const dashboardBtnEl = card.querySelector(".community-list-dashboard");
@@ -1611,6 +1931,8 @@
             createCommunityCenteredBtn.addEventListener("click", async () => {
                 const name = prompt("Enter community name:");
                 if (!name || !name.trim()) return;
+                const passcode = prompt("Enter community passcode (leave blank for none):");
+                const membersOnly = confirm("Make this community members-only? (Only members can see it)");
                 if (!localSupabase) {
                     alert("Service unavailable.");
                     return;
@@ -1625,8 +1947,52 @@
                     alert("Failed to apply credit. Please try again.");
                     return;
                 }
-                await saveCommunity(name.trim(), "");
+                await saveCommunity(name.trim(), "", passcode, membersOnly);
                 updatePremiumUI();
+            });
+        }
+
+        if (joinCommunityCenteredBtn) {
+            joinCommunityCenteredBtn.addEventListener("click", async () => {
+                const passcode = prompt("Enter community passcode:");
+                if (!passcode || !passcode.trim()) return;
+                if (!localSupabase) {
+                    alert("Service unavailable.");
+                    return;
+                }
+                const { data, error } = await localSupabase
+                    .from("communities")
+                    .select("*")
+                    .eq("passcode", passcode.trim())
+                    .maybeSingle();
+                if (error || !data) {
+                    alert("No community found with that passcode.");
+                    return;
+                }
+                const { data: { user } } = await localSupabase.auth.getUser();
+                if (!user) {
+                    alert("You must be logged in to join.");
+                    return;
+                }
+                const existing = await localSupabase
+                    .from("user_communities")
+                    .select("id")
+                    .eq("user_id", user.id)
+                    .eq("community_id", data.id)
+                    .maybeSingle();
+                if (existing) {
+                    alert("You have already joined this community.");
+                    return;
+                }
+                const { error: joinError } = await localSupabase
+                    .from("user_communities")
+                    .insert([{ user_id: user.id, community_id: data.id, joined_at: new Date().toISOString() }]);
+                if (joinError) {
+                    alert("Failed to join community: " + joinError.message);
+                    return;
+                }
+                alert("Joined " + data.name + " successfully!");
+                loadCommunities();
             });
         }
 

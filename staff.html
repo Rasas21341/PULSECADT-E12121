@@ -606,7 +606,7 @@
                     return;
                 }
 
-                let html = `<table><tr><th>Name</th><th>Owner</th><th>Created</th><th>Status</th><th>Actions</th></tr>`;
+                let html = `<table><tr><th>Name</th><th>Owner</th><th>Created</th><th>Status</th><th>Members Only</th><th>Actions</th></tr>`;
                 const canSuspend = userDepartment !== "Support Team";
                 const canDelete = userDepartment !== "Support Team";
                 data.forEach((row) => {
@@ -614,16 +614,20 @@
                     const owner = (row.creator_email || "N/A").replace(/</g, "&lt;").replace(/>/g, "&gt;");
                     const created = row.created_at ? new Date(row.created_at).toLocaleString() : "";
                     const suspended = !!row.suspended;
+                    const membersOnly = !!row.members_only;
                     const statusCell = suspended
                         ? `<span class="status-pill" style="background:#dc2626;width:auto;">Suspended</span>`
                         : `<span class="status-pill" style="background:#16a34a;width:auto;">Active</span>`;
+                    const membersOnlyCell = membersOnly
+                        ? `<span class="status-pill" style="background:#2563eb;width:auto;">Members Only</span>`
+                        : `<span style="color:#94a3b8;font-size:12px;font-weight:600;">Public</span>`;
                     const suspendBtn = canSuspend
                         ? `<button class="verified-btn suspend-server-btn" data-id="${row.id}" data-suspended="${suspended}">${suspended ? "Unsuspend" : "Suspend"}</button>`
                         : `<span style="color:#94a3b8;font-size:12px;font-weight:600;">No Permission</span>`;
                     const deleteBtn = canDelete
                         ? `<button class="verified-btn delete-server-btn" data-id="${row.id}">Delete</button>`
                         : `<span style="color:#94a3b8;font-size:12px;font-weight:600;">No Permission</span>`;
-                    html += `<tr><td>${name}</td><td>${owner}</td><td>${created}</td><td>${statusCell}</td><td>${suspendBtn} ${deleteBtn}</td></tr>`;
+                    html += `<tr><td>${name}</td><td>${owner}</td><td>${created}</td><td>${statusCell}</td><td>${membersOnlyCell}</td><td>${suspendBtn} ${deleteBtn}</td></tr>`;
                 });
                 html += "</table>";
                 contentEl.innerHTML = html;
