@@ -1043,6 +1043,29 @@
             }
         }
 
+        async function syncUserToUsersTable(userId, email) {
+            if (!localSupabase || !userId || !email) return false;
+            try {
+                const { data: existing } = await localSupabase
+                    .from("users")
+                    .select("id")
+                    .eq("id", userId)
+                    .maybeSingle();
+                if (existing) return true;
+                const { error } = await localSupabase
+                    .from("users")
+                    .insert([{ id: userId, email: email, department: "Unassigned", created_at: new Date().toISOString() }]);
+                if (error) {
+                    console.error("Failed to sync user to users table:", error);
+                    return false;
+                }
+                return true;
+            } catch (err) {
+                console.error("Failed to sync user to users table:", err);
+                return false;
+            }
+        }
+
         window.switchTab = function(tab) {
             const loginTab = document.getElementById("loginTab");
             const signupTab = document.getElementById("signupTab");
@@ -1119,6 +1142,9 @@
                      if (userDropdown) userDropdown.style.display = "inline-flex";
                     if (loginAccount) { loginAccount.style.display = "block"; loginAccount.textContent = "Session active. You can close this tab safely."; }
                     loginForm.reset();
+                    if (data.user) {
+                        syncUserToUsersTable(data.user.id, email);
+                    }
 
                     const loggedInScreen = document.getElementById("loggedInScreen");
                     const container = document.querySelector(".container");
@@ -1180,11 +1206,10 @@
                     }
 
                     if (data.user) {
-                        const { error: insertError } = await localSupabase
-                            .from("users")
-                            .insert([{ id: data.user.id, email: email, department: "Unassigned", created_at: new Date().toISOString() }]);
-                        if (insertError) {
-                            console.error("Failed to add user to users table:", insertError);
+                        const synced = await syncUserToUsersTable(data.user.id, email);
+                        if (!synced && signupError) {
+                            signupError.textContent = "Account created, but profile sync failed. You may need to log in again for staff access.";
+                            signupError.style.display = "block";
                         }
                     }
 
