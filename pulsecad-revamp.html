@@ -378,25 +378,19 @@
         }
 
         .discord-login-btn {
-            width: 100%;
-            padding: 12px 14px;
-            border-radius: 12px;
+            padding: 8px 14px;
+            border-radius: 999px;
             border: 1px solid #5865F2;
             background: #5865F2;
             color: #ffffff;
-            font-size: 15px;
-            font-weight: 700;
+            font-size: 13px;
+            font-weight: 600;
             cursor: pointer;
-            margin-top: 10px;
-            transition: transform .05s ease, background .15s ease;
+            transition: background .15s ease;
         }
 
         .discord-login-btn:hover {
             background: #4752C4;
-        }
-
-        .discord-login-btn:active {
-            transform: translateY(1px);
         }
 
         .auth-error {
@@ -889,7 +883,6 @@
                         <input type="password" id="loginPassword" placeholder="Your password" required minlength="6" />
                     </div>
                      <button type="submit" class="auth-submit">Login</button>
-                     <button type="button" class="discord-login-btn" id="discordLoginBtn">Login with Discord</button>
                      <div class="auth-error" id="loginError"></div>
                     <div class="auth-success" id="loginSuccess"></div>
                     <div class="auth-account" id="loginAccount"></div>
@@ -953,6 +946,12 @@
                     <span class="badge badge-blue">PulseCAD Supporter</span>
                     <span class="badge badge-purple">PulseCAD Management</span>
                     <span class="badge badge-gold" id="settingsPremiumBadge" style="display:none;">Premium</span>
+                </div>
+            </div>
+            <div class="settings-row">
+                <div class="settings-label">Discord</div>
+                <div class="settings-value">
+                    <button type="button" class="discord-login-btn" id="discordLoginBtn">Login with Discord</button>
                 </div>
             </div>
         </div>
@@ -1225,13 +1224,7 @@
             const loggedInScreen = document.getElementById("loggedInScreen");
             const authModal = document.getElementById("authModal");
 
-            const displayName = userData.global_name || userData.username;
-            const discriminator = userData.discriminator !== "0" ? "#" + userData.discriminator : "";
-
             if (topbar) topbar.style.display = "none";
-            if (userEmailDisplay) {
-                userEmailDisplay.textContent = displayName + discriminator;
-            }
             if (userDropdown) userDropdown.style.display = "inline-flex";
             if (container) container.style.display = "none";
             if (loggedInScreen) loggedInScreen.classList.add("open");
@@ -1239,7 +1232,7 @@
 
             const loginSuccess = document.getElementById("loginSuccess");
             if (loginSuccess) {
-                loginSuccess.textContent = "Logged in with Discord as " + displayName + ".";
+                loginSuccess.textContent = "Discord account connected.";
                 loginSuccess.style.display = "block";
             }
         }
