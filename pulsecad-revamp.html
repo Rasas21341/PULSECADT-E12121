@@ -1258,16 +1258,6 @@
             if (loggedInScreen) loggedInScreen.classList.add("open");
             if (authModal) authModal.classList.remove("open");
 
-            if (userEmailDisplay) {
-                if (displayName) {
-                    userEmailDisplay.textContent = displayName;
-                } else if (userData) {
-                    const name = userData.global_name || userData.username || "";
-                    const discriminator = userData.discriminator && userData.discriminator !== "0" ? "#" + userData.discriminator : "";
-                    userEmailDisplay.textContent = name + discriminator;
-                }
-            }
-
             const loginSuccess = document.getElementById("loginSuccess");
             if (loginSuccess) {
                 loginSuccess.textContent = "Discord account connected.";
@@ -1392,20 +1382,6 @@
                      loginForm.reset();
                      if (data.user) {
                          syncUserToUsersTable(data.user.id, email);
-                         if (localSupabase) {
-                             try {
-                                 const { data: userData } = await localSupabase
-                                     .from("users")
-                                     .select("username")
-                                     .eq("id", data.user.id)
-                                     .maybeSingle();
-                                 if (userData?.username && userEmailDisplay) {
-                                     userEmailDisplay.textContent = userData.username;
-                                 }
-                             } catch (err) {
-                                 console.error("Failed to load username:", err);
-                             }
-                         }
                      }
 
                     const loggedInScreen = document.getElementById("loggedInScreen");
@@ -2095,5 +2071,6 @@
         if (proBtn) {
         }
     </script>
+    <call-us-selector phonesystem-url="https://1416.3cx.cloud/" party="3dprints"></call-us-selector>
 </body>
 </html>
