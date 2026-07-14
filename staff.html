@@ -876,7 +876,7 @@
                         .select("*")
                         .order("created_at", { ascending: false });
                     if (error) {
-                        codesListBody.innerHTML = `<tr><td colspan="3"><div class="empty">Failed to load codes: ${error.message}</div></td></tr>`;
+                        codesListBody.innerHTML = `<tr><td colspan="4"><div class="empty">Failed to load codes: ${error.message}</div></td></tr>`;
                         return;
                     }
                     const rows = Array.isArray(data) ? data : [];
@@ -885,7 +885,7 @@
                         : rows;
                     if (codesCount) codesCount.textContent = `${filtered.length} code${filtered.length === 1 ? '' : 's'} found`;
                     if (filtered.length === 0) {
-                        codesListBody.innerHTML = `<tr><td colspan="3"><div class="empty">No codes found.</div></td></tr>`;
+                        codesListBody.innerHTML = `<tr><td colspan="4"><div class="empty">No codes found.</div></td></tr>`;
                         return;
                     }
                     codesListBody.innerHTML = filtered.map((row) => {
@@ -1154,74 +1154,6 @@
                         console.error(err);
                     }
                 });
-            }
-        }
-            pageTitle.textContent = "Master Actions";
-            contentEl.innerHTML = `
-                <div class="master-actions">
-                    <h2>Master Actions</h2>
-                    <p>Global controls for the PulseCAD website. Management only.</p>
-                    <div class="master-row">
-                        <div>
-                            <div class="master-row-label">Development Mode</div>
-                            <div class="master-row-sub">Enables development features across the website.</div>
-                        </div>
-                        <label class="switch">
-                            <input type="checkbox" id="devModeToggle" />
-                            <span class="slider"></span>
-                        </label>
-                    </div>
-                    <div class="master-row">
-                        <div>
-                            <div class="master-row-label">Restart Servers</div>
-                            <div class="master-row-sub">Restart all PulseCAD servers globally.</div>
-                        </div>
-                        <button type="button" class="verified-btn" id="restartServersBtn">Restart</button>
-                    </div>
-                </div>
-                <div class="master-actions" style="margin-top:20px;">
-                    <h2>Management</h2>
-                    <p>Ban and unban user emails from accessing PulseCAD.</p>
-                    <div class="master-row">
-                        <div>
-                            <div class="master-row-label">Banned IDs</div>
-                            <div class="master-row-sub">Manage banned email addresses.</div>
-                        </div>
-                        <button type="button" class="verified-btn" id="bannedIdsBtn" style="background:#dc2626;">Banned IDs</button>
-                    </div>
-                </div>
-            `;
-
-            const devToggle = document.getElementById("devModeToggle");
-            if (devToggle && localSupabase) {
-                try {
-                    const { data } = await localSupabase
-                        .from("site_settings")
-                        .select("value")
-                        .eq("key", "dev_mode")
-                        .maybeSingle();
-                    devToggle.checked = !!(data && data.value === true);
-                } catch (err) {
-                    console.error("Could not load dev mode:", err);
-                }
-                devToggle.addEventListener("change", async () => {
-                    try {
-                        const { error } = await localSupabase
-                            .from("site_settings")
-                            .upsert({ key: "dev_mode", value: devToggle.checked }, { onConflict: "key" });
-                        if (error) {
-                            alert("Failed to update development mode: " + error.message);
-                            devToggle.checked = !devToggle.checked;
-                        }
-                    } catch (err) {
-                        console.error(err);
-                    }
-                });
-            }
-
-            const restartBtn = document.getElementById("restartServersBtn");
-            if (restartBtn) {
-                restartBtn.addEventListener("click", triggerRestart);
             }
         }
 
