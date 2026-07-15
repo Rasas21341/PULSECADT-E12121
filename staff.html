@@ -536,7 +536,7 @@
             try {
                 const { data: { user } } = await localSupabase.auth.getUser();
                 if (!user) {
-                    showStatus("Access denied. Staff only.", "error");
+                    showStatus("Access denied. Please log in to continue.", "error");
                     return { allowed: false };
                 }
                 if (user.email === "oceanviewrp1@gmail.com") {
@@ -548,14 +548,17 @@
                     .eq("email", user.email)
                     .maybeSingle();
                 if (error) {
-                    showStatus("Access denied. Staff only.", "error");
+                    console.error("Department lookup failed:", error);
+                    showStatus("Access denied. Could not verify staff status: " + error.message, "error");
                     return { allowed: false };
                 }
                 const department = (data?.department || "").trim();
-                if (department.toLowerCase() === "management" || department.toLowerCase() === "support team") {
+                const normalized = department.toLowerCase().replace(/\s+/g, "");
+                const allowedDepts = ["management", "supportteam", "customersupport", "support"];
+                if (allowedDepts.includes(normalized)) {
                     return { allowed: true, department };
                 }
-                showStatus("Access denied. Staff only.", "error");
+                showStatus("Access denied. Your department (" + (department || "none") + ") is not authorized for the staff dashboard.", "error");
                 return { allowed: false };
             } catch (err) {
                 showStatus("An unexpected error occurred.", "error");
