@@ -790,8 +790,6 @@
             codesBtn.addEventListener("click", loadCodes);
         }
 
-        initSidebar();
-
         async function loadApplications() {
             const staff = await ensureStaff();
             if (!staff.allowed) return;
@@ -1254,7 +1252,28 @@
         }
 
         captureMyIp();
-        loadServers();
+
+        function showAccessDenied() {
+            document.body.innerHTML = `
+                <div style="min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:24px;text-align:center;font-family:inherit;">
+                    <div style="font-size:24px;font-weight:700;color:#0f172a;">Access Denied</div>
+                    <div style="font-size:14px;color:#64748b;max-width:420px;">You do not have access to the staff dashboard. If you believe this is a mistake, please contact a manager.</div>
+                    <a href="index.html" style="display:inline-block;padding:10px 18px;border-radius:999px;background:#2563eb;color:#ffffff;font-size:14px;font-weight:700;text-decoration:none;">Return Home</a>
+                </div>
+            `;
+        }
+
+        async function init() {
+            const staff = await ensureStaff();
+            if (!staff.allowed) {
+                showAccessDenied();
+                return;
+            }
+            initSidebar();
+            loadServers();
+        }
+
+        init();
 
         async function triggerRestart() {
             if (!confirm("Are you sure you want to restart all servers? This will temporarily make the site unavailable.")) {
