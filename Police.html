@@ -538,6 +538,16 @@
             background: #eff6ff;
         }
 
+        .panel-banner {
+            width: 100%;
+            max-width: 520px;
+            height: auto;
+            border-radius: 16px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+            margin-bottom: 4px;
+        }
+
     </style>
 </head>
 <body>
@@ -554,12 +564,21 @@
     </div>
 
 
+    <img class="panel-banner" src="https://imgv2-1-f.scribdassets.com/img/document/865053056/original/2dedda0f99/1?v=1" alt="Police panel banner" />
+
     <button class="back-btn" id="backBtn">← Back</button>
     <div class="button-row">
         <button type="button" class="lookup-btn" id="lookupBtn" aria-label="Lookup">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <circle cx="11" cy="11" r="8"></circle>
                 <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+        </button>
+        <button type="button" class="lookup-btn" id="liveMapBtn" aria-label="Live Map" title="Live Map (ER:LC)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="1 6 8 3 16 6 23 3 23 18 16 21 8 18 1 21"></polygon>
+                <line x1="8" y1="3" x2="8" y2="18"></line>
+                <line x1="16" y1="6" x2="16" y2="21"></line>
             </svg>
         </button>
     </div>
@@ -710,6 +729,18 @@
             <button type="button" class="report-submit" id="arrestDownloadPdfBtn" style="background:#334155;">Download PDF</button>
             <div class="lookup-error" id="arrestError"></div>
             <div class="lookup-result" id="arrestSuccess"></div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="liveMapModal">
+        <div class="modal" style="max-width:600px;">
+            <div class="modal-header">
+                <div class="modal-title">Live Map (ER:LC)</div>
+                <button class="modal-close" id="liveMapModalClose" type="button" aria-label="Close">×</button>
+            </div>
+            <canvas id="liveMapCanvas" width="560" height="340" style="width:100%; border-radius:12px; background:#0b1220; display:block;"></canvas>
+            <div id="liveMapStatus" style="font-size:13px; color:#64748b; margin:8px 0;"></div>
+            <div id="liveMapList" style="max-height:200px; overflow:auto;"></div>
         </div>
     </div>
 
@@ -1572,6 +1603,130 @@
         const arrestDownloadPdfBtn = document.getElementById("arrestDownloadPdfBtn");
         if (arrestDownloadPdfBtn) {
             arrestDownloadPdfBtn.addEventListener("click", generateArrestPdf);
+        }
+
+        // ---- ERLC Live Map ----
+        let erlcApiKey = new URLSearchParams(window.location.search).get("erlckey") || "";
+        if (!erlcApiKey) {
+            try { erlcApiKey = localStorage.getItem("policeErkKey") || ""; } catch (e) {}
+        }
+
+        function esc(s) {
+            return String(s == null ? "" : s).replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        }
+
+        const liveMapBtn = document.getElementById("liveMapBtn");
+        const liveMapModal = document.getElementById("liveMapModal");
+        const liveMapModalClose = document.getElementById("liveMapModalClose");
+        const liveMapCanvas = document.getElementById("liveMapCanvas");
+        const liveMapStatus = document.getElementById("liveMapStatus");
+        const liveMapList = document.getElementById("liveMapList");
+
+        if (liveMapBtn && !erlcApiKey) liveMapBtn.style.display = "none";
+
+        let liveMapTimer = null;
+        function stopLiveMap() {
+            if (liveMapTimer) { clearInterval(liveMapTimer); liveMapTimer = null; }
+        }
+
+        async function fetchErkPlayers() {
+            const res = await fetch("/api/erlc/v2/server?Players=true", {
+                headers: { "server-key": erlcApiKey, "Accept": "application/json" }
+            });
+            if (!res.ok) throw new Error("HTTP " + res.status);
+            const json = await res.json();
+            return Array.isArray(json.Players) ? json.Players : [];
+        }
+
+        function drawLiveMap(players) {
+            if (!liveMapCanvas) return;
+            const ctx = liveMapCanvas.getContext("2d");
+            const W = liveMapCanvas.width, H = liveMapCanvas.height;
+            ctx.clearRect(0, 0, W, H);
+            ctx.fillStyle = "#0b1220";
+            ctx.fillRect(0, 0, W, H);
+            ctx.strokeStyle = "rgba(148,163,184,0.15)";
+            ctx.lineWidth = 1;
+            for (let i = 0; i <= W; i += 40) { ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, H); ctx.stroke(); }
+            for (let j = 0; j <= H; j += 40) { ctx.beginPath(); ctx.moveTo(0, j); ctx.lineTo(W, j); ctx.stroke(); }
+
+            if (!players.length) return;
+            let minX = Infinity, maxX = -Infinity, minZ = Infinity, maxZ = -Infinity;
+            players.forEach((p) => {
+                const l = p.Location || {};
+                if (typeof l.LocationX === "number") { minX = Math.min(minX, l.LocationX); maxX = Math.max(maxX, l.LocationX); }
+                if (typeof l.LocationZ === "number") { minZ = Math.min(minZ, l.LocationZ); maxZ = Math.max(maxZ, l.LocationZ); }
+            });
+            if (!isFinite(minX)) { minX = maxX = 0; }
+            if (!isFinite(minZ)) { minZ = maxZ = 0; }
+            const pad = 30;
+            const sx = (maxX === minX) ? 0 : (W - 2 * pad) / (maxX - minX);
+            const sz = (maxZ === minZ) ? 0 : (H - 2 * pad) / (maxZ - minZ);
+            const s = Math.min(sx, sz) || 1;
+            const ox = pad - minX * s + (W - 2 * pad - (maxX - minX) * s) / 2;
+            const oz = pad - minZ * s + (H - 2 * pad - (maxZ - minZ) * s) / 2;
+            const officerLower = (officerName || "").trim().toLowerCase();
+            players.forEach((p) => {
+                const l = p.Location || {};
+                const x = l.LocationX, z = l.LocationZ;
+                if (typeof x !== "number" || typeof z !== "number") return;
+                const px = ox + x * s, py = oz + z * s;
+                const pname = (p.Player || "").split(":")[0];
+                const isOfficer = officerLower && pname.toLowerCase().indexOf(officerLower) !== -1;
+                ctx.beginPath();
+                ctx.arc(px, py, isOfficer ? 7 : 5, 0, Math.PI * 2);
+                ctx.fillStyle = isOfficer ? "#22c55e" : (p.Team === "Civilian" ? "#94a3b8" : "#ef4444");
+                ctx.fill();
+                ctx.fillStyle = "#e2e8f0";
+                ctx.font = "11px sans-serif";
+                ctx.fillText(pname + (p.Callsign ? (" · " + p.Callsign) : ""), px + 8, py + 3);
+            });
+        }
+
+        function renderLiveMapList(players) {
+            if (!liveMapList) return;
+            if (!players.length) { liveMapList.innerHTML = '<div class="empty">No players in server.</div>'; return; }
+            liveMapList.innerHTML = players.map((p) => {
+                const pname = (p.Player || "?").split(":")[0];
+                const l = p.Location || {};
+                const addr = [l.StreetName, l.BuildingNumber, l.PostalCode].filter(Boolean).join(" ");
+                const stars = p.WantedStars ? "★".repeat(Math.min(p.WantedStars, 5)) : "";
+                return `<div class="record-item"><div class="record-text"><strong>${esc(pname)}${p.Callsign ? (" · " + esc(p.Callsign)) : ""}</strong><span>${esc(p.Team || "")}${stars ? (" · " + stars) : ""}${addr ? (" · " + esc(addr)) : ""}</span></div></div>`;
+            }).join("");
+        }
+
+        async function refreshLiveMap() {
+            if (!liveMapModal || !liveMapModal.classList.contains("open")) return;
+            try {
+                const players = await fetchErkPlayers();
+                drawLiveMap(players);
+                renderLiveMapList(players);
+                if (liveMapStatus) liveMapStatus.textContent = players.length + " players currently in server";
+            } catch (err) {
+                if (liveMapStatus) liveMapStatus.textContent = "Live map unavailable: " + err.message + " — check API key / browser CORS";
+                console.error("ERLC live map failed:", err);
+            }
+        }
+
+        function startLiveMap() {
+            refreshLiveMap();
+            stopLiveMap();
+            liveMapTimer = setInterval(refreshLiveMap, 5000);
+        }
+
+        if (liveMapBtn && erlcApiKey) {
+            liveMapBtn.addEventListener("click", () => {
+                if (liveMapModal) liveMapModal.classList.add("open");
+                startLiveMap();
+            });
+        }
+        if (liveMapModalClose) {
+            liveMapModalClose.addEventListener("click", () => { stopLiveMap(); if (liveMapModal) liveMapModal.classList.remove("open"); });
+        }
+        if (liveMapModal) {
+            liveMapModal.addEventListener("click", (e) => {
+                if (e.target === liveMapModal) { stopLiveMap(); liveMapModal.classList.remove("open"); }
+            });
         }
     </script>
 </body>

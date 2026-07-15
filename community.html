@@ -592,6 +592,10 @@
                         }
                         const serverName = (communityData.name || "").replace(/</g, "&lt;").replace(/>/g, "&gt;");
                         const approvalMode = communityData.join_approval === "manual" ? "manual" : "automatic";
+                        let initialErkKey = communityData.erlc_api_key || "";
+                        if (!initialErkKey) {
+                            try { initialErkKey = localStorage.getItem("erlcApiKey_" + id) || ""; } catch (e) {}
+                        }
 
                         contentEl.innerHTML = `
                             <div class="dashboard">
@@ -612,6 +616,10 @@
                                     <div class="field">
                                         <label>Community Passcode</label>
                                         <input type="text" id="communityPasscodeInput" placeholder="Leave blank for no passcode" value="${(communityData.passcode || '').replace(/</g, '&lt;').replace(/>/g, '&gt;')}" />
+                                    </div>
+                                    <div class="field">
+                                        <label>ERLC API Key</label>
+                                        <input type="text" id="erlcApiKeyInput" placeholder="ERLC API key" value="${initialErkKey.replace(/</g, '&lt;').replace(/>/g, '&gt;')}" />
                                     </div>
                                     <div class="dashboard-dropdown">
                                         <button type="button" class="dropdown-toggle" id="membersDropdownToggle">Members</button>
@@ -688,6 +696,29 @@
                                         .eq("id", id);
                                 } catch (err) {
                                     alert("Failed to save community passcode.");
+                                }
+                            });
+                        }
+
+                        const erlcApiKeyInput = document.getElementById("erlcApiKeyInput");
+                        if (erlcApiKeyInput) {
+                            erlcApiKeyInput.addEventListener("blur", async () => {
+                                const val = erlcApiKeyInput.value.trim();
+                                try {
+                                    const { error } = await localSupabase
+                                        .from("communities")
+                                        .update({ erlc_api_key: val || null })
+                                        .eq("id", id);
+                                    if (error) console.warn("DB save of ERLC API key failed:", error.message);
+                                    try {
+                                        if (val) localStorage.setItem("erlcApiKey_" + id, val);
+                                        else localStorage.removeItem("erlcApiKey_" + id);
+                                    } catch (e) {}
+                                } catch (err) {
+                                    try {
+                                        if (val) localStorage.setItem("erlcApiKey_" + id, val);
+                                        else localStorage.removeItem("erlcApiKey_" + id);
+                                    } catch (e) {}
                                 }
                             });
                         }
@@ -1299,7 +1330,11 @@
                     return;
                 }
                 if (poError) { poError.textContent = ""; poError.style.display = "none"; }
+                let erlcKey = (data && data.erlc_api_key) || "";
+                if (!erlcKey) { try { erlcKey = localStorage.getItem("erlcApiKey_" + id) || ""; } catch (e) {} }
                 const params = new URLSearchParams({ name, rank, callsign });
+                if (erlcKey) params.set("erlckey", erlcKey);
+                try { localStorage.setItem("policeErkKey", erlcKey); } catch (e) {}
                 window.open("police.html?" + params.toString(), "_blank");
                 if (policeModal) policeModal.classList.remove("open");
             });
@@ -1324,7 +1359,12 @@
 
         function handleDepartmentClick(department) {
             if (!department.passcode) {
-                window.open("police.html", "_blank");
+                let erlcKey = (data && data.erlc_api_key) || "";
+                if (!erlcKey) { try { erlcKey = localStorage.getItem("erlcApiKey_" + id) || ""; } catch (e) {} }
+                const params = new URLSearchParams({});
+                if (erlcKey) params.set("erlckey", erlcKey);
+                try { localStorage.setItem("policeErkKey", erlcKey); } catch (e) {}
+                window.open("police.html?" + params.toString(), "_blank");
                 return;
             }
             openDeptPasscodeModal(department);
