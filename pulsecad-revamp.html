@@ -2200,13 +2200,68 @@ enable-ga="false"
             }
         }
 
+        function applyLoggedInUI(email) {
+            const topbar = document.getElementById("topbar");
+            const topbarLoginBtn = document.getElementById("topbarLoginBtn");
+            const userDropdown = document.getElementById("userDropdown");
+            const userEmailDisplay = document.getElementById("userEmailDisplay");
+            const container = document.querySelector(".container");
+            const loggedInScreen = document.getElementById("loggedInScreen");
+            const authModal = document.getElementById("authModal");
+            if (topbar) topbar.style.display = "none";
+            if (topbarLoginBtn) topbarLoginBtn.textContent = "Logout";
+            if (userDropdown) userDropdown.style.display = "inline-flex";
+            if (userEmailDisplay && email) userEmailDisplay.textContent = email;
+            if (container) container.style.display = "none";
+            if (loggedInScreen) loggedInScreen.classList.add("open");
+            if (authModal) authModal.classList.remove("open");
+        }
+
+        function applyLoggedOutUI() {
+            const topbar = document.getElementById("topbar");
+            const topbarLoginBtn = document.getElementById("topbarLoginBtn");
+            const userDropdown = document.getElementById("userDropdown");
+            const container = document.querySelector(".container");
+            const loggedInScreen = document.getElementById("loggedInScreen");
+            const settingsScreen = document.getElementById("settingsScreen");
+            if (topbar) topbar.style.display = "block";
+            if (topbarLoginBtn) topbarLoginBtn.textContent = "Login";
+            if (userDropdown) userDropdown.style.display = "none";
+            if (loggedInScreen) loggedInScreen.classList.remove("open");
+            if (settingsScreen) settingsScreen.classList.remove("open");
+            if (container) container.style.display = "block";
+        }
+
+        async function restoreSession() {
+            if (!localSupabase) return;
+            try {
+                const { data: { session } } = await localSupabase.auth.getSession();
+                if (session && session.user) {
+                    applyLoggedInUI(session.user.email || "");
+                    updatePremiumUI();
+                    loadCommunities();
+                } else {
+                    applyLoggedOutUI();
+                }
+            } catch (err) {
+                console.error("Restore session failed:", err);
+            }
+        }
+
         if (localSupabase) {
-            localSupabase.auth.onAuthStateChange(() => {
+            localSupabase.auth.onAuthStateChange((event, session) => {
+                if (session && session.user) {
+                    applyLoggedInUI(session.user.email || "");
+                } else {
+                    applyLoggedOutUI();
+                }
                 loadCommunities();
                 refreshLockdown();
                 updatePremiumUI();
             });
         }
+
+        restoreSession();
 
         refreshLockdown();
 
