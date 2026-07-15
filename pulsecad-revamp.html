@@ -1252,22 +1252,6 @@
             background: #dbeafe;
         }
 
-        .wallet-btn {
-            display: inline-block;
-            padding: 8px 14px;
-            border-radius: 999px;
-            font-size: 13px;
-            font-weight: 700;
-            color: #166534;
-            background: #f0fdf4;
-            border: 1px solid #bbf7d0;
-            cursor: pointer;
-        }
-
-        .wallet-btn:hover {
-            background: #dcfce7;
-        }
-
         .wallet-balance-card {
             text-align: center;
             padding: 18px 0 20px;
@@ -1421,7 +1405,6 @@ enable-ga="false"
     <div class="topbar" id="topbar">
         <span class="pill">
             <a href="/changelogs" class="changelogs-btn">Changelogs</a>
-            <button type="button" class="wallet-btn" id="topbarWalletBtn">Wallet</button>
             <button type="button" class="pro-btn" id="topbarProBtn">Pro</button>
             <button type="button" class="login-btn" id="topbarLoginBtn">Login</button>
             
@@ -2674,7 +2657,7 @@ enable-ga="false"
                 if (isSuspended) return;
                 const rowId = card.querySelector(".community-list-info")?.getAttribute("data-id");
                 if (rowId) {
-                    window.open("community.html?id=" + encodeURIComponent(rowId), "_blank");
+                    window.open("community/" + encodeURIComponent(rowId), "_blank");
                 }
             });
 
@@ -2723,7 +2706,7 @@ enable-ga="false"
                         e.stopPropagation();
                         const rowId = dashboardBtnEl.getAttribute("data-id");
                         if (rowId) {
-                            window.open("community.html?id=" + encodeURIComponent(rowId) + "&dashboard=1", "_blank");
+                            window.open("community/" + encodeURIComponent(rowId) + "?dashboard=1", "_blank");
                         }
                     });
                 }
@@ -3368,7 +3351,6 @@ enable-ga="false"
             return div.innerHTML;
         }
 
-        const topbarWalletBtn = document.getElementById("topbarWalletBtn");
         const walletModal = document.getElementById("walletModal");
         const walletModalClose = document.getElementById("walletModalClose");
         const walletAddBtn = document.getElementById("walletAddBtn");
@@ -3423,13 +3405,6 @@ enable-ga="false"
         }
 
         const dropdownWalletBtn = document.getElementById("dropdownWalletBtn");
-
-        if (topbarWalletBtn) {
-            topbarWalletBtn.addEventListener("click", (e) => {
-                e.stopPropagation();
-                openWalletModal();
-            });
-        }
 
         if (dropdownWalletBtn) {
             dropdownWalletBtn.addEventListener("click", (e) => {

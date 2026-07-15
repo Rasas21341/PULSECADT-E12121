@@ -532,11 +532,19 @@
 
         document.getElementById("backBtn").addEventListener("click", () => window.close());
 
+        function getCommunityIdFromUrl() {
+            const params = new URLSearchParams(window.location.search);
+            const q = params.get("id");
+            if (q) return q;
+            const m = window.location.pathname.match(/\/community\/([^/?#]+)/);
+            if (m) return decodeURIComponent(m[1]);
+            return null;
+        }
+
         async function loadCommunity() {
             try {
-                const params = new URLSearchParams(window.location.search);
-                const id = params.get("id");
-                const dashboard = params.get("dashboard");
+                const id = getCommunityIdFromUrl();
+                const dashboard = new URLSearchParams(window.location.search).get("dashboard");
                 if (!id) {
                     contentEl.innerHTML = `<div class="empty">No community specified.</div>`;
                     return;
