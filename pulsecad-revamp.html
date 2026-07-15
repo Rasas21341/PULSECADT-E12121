@@ -169,6 +169,327 @@
             min-width: 0;
         }
 
+        .support-ticket-btn {
+            display: inline-flex;
+            align-items: center;
+            font-size: 13px;
+            font-weight: 600;
+            color: #2563eb;
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            padding: 8px 14px;
+            border-radius: 999px;
+            cursor: pointer;
+            white-space: nowrap;
+            flex: 0 0 auto;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+        }
+
+        .support-ticket-btn:hover {
+            background: #dbeafe;
+        }
+
+        .mod-panel-btn {
+            padding: 6px 12px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 700;
+            color: #ffffff;
+            background: #7c3aed;
+            border: 1px solid #7c3aed;
+            cursor: pointer;
+            white-space: nowrap;
+            text-decoration: none;
+        }
+
+        .mod-panel-btn:hover {
+            background: #6d28d9;
+        }
+
+        .support-field {
+            margin-bottom: 14px;
+        }
+
+        .support-field label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: #334155;
+            margin-bottom: 6px;
+        }
+
+        .support-field input,
+        .support-field select,
+        .support-field textarea {
+            width: 100%;
+            padding: 12px 14px;
+            border-radius: 12px;
+            border: 1px solid #cbd5e1;
+            font-size: 15px;
+            color: #0f172a;
+            outline: none;
+            font-family: inherit;
+            transition: border-color .15s ease, box-shadow .15s ease;
+        }
+
+        .support-field textarea {
+            min-height: 110px;
+            resize: vertical;
+        }
+
+        .support-field input:focus,
+        .support-field select:focus,
+        .support-field textarea:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+        }
+
+        .support-submit {
+            width: 100%;
+            padding: 12px 14px;
+            border-radius: 12px;
+            border: none;
+            background: #2563eb;
+            color: #ffffff;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform .05s ease, background .15s ease;
+        }
+
+        .support-submit:hover {
+            background: #1d4ed8;
+        }
+
+        .support-submit:active {
+            transform: translateY(1px);
+        }
+
+        .support-submit:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .support-error {
+            margin-top: 12px;
+            padding: 10px 12px;
+            border-radius: 10px;
+            background: #fef2f2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+            font-size: 14px;
+            display: none;
+        }
+
+        .support-waiting {
+            margin-top: 12px;
+            padding: 14px;
+            border-radius: 12px;
+            background: #f0fdf4;
+            color: #166534;
+            border: 1px solid #bbf7d0;
+            font-size: 14px;
+            text-align: center;
+            display: none;
+        }
+
+        .support-waiting-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #22c55e;
+            margin: 0 auto 10px;
+            animation: blink 1s infinite;
+        }
+
+        .support-tabs {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 16px;
+        }
+
+        .support-tab-btn {
+            flex: 1;
+            padding: 9px 10px;
+            border-radius: 999px;
+            border: 1px solid #e2e8f0;
+            background: #ffffff;
+            color: #475569;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .support-tab-btn.active {
+            background: #0f172a;
+            color: #ffffff;
+            border-color: #0f172a;
+        }
+
+        .support-my-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-height: 60vh;
+            overflow-y: auto;
+        }
+
+        .support-my-item {
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 12px;
+            cursor: pointer;
+            transition: background .15s ease, border-color .15s ease;
+        }
+
+        .support-my-item:hover {
+            background: #f8fafc;
+            border-color: #cbd5e1;
+        }
+
+        .support-my-item-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            margin-bottom: 4px;
+        }
+
+        .support-my-item-type {
+            font-size: 13px;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .support-my-item-preview {
+            font-size: 12px;
+            color: #64748b;
+            word-break: break-word;
+        }
+
+        .support-my-empty {
+            font-size: 13px;
+            color: #64748b;
+            text-align: center;
+            padding: 24px;
+        }
+
+        .support-status {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: capitalize;
+            background: #f0fdf4;
+            color: #166534;
+            border: 1px solid #bbf7d0;
+        }
+
+        .support-status-closed {
+            background: #f1f5f9;
+            color: #475569;
+            border-color: #e2e8f0;
+        }
+
+        .support-thread-back {
+            background: transparent;
+            border: none;
+            color: #2563eb;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            padding: 4px 0;
+            margin-bottom: 8px;
+        }
+
+        .support-thread-header {
+            font-size: 13px;
+            color: #475569;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .support-thread-messages {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-height: 320px;
+            overflow-y: auto;
+            padding: 4px;
+            margin-bottom: 12px;
+        }
+
+        .support-msg {
+            max-width: 82%;
+            padding: 10px 12px;
+            border-radius: 14px;
+            font-size: 13px;
+            line-height: 1.5;
+            word-break: break-word;
+            white-space: pre-wrap;
+        }
+
+        .support-msg-user {
+            align-self: flex-end;
+            background: #2563eb;
+            color: #ffffff;
+            border-bottom-right-radius: 4px;
+        }
+
+        .support-msg-staff {
+            align-self: flex-start;
+            background: #f1f5f9;
+            color: #0f172a;
+            border-bottom-left-radius: 4px;
+        }
+
+        .support-msg-sender {
+            font-size: 11px;
+            font-weight: 700;
+            opacity: 0.8;
+            margin-bottom: 3px;
+        }
+
+        .support-msg-time {
+            font-size: 10px;
+            opacity: 0.7;
+            margin-top: 4px;
+        }
+
+        .support-thread-empty {
+            font-size: 13px;
+            color: #94a3b8;
+            text-align: center;
+            padding: 16px;
+        }
+
+        .support-reply-form {
+            display: flex;
+            gap: 8px;
+            align-items: flex-end;
+        }
+
+        .support-reply-input {
+            flex: 1;
+            min-height: 44px;
+            max-height: 120px;
+            padding: 10px 12px;
+            border-radius: 12px;
+            border: 1px solid #cbd5e1;
+            font-size: 14px;
+            font-family: inherit;
+            color: #0f172a;
+            outline: none;
+            resize: vertical;
+        }
+
+        .support-reply-input:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+        }
+
         .premium-count {
             display: inline-flex;
             align-items: center;
@@ -884,6 +1205,7 @@ enable-ga="false"
     </div>
     <div class="topbar-right">
         <div class="user-dropdown" id="userDropdown" style="display:none;">
+            <button type="button" class="support-ticket-btn" id="supportTicketBtn">Support Ticket</button>
             <div class="user-email" id="userEmailDisplay"></div>
             <div class="premium-count" id="premiumCountDisplay" style="display:none;"><span id="premiumCountText"></span></div>
             <div class="dropdown-menu" id="dropdownMenu">
@@ -989,6 +1311,55 @@ enable-ga="false"
                 <div class="settings-label">Discord</div>
                 <div class="settings-value">
                     <button type="button" class="discord-login-btn" id="discordLoginBtn">Login with Discord</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-overlay" id="supportModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">Support</div>
+                <button class="modal-close" id="supportModalClose" type="button" aria-label="Close">×</button>
+            </div>
+            <div class="support-tabs">
+                <button type="button" class="support-tab-btn active" id="supportTabNew" data-tab="new">New Ticket</button>
+                <button type="button" class="support-tab-btn" id="supportTabMine" data-tab="mine">My Tickets</button>
+            </div>
+            <div id="supportNewView">
+                <form id="supportForm">
+                    <div class="support-field">
+                        <label for="supportEmail">Email</label>
+                        <input type="email" id="supportEmail" placeholder="you@example.com" required />
+                    </div>
+                    <div class="support-field">
+                        <label for="supportType">Report Type</label>
+                        <select id="supportType" required>
+                            <option value="Regular Support">Regular Support</option>
+                            <option value="Staff Report">Staff Report</option>
+                        </select>
+                    </div>
+                    <div class="support-field">
+                        <label for="supportDescription">Description</label>
+                        <textarea id="supportDescription" placeholder="Describe your issue or report in detail..." required></textarea>
+                    </div>
+                    <button type="submit" class="support-submit" id="supportSubmitBtn">Submit Ticket</button>
+                    <div class="support-error" id="supportError"></div>
+                </form>
+                <div class="support-waiting" id="supportWaiting">
+                    <div class="support-waiting-dot"></div>
+                    <div id="supportWaitingText">Your ticket has been submitted. Please wait here while our team reviews your request.</div>
+                </div>
+            </div>
+            <div id="supportMineView" style="display:none;">
+                <div id="supportMyList" class="support-my-list">Loading...</div>
+                <div id="supportThreadView" style="display:none;">
+                    <button type="button" class="support-thread-back" id="supportThreadBack">← Back to my tickets</button>
+                    <div class="support-thread-header" id="supportThreadHeader"></div>
+                    <div class="support-thread-messages" id="supportThreadMessages"></div>
+                    <form class="support-reply-form" id="supportReplyForm">
+                        <textarea class="support-reply-input" id="supportReplyInput" placeholder="Type your message..." required></textarea>
+                        <button type="submit" class="support-submit" id="supportReplySendBtn" style="width:auto;">Send</button>
+                    </form>
                 </div>
             </div>
         </div>
@@ -1906,8 +2277,9 @@ enable-ga="false"
             const badgesHtml = badges.length ? `<div class="community-list-badges">${badges.join("")}</div>` : "";
             const lockIcon = isMembersOnly ? '<span class="community-lock-icon"> →</span>' : "";
             const dashboardBtn = isCreator ? `<button type="button" class="community-list-dashboard" data-id="${id || ''}">Dashboard</button>` : "";
+            const modPanelBtn = isCreator ? `<button type="button" class="mod-panel-btn" data-id="${id || ''}">Mod Panel</button>` : "";
             const leaveBtn = (isJoined && !isCreator) ? `<button type="button" class="community-list-leave" data-id="${id || ''}">Leave</button>` : "";
-            card.innerHTML = `<div class="community-list-info"${communityId}><div class="community-list-name">${escapedName}</div>${creatorText}${isSuspended ? '<div class="community-list-meta" style="color:#dc2626;font-weight:700;">This community has been suspended.</div>' : ''}<div class="community-list-meta"></div></div>${badgesHtml}${lockIcon}${dashboardBtn}${leaveBtn}${(!isJoined && !isCreator && !isSuspended) ? '<button type="button" class="community-list-join">Join</button>' : ""}`;
+            card.innerHTML = `<div class="community-list-info"${communityId}><div class="community-list-name">${escapedName}</div>${creatorText}${isSuspended ? '<div class="community-list-meta" style="color:#dc2626;font-weight:700;">This community has been suspended.</div>' : ''}<div class="community-list-meta"></div></div>${badgesHtml}${lockIcon}${dashboardBtn}${modPanelBtn}${leaveBtn}${(!isJoined && !isCreator && !isSuspended) ? '<button type="button" class="community-list-join">Join</button>' : ""}`;
             loggedInCommunities.appendChild(card);
 
             card.style.cursor = isSuspended ? "default" : "pointer";
@@ -1915,6 +2287,7 @@ enable-ga="false"
                 if (e.target.closest(".community-list-join")) return;
                 if (e.target.closest(".community-list-leave")) return;
                 if (e.target.closest(".community-list-dashboard")) return;
+                if (e.target.closest(".mod-panel-btn")) return;
                 if (isSuspended) return;
                 const rowId = card.querySelector(".community-list-info")?.getAttribute("data-id");
                 if (rowId) {
@@ -1968,6 +2341,17 @@ enable-ga="false"
                         const rowId = dashboardBtnEl.getAttribute("data-id");
                         if (rowId) {
                             window.open("community.html?id=" + encodeURIComponent(rowId) + "&dashboard=1", "_blank");
+                        }
+                    });
+                }
+
+                const modPanelBtnEl = card.querySelector(".mod-panel-btn");
+                if (modPanelBtnEl) {
+                    modPanelBtnEl.addEventListener("click", (e) => {
+                        e.stopPropagation();
+                        const rowId = modPanelBtnEl.getAttribute("data-id");
+                        if (rowId) {
+                            window.open("mpanel.html?id=" + encodeURIComponent(rowId), "_blank");
                         }
                     });
                 }
@@ -2096,6 +2480,413 @@ enable-ga="false"
                     return;
                 }
                 window.open("staff.html", "_blank");
+            });
+        }
+
+        // Support Ticket
+        const supportTicketBtn = document.getElementById("supportTicketBtn");
+        const supportModal = document.getElementById("supportModal");
+        const supportModalClose = document.getElementById("supportModalClose");
+        const supportForm = document.getElementById("supportForm");
+        const supportEmail = document.getElementById("supportEmail");
+        const supportType = document.getElementById("supportType");
+        const supportDescription = document.getElementById("supportDescription");
+        const supportSubmitBtn = document.getElementById("supportSubmitBtn");
+        const supportError = document.getElementById("supportError");
+        const supportWaiting = document.getElementById("supportWaiting");
+        const supportWaitingText = document.getElementById("supportWaitingText");
+        const supportTabNew = document.getElementById("supportTabNew");
+        const supportTabMine = document.getElementById("supportTabMine");
+        const supportNewView = document.getElementById("supportNewView");
+        const supportMineView = document.getElementById("supportMineView");
+        const supportMyList = document.getElementById("supportMyList");
+        const supportThreadView = document.getElementById("supportThreadView");
+        const supportThreadBack = document.getElementById("supportThreadBack");
+        const supportThreadHeader = document.getElementById("supportThreadHeader");
+        const supportThreadMessages = document.getElementById("supportThreadMessages");
+        const supportReplyForm = document.getElementById("supportReplyForm");
+        const supportReplyInput = document.getElementById("supportReplyInput");
+        const supportReplySendBtn = document.getElementById("supportReplySendBtn");
+        let currentSupportTicket = null;
+        let userMsgChannel = null;
+        let userMsgPoll = null;
+        let userActiveTicketId = null;
+        let userLastMsgSig = "";
+        let userSeenStaffIds = new Set();
+        let userThreadInitialized = false;
+        let supportAudioCtx = null;
+
+        function ensureSupportAudio() {
+            try {
+                if (!supportAudioCtx) {
+                    const Ctx = window.AudioContext || window.webkitAudioContext;
+                    if (Ctx) supportAudioCtx = new Ctx();
+                }
+                if (supportAudioCtx && supportAudioCtx.state === "suspended") {
+                    supportAudioCtx.resume();
+                }
+            } catch (err) {
+                console.error("Audio init failed:", err);
+            }
+        }
+
+        function playSupportDing() {
+            try {
+                ensureSupportAudio();
+                if (!supportAudioCtx) return;
+                const ctx = supportAudioCtx;
+                const now = ctx.currentTime;
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.type = "sine";
+                osc.frequency.setValueAtTime(880, now);
+                osc.frequency.setValueAtTime(1174.66, now + 0.13);
+                gain.gain.setValueAtTime(0.0001, now);
+                gain.gain.exponentialRampToValueAtTime(0.35, now + 0.02);
+                gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.45);
+                osc.start(now);
+                osc.stop(now + 0.47);
+            } catch (err) {
+                console.error("Ding failed:", err);
+            }
+        }
+
+        function stopUserMessageLive() {
+            if (userMsgChannel && localSupabase) {
+                try { localSupabase.removeChannel(userMsgChannel); } catch (e) {}
+            }
+            userMsgChannel = null;
+            if (userMsgPoll) {
+                clearInterval(userMsgPoll);
+                userMsgPoll = null;
+            }
+            userActiveTicketId = null;
+        }
+
+        function startUserMessageLive(ticketId) {
+            stopUserMessageLive();
+            userActiveTicketId = ticketId;
+            userLastMsgSig = "";
+            if (!localSupabase) return;
+            try {
+                userMsgChannel = localSupabase
+                    .channel("user-ticket-" + ticketId)
+                    .on("postgres_changes", {
+                        event: "*",
+                        schema: "public",
+                        table: "support_messages",
+                        filter: "ticket_id=eq." + ticketId
+                    }, () => {
+                        if (userActiveTicketId === ticketId) loadSupportThreadMessages(ticketId);
+                    })
+                    .subscribe();
+            } catch (err) {
+                console.error("Realtime subscribe failed:", err);
+            }
+            userMsgPoll = setInterval(() => {
+                if (userActiveTicketId === ticketId) loadSupportThreadMessages(ticketId);
+            }, 4000);
+        }
+
+        function supportEscapeHtml(text) {
+            if (text === null || text === undefined) return "";
+            const div = document.createElement("div");
+            div.textContent = String(text);
+            return div.innerHTML;
+        }
+
+        function switchSupportTab(tab) {
+            stopUserMessageLive();
+            if (tab === "mine") {
+                if (supportTabMine) supportTabMine.classList.add("active");
+                if (supportTabNew) supportTabNew.classList.remove("active");
+                if (supportMineView) supportMineView.style.display = "block";
+                if (supportNewView) supportNewView.style.display = "none";
+                showMyTicketList();
+                loadMyTickets();
+            } else {
+                if (supportTabNew) supportTabNew.classList.add("active");
+                if (supportTabMine) supportTabMine.classList.remove("active");
+                if (supportNewView) supportNewView.style.display = "block";
+                if (supportMineView) supportMineView.style.display = "none";
+            }
+        }
+
+        function showMyTicketList() {
+            stopUserMessageLive();
+            if (supportThreadView) supportThreadView.style.display = "none";
+            if (supportMyList) supportMyList.style.display = "flex";
+        }
+
+        async function loadMyTickets() {
+            if (!supportMyList) return;
+            if (!localSupabase) {
+                supportMyList.innerHTML = `<div class="support-my-empty">Support service is unavailable.</div>`;
+                return;
+            }
+            supportMyList.innerHTML = `<div class="support-my-empty">Loading...</div>`;
+            try {
+                const { data: { user } } = await localSupabase.auth.getUser();
+                if (!user) {
+                    supportMyList.innerHTML = `<div class="support-my-empty">Log in to view your past tickets.</div>`;
+                    return;
+                }
+                const { data, error } = await localSupabase
+                    .from("support_tickets")
+                    .select("*")
+                    .or(`user_id.eq.${user.id},email.eq.${user.email}`)
+                    .order("created_at", { ascending: false });
+                if (error) {
+                    supportMyList.innerHTML = `<div class="support-my-empty">Failed to load tickets.</div>`;
+                    console.error("Load my tickets failed:", error);
+                    return;
+                }
+                if (!Array.isArray(data) || data.length === 0) {
+                    supportMyList.innerHTML = `<div class="support-my-empty">You have not opened any tickets yet.</div>`;
+                    return;
+                }
+                supportMyList.innerHTML = data.map((t) => {
+                    const status = t.status || "open";
+                    const created = t.created_at ? new Date(t.created_at).toLocaleDateString() : "";
+                    return `
+                        <div class="support-my-item" data-id="${supportEscapeHtml(t.id)}">
+                            <div class="support-my-item-top">
+                                <span class="support-my-item-type">${supportEscapeHtml(t.report_type || "Regular Support")}</span>
+                                <span class="support-status support-status-${supportEscapeHtml(status)}">${supportEscapeHtml(status)}</span>
+                            </div>
+                            <div class="support-my-item-preview">${supportEscapeHtml((t.description || "").slice(0, 70))}</div>
+                            <div class="support-my-item-preview" style="margin-top:4px;color:#94a3b8;">${supportEscapeHtml(created)}</div>
+                        </div>
+                    `;
+                }).join("");
+
+                supportMyList.querySelectorAll(".support-my-item").forEach((item) => {
+                    item.addEventListener("click", () => {
+                        const ticket = data.find((t) => String(t.id) === item.getAttribute("data-id"));
+                        if (ticket) openSupportThread(ticket);
+                    });
+                });
+            } catch (err) {
+                console.error("Failed to load my tickets:", err);
+                supportMyList.innerHTML = `<div class="support-my-empty">Failed to load tickets.</div>`;
+            }
+        }
+
+        function openSupportThread(ticket) {
+            currentSupportTicket = ticket;
+            userSeenStaffIds = new Set();
+            userThreadInitialized = false;
+            ensureSupportAudio();
+            if (supportMyList) supportMyList.style.display = "none";
+            if (supportThreadView) supportThreadView.style.display = "block";
+            if (supportThreadHeader) {
+                const created = ticket.created_at ? new Date(ticket.created_at).toLocaleString() : "";
+                supportThreadHeader.innerHTML = `<strong>${supportEscapeHtml(ticket.report_type || "Regular Support")}</strong> &middot; ${supportEscapeHtml(ticket.status || "open")}<br><span style="color:#94a3b8;">${supportEscapeHtml(created)}</span><br>${supportEscapeHtml(ticket.description || "")}`;
+            }
+            loadSupportThreadMessages(ticket.id);
+            startUserMessageLive(ticket.id);
+        }
+
+        async function loadSupportThreadMessages(ticketId) {
+            if (!supportThreadMessages || !localSupabase) return;
+            try {
+                const { data, error } = await localSupabase
+                    .from("support_messages")
+                    .select("*")
+                    .eq("ticket_id", ticketId)
+                    .order("created_at", { ascending: true });
+                if (error) {
+                    supportThreadMessages.innerHTML = `<div class="support-thread-empty">Failed to load messages.</div>`;
+                    return;
+                }
+                if (!Array.isArray(data) || data.length === 0) {
+                    userLastMsgSig = "empty";
+                    userThreadInitialized = true;
+                    supportThreadMessages.innerHTML = `<div class="support-thread-empty">No replies yet. Send a message below.</div>`;
+                    return;
+                }
+
+                // Detect new staff replies and play a ding
+                const staffMsgs = data.filter((m) => m.sender_role === "staff");
+                if (userThreadInitialized) {
+                    const hasNewStaff = staffMsgs.some((m) => !userSeenStaffIds.has(m.id));
+                    if (hasNewStaff) playSupportDing();
+                }
+                staffMsgs.forEach((m) => userSeenStaffIds.add(m.id));
+                userThreadInitialized = true;
+
+                const sig = data.length + "|" + (data[data.length - 1].id || "") + "|" + (data[data.length - 1].created_at || "");
+                if (sig === userLastMsgSig) return;
+                userLastMsgSig = sig;
+                supportThreadMessages.innerHTML = data.map((m) => {
+                    const role = m.sender_role === "staff" ? "staff" : "user";
+                    const time = m.created_at ? new Date(m.created_at).toLocaleString() : "";
+                    const senderLabel = role === "staff" ? "Support Team" : "You";
+                    return `
+                        <div class="support-msg support-msg-${role}">
+                            <div class="support-msg-sender">${supportEscapeHtml(senderLabel)}</div>
+                            <div>${supportEscapeHtml(m.message || "")}</div>
+                            <div class="support-msg-time">${supportEscapeHtml(time)}</div>
+                        </div>
+                    `;
+                }).join("");
+                supportThreadMessages.scrollTop = supportThreadMessages.scrollHeight;
+            } catch (err) {
+                console.error("Failed to load thread messages:", err);
+                supportThreadMessages.innerHTML = `<div class="support-thread-empty">Failed to load messages.</div>`;
+            }
+        }
+
+        if (supportTabNew) supportTabNew.addEventListener("click", () => switchSupportTab("new"));
+        if (supportTabMine) supportTabMine.addEventListener("click", () => switchSupportTab("mine"));
+        if (supportThreadBack) supportThreadBack.addEventListener("click", () => { showMyTicketList(); loadMyTickets(); });
+
+        if (supportReplyForm) {
+            supportReplyForm.addEventListener("submit", async (e) => {
+                e.preventDefault();
+                if (!currentSupportTicket || !localSupabase) return;
+                const message = supportReplyInput ? supportReplyInput.value.trim() : "";
+                if (!message) return;
+                if (supportReplySendBtn) { supportReplySendBtn.disabled = true; supportReplySendBtn.textContent = "..."; }
+                try {
+                    const { data: { user } } = await localSupabase.auth.getUser();
+                    if (!user) {
+                        alert("You must be logged in to reply.");
+                        return;
+                    }
+                    const { error } = await localSupabase
+                        .from("support_messages")
+                        .insert([{
+                            ticket_id: currentSupportTicket.id,
+                            sender_email: user.email || "User",
+                            sender_role: "user",
+                            message,
+                            created_at: new Date().toISOString()
+                        }]);
+                    if (error) {
+                        alert("Failed to send message: " + error.message);
+                        return;
+                    }
+                    if (supportReplyInput) supportReplyInput.value = "";
+                    loadSupportThreadMessages(currentSupportTicket.id);
+                } catch (err) {
+                    console.error("Reply failed:", err);
+                    alert("Failed to send message.");
+                } finally {
+                    if (supportReplySendBtn) { supportReplySendBtn.disabled = false; supportReplySendBtn.textContent = "Send"; }
+                }
+            });
+        }
+
+        async function openSupportModal() {
+            if (!supportModal) return;
+            ensureSupportAudio();
+            if (dropdownMenu) dropdownMenu.classList.remove("open");
+            switchSupportTab("new");
+            if (supportForm) supportForm.style.display = "block";
+            if (supportWaiting) supportWaiting.style.display = "none";
+            if (supportError) { supportError.textContent = ""; supportError.style.display = "none"; }
+            if (supportSubmitBtn) { supportSubmitBtn.disabled = false; supportSubmitBtn.textContent = "Submit Ticket"; }
+            if (supportForm) supportForm.reset();
+
+            // Autofill email if logged in
+            if (supportEmail && localSupabase) {
+                try {
+                    const { data: { user } } = await localSupabase.auth.getUser();
+                    if (user?.email) {
+                        supportEmail.value = user.email;
+                    }
+                } catch (err) {
+                    console.error("Failed to autofill email:", err);
+                }
+            }
+
+            supportModal.classList.add("open");
+        }
+
+        if (supportTicketBtn) {
+            supportTicketBtn.addEventListener("click", (e) => {
+                e.stopPropagation();
+                openSupportModal();
+            });
+        }
+
+        if (supportModalClose) {
+            supportModalClose.addEventListener("click", () => {
+                stopUserMessageLive();
+                if (supportModal) supportModal.classList.remove("open");
+            });
+        }
+
+        if (supportModal) {
+            supportModal.addEventListener("click", (e) => {
+                if (e.target === supportModal) {
+                    stopUserMessageLive();
+                    supportModal.classList.remove("open");
+                }
+            });
+        }
+
+        if (supportForm) {
+            supportForm.addEventListener("submit", async (e) => {
+                e.preventDefault();
+                if (supportError) { supportError.textContent = ""; supportError.style.display = "none"; }
+
+                const email = supportEmail ? supportEmail.value.trim() : "";
+                const type = supportType ? supportType.value : "";
+                const description = supportDescription ? supportDescription.value.trim() : "";
+
+                if (!email || !type || !description) {
+                    if (supportError) { supportError.textContent = "Please fill in all fields."; supportError.style.display = "block"; }
+                    return;
+                }
+
+                if (!localSupabase) {
+                    if (supportError) { supportError.textContent = "Support service is currently unavailable."; supportError.style.display = "block"; }
+                    return;
+                }
+
+                if (supportSubmitBtn) { supportSubmitBtn.disabled = true; supportSubmitBtn.textContent = "Submitting..."; }
+
+                try {
+                    let userId = null;
+                    try {
+                        const { data: { user } } = await localSupabase.auth.getUser();
+                        userId = user?.id || null;
+                    } catch (err) {
+                        console.error("Failed to get user for ticket:", err);
+                    }
+
+                    const { error } = await localSupabase
+                        .from("support_tickets")
+                        .insert([{
+                            email,
+                            report_type: type,
+                            description,
+                            user_id: userId,
+                            status: "open",
+                            created_at: new Date().toISOString()
+                        }]);
+
+                    if (error) {
+                        if (supportError) { supportError.textContent = error.message || "Failed to submit ticket."; supportError.style.display = "block"; }
+                        if (supportSubmitBtn) { supportSubmitBtn.disabled = false; supportSubmitBtn.textContent = "Submit Ticket"; }
+                        console.error("Ticket insert failed:", error);
+                        return;
+                    }
+
+                    if (supportForm) supportForm.style.display = "none";
+                    if (supportWaiting) supportWaiting.style.display = "block";
+                    if (supportWaitingText) {
+                        supportWaitingText.textContent = "Your " + type + " ticket has been submitted. Please wait here while our team reviews your request.";
+                    }
+                } catch (err) {
+                    if (supportError) { supportError.textContent = "An unexpected error occurred."; supportError.style.display = "block"; }
+                    if (supportSubmitBtn) { supportSubmitBtn.disabled = false; supportSubmitBtn.textContent = "Submit Ticket"; }
+                    console.error(err);
+                }
             });
         }
 

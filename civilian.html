@@ -438,7 +438,14 @@
          }
 
          .modal-overlay {
-            display: flex;
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
         }
 
         .modal {
@@ -776,22 +783,6 @@
                 if (listEl) listEl.innerHTML = '<div class="empty-state">Database not loaded. Check console for errors.</div>';
                 return;
             }
-
-            try {
-                const { data, error } = await localSupabase
-                    .from("civilians")
-                    .select("*")
-                    .order("created_at", { ascending: false });
-
-                if (error) {
-                    listEl.innerHTML = `<div class="empty-state">Error loading civilians: ${escapeHtml(error.message)}</div>`;
-                    return;
-                }
-
-                if (!Array.isArray(data) || data.length === 0) {
-                    listEl.innerHTML = '<div class="empty-state">No civilians created yet.</div>';
-                    return;
-                }
 
             try {
                 const { data, error } = await localSupabase
@@ -1376,7 +1367,6 @@
         document.querySelectorAll(".modal-overlay").forEach((overlay) => {
             overlay.classList.remove("open");
         });
-        const licenseCard = document.getElementById("licenseCard");
         if (licenseCard) licenseCard.classList.remove("open");
     </script>
 </body>

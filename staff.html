@@ -482,8 +482,7 @@
         .give-key-btn:hover {
             background: #15803d;
         }
-    </style>
-</head>
+    </style></head>
 <body>
     <div class="sidebar">
         <div class="sidebar-title">Staff Dashboard</div>
@@ -1008,6 +1007,13 @@
                         </div>
                         <button type="button" class="verified-btn" id="bannedIdsBtn" style="background:#dc2626;">Banned IDs</button>
                     </div>
+                    <div class="master-row">
+                        <div>
+                            <div class="master-row-label">Support Panel</div>
+                            <div class="master-row-sub">View and manage open support tickets.</div>
+                        </div>
+                        <button type="button" class="verified-btn" id="supportPanelBtn">Support Panel</button>
+                    </div>
                 </div>
             `;
 
@@ -1046,6 +1052,13 @@
             const bannedIdsBtn = document.getElementById("bannedIdsBtn");
             if (bannedIdsBtn) {
                 bannedIdsBtn.addEventListener("click", loadBannedIds);
+            }
+
+            const supportPanelBtn = document.getElementById("supportPanelBtn");
+            if (supportPanelBtn) {
+                supportPanelBtn.addEventListener("click", () => {
+                    window.open("support-panel.html", "_blank");
+                });
             }
         }
 
