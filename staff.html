@@ -551,8 +551,8 @@
                     showStatus("Access denied. Staff only.", "error");
                     return { allowed: false };
                 }
-                const department = data?.department || "";
-                if (department === "Management" || department === "Support Team") {
+                const department = (data?.department || "").trim();
+                if (department.toLowerCase() === "management" || department.toLowerCase() === "support team") {
                     return { allowed: true, department };
                 }
                 showStatus("Access denied. Staff only.", "error");
@@ -755,14 +755,15 @@
         }
 
         async function initSidebar() {
-            const dept = await getUserDepartment();
-            if (applicationsBtn && (dept === "Support Team" || (dept || "").toLowerCase() === "customer support")) {
+            const dept = (await getUserDepartment() || "").trim();
+            const lower = dept.toLowerCase();
+            if (applicationsBtn && (lower === "support team" || lower === "customer support")) {
                 applicationsBtn.style.display = "none";
             }
-            if (codesBtn && (dept === "Management" || dept === "Support Team")) {
+            if (codesBtn && (lower === "management" || lower === "support team")) {
                 codesBtn.style.display = "block";
             }
-            if (masterActionsBtn && dept === "Management") {
+            if (masterActionsBtn && lower === "management") {
                 masterActionsBtn.style.display = "block";
             }
         }
@@ -792,8 +793,8 @@
         async function loadApplications() {
             const staff = await ensureStaff();
             if (!staff.allowed) return;
-            if (staff.department === "Support Team") {
-                showStatus("Access denied. Support Team cannot access Applications.", "error");
+            if ((staff.department || "").toLowerCase() === "support team" || (staff.department || "").toLowerCase() === "customer support") {
+                showStatus("Access denied. Support staff cannot access Applications.", "error");
                 return;
             }
             pageTitle.textContent = "Applications";
