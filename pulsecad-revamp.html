@@ -1251,6 +1251,139 @@
         .pro-btn:hover {
             background: #dbeafe;
         }
+
+        .wallet-btn {
+            display: inline-block;
+            padding: 8px 14px;
+            border-radius: 999px;
+            font-size: 13px;
+            font-weight: 700;
+            color: #166534;
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            cursor: pointer;
+        }
+
+        .wallet-btn:hover {
+            background: #dcfce7;
+        }
+
+        .wallet-balance-card {
+            text-align: center;
+            padding: 18px 0 20px;
+            border-bottom: 1px solid #f1f5f9;
+            margin-bottom: 16px;
+        }
+
+        .wallet-balance-amount {
+            font-size: 32px;
+            font-weight: 800;
+            color: #0f172a;
+        }
+
+        .wallet-balance-label {
+            font-size: 12px;
+            color: #94a3b8;
+            margin-top: 4px;
+        }
+
+        .wallet-form {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 18px;
+        }
+
+        .wallet-input {
+            flex: 1;
+            padding: 12px 14px;
+            border-radius: 12px;
+            border: 1px solid #cbd5e1;
+            font-size: 15px;
+            color: #0f172a;
+            outline: none;
+            font-family: inherit;
+        }
+
+        .wallet-input:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+        }
+
+        .wallet-primary-btn {
+            padding: 12px 16px;
+            border-radius: 12px;
+            border: none;
+            background: #16a34a;
+            color: #ffffff;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .wallet-primary-btn:hover {
+            background: #15803d;
+        }
+
+        .wallet-history-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 10px;
+        }
+
+        .wallet-history {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-height: 240px;
+            overflow-y: auto;
+        }
+
+        .wallet-tx {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 10px 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+        }
+
+        .wallet-tx-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #0f172a;
+        }
+
+        .wallet-tx-time {
+            font-size: 11px;
+            color: #94a3b8;
+            margin-top: 2px;
+        }
+
+        .wallet-tx-amount {
+            font-size: 14px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .wallet-tx-amount.pos {
+            color: #16a34a;
+        }
+
+        .wallet-tx-amount.neg {
+            color: #dc2626;
+        }
+
+        .wallet-empty {
+            font-size: 13px;
+            color: #94a3b8;
+            text-align: center;
+            padding: 18px;
+        }
     </style>
 </head>
 <!--<call-us 
@@ -1288,6 +1421,7 @@ enable-ga="false"
     <div class="topbar" id="topbar">
         <span class="pill">
             <a href="/changelogs" class="changelogs-btn">Changelogs</a>
+            <button type="button" class="wallet-btn" id="topbarWalletBtn">Wallet</button>
             <button type="button" class="pro-btn" id="topbarProBtn">Pro</button>
             <button type="button" class="login-btn" id="topbarLoginBtn">Login</button>
             
@@ -1299,6 +1433,7 @@ enable-ga="false"
             <div class="user-email" id="userEmailDisplay"></div>
             <div class="premium-count" id="premiumCountDisplay" style="display:none;"><span id="premiumCountText"></span></div>
             <div class="dropdown-menu" id="dropdownMenu">
+                <button type="button" class="dropdown-item" id="dropdownWalletBtn">Wallet</button>
                 <button type="button" class="dropdown-item" id="dropdownSettingsBtn">Settings</button>
                 <button type="button" class="dropdown-item" id="dropdownJoinCommunityBtn">Redeem</button>
                 <button type="button" class="dropdown-item danger" id="dropdownLogoutBtn">Logout</button>
@@ -1474,6 +1609,26 @@ enable-ga="false"
             </div>
         </div>
     </div>
+    <div class="modal-overlay" id="walletModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">Wallet</div>
+                <button class="modal-close" id="walletModalClose" type="button" aria-label="Close">×</button>
+            </div>
+            <div class="wallet-balance-card">
+                <div class="wallet-balance-amount" id="walletBalanceAmount">$0.00</div>
+                <div class="wallet-balance-label">Available Balance</div>
+            </div>
+            <div class="wallet-form">
+                <input type="number" id="walletAmountInput" class="wallet-input" placeholder="Amount to add" min="0" step="0.01" />
+                <button type="button" class="wallet-primary-btn" id="walletAddBtn">Add Funds</button>
+            </div>
+            <div class="wallet-history-title">Recent Activity</div>
+            <div class="wallet-history" id="walletHistory">
+                <div class="wallet-empty">No transactions yet.</div>
+            </div>
+        </div>
+    </div>
     <div class="lockdown" id="lockdown">
         <div class="lockdown-card">
             <div class="lockdown-dot"></div>
@@ -1520,6 +1675,21 @@ enable-ga="false"
                 console.error("Failed to get department:", err);
                 return "";
             }
+        }
+
+        const STAFF_ACCESS_DEPARTMENTS = ["Management"];
+
+        async function updateStaffButtonVisibility() {
+            const btn = document.getElementById("staffDashboardBtn");
+            if (!btn) return;
+            let allowed = false;
+            try {
+                const dept = await getUserDepartment();
+                allowed = STAFF_ACCESS_DEPARTMENTS.includes(dept);
+            } catch (err) {
+                console.error("Failed to check staff access:", err);
+            }
+            btn.style.display = allowed ? "inline-block" : "none";
         }
 
         async function checkPremiumStatus() {
@@ -2370,6 +2540,7 @@ enable-ga="false"
             if (authModal) authModal.classList.remove("open");
             const trustedFooter = document.getElementById("trustedFooter");
             if (trustedFooter) trustedFooter.style.display = "none";
+            updateStaffButtonVisibility();
         }
 
         function applyLoggedOutUI() {
@@ -3186,6 +3357,117 @@ enable-ga="false"
                     if (supportSubmitBtn) { supportSubmitBtn.disabled = false; supportSubmitBtn.textContent = "Submit Ticket"; }
                     console.error(err);
                 }
+            });
+        }
+
+        // Wallet
+        function walletEscapeHtml(text) {
+            if (!text) return "";
+            const div = document.createElement("div");
+            div.textContent = String(text);
+            return div.innerHTML;
+        }
+
+        const topbarWalletBtn = document.getElementById("topbarWalletBtn");
+        const walletModal = document.getElementById("walletModal");
+        const walletModalClose = document.getElementById("walletModalClose");
+        const walletAddBtn = document.getElementById("walletAddBtn");
+        const walletAmountInput = document.getElementById("walletAmountInput");
+        const walletBalanceAmount = document.getElementById("walletBalanceAmount");
+        const walletHistory = document.getElementById("walletHistory");
+
+        async function getWalletKey() {
+            let email = "guest";
+            if (localSupabase) {
+                try {
+                    const { data: { user } } = await localSupabase.auth.getUser();
+                    if (user && user.email) email = user.email;
+                } catch (err) {
+                    console.error("Failed to get wallet user:", err);
+                }
+            }
+            return "pulsecad_wallet_" + email.toLowerCase();
+        }
+
+        function renderWalletHistory(transactions) {
+            if (!walletHistory) return;
+            if (!transactions.length) {
+                walletHistory.innerHTML = '<div class="wallet-empty">No transactions yet.</div>';
+                return;
+            }
+            walletHistory.innerHTML = transactions.slice(0, 20).map((t) => `
+                <div class="wallet-tx">
+                    <div class="wallet-tx-info">
+                        <div class="wallet-tx-title">${walletEscapeHtml(t.note || "Transaction")}</div>
+                        <div class="wallet-tx-time">${new Date(t.time).toLocaleString()}</div>
+                    </div>
+                    <div class="wallet-tx-amount ${t.amount >= 0 ? "pos" : "neg"}">${t.amount >= 0 ? "+" : "-"}$${Math.abs(t.amount).toFixed(2)}</div>
+                </div>
+            `).join("");
+        }
+
+        async function loadWallet() {
+            const key = await getWalletKey();
+            let data = null;
+            try { data = JSON.parse(localStorage.getItem(key) || "null"); } catch (e) { data = null; }
+            if (!data || typeof data !== "object") data = { balance: 0, transactions: [] };
+            if (walletBalanceAmount) walletBalanceAmount.textContent = "$" + Number(data.balance || 0).toFixed(2);
+            renderWalletHistory(data.transactions || []);
+        }
+
+        async function openWalletModal() {
+            if (!walletModal) return;
+            if (dropdownMenu) dropdownMenu.classList.remove("open");
+            await loadWallet();
+            walletModal.classList.add("open");
+        }
+
+        const dropdownWalletBtn = document.getElementById("dropdownWalletBtn");
+
+        if (topbarWalletBtn) {
+            topbarWalletBtn.addEventListener("click", (e) => {
+                e.stopPropagation();
+                openWalletModal();
+            });
+        }
+
+        if (dropdownWalletBtn) {
+            dropdownWalletBtn.addEventListener("click", (e) => {
+                e.stopPropagation();
+                openWalletModal();
+            });
+        }
+
+        if (walletModalClose) {
+            walletModalClose.addEventListener("click", () => {
+                if (walletModal) walletModal.classList.remove("open");
+            });
+        }
+
+        if (walletModal) {
+            walletModal.addEventListener("click", (e) => {
+                if (e.target === walletModal) walletModal.classList.remove("open");
+            });
+        }
+
+        if (walletAddBtn) {
+            walletAddBtn.addEventListener("click", async () => {
+                const amt = parseFloat(walletAmountInput ? walletAmountInput.value : "0");
+                if (isNaN(amt) || amt <= 0) {
+                    alert("Enter a valid amount to add.");
+                    return;
+                }
+                const key = await getWalletKey();
+                let data = null;
+                try { data = JSON.parse(localStorage.getItem(key) || "null"); } catch (e) { data = null; }
+                if (!data || typeof data !== "object") data = { balance: 0, transactions: [] };
+                data.balance = Number(data.balance || 0) + amt;
+                data.transactions = data.transactions || [];
+                data.transactions.unshift({ note: "Added funds", amount: amt, time: new Date().toISOString() });
+                localStorage.setItem(key, JSON.stringify(data));
+                if (walletBalanceAmount) walletBalanceAmount.textContent = "$" + Number(data.balance).toFixed(2);
+                renderWalletHistory(data.transactions);
+                if (walletAmountInput) walletAmountInput.value = "";
             });
         }
 
