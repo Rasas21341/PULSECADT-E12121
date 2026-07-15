@@ -16,12 +16,178 @@
             background: #f8fafc;
             color: #1a202c;
             min-height: 100vh;
-            padding: 40px 20px;
         }
 
-        .doc-wrap {
-            max-width: 800px;
-            margin: 0 auto;
+        .doc-status {
+            position: fixed;
+            top: 16px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            display: none;
+            z-index: 1000;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+        }
+
+        .doc-status.error {
+            background: #fef2f2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+            display: block;
+        }
+
+        .doc-status.success {
+            background: #f0fdf4;
+            color: #166534;
+            border: 1px solid #bbf7d0;
+            display: block;
+        }
+
+        .doc-layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .doc-sidebar {
+            width: 280px;
+            flex: 0 0 280px;
+            background: #ffffff;
+            border-right: 1px solid #e2e8f0;
+            padding: 20px 16px;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            position: sticky;
+            top: 0;
+            overflow-y: auto;
+        }
+
+        .doc-sidebar-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 4px;
+            word-break: break-word;
+        }
+
+        .doc-sidebar-sub {
+            font-size: 12px;
+            color: #94a3b8;
+            margin-bottom: 16px;
+        }
+
+        .doc-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            flex: 1;
+        }
+
+        .doc-nav-section {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            color: #64748b;
+            padding: 14px 8px 6px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 6px;
+        }
+
+        .doc-nav-page {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 6px;
+            padding: 8px 10px;
+            border-radius: 10px;
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            width: 100%;
+            text-align: left;
+            font-size: 14px;
+            font-weight: 600;
+            color: #334155;
+        }
+
+        .doc-nav-page:hover {
+            background: #f1f5f9;
+        }
+
+        .doc-nav-page.active {
+            background: #eff6ff;
+            color: #1d4ed8;
+        }
+
+        .doc-nav-page-label {
+            flex: 1;
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .doc-nav-del {
+            border: none;
+            background: transparent;
+            color: #cbd5e1;
+            font-size: 15px;
+            line-height: 1;
+            cursor: pointer;
+            padding: 2px 4px;
+            border-radius: 6px;
+            flex: 0 0 auto;
+            display: none;
+        }
+
+        .doc-nav-page:hover .doc-nav-del,
+        .doc-nav-section:hover .doc-nav-del {
+            display: inline-block;
+        }
+
+        .doc-nav-del:hover {
+            color: #dc2626;
+            background: #fef2f2;
+        }
+
+        .doc-add-btns {
+            display: flex;
+            gap: 8px;
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid #f1f5f9;
+        }
+
+        .doc-add-btn {
+            flex: 1;
+            padding: 8px 10px;
+            border-radius: 10px;
+            border: 1px dashed #cbd5e1;
+            background: #ffffff;
+            color: #475569;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .doc-add-btn:hover {
+            background: #f8fafc;
+            border-color: #94a3b8;
+            color: #0f172a;
+        }
+
+        /* Main */
+        .doc-main {
+            flex: 1;
+            min-width: 0;
+            padding: 30px 40px 60px;
         }
 
         .doc-toolbar {
@@ -29,7 +195,7 @@
             align-items: center;
             justify-content: space-between;
             gap: 12px;
-            margin-bottom: 16px;
+            margin-bottom: 20px;
             flex-wrap: wrap;
         }
 
@@ -52,18 +218,10 @@
 
         .btn:hover { background: #f1f5f9; }
 
-        .btn.primary {
-            background: #2563eb;
-            color: #ffffff;
-            border-color: #2563eb;
-        }
+        .btn.primary { background: #2563eb; color: #ffffff; border-color: #2563eb; }
         .btn.primary:hover { background: #1d4ed8; }
 
-        .btn.success {
-            background: #16a34a;
-            color: #ffffff;
-            border-color: #16a34a;
-        }
+        .btn.success { background: #16a34a; color: #ffffff; border-color: #16a34a; }
         .btn.success:hover { background: #15803d; }
 
         .doc-card {
@@ -72,33 +230,16 @@
             border-radius: 16px;
             padding: 40px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.04);
-            min-height: 400px;
+            min-height: 500px;
+            max-width: 820px;
         }
 
-        .doc-title {
-            font-size: 30px;
+        .doc-page-title {
+            font-size: 28px;
             font-weight: 700;
             color: #0f172a;
-            margin-bottom: 10px;
+            margin-bottom: 16px;
             word-break: break-word;
-        }
-
-        .doc-depts {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-            margin-bottom: 20px;
-        }
-
-        .doc-chip {
-            display: inline-block;
-            padding: 3px 10px;
-            border-radius: 999px;
-            background: #eff6ff;
-            color: #1d4ed8;
-            border: 1px solid #bfdbfe;
-            font-size: 12px;
-            font-weight: 700;
         }
 
         .doc-content {
@@ -107,8 +248,6 @@
             color: #334155;
             white-space: pre-wrap;
             word-break: break-word;
-            border-top: 1px solid #f1f5f9;
-            padding-top: 20px;
         }
 
         .doc-empty-body {
@@ -118,7 +257,7 @@
 
         .doc-title-input {
             width: 100%;
-            font-size: 26px;
+            font-size: 24px;
             font-weight: 700;
             color: #0f172a;
             border: 1px solid #cbd5e1;
@@ -135,7 +274,7 @@
 
         .doc-content-input {
             width: 100%;
-            min-height: 360px;
+            min-height: 420px;
             font-size: 15px;
             line-height: 1.7;
             color: #334155;
@@ -152,62 +291,74 @@
             box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
         }
 
-        .doc-status {
-            max-width: 800px;
-            margin: 0 auto 16px;
-            padding: 12px 16px;
-            border-radius: 12px;
-            font-size: 14px;
-            font-weight: 600;
-            display: none;
+        .doc-empty-state {
+            font-size: 15px;
+            color: #64748b;
+            text-align: center;
+            padding: 60px 20px;
         }
 
-        .doc-status.error {
-            background: #fef2f2;
-            color: #991b1b;
-            border: 1px solid #fecaca;
-            display: block;
+        .doc-fullscreen-msg {
+            max-width: 600px;
+            margin: 80px auto;
+            text-align: center;
+            font-size: 16px;
+            color: #475569;
+            padding: 0 20px;
         }
 
-        .doc-status.success {
-            background: #f0fdf4;
-            color: #166534;
-            border: 1px solid #bbf7d0;
-            display: block;
-        }
-
-        .doc-meta {
-            font-size: 12px;
-            color: #94a3b8;
-            margin-top: 24px;
+        @media (max-width: 760px) {
+            .doc-layout { flex-direction: column; }
+            .doc-sidebar {
+                width: 100%;
+                flex: 1 1 auto;
+                height: auto;
+                position: static;
+                border-right: none;
+                border-bottom: 1px solid #e2e8f0;
+            }
+            .doc-main { padding: 20px; }
+            .doc-card { padding: 24px; }
         }
     </style>
 </head>
 <body>
     <div class="doc-status" id="docStatus"></div>
-    <div class="doc-wrap" id="docWrap" style="display:none;">
-        <div class="doc-toolbar">
-            <button type="button" class="btn" id="backBtn">← Back</button>
-            <div class="doc-toolbar-actions" id="ownerActions" style="display:none;">
-                <button type="button" class="btn" id="copyLinkBtn">Copy Link</button>
-                <button type="button" class="btn primary" id="editBtn">Edit</button>
-                <button type="button" class="btn success" id="saveBtn" style="display:none;">Save</button>
-                <button type="button" class="btn" id="cancelBtn" style="display:none;">Cancel</button>
+
+    <div id="fullscreenMsg" class="doc-fullscreen-msg" style="display:none;"></div>
+
+    <div class="doc-layout" id="docLayout" style="display:none;">
+        <div class="doc-sidebar">
+            <div class="doc-sidebar-title" id="sidebarTitle">Document</div>
+            <div class="doc-sidebar-sub" id="sidebarSub"></div>
+            <div class="doc-nav" id="docNav"></div>
+            <div class="doc-add-btns" id="addBtns" style="display:none;">
+                <button type="button" class="doc-add-btn" id="addPageBtn">+ Page</button>
+                <button type="button" class="doc-add-btn" id="addSectionBtn">+ Section</button>
             </div>
         </div>
 
-        <div class="doc-card">
-            <!-- View mode -->
-            <div id="viewMode">
-                <div class="doc-title" id="viewTitle"></div>
-                <div class="doc-depts" id="viewDepts"></div>
-                <div class="doc-content" id="viewContent"></div>
-                <div class="doc-meta" id="viewMeta"></div>
+        <div class="doc-main">
+            <div class="doc-toolbar">
+                <button type="button" class="btn" id="backBtn">← Back</button>
+                <div class="doc-toolbar-actions">
+                    <button type="button" class="btn" id="copyLinkBtn">Copy Link</button>
+                    <button type="button" class="btn primary" id="editBtn" style="display:none;">Edit</button>
+                    <button type="button" class="btn success" id="saveBtn" style="display:none;">Save</button>
+                    <button type="button" class="btn" id="cancelBtn" style="display:none;">Cancel</button>
+                </div>
             </div>
-            <!-- Edit mode -->
-            <div id="editMode" style="display:none;">
-                <input type="text" class="doc-title-input" id="editTitle" placeholder="Document name..." />
-                <textarea class="doc-content-input" id="editContent" placeholder="Write the document content here..."></textarea>
+
+            <div class="doc-card">
+                <div id="viewMode">
+                    <div class="doc-page-title" id="viewTitle"></div>
+                    <div class="doc-content" id="viewContent"></div>
+                    <div id="emptyState" class="doc-empty-state" style="display:none;">Select a page from the sidebar to view it.</div>
+                </div>
+                <div id="editMode" style="display:none;">
+                    <input type="text" class="doc-title-input" id="editTitle" placeholder="Page name..." />
+                    <textarea class="doc-content-input" id="editContent" placeholder="Write the page content here..."></textarea>
+                </div>
             </div>
         </div>
     </div>
@@ -221,14 +372,20 @@
         const docId = params.get("id");
 
         const statusEl = document.getElementById("docStatus");
-        const wrapEl = document.getElementById("docWrap");
-        const ownerActions = document.getElementById("ownerActions");
+        const layoutEl = document.getElementById("docLayout");
+        const fullscreenMsg = document.getElementById("fullscreenMsg");
+        const sidebarTitle = document.getElementById("sidebarTitle");
+        const sidebarSub = document.getElementById("sidebarSub");
+        const docNav = document.getElementById("docNav");
+        const addBtns = document.getElementById("addBtns");
+        const addPageBtn = document.getElementById("addPageBtn");
+        const addSectionBtn = document.getElementById("addSectionBtn");
+
         const viewMode = document.getElementById("viewMode");
         const editMode = document.getElementById("editMode");
         const viewTitle = document.getElementById("viewTitle");
-        const viewDepts = document.getElementById("viewDepts");
         const viewContent = document.getElementById("viewContent");
-        const viewMeta = document.getElementById("viewMeta");
+        const emptyState = document.getElementById("emptyState");
         const editTitle = document.getElementById("editTitle");
         const editContent = document.getElementById("editContent");
         const editBtn = document.getElementById("editBtn");
@@ -238,7 +395,11 @@
 
         let localSupabase = null;
         let currentDoc = null;
+        let pages = [];
+        let selectedId = null;
         let isOwner = false;
+        let editing = false;
+
         try {
             if (typeof window.supabase !== "undefined") {
                 localSupabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -256,6 +417,16 @@
             if (!statusEl) return;
             statusEl.className = "doc-status " + (type || "error");
             statusEl.textContent = message;
+            if (type === "success") {
+                setTimeout(() => { if (statusEl) statusEl.style.display = "none"; }, 2000);
+            }
+        }
+
+        function showFullscreenMessage(message) {
+            if (fullscreenMsg) {
+                fullscreenMsg.textContent = message;
+                fullscreenMsg.style.display = "block";
+            }
         }
 
         function escapeHtml(text) {
@@ -265,31 +436,113 @@
             return div.innerHTML;
         }
 
-        function renderView() {
-            if (!currentDoc) return;
-            if (viewTitle) viewTitle.textContent = currentDoc.title || "Untitled Document";
-            if (viewDepts) {
-                const depts = Array.isArray(currentDoc.departments) ? currentDoc.departments : [];
-                viewDepts.innerHTML = depts.map((n) => `<span class="doc-chip">${escapeHtml(n)}</span>`).join("");
+        function genId() {
+            return "p" + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+        }
+
+        function normalizePages() {
+            let p = currentDoc.pages;
+            if (typeof p === "string") {
+                try { p = JSON.parse(p); } catch (e) { p = null; }
             }
-            if (viewContent) {
-                if (currentDoc.content && currentDoc.content.trim()) {
-                    viewContent.textContent = currentDoc.content;
-                    viewContent.classList.remove("doc-empty-body");
+            if (!Array.isArray(p) || p.length === 0) {
+                // Migrate from single content column
+                p = [{
+                    id: genId(),
+                    type: "page",
+                    title: currentDoc.title || "Page 1",
+                    content: currentDoc.content || ""
+                }];
+            }
+            pages = p;
+        }
+
+        function firstPageId() {
+            const firstPage = pages.find((e) => e.type === "page");
+            return firstPage ? firstPage.id : null;
+        }
+
+        function renderSidebar() {
+            if (!docNav) return;
+            docNav.innerHTML = "";
+            if (pages.length === 0) {
+                docNav.innerHTML = `<div class="doc-empty-state" style="padding:20px 8px; font-size:13px;">No pages yet.</div>`;
+                return;
+            }
+            pages.forEach((entry) => {
+                if (entry.type === "section") {
+                    const sec = document.createElement("div");
+                    sec.className = "doc-nav-section";
+                    sec.innerHTML = `<span>${escapeHtml(entry.title || "Section")}</span>` +
+                        (isOwner ? `<button type="button" class="doc-nav-del" title="Delete section" data-del="${escapeHtml(entry.id)}">×</button>` : "");
+                    docNav.appendChild(sec);
                 } else {
-                    viewContent.textContent = "This document has no content yet.";
-                    viewContent.classList.add("doc-empty-body");
+                    const btn = document.createElement("button");
+                    btn.type = "button";
+                    btn.className = "doc-nav-page" + (entry.id === selectedId ? " active" : "");
+                    btn.innerHTML = `<span class="doc-nav-page-label">${escapeHtml(entry.title || "Untitled")}</span>` +
+                        (isOwner ? `<span class="doc-nav-del" title="Delete page" data-del="${escapeHtml(entry.id)}">×</span>` : "");
+                    btn.addEventListener("click", (e) => {
+                        if (e.target.closest("[data-del]")) return;
+                        selectPage(entry.id);
+                    });
+                    docNav.appendChild(btn);
                 }
-            }
-            if (viewMeta) {
-                const created = currentDoc.created_at ? new Date(currentDoc.created_at).toLocaleString() : "";
-                viewMeta.textContent = created ? "Created " + created : "";
+            });
+
+            if (isOwner) {
+                docNav.querySelectorAll("[data-del]").forEach((el) => {
+                    el.addEventListener("click", (e) => {
+                        e.stopPropagation();
+                        deleteEntry(el.getAttribute("data-del"));
+                    });
+                });
             }
         }
 
+        function selectPage(id) {
+            if (editing) {
+                if (!confirm("Discard unsaved changes?")) return;
+                exitEditMode();
+            }
+            selectedId = id;
+            renderSidebar();
+            renderMainView();
+        }
+
+        function getSelected() {
+            return pages.find((e) => e.id === selectedId && e.type === "page") || null;
+        }
+
+        function renderMainView() {
+            const page = getSelected();
+            if (!page) {
+                if (viewTitle) viewTitle.textContent = "";
+                if (viewContent) viewContent.innerHTML = "";
+                if (emptyState) emptyState.style.display = "block";
+                if (editBtn) editBtn.style.display = "none";
+                return;
+            }
+            if (emptyState) emptyState.style.display = "none";
+            if (viewTitle) viewTitle.textContent = page.title || "Untitled";
+            if (viewContent) {
+                if (page.content && page.content.trim()) {
+                    viewContent.textContent = page.content;
+                    viewContent.classList.remove("doc-empty-body");
+                } else {
+                    viewContent.textContent = "This page has no content yet.";
+                    viewContent.classList.add("doc-empty-body");
+                }
+            }
+            if (isOwner && editBtn) editBtn.style.display = "inline-block";
+        }
+
         function enterEditMode() {
-            if (editTitle) editTitle.value = currentDoc.title || "";
-            if (editContent) editContent.value = currentDoc.content || "";
+            const page = getSelected();
+            if (!page) return;
+            editing = true;
+            if (editTitle) editTitle.value = page.title || "";
+            if (editContent) editContent.value = page.content || "";
             if (viewMode) viewMode.style.display = "none";
             if (editMode) editMode.style.display = "block";
             if (editBtn) editBtn.style.display = "none";
@@ -298,52 +551,103 @@
         }
 
         function exitEditMode() {
+            editing = false;
             if (viewMode) viewMode.style.display = "block";
             if (editMode) editMode.style.display = "none";
-            if (editBtn) editBtn.style.display = "inline-block";
             if (saveBtn) saveBtn.style.display = "none";
             if (cancelBtn) cancelBtn.style.display = "none";
+            renderMainView();
         }
 
-        async function saveDocument() {
-            if (!currentDoc || !localSupabase) return;
+        async function persistPages() {
+            if (!localSupabase || !currentDoc) return false;
+            const { error } = await localSupabase
+                .from("documents")
+                .update({ pages: pages })
+                .eq("id", currentDoc.id);
+            if (error) {
+                showStatus("Failed to save: " + error.message, "error");
+                return false;
+            }
+            return true;
+        }
+
+        async function savePage() {
+            const page = getSelected();
+            if (!page) return;
             const newTitle = editTitle ? editTitle.value.trim() : "";
             const newContent = editContent ? editContent.value : "";
             if (!newTitle) {
-                showStatus("Document name cannot be empty.", "error");
+                showStatus("Page name cannot be empty.", "error");
                 return;
             }
             if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = "Saving..."; }
-            try {
-                const { error } = await localSupabase
-                    .from("documents")
-                    .update({ title: newTitle, content: newContent })
-                    .eq("id", currentDoc.id);
-                if (error) {
-                    showStatus("Failed to save: " + error.message, "error");
-                    return;
-                }
-                currentDoc.title = newTitle;
-                currentDoc.content = newContent;
-                renderView();
+            page.title = newTitle;
+            page.content = newContent;
+            const ok = await persistPages();
+            if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = "Save"; }
+            if (ok) {
                 exitEditMode();
-                showStatus("Document saved.", "success");
-                setTimeout(() => { if (statusEl) statusEl.style.display = "none"; }, 2000);
-            } catch (err) {
-                console.error("Save failed:", err);
-                showStatus("Failed to save document.", "error");
-            } finally {
-                if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = "Save"; }
+                renderSidebar();
+                renderMainView();
+                showStatus("Saved.", "success");
             }
+        }
+
+        async function addPage() {
+            const name = prompt("Page name:");
+            if (!name || !name.trim()) return;
+            const entry = { id: genId(), type: "page", title: name.trim(), content: "" };
+            pages.push(entry);
+            const ok = await persistPages();
+            if (ok) {
+                selectedId = entry.id;
+                renderSidebar();
+                renderMainView();
+            } else {
+                pages.pop();
+            }
+        }
+
+        async function addSection() {
+            const name = prompt("Section name:");
+            if (!name || !name.trim()) return;
+            const entry = { id: genId(), type: "section", title: name.trim() };
+            pages.push(entry);
+            const ok = await persistPages();
+            if (ok) {
+                renderSidebar();
+            } else {
+                pages.pop();
+            }
+        }
+
+        async function deleteEntry(id) {
+            const entry = pages.find((e) => e.id === id);
+            if (!entry) return;
+            const label = entry.type === "section" ? "section" : "page";
+            if (!confirm("Delete this " + label + "?")) return;
+            const idx = pages.findIndex((e) => e.id === id);
+            const removed = pages.splice(idx, 1);
+            const ok = await persistPages();
+            if (!ok) {
+                pages.splice(idx, 0, removed[0]);
+                return;
+            }
+            if (selectedId === id) {
+                selectedId = firstPageId();
+            }
+            renderSidebar();
+            renderMainView();
         }
 
         async function init() {
             if (!docId) {
-                showStatus("No document specified.", "error");
+                showFullscreenMessage("No document specified.");
                 return;
             }
             if (!localSupabase) {
-                showStatus("Service unavailable.", "error");
+                showFullscreenMessage("Service unavailable.");
                 return;
             }
             try {
@@ -353,12 +657,11 @@
                     .eq("id", docId)
                     .maybeSingle();
                 if (error || !data) {
-                    showStatus("Document not found or you don't have access to it.", "error");
+                    showFullscreenMessage("Document not found or you don't have access to it.");
                     return;
                 }
                 currentDoc = data;
 
-                // Determine if current user is the community owner (can edit)
                 try {
                     const { data: { user } } = await localSupabase.auth.getUser();
                     if (user) {
@@ -373,25 +676,38 @@
                     console.error("Owner check failed:", err);
                 }
 
+                normalizePages();
+                selectedId = firstPageId();
+
                 document.title = (currentDoc.title || "Document") + " - PulseCAD";
-                if (wrapEl) wrapEl.style.display = "block";
-                if (ownerActions) ownerActions.style.display = isOwner ? "flex" : "none";
-                renderView();
+                if (sidebarTitle) sidebarTitle.textContent = currentDoc.title || "Document";
+                if (sidebarSub) {
+                    const depts = Array.isArray(currentDoc.departments) ? currentDoc.departments : [];
+                    sidebarSub.textContent = depts.length ? depts.join(", ") : "";
+                }
+                if (layoutEl) layoutEl.style.display = "flex";
+                if (addBtns) addBtns.style.display = isOwner ? "flex" : "none";
+                if (copyLinkBtn) copyLinkBtn.style.display = "inline-block";
+
+                renderSidebar();
+                renderMainView();
             } catch (err) {
                 console.error("Init failed:", err);
-                showStatus("Failed to load document.", "error");
+                showFullscreenMessage("Failed to load document.");
             }
         }
 
         if (editBtn) editBtn.addEventListener("click", enterEditMode);
-        if (cancelBtn) cancelBtn.addEventListener("click", exitEditMode);
-        if (saveBtn) saveBtn.addEventListener("click", saveDocument);
+        if (cancelBtn) cancelBtn.addEventListener("click", () => { editing = false; exitEditMode(); });
+        if (saveBtn) saveBtn.addEventListener("click", savePage);
+        if (addPageBtn) addPageBtn.addEventListener("click", addPage);
+        if (addSectionBtn) addSectionBtn.addEventListener("click", addSection);
         if (copyLinkBtn) {
             copyLinkBtn.addEventListener("click", () => {
                 const link = window.location.href;
                 if (navigator.clipboard && navigator.clipboard.writeText) {
                     navigator.clipboard.writeText(link)
-                        .then(() => { showStatus("Link copied to clipboard.", "success"); setTimeout(() => { if (statusEl) statusEl.style.display = "none"; }, 2000); })
+                        .then(() => showStatus("Link copied to clipboard.", "success"))
                         .catch(() => prompt("Copy this link:", link));
                 } else {
                     prompt("Copy this link:", link);
