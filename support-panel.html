@@ -65,6 +65,38 @@
             display: block;
         }
 
+        .support-stats {
+            display: flex;
+            gap: 12px;
+            padding: 16px 24px 0;
+            flex-wrap: wrap;
+        }
+
+        .support-stat {
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+            padding: 10px 16px;
+            border-radius: 12px;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        }
+
+        .support-stat-num {
+            font-size: 20px;
+            font-weight: 800;
+            color: #0f172a;
+        }
+
+        .support-stat-label {
+            font-size: 12px;
+            font-weight: 700;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
         .support-panel {
             display: flex;
             gap: 16px;
@@ -471,6 +503,7 @@
         </div>
     </div>
     <div class="status" id="status"></div>
+    <div class="support-stats" id="supportStats"></div>
     <div class="support-panel" id="supportPanel">
         <div class="support-list">
             <div class="support-list-tabs">
@@ -611,6 +644,7 @@
 
         function renderList() {
             if (!ticketsEl) return;
+            updateStats();
             const filtered = allTickets.filter((t) => (t.report_type || "Regular Support") === currentCategory);
             if (filtered.length === 0) {
                 ticketsEl.innerHTML = `<div class="support-empty">No ${escapeHtml(currentCategory)} tickets.</div>`;
@@ -641,6 +675,64 @@
             });
         }
 
+        function updateStats() {
+            const el = document.getElementById("supportStats");
+            if (!el) return;
+            const open = allTickets.filter((t) => (t.status || "open") !== "closed").length;
+            const closed = allTickets.filter((t) => (t.status || "open") === "closed").length;
+            el.innerHTML = `
+                <div class="support-stat"><span class="support-stat-num">${open}</span><span class="support-stat-label">Tickets Open</span></div>
+                <div class="support-stat"><span class="support-stat-num">${closed}</span><span class="support-stat-label">Tickets Closed</span></div>
+            `;
+        }
+
+        async function closeTicket(ticket) {
+            if (!localSupabase) return;
+            const { error } = await localSupabase
+                .from("support_tickets")
+                .update({ status: "closed" })
+                .eq("id", ticket.id);
+            if (error) {
+                alert("Failed to close ticket: " + error.message);
+                return;
+            }
+            await refreshTicketStatus(ticket);
+            renderList();
+            renderDetail(ticket);
+        }
+
+        async function openTicket(ticket) {
+            if (!localSupabase) return;
+            const { error } = await localSupabase
+                .from("support_tickets")
+                .update({ status: "open" })
+                .eq("id", ticket.id);
+            if (error) {
+                alert("Failed to open ticket: " + error.message);
+                return;
+            }
+            await refreshTicketStatus(ticket);
+            renderList();
+            renderDetail(ticket);
+        }
+
+        async function refreshTicketStatus(ticket) {
+            if (!localSupabase) return;
+            try {
+                const { data } = await localSupabase
+                    .from("support_tickets")
+                    .select("status")
+                    .eq("id", ticket.id)
+                    .maybeSingle();
+                const newStatus = (data && data.status) || "open";
+                ticket.status = newStatus;
+                const stored = allTickets.find((t) => String(t.id) === String(ticket.id));
+                if (stored) stored.status = newStatus;
+            } catch (err) {
+                console.error("Failed to refresh ticket status:", err);
+            }
+        }
+
         function renderDetail(ticket) {
             if (!detailEl || !ticket) return;
             const created = ticket.created_at ? new Date(ticket.created_at).toLocaleString() : "Unknown";
@@ -657,14 +749,14 @@
                     <div class="support-detail-label">Description</div>
                     <div class="support-detail-desc">${escapeHtml(ticket.description || "No description provided.")}</div>
                     <div class="support-detail-actions">
-                        ${status !== "closed" ? `<button type="button" class="action-btn" id="closeTicketBtn">Mark as Closed</button>` : ""}
+                        ${status !== "closed" ? `<button type="button" class="action-btn" id="closeTicketBtn">Mark as Closed</button>` : `<button type="button" class="action-btn" id="openTicketBtn">Reopen Ticket</button>`}
                         <button type="button" class="action-btn danger" id="deleteTicketBtn">Delete Ticket</button>
                     </div>
                     <div class="support-thread">
                         <div class="support-detail-label">Conversation</div>
                         <div class="support-thread-messages" id="threadMessages"><div class="support-thread-empty">Loading messages...</div></div>
                         <form class="support-reply-form" id="replyForm">
-                            <textarea class="support-reply-input" id="replyInput" placeholder="Type a reply to the user..." required></textarea>
+                            <textarea class="support-reply-input" id="replyInput" placeholder="Type a reply... or /close to close, /open to reopen" required></textarea>
                             <button type="submit" class="action-btn" id="replySendBtn">Send</button>
                         </form>
                     </div>
@@ -673,20 +765,12 @@
 
             const closeBtn = document.getElementById("closeTicketBtn");
             if (closeBtn) {
-                closeBtn.addEventListener("click", async () => {
-                    if (!localSupabase) return;
-                    const { error } = await localSupabase
-                        .from("support_tickets")
-                        .update({ status: "closed" })
-                        .eq("id", ticket.id);
-                    if (error) {
-                        alert("Failed to close ticket: " + error.message);
-                        return;
-                    }
-                    ticket.status = "closed";
-                    renderList();
-                    renderDetail(ticket);
-                });
+                closeBtn.addEventListener("click", () => closeTicket(ticket));
+            }
+
+            const openBtn = document.getElementById("openTicketBtn");
+            if (openBtn) {
+                openBtn.addEventListener("click", () => openTicket(ticket));
             }
 
             const deleteBtn = document.getElementById("deleteTicketBtn");
@@ -713,6 +797,15 @@
             startMessageLive(ticket.id);
 
             const replyForm = document.getElementById("replyForm");
+            const replyInput = document.getElementById("replyInput");
+            if (replyInput) {
+                replyInput.addEventListener("keydown", (e) => {
+                    if (e.key === "Enter" && !e.shiftKey) {
+                        e.preventDefault();
+                        if (replyForm) replyForm.requestSubmit();
+                    }
+                });
+            }
             if (replyForm) {
                 replyForm.addEventListener("submit", async (e) => {
                     e.preventDefault();
@@ -721,8 +814,28 @@
                     const message = input ? input.value.trim() : "";
                     if (!message || !localSupabase) return;
 
+                    const cmd = message.toLowerCase();
+
                     if (sendBtn) { sendBtn.disabled = true; sendBtn.textContent = "..."; }
                     try {
+                        if (cmd === "/close") {
+                            if (ticket.status === "closed") {
+                                alert("This ticket is already closed.");
+                                return;
+                            }
+                            await closeTicket(ticket);
+                            if (input) input.value = "";
+                            return;
+                        }
+                        if (cmd === "/open") {
+                            if (ticket.status !== "closed") {
+                                alert("This ticket is already open.");
+                                return;
+                            }
+                            await openTicket(ticket);
+                            if (input) input.value = "";
+                            return;
+                        }
                         const { data: { user } } = await localSupabase.auth.getUser();
                         const { error } = await localSupabase
                             .from("support_messages")

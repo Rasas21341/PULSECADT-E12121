@@ -1003,6 +1003,7 @@
                 <div class="master-actions" style="margin-top:20px;">
                     <h2>Management</h2>
                     <p>Ban and unban user emails from accessing PulseCAD.</p>
+                    ${staff.department === "Management" ? `
                     <div class="master-row">
                         <div>
                             <div class="master-row-label">Banned IDs</div>
@@ -1010,6 +1011,7 @@
                         </div>
                         <button type="button" class="verified-btn" id="bannedIdsBtn" style="background:#dc2626;">Banned IDs</button>
                     </div>
+                    ` : ""}
                     <div class="master-row">
                         <div>
                             <div class="master-row-label">Support Panel</div>
@@ -1068,6 +1070,10 @@
         async function loadBannedIds() {
             const staff = await ensureStaff();
             if (!staff.allowed) return;
+            if (staff.department !== "Management") {
+                showStatus("Access denied. Management only.", "error");
+                return;
+            }
             pageTitle.textContent = "Banned IDs";
             contentEl.innerHTML = `
                 <div class="codes-section">
