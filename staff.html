@@ -686,7 +686,7 @@
             try {
                 const { data, error } = await localSupabase
                     .from("users")
-                    .select("id, email, created_at, department")
+                    .select("id, email, created_at, department, ip")
                     .order("created_at", { ascending: false });
 
                 if (error) {
@@ -699,14 +699,16 @@
                     return;
                 }
 
-                let html = `<table><tr><th>Email</th><th>Created</th><th>Department</th><th>Actions</th></tr>`;
                 const userDepartment = await getUserDepartment();
+                const isManagement = userDepartment === "Management";
+                let html = `<table><tr><th>Email</th><th>Created</th><th>Department</th>${isManagement ? "<th>IP</th>" : ""}<th>Actions</th></tr>`;
                 data.forEach((row) => {
                     const email = (row.email || "N/A").replace(/</g, "&lt;").replace(/>/g, "&gt;");
                     const created = row.created_at ? new Date(row.created_at).toLocaleString() : "";
                     const currentDept = row.department || "";
+                    const ipCell = isManagement ? `<td>${(row.ip || "N/A").replace(/</g, "&lt;").replace(/>/g, "&gt;")}</td>` : "";
                     const giveKeyBtn = userDepartment === "Management" ? `<button type="button" class="give-key-btn" data-user-id="${row.id}" data-email="${email.replace(/"/g, '&quot;')}">Give Key</button>` : `<span style="color:#94a3b8;font-size:12px;font-weight:600;">No Permission</span>`;
-                    html += `<tr><td>${email}</td><td>${created}</td><td><select class="department-select" data-user-id="${row.id}"><option value="">Unassigned</option><option value="Management" ${currentDept === 'Management' ? 'selected' : ''}>Management</option><option value="Support Team" ${currentDept === 'Support Team' ? 'selected' : ''}>Support Team</option><option value="Development Team" ${currentDept === 'Development Team' ? 'selected' : ''}>Development Team</option></select></td><td>${giveKeyBtn}</td></tr>`;
+                    html += `<tr><td>${email}</td><td>${created}</td><td><select class="department-select" data-user-id="${row.id}"><option value="">Unassigned</option><option value="Management" ${currentDept === 'Management' ? 'selected' : ''}>Management</option><option value="Support Team" ${currentDept === 'Support Team' ? 'selected' : ''}>Support Team</option><option value="Development Team" ${currentDept === 'Development Team' ? 'selected' : ''}>Development Team</option></select></td>${ipCell}<td>${giveKeyBtn}</td></tr>`;
                 });
                 html += "</table>";
                 contentEl.innerHTML = html;
@@ -1204,10 +1206,48 @@
             }
         }
 
-        if (applicationsBtn) {
-            applicationsBtn.addEventListener("click", loadApplications);
+        async function fetchJson(url, ms) {
+            const ctrl = new AbortController();
+            const t = setTimeout(() => ctrl.abort(), ms || 6000);
+            try {
+                const res = await fetch(url, { cache: "no-store", signal: ctrl.signal });
+                clearTimeout(t);
+                if (!res.ok) return null;
+                return await res.json();
+            } catch (e) {
+                clearTimeout(t);
+                return null;
+            }
         }
 
+        async function getClientIp() {
+            const providers = [
+                () => fetchJson("https://api.ipify.org?format=json").then((j) => j && j.ip),
+                () => fetchJson("https://ipwho.is/").then((j) => j && j.success && j.ip),
+                () => fetchJson("https://api.my-ip.io/ip").then((t) => (typeof t === "string" && t.trim()) ? t.trim() : null)
+            ];
+            for (const p of providers) {
+                try {
+                    const ip = await p();
+                    if (ip) return ip;
+                } catch (e) { /* try next */ }
+            }
+            return null;
+        }
+
+        async function captureMyIp() {
+            if (!localSupabase) return;
+            try {
+                const { data: { user } } = await localSupabase.auth.getUser();
+                if (!user) return;
+                const ip = await getClientIp();
+                if (ip) {
+                    await localSupabase.from("users").update({ ip: ip }).eq("id", user.id);
+                }
+            } catch (e) { /* ignore */ }
+        }
+
+        captureMyIp();
         loadServers();
 
         async function triggerRestart() {

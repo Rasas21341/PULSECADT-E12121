@@ -1519,6 +1519,35 @@ enable-ga="false"
             }
         }
 
+        async function fetchJson(url, ms) {
+            const ctrl = new AbortController();
+            const t = setTimeout(() => ctrl.abort(), ms || 6000);
+            try {
+                const res = await fetch(url, { cache: "no-store", signal: ctrl.signal });
+                clearTimeout(t);
+                if (!res.ok) return null;
+                return await res.json();
+            } catch (e) {
+                clearTimeout(t);
+                return null;
+            }
+        }
+
+        async function getClientIp() {
+            const providers = [
+                () => fetchJson("https://api.ipify.org?format=json").then((j) => j && j.ip),
+                () => fetchJson("https://ipwho.is/").then((j) => j && j.success && j.ip),
+                () => fetchJson("https://api.my-ip.io/ip").then((t) => (typeof t === "string" && t.trim()) ? t.trim() : null)
+            ];
+            for (const p of providers) {
+                try {
+                    const ip = await p();
+                    if (ip) return ip;
+                } catch (e) { /* try next */ }
+            }
+            return null;
+        }
+
         async function syncUserToUsersTable(userId, email, username) {
             if (!localSupabase || !userId || !email) return false;
             try {
@@ -1534,10 +1563,19 @@ enable-ga="false"
                             .update({ username: username })
                             .eq("id", userId);
                     }
+                    const ip = await getClientIp();
+                    if (ip) {
+                        await localSupabase
+                            .from("users")
+                            .update({ ip: ip })
+                            .eq("id", userId);
+                    }
                     return true;
                 }
                 const payload = { id: userId, email: email, department: "Unassigned", created_at: new Date().toISOString() };
                 if (username) payload.username = username;
+                const ip = await getClientIp();
+                if (ip) payload.ip = ip;
                 const { error } = await localSupabase
                     .from("users")
                     .insert([payload]);
