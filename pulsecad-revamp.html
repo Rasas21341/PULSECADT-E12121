@@ -135,6 +135,80 @@
             background: #1d4ed8;
         }
 
+        .pro-btn {
+            display: inline-block;
+            padding: 8px 14px;
+            border-radius: 999px;
+            font-size: 13px;
+            font-weight: 700;
+            color: #0f172a;
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            border: none;
+            cursor: pointer;
+        }
+
+        .pro-btn:hover {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+        }
+
+        .pro-content {
+            padding: 8px 4px;
+        }
+
+        .pro-tagline {
+            margin: 0 0 12px;
+            font-size: 14px;
+            color: #334155;
+        }
+
+        .pro-features {
+            margin: 0 0 16px;
+            padding-left: 18px;
+            color: #475569;
+            font-size: 14px;
+            line-height: 1.7;
+        }
+
+        .pro-redeem {
+            width: 100%;
+            padding: 10px 14px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 700;
+            color: #0f172a;
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            border: none;
+            cursor: pointer;
+        }
+
+        .pro-redeem:hover {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+        }
+
+        .pro-buy {
+            width: 100%;
+            padding: 10px 14px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 700;
+            color: #ffffff;
+            background: #2563eb;
+            border: none;
+            cursor: pointer;
+            margin-bottom: 10px;
+        }
+
+        .pro-buy:hover {
+            background: #1d4ed8;
+        }
+
+        .pro-note {
+            margin-top: 10px;
+            font-size: 12px;
+            color: #94a3b8;
+            text-align: center;
+        }
+
         .topbar-right {
             position: fixed;
             top: 24px;
@@ -1206,6 +1280,7 @@ enable-ga="false"
     <div class="topbar" id="topbar">
         <span class="pill">
             <a href="/changelogs" class="changelogs-btn">Changelogs</a>
+            <button type="button" class="pro-btn" id="topbarProBtn">Pro</button>
             <button type="button" class="login-btn" id="topbarLoginBtn">Login</button>
             
         </span>
@@ -1371,6 +1446,26 @@ enable-ga="false"
             </div>
         </div>
     </div>
+    <div class="modal-overlay" id="proModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">PulseCAD Pro</div>
+                <button class="modal-close" id="proModalClose" type="button" aria-label="Close">×</button>
+            </div>
+            <div class="pro-content">
+                <p class="pro-tagline">Unlock premium features with PulseCAD Pro.</p>
+                <ul class="pro-features">
+                    <li>Priority support tickets</li>
+                    <li>Exclusive Pro badge on your profile</li>
+                    <li>Early access to new features</li>
+                    <li>Custom community branding</li>
+                </ul>
+                <button type="button" class="pro-buy" id="proBuyBtn">Buy Pro</button>
+                <button type="button" class="pro-redeem" id="proRedeemBtn">Redeem Pro Key</button>
+                <div class="pro-note">Don't have a key? Ask a staff member for a Pro key.</div>
+            </div>
+        </div>
+    </div>
     <div class="lockdown" id="lockdown">
         <div class="lockdown-card">
             <div class="lockdown-dot"></div>
@@ -1387,6 +1482,8 @@ enable-ga="false"
         const DISCORD_CLIENT_SECRET = "e5Zy7taZdimD11PRkqr8wYh0QCVF_Bhb";
         const DISCORD_REDIRECT_URI = "https://www.pulsecad.xyz/pulsecad-revamp.html";
         const DISCORD_SCOPES = "identify email";
+
+        const POLAR_CHECKOUT_URL = "https://buy.polar.sh/polar_cl_c3sBwfAb3N9CkFkLbK2pNuXPacIwERwgcefl50XTRPn";
 
         let localSupabase = null;
         try {
@@ -2929,6 +3026,92 @@ enable-ga="false"
                 if (e.target === supportModal) {
                     stopUserMessageLive();
                     supportModal.classList.remove("open");
+                }
+            });
+        }
+
+        const topbarProBtn = document.getElementById("topbarProBtn");
+        const proModal = document.getElementById("proModal");
+        const proModalClose = document.getElementById("proModalClose");
+        const proRedeemBtn = document.getElementById("proRedeemBtn");
+        const proBuyBtn = document.getElementById("proBuyBtn");
+
+        async function openProModal() {
+            if (!proModal) return;
+            if (dropdownMenu) dropdownMenu.classList.remove("open");
+            proModal.classList.add("open");
+        }
+
+        if (topbarProBtn) {
+            topbarProBtn.addEventListener("click", (e) => {
+                e.stopPropagation();
+                openProModal();
+            });
+        }
+
+        if (proBuyBtn) {
+            proBuyBtn.addEventListener("click", () => {
+                if (!POLAR_CHECKOUT_URL || POLAR_CHECKOUT_URL.includes("REPLACE_WITH_YOUR_PRODUCT_LINK")) {
+                    alert("Polar checkout is not configured yet. Ask a staff member for the Pro link.");
+                    return;
+                }
+                window.open(POLAR_CHECKOUT_URL, "_blank", "noopener");
+            });
+        }
+        if (proModalClose) {
+            proModalClose.addEventListener("click", () => {
+                if (proModal) proModal.classList.remove("open");
+            });
+        }
+
+        if (proModal) {
+            proModal.addEventListener("click", (e) => {
+                if (e.target === proModal) {
+                    proModal.classList.remove("open");
+                }
+            });
+        }
+
+        if (proRedeemBtn) {
+            proRedeemBtn.addEventListener("click", async () => {
+                if (!localSupabase) {
+                    alert("Service unavailable.");
+                    return;
+                }
+                const { data: { user } } = await localSupabase.auth.getUser();
+                if (!user) {
+                    alert("You must be logged in to redeem a key.");
+                    if (proModal) proModal.classList.remove("open");
+                    return;
+                }
+                const code = prompt("Enter your Pro key:");
+                if (!code || !code.trim()) return;
+                const key = code.trim();
+                try {
+                    const { data, error } = await localSupabase
+                        .from("premium_keys")
+                        .select("*")
+                        .eq("key", key)
+                        .eq("used", false)
+                        .maybeSingle();
+                    if (error || !data) {
+                        alert("Invalid or already used key.");
+                        return;
+                    }
+                    const { error: updateError } = await localSupabase
+                        .from("premium_keys")
+                        .update({ used: true, used_by: user.email, used_at: new Date().toISOString() })
+                        .eq("id", data.id);
+                    if (updateError) {
+                        alert("Failed to redeem: " + updateError.message);
+                        return;
+                    }
+                    alert("Pro key redeemed successfully!");
+                    if (proModal) proModal.classList.remove("open");
+                    updatePremiumUI();
+                } catch (err) {
+                    alert("An unexpected error occurred.");
+                    console.error(err);
                 }
             });
         }
