@@ -950,6 +950,13 @@
             align-items: center;
         }
 
+        .community-list-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-left: auto;
+        }
+
         .staff-dashboard-card {
             max-width: 720px;
             margin: 24px auto 0 auto;
@@ -2375,7 +2382,7 @@ enable-ga="false"
             const dashboardBtn = isCreator ? `<button type="button" class="community-list-dashboard" data-id="${id || ''}">Dashboard</button>` : "";
             const modPanelBtn = isCreator ? `<button type="button" class="mod-panel-btn" data-id="${id || ''}">Mod Panel</button>` : "";
             const leaveBtn = (isJoined && !isCreator) ? `<button type="button" class="community-list-leave" data-id="${id || ''}">Leave</button>` : "";
-            card.innerHTML = `<div class="community-list-info"${communityId}><div class="community-list-name">${escapedName}</div>${creatorText}${isSuspended ? '<div class="community-list-meta" style="color:#dc2626;font-weight:700;">This community has been suspended.</div>' : ''}<div class="community-list-meta"></div></div>${badgesHtml}${lockIcon}${dashboardBtn}${modPanelBtn}${leaveBtn}${(!isJoined && !isCreator && !isSuspended) ? '<button type="button" class="community-list-join">Join</button>' : ""}`;
+            card.innerHTML = `<div class="community-list-info"${communityId}><div class="community-list-name">${escapedName}</div>${creatorText}${isSuspended ? '<div class="community-list-meta" style="color:#dc2626;font-weight:700;">This community has been suspended.</div>' : ''}<div class="community-list-meta"></div></div>${badgesHtml}${lockIcon}<div class="community-list-actions">${dashboardBtn}${modPanelBtn}${leaveBtn}${(!isJoined && !isCreator && !isSuspended) ? '<button type="button" class="community-list-join">Join</button>' : ""}</div>`;
             loggedInCommunities.appendChild(card);
 
             card.style.cursor = isSuspended ? "default" : "pointer";
