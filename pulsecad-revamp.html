@@ -2133,7 +2133,7 @@ enable-ga="false"
                                 const joined = isCreator || await checkUserJoined(userId, row.id);
                                 // Only show communities the user created or has joined
                                 if (!isCreator && !joined) continue;
-                                addCommunityCard(row.name, row.description || "Community", joined, row.id, row.creator_email, !!row.verification_requested, !!row.suspended, !!row.members_only);
+                                addCommunityCard(row.name, row.description || "Community", joined, row.id, isCreator, !!row.verification_requested, !!row.suspended, !!row.members_only);
                             }
                         }
                     })
@@ -2298,7 +2298,7 @@ enable-ga="false"
                             return null;
                         }
                         if (Array.isArray(insertData) && insertData[0]) {
-                                addCommunityCard(name, insertData[0].description || "Community", false, insertData[0].id, insertData[0].creator_email, !!insertData[0].verification_requested, !!insertData[0].suspended, !!insertData[0].members_only);
+                                addCommunityCard(name, insertData[0].description || "Community", false, insertData[0].id, true, !!insertData[0].verification_requested, !!insertData[0].suspended, !!insertData[0].members_only);
                         }
                         return insertData ? insertData[0] : null;
                     })
@@ -2312,7 +2312,7 @@ enable-ga="false"
             });
         }
 
-        function addCommunityCard(name, meta, joined, id, creatorEmail, verified, suspended, membersOnly) {
+        function addCommunityCard(name, meta, joined, id, creator, verified, suspended, membersOnly) {
             if (!loggedInCommunities) return;
             if (id && loggedInCommunities.querySelector(`[data-id="${id}"]`)) {
                 return;
@@ -2322,7 +2322,7 @@ enable-ga="false"
             const escapedName = name.replace(/</g, "&lt;").replace(/>/g, "&gt;");
             const escapedMeta = (meta || "").replace(/</g, "&lt;").replace(/>/g, "&gt;") || "Community";
             const isJoined = !!joined;
-            const isCreator = !!creatorEmail;
+            const isCreator = creator === true;
             const isVerified = !!verified;
             const isSuspended = !!suspended;
             const isMembersOnly = !!membersOnly;

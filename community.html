@@ -717,16 +717,41 @@
                         });
 
                         async function loadMembers() {
-                            if (!membersDropdownMenu) return;
+                            if (!membersDropdownMenu || !localSupabase) return;
                             try {
-                                const { data } = await localSupabase
+                                const { data: community } = await localSupabase
                                     .from("communities")
-                                    .select("*")
-                                    .eq("id", id);
-                                const members = Array.isArray(data) ? data : [];
-                                membersDropdownMenu.innerHTML = members.map((m) => `
-                                    <div class="member-item">${(m.creator_email || 'Member').replace(/</g, '&lt;').replace(/>/g, '&gt;')} ${m.joined ? '(Joined)' : ''}</div>
-                                `).join('');
+                                    .select("creator_email")
+                                    .eq("id", id)
+                                    .maybeSingle();
+
+                                const { data: memberRows } = await localSupabase
+                                    .from("user_communities")
+                                    .select("user_id")
+                                    .eq("community_id", id);
+
+                                const rows = Array.isArray(memberRows) ? memberRows : [];
+                                const ids = rows.map((r) => r.user_id).filter(Boolean);
+                                let emailById = {};
+                                if (ids.length > 0) {
+                                    const { data: users } = await localSupabase
+                                        .from("users")
+                                        .select("id, email")
+                                        .in("id", ids);
+                                    (users || []).forEach((u) => { emailById[u.id] = u.email; });
+                                }
+
+                                const esc = (t) => (t || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                                let html = '';
+                                if (community && community.creator_email) {
+                                    html += `<div class="member-item">${esc(community.creator_email)} (Owner)</div>`;
+                                }
+                                if (rows.length === 0) {
+                                    if (!html) html = '<div class="empty">No members yet.</div>';
+                                } else {
+                                    html += rows.map((r) => `<div class="member-item">${esc(emailById[r.user_id] || r.user_id)}</div>`).join('');
+                                }
+                                membersDropdownMenu.innerHTML = html;
                             } catch (err) {
                                 membersDropdownMenu.innerHTML = '<div class="empty">Failed to load members.</div>';
                             }
