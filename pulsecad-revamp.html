@@ -2110,8 +2110,10 @@ enable-ga="false"
         function loadCommunities() {
             if (!loggedInCommunities || !localSupabase) return;
             loggedInCommunities.innerHTML = "";
-            localSupabase.auth.getUser().then(({ data }) => {
-                const userId = data?.user?.id;
+            localSupabase.auth.getUser().then(({ data: userData }) => {
+                const user = userData?.user;
+                const userId = user?.id;
+                const userEmail = user?.email;
                 if (!userId) {
                     loggedInCommunities.innerHTML = "";
                     return;
@@ -2127,9 +2129,10 @@ enable-ga="false"
                         }
                         if (Array.isArray(data)) {
                             for (const row of data) {
-                                const isCreator = row.creator_email === data?.user?.email;
+                                const isCreator = row.creator_email === userEmail;
                                 const joined = isCreator || await checkUserJoined(userId, row.id);
-                                if (row.members_only && !joined) continue;
+                                // Only show communities the user created or has joined
+                                if (!isCreator && !joined) continue;
                                 addCommunityCard(row.name, row.description || "Community", joined, row.id, row.creator_email, !!row.verification_requested, !!row.suspended, !!row.members_only);
                             }
                         }
