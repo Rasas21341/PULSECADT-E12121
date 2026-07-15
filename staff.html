@@ -756,7 +756,7 @@
 
         async function initSidebar() {
             const dept = await getUserDepartment();
-            if (applicationsBtn && dept === "Support Team") {
+            if (applicationsBtn && (dept === "Support Team" || (dept || "").toLowerCase() === "customer support")) {
                 applicationsBtn.style.display = "none";
             }
             if (codesBtn && (dept === "Management" || dept === "Support Team")) {

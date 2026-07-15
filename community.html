@@ -1244,7 +1244,7 @@
                                 bannerDiv.className = "role-btn-banner";
                                 console.log("Department banner:", dept.name, dept.banner ? "has banner" : "no banner");
                                 if (dept.banner) {
-                                    bannerDiv.style.backgroundImage = `url(${dept.banner})`;
+                                    bannerDiv.style.backgroundImage = `url("${dept.banner}")`;
                                 }
                                 const nameSpan = document.createElement("div");
                                 nameSpan.className = "role-btn-name";
