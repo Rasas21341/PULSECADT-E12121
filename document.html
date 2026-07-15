@@ -319,6 +319,106 @@
             }
             .doc-main { padding: 20px; }
             .doc-card { padding: 24px; }
+            .doc-theme-panel { right: 12px; left: 12px; width: auto; }
+        }
+
+        /* Theme / color customizer */
+        .doc-theme-panel {
+            position: fixed;
+            top: 72px;
+            right: 20px;
+            width: 280px;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+            padding: 18px;
+            z-index: 1200;
+            display: none;
+        }
+
+        .doc-theme-panel.open { display: block; }
+
+        .doc-theme-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .doc-theme-head h3 {
+            font-size: 15px;
+            font-weight: 700;
+            color: #0f172a;
+            margin: 0;
+        }
+
+        .doc-theme-close {
+            border: none;
+            background: transparent;
+            color: #94a3b8;
+            font-size: 20px;
+            line-height: 1;
+            cursor: pointer;
+            padding: 0 4px;
+            border-radius: 6px;
+        }
+
+        .doc-theme-close:hover { color: #0f172a; background: #f1f5f9; }
+
+        .doc-theme-presets {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 14px;
+        }
+
+        .doc-theme-preset {
+            width: 30px;
+            height: 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            border: 2px solid #e2e8f0;
+        }
+
+        .doc-theme-preset:hover { border-color: #94a3b8; }
+
+        .doc-theme-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .doc-theme-row label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #334155;
+        }
+
+        .doc-theme-row input[type="color"] {
+            width: 44px;
+            height: 30px;
+            border: 1px solid #cbd5e1;
+            background: none;
+            cursor: pointer;
+            border-radius: 8px;
+            padding: 2px;
+        }
+
+        .doc-theme-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 6px;
+        }
+
+        .doc-theme-actions .btn { flex: 1; }
+
+        .doc-theme-hint {
+            font-size: 11px;
+            color: #94a3b8;
+            margin-top: 10px;
+            line-height: 1.4;
         }
     </style>
 </head>
@@ -342,6 +442,7 @@
             <div class="doc-toolbar">
                 <button type="button" class="btn" id="backBtn">← Back</button>
                 <div class="doc-toolbar-actions">
+                    <button type="button" class="btn" id="themeBtn" title="Customize page colors">Colors</button>
                     <button type="button" class="btn" id="copyLinkBtn">Copy Link</button>
                     <button type="button" class="btn primary" id="editBtn" style="display:none;">Edit</button>
                     <button type="button" class="btn success" id="saveBtn" style="display:none;">Save</button>
@@ -361,6 +462,34 @@
                 </div>
             </div>
         </div>
+    </div>
+
+    <div class="doc-theme-panel" id="themePanel">
+        <div class="doc-theme-head">
+            <h3>Page Colors</h3>
+            <button type="button" class="doc-theme-close" id="themeCloseBtn" title="Close">×</button>
+        </div>
+
+        <div class="doc-theme-presets" id="themePresets"></div>
+
+        <div class="doc-theme-row">
+            <label for="themeBg">Background</label>
+            <input type="color" id="themeBg" value="#ffffff" />
+        </div>
+        <div class="doc-theme-row">
+            <label for="themeText">Text</label>
+            <input type="color" id="themeText" value="#334155" />
+        </div>
+        <div class="doc-theme-row">
+            <label for="themeAccent">Accent</label>
+            <input type="color" id="themeAccent" value="#2563eb" />
+        </div>
+
+        <div class="doc-theme-actions">
+            <button type="button" class="btn" id="themeResetBtn">Reset</button>
+            <button type="button" class="btn primary" id="themeSaveBtn">Save</button>
+        </div>
+        <div class="doc-theme-hint" id="themeHint"></div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -392,6 +521,16 @@
         const saveBtn = document.getElementById("saveBtn");
         const cancelBtn = document.getElementById("cancelBtn");
         const copyLinkBtn = document.getElementById("copyLinkBtn");
+        const themeBtn = document.getElementById("themeBtn");
+        const themePanel = document.getElementById("themePanel");
+        const themeCloseBtn = document.getElementById("themeCloseBtn");
+        const themePresets = document.getElementById("themePresets");
+        const themeBg = document.getElementById("themeBg");
+        const themeText = document.getElementById("themeText");
+        const themeAccent = document.getElementById("themeAccent");
+        const themeSaveBtn = document.getElementById("themeSaveBtn");
+        const themeResetBtn = document.getElementById("themeResetBtn");
+        const themeHint = document.getElementById("themeHint");
 
         let localSupabase = null;
         let currentDoc = null;
@@ -399,6 +538,7 @@
         let selectedId = null;
         let isOwner = false;
         let editing = false;
+        let currentTheme = { bg: "", text: "", accent: "" };
 
         try {
             if (typeof window.supabase !== "undefined") {
@@ -497,6 +637,11 @@
                         deleteEntry(el.getAttribute("data-del"));
                     });
                 });
+            }
+
+            if (currentTheme.accent) {
+                const a = docNav.querySelector(".doc-nav-page.active");
+                if (a) a.style.color = currentTheme.accent;
             }
         }
 
@@ -641,6 +786,149 @@
             renderMainView();
         }
 
+        const THEME_PRESETS = [
+            { name: "Default", bg: "#ffffff", text: "#334155", accent: "#2563eb" },
+            { name: "Midnight", bg: "#0f172a", text: "#e2e8f0", accent: "#60a5fa" },
+            { name: "Paper", bg: "#fdf6e3", text: "#3b3b3b", accent: "#b58900" },
+            { name: "Forest", bg: "#f0fdf4", text: "#14532d", accent: "#16a34a" },
+            { name: "Rose", bg: "#fff1f2", text: "#881337", accent: "#e11d48" },
+            { name: "Slate", bg: "#1e293b", text: "#cbd5e1", accent: "#38bdf8" }
+        ];
+
+        function buildPresets() {
+            if (!themePresets) return;
+            themePresets.innerHTML = "";
+            THEME_PRESETS.forEach((p) => {
+                const sw = document.createElement("div");
+                sw.className = "doc-theme-preset";
+                sw.title = p.name;
+                sw.style.background = "linear-gradient(135deg, " + p.bg + " 0%, " + p.accent + " 100%)";
+                sw.addEventListener("click", () => {
+                    themeBg.value = p.bg;
+                    themeText.value = p.text;
+                    themeAccent.value = p.accent;
+                    applyTheme(p);
+                });
+                themePresets.appendChild(sw);
+            });
+        }
+
+        function applyTheme(t) {
+            currentTheme = {
+                bg: t.bg || "",
+                text: t.text || "",
+                accent: t.accent || ""
+            };
+            const card = document.querySelector(".doc-card");
+            if (card) {
+                card.style.background = currentTheme.bg || "";
+                card.style.color = currentTheme.text || "";
+                card.style.borderColor = currentTheme.accent || "";
+            }
+            if (viewTitle) viewTitle.style.color = currentTheme.accent || "";
+            if (viewContent) viewContent.style.color = currentTheme.text || "";
+            if (editTitle) editTitle.style.color = currentTheme.accent || "";
+            if (editContent) editContent.style.color = currentTheme.text || "";
+            const activeNav = document.querySelector(".doc-nav-page.active");
+            if (activeNav) activeNav.style.color = currentTheme.accent || "";
+        }
+
+        function readThemeInputs() {
+            return {
+                bg: themeBg ? themeBg.value : "",
+                text: themeText ? themeText.value : "",
+                accent: themeAccent ? themeAccent.value : ""
+            };
+        }
+
+        function setThemeInputs(t) {
+            if (!t) return;
+            if (themeBg) themeBg.value = t.bg || "#ffffff";
+            if (themeText) themeText.value = t.text || "#334155";
+            if (themeAccent) themeAccent.value = t.accent || "#2563eb";
+        }
+
+        function loadTheme() {
+            let t = null;
+            if (currentDoc && currentDoc.theme && typeof currentDoc.theme === "object") {
+                t = currentDoc.theme;
+            } else {
+                try {
+                    const saved = localStorage.getItem("pulsecad_theme_" + docId);
+                    if (saved) t = JSON.parse(saved);
+                } catch (e) { /* ignore */ }
+            }
+            if (t) {
+                setThemeInputs(t);
+                applyTheme(t);
+            } else {
+                setThemeInputs({ bg: "#ffffff", text: "#334155", accent: "#2563eb" });
+                applyTheme({ bg: "", text: "", accent: "" });
+            }
+            if (themeHint) {
+                themeHint.textContent = isOwner
+                    ? "As the owner, saving updates colors for everyone viewing this document."
+                    : "Colors are saved on this device only.";
+            }
+        }
+
+        function saveThemeLocal(t) {
+            try {
+                if (t.bg || t.text || t.accent) {
+                    localStorage.setItem("pulsecad_theme_" + docId, JSON.stringify(t));
+                } else {
+                    localStorage.removeItem("pulsecad_theme_" + docId);
+                }
+            } catch (e) { /* ignore */ }
+        }
+
+        async function persistTheme() {
+            if (!localSupabase || !currentDoc) return false;
+            const { error } = await localSupabase
+                .from("documents")
+                .update({ theme: currentTheme })
+                .eq("id", currentDoc.id);
+            if (error) {
+                showStatus("Couldn't save theme to server: " + error.message, "error");
+                return false;
+            }
+            return true;
+        }
+
+        async function saveTheme() {
+            const t = readThemeInputs();
+            applyTheme(t);
+            saveThemeLocal(t);
+            if (isOwner) {
+                if (themeSaveBtn) { themeSaveBtn.disabled = true; themeSaveBtn.textContent = "Saving..."; }
+                const ok = await persistTheme();
+                if (themeSaveBtn) { themeSaveBtn.disabled = false; themeSaveBtn.textContent = "Save"; }
+                if (ok) showStatus("Colors saved.", "success");
+            } else {
+                showStatus("Colors saved on this device.", "success");
+            }
+        }
+
+        function resetTheme() {
+            const def = { bg: "", text: "", accent: "" };
+            setThemeInputs({ bg: "#ffffff", text: "#334155", accent: "#2563eb" });
+            applyTheme(def);
+            saveThemeLocal(def);
+            if (isOwner) {
+                persistTheme().then((ok) => { if (ok) showStatus("Colors reset.", "success"); });
+            } else {
+                showStatus("Colors reset on this device.", "success");
+            }
+        }
+
+        function openThemePanel() {
+            if (themePanel) themePanel.classList.add("open");
+        }
+
+        function closeThemePanel() {
+            if (themePanel) themePanel.classList.remove("open");
+        }
+
         async function init() {
             if (!docId) {
                 showFullscreenMessage("No document specified.");
@@ -689,8 +977,10 @@
                 if (addBtns) addBtns.style.display = isOwner ? "flex" : "none";
                 if (copyLinkBtn) copyLinkBtn.style.display = "inline-block";
 
+                buildPresets();
                 renderSidebar();
                 renderMainView();
+                loadTheme();
             } catch (err) {
                 console.error("Init failed:", err);
                 showFullscreenMessage("Failed to load document.");
@@ -714,6 +1004,23 @@
                 }
             });
         }
+
+        if (themeBtn) themeBtn.addEventListener("click", () => {
+            if (themePanel && themePanel.classList.contains("open")) closeThemePanel();
+            else openThemePanel();
+        });
+        if (themeCloseBtn) themeCloseBtn.addEventListener("click", closeThemePanel);
+        if (themeBg) themeBg.addEventListener("input", () => applyTheme(readThemeInputs()));
+        if (themeText) themeText.addEventListener("input", () => applyTheme(readThemeInputs()));
+        if (themeAccent) themeAccent.addEventListener("input", () => applyTheme(readThemeInputs()));
+        if (themeSaveBtn) themeSaveBtn.addEventListener("click", saveTheme);
+        if (themeResetBtn) themeResetBtn.addEventListener("click", resetTheme);
+        document.addEventListener("click", (e) => {
+            if (themePanel && themePanel.classList.contains("open")
+                && !themePanel.contains(e.target) && e.target !== themeBtn && !themeBtn.contains(e.target)) {
+                closeThemePanel();
+            }
+        });
 
         init();
     </script>

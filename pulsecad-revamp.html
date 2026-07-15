@@ -30,6 +30,14 @@
             border: 1px solid #e2e8f0;
         }
 
+        .trusted-footer {
+            text-align: center;
+            padding: 18px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #64748b;
+        }
+
         h1 {
             font-size: 32px;
             font-weight: 700;
@@ -2360,6 +2368,8 @@ enable-ga="false"
             if (container) container.style.display = "none";
             if (loggedInScreen) loggedInScreen.classList.add("open");
             if (authModal) authModal.classList.remove("open");
+            const trustedFooter = document.getElementById("trustedFooter");
+            if (trustedFooter) trustedFooter.style.display = "none";
         }
 
         function applyLoggedOutUI() {
@@ -2375,6 +2385,8 @@ enable-ga="false"
             if (loggedInScreen) loggedInScreen.classList.remove("open");
             if (settingsScreen) settingsScreen.classList.remove("open");
             if (container) container.style.display = "block";
+            const trustedFooter = document.getElementById("trustedFooter");
+            if (trustedFooter) trustedFooter.style.display = "block";
         }
 
         async function restoreSession() {
