@@ -436,9 +436,8 @@
         .role-btn-banner {
             width: 100%;
             height: 80px;
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
+            object-fit: cover;
+            display: block;
             background-color: #e2e8f0;
         }
 
@@ -1240,16 +1239,18 @@
                                 const btn = document.createElement("button");
                                 btn.type = "button";
                                 btn.className = "role-btn";
-                                const bannerDiv = document.createElement("div");
-                                bannerDiv.className = "role-btn-banner";
-                                console.log("Department banner:", dept.name, dept.banner ? "has banner" : "no banner");
+                                const bannerImg = document.createElement("img");
+                                bannerImg.className = "role-btn-banner";
+                                bannerImg.alt = (dept.name || "Department") + " banner";
                                 if (dept.banner) {
-                                    bannerDiv.style.backgroundImage = `url("${dept.banner}")`;
+                                    bannerImg.src = dept.banner;
+                                } else {
+                                    bannerImg.style.display = "none";
                                 }
                                 const nameSpan = document.createElement("div");
                                 nameSpan.className = "role-btn-name";
                                 nameSpan.textContent = dept.name;
-                                btn.appendChild(bannerDiv);
+                                btn.appendChild(bannerImg);
                                 btn.appendChild(nameSpan);
                                 btn.setAttribute("data-department-id", dept.id);
                                 btn.setAttribute("data-passcode", dept.passcode || "");
