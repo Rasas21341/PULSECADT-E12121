@@ -2490,7 +2490,7 @@ enable-ga="false"
                     alert("You must be logged in to join.");
                     return;
                 }
-                const existing = await localSupabase
+                const { data: existing } = await localSupabase
                     .from("user_communities")
                     .select("id")
                     .eq("user_id", user.id)
@@ -2498,6 +2498,7 @@ enable-ga="false"
                     .maybeSingle();
                 if (existing) {
                     alert("You have already joined this community.");
+                    loadCommunities();
                     return;
                 }
                 const { error: joinError } = await localSupabase
