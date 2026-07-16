@@ -652,6 +652,8 @@
 
         const localSupabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         const contentEl = document.getElementById("content");
+        let currentCommunityData = null;
+        let currentCommunityId = null;
 
         document.getElementById("backBtn").addEventListener("click", () => window.close());
 
@@ -691,6 +693,9 @@
                     contentEl.innerHTML = `<div class="empty">Community not found.</div>`;
                     return;
                 }
+
+                currentCommunityData = data;
+                currentCommunityId = id;
 
                 const name = (data.name || "N/A").replace(/</g, "&lt;").replace(/>/g, "&gt;");
                 const description = (data.description || "No description.").replace(/</g, "&lt;").replace(/>/g, "&gt;");
@@ -1777,10 +1782,10 @@
                     return;
                 }
                 if (poError) { poError.textContent = ""; poError.style.display = "none"; }
-                let erlcKey = (data && data.erlc_api_key) || "";
-                if (!erlcKey) { try { erlcKey = localStorage.getItem("erlcApiKey_" + id) || ""; } catch (e) {} }
+                let erlcKey = (currentCommunityData && currentCommunityData.erlc_api_key) || "";
+                if (!erlcKey) { try { erlcKey = localStorage.getItem("erlcApiKey_" + currentCommunityId) || ""; } catch (e) {} }
                 const params = new URLSearchParams({ name, rank, callsign });
-                params.set("community", id);
+                params.set("community", currentCommunityId || "");
                 if (erlcKey) params.set("erlckey", erlcKey);
                 try { localStorage.setItem("policeErkKey", erlcKey); } catch (e) {}
                 window.open("/Police.html?" + params.toString(), "_blank");
@@ -1797,10 +1802,10 @@
         let pendingDepartment = null;
 
         function openPoliceForDepartment(department) {
-            let erlcKey = (data && data.erlc_api_key) || "";
-            if (!erlcKey) { try { erlcKey = localStorage.getItem("erlcApiKey_" + id) || ""; } catch (e) {} }
+            let erlcKey = (currentCommunityData && currentCommunityData.erlc_api_key) || "";
+            if (!erlcKey) { try { erlcKey = localStorage.getItem("erlcApiKey_" + currentCommunityId) || ""; } catch (e) {} }
             const params = new URLSearchParams({});
-            params.set("community", id);
+            params.set("community", currentCommunityId || "");
             if (erlcKey) params.set("erlckey", erlcKey);
             try { localStorage.setItem("policeErkKey", erlcKey); } catch (e) {}
             window.open("/Police.html?" + params.toString(), "_blank");
