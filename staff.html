@@ -608,7 +608,7 @@
                     return;
                 }
 
-                let html = `<table><tr><th>Name</th><th>Owner</th><th>Created</th><th>Status</th><th>Members Only</th><th>Actions</th></tr>`;
+                let html = `<table><tr><th>Name</th><th>Owner</th><th>Created</th><th>Status</th><th>Members Only</th><th>Pro</th><th>Actions</th></tr>`;
                 const canSuspend = userDepartment !== "Support Team";
                 const canDelete = userDepartment !== "Support Team";
                 data.forEach((row) => {
@@ -629,7 +629,12 @@
                     const deleteBtn = canDelete
                         ? `<button class="verified-btn delete-server-btn" data-id="${row.id}">Delete</button>`
                         : `<span style="color:#94a3b8;font-size:12px;font-weight:600;">No Permission</span>`;
-                    html += `<tr><td>${name}</td><td>${owner}</td><td>${created}</td><td>${statusCell}</td><td>${membersOnlyCell}</td><td>${suspendBtn} ${deleteBtn}</td></tr>`;
+                    const pro = !!row.pro;
+                    const proCell = pro
+                        ? `<span class="status-pill" style="background:#16a34a;width:auto;">Pro</span>`
+                        : `<span style="color:#94a3b8;font-size:12px;font-weight:600;">No</span>`;
+                    const proToggleBtn = `<button class="verified-btn pro-server-btn" data-id="${row.id}" data-pro="${pro}">${pro ? "Remove Pro" : "Give Pro"}</button>`;
+                    html += `<tr><td>${name}</td><td>${owner}</td><td>${created}</td><td>${statusCell}</td><td>${membersOnlyCell}</td><td>${proCell}<br/>${proToggleBtn}</td><td>${suspendBtn} ${deleteBtn}</td></tr>`;
                 });
                 html += "</table>";
                 contentEl.innerHTML = html;
@@ -669,6 +674,27 @@
                             .eq("id", id);
                         if (error) {
                             alert("Failed to delete server: " + error.message);
+                            return;
+                        }
+                        loadServers();
+                    });
+                });
+
+                contentEl.querySelectorAll(".pro-server-btn").forEach((btn) => {
+                    btn.addEventListener("click", async () => {
+                        const dept = await getUserDepartment();
+                        if (dept === "Support Team") {
+                            alert("Access denied. Support Team cannot manage Pro status.");
+                            return;
+                        }
+                        const id = btn.getAttribute("data-id");
+                        const currently = btn.getAttribute("data-pro") === "true";
+                        const { error } = await localSupabase
+                            .from("communities")
+                            .update({ pro: !currently })
+                            .eq("id", id);
+                        if (error) {
+                            alert("Failed to update Pro status: " + error.message);
                             return;
                         }
                         loadServers();
