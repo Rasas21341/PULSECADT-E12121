@@ -1647,6 +1647,7 @@
                 let erlcKey = (data && data.erlc_api_key) || "";
                 if (!erlcKey) { try { erlcKey = localStorage.getItem("erlcApiKey_" + id) || ""; } catch (e) {} }
                 const params = new URLSearchParams({ name, rank, callsign });
+                params.set("community", id);
                 if (erlcKey) params.set("erlckey", erlcKey);
                 try { localStorage.setItem("policeErkKey", erlcKey); } catch (e) {}
                 window.open("/Police.html?" + params.toString(), "_blank");

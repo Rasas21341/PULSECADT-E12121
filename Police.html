@@ -518,11 +518,94 @@
         }
 
 
+        .onduty-box {
+            position: fixed;
+            top: 140px;
+            left: 24px;
+            width: 260px;
+            max-width: calc(100vw - 48px);
+            z-index: 650;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 16px;
+            box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
+        }
+
+        .onduty-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .onduty-count {
+            font-size: 12px;
+            font-weight: 700;
+            color: #15803d;
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            border-radius: 999px;
+            padding: 2px 8px;
+        }
+
+        .onduty-list {
+            max-height: 320px;
+            overflow-y: auto;
+        }
+
+        .onduty-item {
+            display: flex;
+            flex-direction: column;
+            padding: 8px 10px;
+            border: 1px solid #eef2f7;
+            border-radius: 10px;
+            margin-bottom: 6px;
+        }
+
+        .onduty-item .od-name {
+            font-size: 13px;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .onduty-item .od-sub {
+            font-size: 11px;
+            color: #64748b;
+            margin-top: 2px;
+        }
+
+        .onduty-empty {
+            font-size: 12px;
+            color: #94a3b8;
+            text-align: center;
+            padding: 12px;
+        }
+
+        .onduty-toggle {
+            width: 100%;
+            margin-top: 10px;
+            padding: 9px;
+            border: none;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            background: #16a34a;
+            color: #ffffff;
+        }
+
+        .onduty-toggle.off {
+            background: #dc2626;
+        }
+
         .call-box {
             position: fixed;
             top: 140px;
-            right: 24px;
-            width: 300px;
+            right: 24px;            width: 300px;
             max-width: calc(100vw - 48px);
             z-index: 650;
             background: #ffffff;
@@ -663,6 +746,12 @@
             <label>Priority</label>
             <div class="call-value" id="callPriority">—</div>
         </div>
+    </div>
+
+    <div class="onduty-box" id="ondutyBox">
+        <div class="onduty-title">On Duty <span class="onduty-count" id="ondutyCount">0</span></div>
+        <div class="onduty-list" id="ondutyList"><div class="onduty-empty">No one on duty.</div></div>
+        <button type="button" class="onduty-toggle" id="ondutyToggleBtn">Go On Duty</button>
     </div>
 
     <div class="modal-overlay" id="lookupModal">
@@ -852,18 +941,23 @@
 
         let officerName = "Officer";
         let officerRank = "";
+        let officerCallsign = "";
+        let communityId = new URLSearchParams(window.location.search).get("community") || "default";
 
         (function loadOfficerDetails() {
             const officerInfo = document.getElementById("officerInfo");
             const params = new URLSearchParams(window.location.search);
             const pName = params.get("name");
             const pRank = params.get("rank");
+            const pCallsign = params.get("callsign");
             if (pName) {
                 officerName = pName;
                 officerRank = pRank || "";
+                officerCallsign = pCallsign || "";
                 try {
                     localStorage.setItem("policeOfficerName", officerName);
                     localStorage.setItem("policeOfficerRank", officerRank);
+                    localStorage.setItem("policeOfficerCallsign", officerCallsign);
                 } catch (err) {
                     console.error("Could not save officer details:", err);
                 }
@@ -871,6 +965,7 @@
                 try {
                     officerName = localStorage.getItem("policeOfficerName") || "Officer";
                     officerRank = localStorage.getItem("policeOfficerRank") || "";
+                    officerCallsign = localStorage.getItem("policeOfficerCallsign") || "";
                 } catch (err) {
                     console.error("Could not read officer details:", err);
                 }
@@ -1814,6 +1909,137 @@
         const callPostal = document.getElementById("callPostal");
         const callDescription = document.getElementById("callDescription");
         const callPriority = document.getElementById("callPriority");
+
+        // ---- On Duty ----
+        const ondutyList = document.getElementById("ondutyList");
+        const ondutyCount = document.getElementById("ondutyCount");
+        const ondutyToggleBtn = document.getElementById("ondutyToggleBtn");
+        let isOnDuty = false;
+        let ondutyTimer = null;
+
+        function odEsc(t) {
+            return (t == null ? "" : String(t)).replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        }
+
+        function renderOnDuty(rows) {
+            if (!ondutyList) return;
+            const list = Array.isArray(rows) ? rows : [];
+            if (ondutyCount) ondutyCount.textContent = String(list.length);
+            if (list.length === 0) {
+                ondutyList.innerHTML = '<div class="onduty-empty">No one on duty.</div>';
+                return;
+            }
+            ondutyList.innerHTML = list.map((r) => {
+                const nm = (r.rank ? r.rank + " " : "") + (r.name || "Officer");
+                const sub = r.callsign ? ("Callsign: " + r.callsign) : "";
+                return `<div class="onduty-item"><div class="od-name">${odEsc(nm)}</div>${sub ? `<div class="od-sub">${odEsc(sub)}</div>` : ""}</div>`;
+            }).join("");
+        }
+
+        async function loadOnDuty() {
+            if (localSupabase) {
+                try {
+                    const { data, error } = await localSupabase
+                        .from("police_on_duty")
+                        .select("*")
+                        .eq("community_id", communityId)
+                        .order("created_at", { ascending: true });
+                    if (!error) {
+                        renderOnDuty(data || []);
+                        return;
+                    }
+                } catch (err) {
+                    console.error("Load on-duty failed:", err);
+                }
+            }
+            try {
+                const all = JSON.parse(localStorage.getItem("police_on_duty_" + communityId) || "[]");
+                renderOnDuty(all);
+            } catch (e) {
+                renderOnDuty([]);
+            }
+        }
+
+        function saveLocalOnDuty(record, add) {
+            try {
+                let all = JSON.parse(localStorage.getItem("police_on_duty_" + communityId) || "[]");
+                all = all.filter((r) => r.officer_id !== officerId);
+                if (add) all.push(record);
+                localStorage.setItem("police_on_duty_" + communityId, JSON.stringify(all));
+            } catch (e) { /* ignore */ }
+        }
+
+        async function goOnDuty() {
+            const record = {
+                community_id: communityId,
+                officer_id: officerId,
+                name: officerName,
+                rank: officerRank,
+                callsign: officerCallsign,
+                created_at: new Date().toISOString()
+            };
+            if (localSupabase) {
+                try {
+                    await localSupabase.from("police_on_duty").delete().eq("officer_id", officerId).eq("community_id", communityId);
+                    const { error } = await localSupabase.from("police_on_duty").insert([record]);
+                    if (error) throw error;
+                } catch (err) {
+                    console.error("Go on-duty failed, using local fallback:", err);
+                    saveLocalOnDuty(record, true);
+                }
+            } else {
+                saveLocalOnDuty(record, true);
+            }
+            isOnDuty = true;
+            updateDutyButton();
+            loadOnDuty();
+        }
+
+        async function goOffDuty() {
+            if (localSupabase) {
+                try {
+                    await localSupabase.from("police_on_duty").delete().eq("officer_id", officerId).eq("community_id", communityId);
+                } catch (err) {
+                    console.error("Go off-duty failed:", err);
+                }
+            }
+            saveLocalOnDuty({ officer_id: officerId }, false);
+            isOnDuty = false;
+            updateDutyButton();
+            loadOnDuty();
+        }
+
+        function updateDutyButton() {
+            if (!ondutyToggleBtn) return;
+            if (isOnDuty) {
+                ondutyToggleBtn.textContent = "Go Off Duty";
+                ondutyToggleBtn.classList.add("off");
+            } else {
+                ondutyToggleBtn.textContent = "Go On Duty";
+                ondutyToggleBtn.classList.remove("off");
+            }
+        }
+
+        if (ondutyToggleBtn) {
+            ondutyToggleBtn.addEventListener("click", () => {
+                if (isOnDuty) goOffDuty();
+                else goOnDuty();
+            });
+        }
+
+        window.addEventListener("beforeunload", () => {
+            if (isOnDuty) {
+                try {
+                    if (localSupabase) {
+                        localSupabase.from("police_on_duty").delete().eq("officer_id", officerId).eq("community_id", communityId);
+                    }
+                    saveLocalOnDuty({ officer_id: officerId }, false);
+                } catch (e) { /* ignore */ }
+            }
+        });
+
+        loadOnDuty();
+        ondutyTimer = setInterval(loadOnDuty, 8000);
     </script>
 </body>
-</html>s
+</html>
