@@ -518,6 +518,83 @@
         }
 
 
+        .call-box {
+            width: 100%;
+            max-width: 520px;
+            margin: 0 auto 18px;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 18px;
+            box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
+        }
+
+        .call-box-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 14px;
+        }
+
+        .call-field {
+            margin-bottom: 12px;
+        }
+
+        .call-field label {
+            display: block;
+            font-size: 12px;
+            font-weight: 700;
+            color: #475569;
+            margin-bottom: 6px;
+        }
+
+        .call-field input,
+        .call-field textarea,
+        .call-field select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 12px;
+            font-size: 14px;
+            color: #0f172a;
+            background: #ffffff;
+            font-family: inherit;
+            outline: none;
+            box-sizing: border-box;
+        }
+
+        .call-field textarea {
+            min-height: 72px;
+            resize: vertical;
+        }
+
+        .call-field input:focus,
+        .call-field textarea:focus,
+        .call-field select:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+        }
+
+        .call-priority-select.prio-1 { border-color: #dc2626; color: #dc2626; font-weight: 700; }
+        .call-priority-select.prio-2 { border-color: #f59e0b; color: #b45309; font-weight: 700; }
+        .call-priority-select.prio-3 { border-color: #16a34a; color: #15803d; font-weight: 700; }
+
+        .call-submit {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 12px;
+            background: #2563eb;
+            color: #ffffff;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .call-submit:hover {
+            background: #1d4ed8;
+        }
+
         .plate-lookup-btn {
             position: fixed;
             right: 24px;
@@ -584,6 +661,32 @@
     </div>
 
     <button type="button" class="plate-lookup-btn" id="plateLookupBtn">Plate Lookup</button>
+
+    <div class="call-box" id="callBox">
+        <div class="call-box-title">Call Info</div>
+        <div class="call-field">
+            <label for="callLocation">Location</label>
+            <input type="text" id="callLocation" placeholder="e.g. Main St & 3rd Ave" />
+        </div>
+        <div class="call-field">
+            <label for="callPostal">Postal</label>
+            <input type="text" id="callPostal" placeholder="e.g. 1234" />
+        </div>
+        <div class="call-field">
+            <label for="callDescription">Description</label>
+            <textarea id="callDescription" placeholder="Describe the call..."></textarea>
+        </div>
+        <div class="call-field">
+            <label for="callPriority">Priority</label>
+            <select id="callPriority" class="call-priority-select">
+                <option value="">Select priority</option>
+                <option value="1">Priority 1 (High)</option>
+                <option value="2">Priority 2 (Medium)</option>
+                <option value="3">Priority 3 (Low)</option>
+            </select>
+        </div>
+        <button type="button" class="call-submit" id="callSubmitBtn">Save Call</button>
+    </div>
 
     <div class="modal-overlay" id="lookupModal">
         <div class="modal">
@@ -1726,6 +1829,46 @@
         if (liveMapModal) {
             liveMapModal.addEventListener("click", (e) => {
                 if (e.target === liveMapModal) { stopLiveMap(); liveMapModal.classList.remove("open"); }
+            });
+        }
+
+        // ---- Call Info box ----
+        const callLocation = document.getElementById("callLocation");
+        const callPostal = document.getElementById("callPostal");
+        const callDescription = document.getElementById("callDescription");
+        const callPriority = document.getElementById("callPriority");
+        const callSubmitBtn = document.getElementById("callSubmitBtn");
+
+        if (callPriority) {
+            callPriority.addEventListener("change", () => {
+                callPriority.classList.remove("prio-1", "prio-2", "prio-3");
+                if (callPriority.value) callPriority.classList.add("prio-" + callPriority.value);
+            });
+        }
+
+        if (callSubmitBtn) {
+            callSubmitBtn.addEventListener("click", () => {
+                const call = {
+                    location: callLocation ? callLocation.value.trim() : "",
+                    postal: callPostal ? callPostal.value.trim() : "",
+                    description: callDescription ? callDescription.value.trim() : "",
+                    priority: callPriority ? callPriority.value : "",
+                    time: new Date().toISOString()
+                };
+                if (!call.location && !call.postal && !call.description) {
+                    alert("Enter at least a location, postal, or description.");
+                    return;
+                }
+                try {
+                    const saved = JSON.parse(localStorage.getItem("police_calls") || "[]");
+                    saved.unshift(call);
+                    localStorage.setItem("police_calls", JSON.stringify(saved.slice(0, 50)));
+                } catch (e) { /* ignore */ }
+                if (callLocation) callLocation.value = "";
+                if (callPostal) callPostal.value = "";
+                if (callDescription) callDescription.value = "";
+                if (callPriority) { callPriority.value = ""; callPriority.classList.remove("prio-1", "prio-2", "prio-3"); }
+                alert("Call saved.");
             });
         }
     </script>
