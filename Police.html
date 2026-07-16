@@ -605,7 +605,8 @@
         .call-box {
             position: fixed;
             top: 140px;
-            right: 24px;            width: 300px;
+            right: 24px;
+            width: 300px;
             max-width: calc(100vw - 48px);
             z-index: 650;
             background: #ffffff;
@@ -613,6 +614,57 @@
             border-radius: 16px;
             padding: 18px;
             box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
+        }
+
+        .stats-panel {
+            position: fixed;
+            top: 520px;
+            right: 24px;
+            width: 300px;
+            max-width: calc(100vw - 48px);
+            z-index: 650;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .stats-card {
+            background: #0f172a;
+            color: #e2e8f0;
+            border: 1px solid rgba(148, 163, 184, 0.18);
+            border-radius: 16px;
+            padding: 18px;
+            box-shadow: 0 6px 18px rgba(15, 23, 42, 0.12);
+        }
+
+        .stats-card-title {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 14px;
+            font-weight: 700;
+            color: #f8fafc;
+            margin-bottom: 8px;
+            letter-spacing: 0.01em;
+        }
+
+        .stats-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 32px;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: #111827;
+            color: #f8fafc;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .stats-card-text {
+            font-size: 13px;
+            line-height: 1.5;
+            color: #cbd5e1;
         }
 
         .call-box-title {
@@ -745,6 +797,30 @@
         <div class="call-field">
             <label>Priority</label>
             <div class="call-value" id="callPriority">—</div>
+        </div>
+    </div>
+
+    <div class="stats-panel" id="statsPanel">
+        <div class="stats-card">
+            <div class="stats-card-title">
+                <span>ACTIVE 911 CALLS</span>
+                <span class="stats-badge" id="callsCount">0</span>
+            </div>
+            <div class="stats-card-text" id="callsText">No active calls.</div>
+        </div>
+        <div class="stats-card">
+            <div class="stats-card-title">
+                <span>ACTIVE BOLOS</span>
+                <span class="stats-badge" id="boloCount">0</span>
+            </div>
+            <div class="stats-card-text" id="boloText">No active BOLOs.</div>
+        </div>
+        <div class="stats-card">
+            <div class="stats-card-title">
+                <span>ACTIVE TRAFFIC STOPS</span>
+                <span class="stats-badge" id="trafficCount">0</span>
+            </div>
+            <div class="stats-card-text" id="trafficText">No active traffic stops.</div>
         </div>
     </div>
 
@@ -1903,6 +1979,52 @@
                 if (e.target === liveMapModal) { stopLiveMap(); liveMapModal.classList.remove("open"); }
             });
         }
+
+        const callsCountEl = document.getElementById("callsCount");
+        const boloCountEl = document.getElementById("boloCount");
+        const trafficCountEl = document.getElementById("trafficCount");
+        const callsText = document.getElementById("callsText");
+        const boloText = document.getElementById("boloText");
+        const trafficText = document.getElementById("trafficText");
+
+        async function refreshSidebarStats() {
+            let activeCalls = 0;
+            let activeBolos = 0;
+            let activeTraffic = 0;
+
+            if (localSupabase) {
+                try {
+                    const callsRes = await localSupabase.from("calls").select("id", { count: "exact", head: true });
+                    if (!callsRes.error) activeCalls = callsRes.count || 0;
+                } catch (err) {
+                    console.warn("Calls stats unavailable:", err);
+                }
+
+                try {
+                    const bolosRes = await localSupabase.from("bolos").select("id", { count: "exact", head: true });
+                    if (!bolosRes.error) activeBolos = bolosRes.count || 0;
+                } catch (err) {
+                    console.warn("BOLO stats unavailable:", err);
+                }
+
+                try {
+                    const trafficRes = await localSupabase.from("traffic_stops").select("id", { count: "exact", head: true });
+                    if (!trafficRes.error) activeTraffic = trafficRes.count || 0;
+                } catch (err) {
+                    console.warn("Traffic stop stats unavailable:", err);
+                }
+            }
+
+            if (callsCountEl) callsCountEl.textContent = String(activeCalls);
+            if (boloCountEl) boloCountEl.textContent = String(activeBolos);
+            if (trafficCountEl) trafficCountEl.textContent = String(activeTraffic);
+            if (callsText) callsText.textContent = activeCalls === 0 ? "No active calls." : `${activeCalls} active call${activeCalls === 1 ? "" : "s"}.`;
+            if (boloText) boloText.textContent = activeBolos === 0 ? "No active BOLOs." : `${activeBolos} active BOLO${activeBolos === 1 ? "" : "s"}.`;
+            if (trafficText) trafficText.textContent = activeTraffic === 0 ? "No active traffic stops." : `${activeTraffic} active traffic stop${activeTraffic === 1 ? "" : "s"}.`;
+        }
+
+        setTimeout(refreshSidebarStats, 0);
+        setInterval(refreshSidebarStats, 15000);
 
         // ---- Call Info box (read-only display) ----
         const callLocation = document.getElementById("callLocation");
