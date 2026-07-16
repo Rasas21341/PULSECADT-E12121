@@ -716,6 +716,21 @@
                                                 <input type="text" id="discordWebhookInput" placeholder="https://discord.com/api/webhooks/..." value="${(communityData.discord_webhook || '').replace(/"/g, '&quot;')}" />
                                                 <button type="button" class="submit-btn" id="saveDiscordWebhookBtn" style="margin-top:8px; padding:8px 12px; font-size:13px;">Save Webhook</button>
                                             </div>
+                                            <div class="field" style="margin-top:12px; border-top:1px solid #e2e8f0; padding-top:12px;">
+                                                <div style="font-size:12px; font-weight:600; color:#334155; margin-bottom:6px;">Or pick a channel (bot token)</div>
+                                                <label style="font-size:12px; color:#64748b;">Bot Token</label>
+                                                <input type="password" id="discordBotTokenInput" placeholder="Bot token (kept server-side)" style="margin-top:4px;" />
+                                                <button type="button" class="submit-btn" id="discordFetchGuildsBtn" style="margin-top:8px; padding:8px 12px; font-size:13px;">Fetch Servers</button>
+                                                <div id="discordGuildSelectWrap" style="margin-top:8px; display:none;">
+                                                    <select id="discordGuildSelect" class="department-select" style="width:100%;"></select>
+                                                    <button type="button" class="submit-btn" id="discordFetchChannelsBtn" style="margin-top:8px; padding:8px 12px; font-size:13px;">Fetch Channels</button>
+                                                </div>
+                                                <div id="discordChannelSelectWrap" style="margin-top:8px; display:none;">
+                                                    <select id="discordChannelSelect" class="department-select" style="width:100%;"></select>
+                                                    <button type="button" class="submit-btn" id="discordUseChannelBtn" style="margin-top:8px; padding:8px 12px; font-size:13px;">Use This Channel</button>
+                                                </div>
+                                                <div id="discordChannelStatus" style="font-size:12px; color:#64748b; margin-top:6px;"></div>
+                                            </div>
                                             <div class="field" style="margin-top:10px;">
                                                 <div style="font-size:12px; font-weight:600; color:#334155; margin-bottom:4px;">Invite the PulseCAD bot</div>
                                                 <a class="submit-btn discord-invite-link" id="discordBotInviteLink" target="_blank" rel="noopener">Invite Bot to Server</a>
@@ -1359,6 +1374,105 @@
                                     alert("Discord webhook saved.");
                                 } catch (err) {
                                     alert("Failed to save webhook: " + (err.message || err));
+                                }
+                            });
+                        }
+
+                        const discordBotTokenInput = document.getElementById("discordBotTokenInput");
+                        const discordFetchGuildsBtn = document.getElementById("discordFetchGuildsBtn");
+                        const discordGuildSelectWrap = document.getElementById("discordGuildSelectWrap");
+                        const discordGuildSelect = document.getElementById("discordGuildSelect");
+                        const discordFetchChannelsBtn = document.getElementById("discordFetchChannelsBtn");
+                        const discordChannelSelectWrap = document.getElementById("discordChannelSelectWrap");
+                        const discordChannelSelect = document.getElementById("discordChannelSelect");
+                        const discordUseChannelBtn = document.getElementById("discordUseChannelBtn");
+                        const discordChannelStatus = document.getElementById("discordChannelStatus");
+
+                        async function discordApi(route, body) {
+                            const endpoints = ["/api/discord-" + route, "https://www.pulsecad.xyz/api/discord-" + route];
+                            for (const ep of endpoints) {
+                                try {
+                                    const r = await fetch(ep, {
+                                        method: "POST",
+                                        headers: { "Content-Type": "application/json" },
+                                        body: JSON.stringify(body)
+                                    });
+                                    const data = await r.json();
+                                    if (r.ok) return data;
+                                    if (data && data.error) throw new Error(data.error);
+                                    throw new Error("Request failed");
+                                } catch (err) {
+                                    if (ep === endpoints[endpoints.length - 1]) throw err;
+                                }
+                            }
+                        }
+
+                        if (discordFetchGuildsBtn) {
+                            discordFetchGuildsBtn.addEventListener("click", async () => {
+                                const token = discordBotTokenInput ? discordBotTokenInput.value.trim() : "";
+                                if (!token) { alert("Enter the bot token first."); return; }
+                                if (discordChannelStatus) discordChannelStatus.textContent = "Loading servers...";
+                                try {
+                                    const data = await discordApi("guilds", { token });
+                                    const guilds = data.guilds || [];
+                                    if (guilds.length === 0) {
+                                        if (discordChannelStatus) discordChannelStatus.textContent = "No servers found for this bot.";
+                                        return;
+                                    }
+                                    discordGuildSelect.innerHTML = guilds.map((g) => `<option value="${g.id}">${g.name.replace(/</g, '&lt;')}</option>`).join('');
+                                    discordGuildSelectWrap.style.display = "block";
+                                    discordChannelSelectWrap.style.display = "none";
+                                    if (discordChannelStatus) discordChannelStatus.textContent = "Select a server and fetch channels.";
+                                } catch (err) {
+                                    if (discordChannelStatus) discordChannelStatus.textContent = "Error: " + (err.message || err);
+                                }
+                            });
+                        }
+
+                        if (discordFetchChannelsBtn) {
+                            discordFetchChannelsBtn.addEventListener("click", async () => {
+                                const token = discordBotTokenInput ? discordBotTokenInput.value.trim() : "";
+                                const guildId = discordGuildSelect ? discordGuildSelect.value : "";
+                                if (!token || !guildId) { alert("Fetch servers first."); return; }
+                                if (discordChannelStatus) discordChannelStatus.textContent = "Loading channels...";
+                                try {
+                                    const data = await discordApi("channels", { token, guildId });
+                                    const channels = data.channels || [];
+                                    const textChannels = channels.filter((c) => c.type === 0 || c.type === 5);
+                                    if (textChannels.length === 0) {
+                                        if (discordChannelStatus) discordChannelStatus.textContent = "No text channels found.";
+                                        return;
+                                    }
+                                    discordChannelSelect.innerHTML = textChannels.map((c) => `<option value="${c.id}">${c.name.replace(/</g, '&lt;')}</option>`).join('');
+                                    discordChannelSelectWrap.style.display = "block";
+                                    if (discordChannelStatus) discordChannelStatus.textContent = "Select a channel and click Use This Channel.";
+                                } catch (err) {
+                                    if (discordChannelStatus) discordChannelStatus.textContent = "Error: " + (err.message || err);
+                                }
+                            });
+                        }
+
+                        if (discordUseChannelBtn) {
+                            discordUseChannelBtn.addEventListener("click", async () => {
+                                const token = discordBotTokenInput ? discordBotTokenInput.value.trim() : "";
+                                const channelId = discordChannelSelect ? discordChannelSelect.value : "";
+                                if (!token || !channelId) { alert("Select a channel first."); return; }
+                                if (discordChannelStatus) discordChannelStatus.textContent = "Creating webhook...";
+                                try {
+                                    const data = await discordApi("create-webhook", { token, channelId });
+                                    const webhook = data.webhook || "";
+                                    if (!webhook) throw new Error("No webhook returned.");
+                                    if (discordWebhookInput) discordWebhookInput.value = webhook;
+                                    const { error } = await localSupabase
+                                        .from("communities")
+                                        .update({ discord_webhook: webhook })
+                                        .eq("id", id);
+                                    if (error) throw error;
+                                    if (communityData) communityData.discord_webhook = webhook;
+                                    if (discordChannelStatus) discordChannelStatus.textContent = "Channel linked! Join logs will post there.";
+                                    alert("Channel linked successfully.");
+                                } catch (err) {
+                                    if (discordChannelStatus) discordChannelStatus.textContent = "Error: " + (err.message || err);
                                 }
                             });
                         }
