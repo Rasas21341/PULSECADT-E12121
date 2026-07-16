@@ -585,7 +585,11 @@
             const q = params.get("id");
             if (q) return q;
             const m = window.location.pathname.match(/\/community\/([^/?#]+)/);
-            if (m) return decodeURIComponent(m[1]);
+            if (m) {
+                const seg = decodeURIComponent(m[1]);
+                if (/\.html?$/i.test(seg)) return null;
+                return seg;
+            }
             return null;
         }
 
@@ -1218,13 +1222,13 @@
                                 documentsList.querySelectorAll("[data-action='open-doc']").forEach((btn) => {
                                     btn.addEventListener("click", (e) => {
                                         const documentId = e.target.closest(".request-item").getAttribute("data-document-id");
-                                        window.open("document.html?id=" + encodeURIComponent(documentId), "_blank");
+                                        window.open("/document.html?id=" + encodeURIComponent(documentId), "_blank");
                                     });
                                 });
                                 documentsList.querySelectorAll("[data-action='copy-doc']").forEach((btn) => {
                                     btn.addEventListener("click", (e) => {
                                         const documentId = e.target.closest(".request-item").getAttribute("data-document-id");
-                                        const link = new URL("document.html", window.location.href);
+                                        const link = new URL("/document.html", window.location.origin);
                                         link.searchParams.set("id", documentId);
                                         if (navigator.clipboard && navigator.clipboard.writeText) {
                                             navigator.clipboard.writeText(link.href)
@@ -1603,7 +1607,7 @@
 
                 contentEl.querySelectorAll(".role-btn[data-role='Civilian']").forEach((btn) => {
                     btn.addEventListener("click", () => {
-                        window.open("civilian.html", "_blank");
+                        window.open("/civilian.html", "_blank");
                     });
                 });
             } catch (err) {
@@ -1645,7 +1649,7 @@
                 const params = new URLSearchParams({ name, rank, callsign });
                 if (erlcKey) params.set("erlckey", erlcKey);
                 try { localStorage.setItem("policeErkKey", erlcKey); } catch (e) {}
-                window.open("police.html?" + params.toString(), "_blank");
+                window.open("/police.html?" + params.toString(), "_blank");
                 if (policeModal) policeModal.classList.remove("open");
             });
         }
@@ -1674,7 +1678,7 @@
                 const params = new URLSearchParams({});
                 if (erlcKey) params.set("erlckey", erlcKey);
                 try { localStorage.setItem("policeErkKey", erlcKey); } catch (e) {}
-                window.open("police.html?" + params.toString(), "_blank");
+                window.open("/police.html?" + params.toString(), "_blank");
                 return;
             }
             openDeptPasscodeModal(department);
@@ -1719,7 +1723,7 @@
                 const entered = deptPasscodeInput ? deptPasscodeInput.value.trim() : "";
                 if (entered === pendingDepartment.passcode) {
                     if (deptPasscodeModal) deptPasscodeModal.classList.remove("open");
-                    window.open("police.html", "_blank");
+                    window.open("/police.html", "_blank");
                     pendingDepartment = null;
                 } else {
                     if (deptPasscodeError) { deptPasscodeError.textContent = "Incorrect passcode."; deptPasscodeError.style.display = "block"; }
