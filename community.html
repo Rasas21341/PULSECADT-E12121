@@ -1649,7 +1649,7 @@
                 const params = new URLSearchParams({ name, rank, callsign });
                 if (erlcKey) params.set("erlckey", erlcKey);
                 try { localStorage.setItem("policeErkKey", erlcKey); } catch (e) {}
-                window.open("/police.html?" + params.toString(), "_blank");
+                window.open("/Police.html?" + params.toString(), "_blank");
                 if (policeModal) policeModal.classList.remove("open");
             });
         }
@@ -1678,7 +1678,7 @@
                 const params = new URLSearchParams({});
                 if (erlcKey) params.set("erlckey", erlcKey);
                 try { localStorage.setItem("policeErkKey", erlcKey); } catch (e) {}
-                window.open("/police.html?" + params.toString(), "_blank");
+                window.open("/Police.html?" + params.toString(), "_blank");
                 return;
             }
             openDeptPasscodeModal(department);
@@ -1723,7 +1723,7 @@
                 const entered = deptPasscodeInput ? deptPasscodeInput.value.trim() : "";
                 if (entered === pendingDepartment.passcode) {
                     if (deptPasscodeModal) deptPasscodeModal.classList.remove("open");
-                    window.open("/police.html", "_blank");
+                    window.open("/Police.html", "_blank");
                     pendingDepartment = null;
                 } else {
                     if (deptPasscodeError) { deptPasscodeError.textContent = "Incorrect passcode."; deptPasscodeError.style.display = "block"; }
