@@ -225,6 +225,7 @@
         .btn.success:hover { background: #15803d; }
 
         .doc-card {
+            position: relative;
             background: #ffffff;
             border: 1px solid #e2e8f0;
             border-radius: 16px;
@@ -420,6 +421,73 @@
             margin-top: 10px;
             line-height: 1.4;
         }
+
+        /* Copy protection + watermark */
+        .doc-protected .doc-page-title,
+        .doc-protected .doc-content {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            -webkit-touch-callout: none;
+        }
+
+        .doc-watermark {
+            position: absolute;
+            inset: 0;
+            overflow: hidden;
+            pointer-events: none;
+            z-index: 1;
+            display: none;
+        }
+
+        .doc-watermark.active {
+            display: block;
+        }
+
+        #viewMode,
+        #editMode {
+            position: relative;
+            z-index: 2;
+        }
+
+        .doc-theme-field {
+            margin-top: 12px;
+        }
+
+        .doc-theme-field label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: #334155;
+            margin-bottom: 6px;
+        }
+
+        .doc-theme-field input {
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: 10px;
+            border: 1px solid #cbd5e1;
+            font-size: 14px;
+            color: #0f172a;
+            outline: none;
+            font-family: inherit;
+        }
+
+        .doc-theme-field input:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+        }
+
+        .doc-watermark span {
+            position: absolute;
+            transform: rotate(-28deg);
+            font-size: 22px;
+            font-weight: 700;
+            color: rgba(15, 23, 42, 0.08);
+            white-space: nowrap;
+            letter-spacing: 2px;
+        }
     </style>
 </head>
 <body>
@@ -451,6 +519,7 @@
             </div>
 
             <div class="doc-card">
+                <div class="doc-watermark" id="docWatermark"></div>
                 <div id="viewMode">
                     <div class="doc-page-title" id="viewTitle"></div>
                     <div class="doc-content" id="viewContent"></div>
@@ -483,6 +552,11 @@
         <div class="doc-theme-row">
             <label for="themeAccent">Accent</label>
             <input type="color" id="themeAccent" value="#2563eb" />
+        </div>
+
+        <div class="doc-theme-field">
+            <label for="themeWatermark">Watermark text (blank = default)</label>
+            <input type="text" id="themeWatermark" placeholder="e.g. CONFIDENTIAL" maxlength="40" />
         </div>
 
         <div class="doc-theme-actions">
@@ -528,6 +602,7 @@
         const themeBg = document.getElementById("themeBg");
         const themeText = document.getElementById("themeText");
         const themeAccent = document.getElementById("themeAccent");
+        const themeWatermark = document.getElementById("themeWatermark");
         const themeSaveBtn = document.getElementById("themeSaveBtn");
         const themeResetBtn = document.getElementById("themeResetBtn");
         const themeHint = document.getElementById("themeHint");
@@ -538,6 +613,7 @@
         let selectedId = null;
         let isOwner = false;
         let editing = false;
+        let currentCommunityName = "";
         let currentTheme = { bg: "", text: "", accent: "" };
 
         try {
@@ -659,6 +735,46 @@
             return pages.find((e) => e.id === selectedId && e.type === "page") || null;
         }
 
+        function getWatermarkText() {
+            if (currentTheme.watermark && currentTheme.watermark.trim()) return currentTheme.watermark.trim();
+            return (currentCommunityName || (currentDoc && currentDoc.title) || "PulseCAD").toString().trim() || "PulseCAD";
+        }
+
+        function buildWatermark(text) {
+            const wm = document.getElementById("docWatermark");
+            const card = document.querySelector(".doc-card");
+            if (!wm || !card) return;
+            wm.innerHTML = "";
+            if (!text || editing) {
+                wm.classList.remove("active");
+                return;
+            }
+            const h = Math.max(card.scrollHeight, card.clientHeight, 500);
+            const w = Math.max(card.clientWidth, 360);
+            const stepY = 120;
+            const stepX = 240;
+            for (let y = -30; y < h; y += stepY) {
+                for (let x = -50; x < w; x += stepX) {
+                    const s = document.createElement("span");
+                    s.textContent = text;
+                    s.style.top = y + "px";
+                    s.style.left = x + "px";
+                    wm.appendChild(s);
+                }
+            }
+            wm.classList.add("active");
+        }
+
+        function applyProtection() {
+            const card = document.querySelector(".doc-card");
+            if (!card) return;
+            if (editing) {
+                card.classList.remove("doc-protected");
+            } else {
+                card.classList.add("doc-protected");
+            }
+        }
+
         function renderMainView() {
             const page = getSelected();
             if (!page) {
@@ -680,6 +796,8 @@
                 }
             }
             if (isOwner && editBtn) editBtn.style.display = "inline-block";
+            applyProtection();
+            buildWatermark(getWatermarkText());
         }
 
         function enterEditMode() {
@@ -693,6 +811,8 @@
             if (editBtn) editBtn.style.display = "none";
             if (saveBtn) saveBtn.style.display = "inline-block";
             if (cancelBtn) cancelBtn.style.display = "inline-block";
+            applyProtection();
+            buildWatermark(getWatermarkText());
         }
 
         function exitEditMode() {
@@ -817,7 +937,8 @@
             currentTheme = {
                 bg: t.bg || "",
                 text: t.text || "",
-                accent: t.accent || ""
+                accent: t.accent || "",
+                watermark: (t.watermark || "").trim()
             };
             const card = document.querySelector(".doc-card");
             if (card) {
@@ -831,6 +952,7 @@
             if (editContent) editContent.style.color = currentTheme.text || "";
             const activeNav = document.querySelector(".doc-nav-page.active");
             if (activeNav) activeNav.style.color = currentTheme.accent || "";
+            buildWatermark(getWatermarkText());
         }
 
         function readThemeInputs() {
@@ -955,10 +1077,11 @@
                     if (user) {
                         const { data: community } = await localSupabase
                             .from("communities")
-                            .select("creator_email")
+                            .select("creator_email, name")
                             .eq("id", data.community_id)
                             .maybeSingle();
                         isOwner = !!(community && community.creator_email === user.email);
+                        currentCommunityName = (community && community.name) || "";
                     }
                 } catch (err) {
                     console.error("Owner check failed:", err);
@@ -1021,6 +1144,18 @@
                 closeThemePanel();
             }
         });
+
+        // Copy protection on the document card (disabled while editing)
+        const docCard = document.querySelector(".doc-card");
+        if (docCard) {
+            ["copy", "cut", "contextmenu", "selectstart", "dragstart"].forEach((evt) => {
+                docCard.addEventListener(evt, (e) => {
+                    if (editing) return;
+                    if (editMode && editMode.style.display !== "none" && editMode.contains(e.target)) return;
+                    e.preventDefault();
+                });
+            });
+        }
 
         init();
     </script>

@@ -756,6 +756,7 @@
 
                         async function loadMembers() {
                             if (!membersDropdownMenu || !localSupabase) return;
+                            membersDropdownMenu.innerHTML = '<div class="empty">Loading members...</div>';
                             try {
                                 const { data: community } = await localSupabase
                                     .from("communities")
@@ -763,19 +764,22 @@
                                     .eq("id", id)
                                     .maybeSingle();
 
-                                const { data: memberRows } = await localSupabase
+                                const { data: memberRows, error: memberError } = await localSupabase
                                     .from("user_communities")
                                     .select("user_id")
                                     .eq("community_id", id);
+
+                                if (memberError) throw memberError;
 
                                 const rows = Array.isArray(memberRows) ? memberRows : [];
                                 const ids = rows.map((r) => r.user_id).filter(Boolean);
                                 let emailById = {};
                                 if (ids.length > 0) {
-                                    const { data: users } = await localSupabase
+                                    const { data: users, error: userError } = await localSupabase
                                         .from("users")
                                         .select("id, email")
                                         .in("id", ids);
+                                    if (userError) throw userError;
                                     (users || []).forEach((u) => { emailById[u.id] = u.email; });
                                 }
 
@@ -791,7 +795,12 @@
                                 }
                                 membersDropdownMenu.innerHTML = html;
                             } catch (err) {
-                                membersDropdownMenu.innerHTML = '<div class="empty">Failed to load members.</div>';
+                                console.error("Failed to load members:", err);
+                                if (err && err.code === "42501" || (err && err.message && /permission|policy|row-level/i.test(err.message))) {
+                                    membersDropdownMenu.innerHTML = '<div class="empty">Members are hidden by database permissions (RLS). Enable read access on user_communities.</div>';
+                                } else {
+                                    membersDropdownMenu.innerHTML = '<div class="empty">Failed to load members.</div>';
+                                }
                             }
                         }
 
@@ -1052,6 +1061,16 @@
                         const newDocumentInput = document.getElementById("newDocumentInput");
                         const documentDeptCheckboxes = document.getElementById("documentDeptCheckboxes");
                         const addDocumentBtn = document.getElementById("addDocumentBtn");
+
+                        const communityIsPro = !!(communityData && communityData.pro);
+                        if (documentsDropdownToggle && !communityIsPro) {
+                            documentsDropdownToggle.disabled = true;
+                            documentsDropdownToggle.style.opacity = "0.5";
+                            documentsDropdownToggle.style.cursor = "not-allowed";
+                            documentsDropdownToggle.textContent = "Documents (Pro)";
+                            documentsDropdownToggle.title = "Documents is a PulseCAD Pro feature. Upgrade your community to Pro to use it.";
+                            if (documentsDropdownMenu) documentsDropdownMenu.style.display = "none";
+                        }
 
                         async function loadDocumentDeptCheckboxes() {
                             if (!documentDeptCheckboxes || !localSupabase) return;

@@ -1416,7 +1416,6 @@ enable-ga="false"
             <div class="user-email" id="userEmailDisplay"></div>
             <div class="premium-count" id="premiumCountDisplay" style="display:none;"><span id="premiumCountText"></span></div>
             <div class="dropdown-menu" id="dropdownMenu">
-                <button type="button" class="dropdown-item" id="dropdownWalletBtn">Wallet</button>
                 <button type="button" class="dropdown-item" id="dropdownSettingsBtn">Settings</button>
                 <button type="button" class="dropdown-item" id="dropdownJoinCommunityBtn">Redeem</button>
                 <button type="button" class="dropdown-item danger" id="dropdownLogoutBtn">Logout</button>
@@ -1519,6 +1518,15 @@ enable-ga="false"
                 <div class="settings-label">Discord</div>
                 <div class="settings-value">
                     <button type="button" class="discord-login-btn" id="discordLoginBtn">Login with Discord</button>
+                </div>
+            </div>
+            <div class="settings-row">
+                <div class="settings-label">Theme</div>
+                <div class="settings-value">
+                    <div class="theme-toggle" id="themeToggle">
+                        <button type="button" class="theme-option active" data-theme="light">Light</button>
+                        <button type="button" class="theme-option" data-theme="dark">Dark</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -3404,15 +3412,6 @@ enable-ga="false"
             walletModal.classList.add("open");
         }
 
-        const dropdownWalletBtn = document.getElementById("dropdownWalletBtn");
-
-        if (dropdownWalletBtn) {
-            dropdownWalletBtn.addEventListener("click", (e) => {
-                e.stopPropagation();
-                openWalletModal();
-            });
-        }
-
         if (walletModalClose) {
             walletModalClose.addEventListener("click", () => {
                 if (walletModal) walletModal.classList.remove("open");
@@ -3451,7 +3450,5 @@ enable-ga="false"
         if (proBtn) {
         }
     </script>
-    <script src="https://1416.3cx.cloud/webclient/v1/dist/webcomponent.js"></script>
-    <call-us-selector phonesystem-url="https://1416.3cx.cloud/" party="3dprints"></call-us-selector>
 </body>
 </html>
