@@ -494,6 +494,81 @@
             text-align: center;
         }
 
+        .dept-wrap {
+            width: 220px;
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .dept-wrap .role-btn {
+            width: 100%;
+        }
+
+        .dept-passcode-box {
+            display: none;
+            margin-top: 8px;
+            padding: 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            background: #ffffff;
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
+        }
+
+        .dept-passcode-box.open {
+            display: block;
+        }
+
+        .dept-passcode-box label {
+            display: block;
+            font-size: 12px;
+            font-weight: 700;
+            color: #475569;
+            margin-bottom: 6px;
+            text-align: left;
+        }
+
+        .dept-passcode-box input {
+            width: 100%;
+            padding: 9px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 10px;
+            font-size: 14px;
+            box-sizing: border-box;
+            outline: none;
+            font-family: inherit;
+        }
+
+        .dept-passcode-box input:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+        }
+
+        .dept-passcode-box .dept-pc-submit {
+            width: 100%;
+            margin-top: 8px;
+            padding: 9px;
+            border: none;
+            border-radius: 10px;
+            background: #2563eb;
+            color: #ffffff;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .dept-passcode-box .dept-pc-submit:hover {
+            background: #1d4ed8;
+        }
+
+        .dept-passcode-box .dept-pc-error {
+            display: none;
+            color: #dc2626;
+            font-size: 12px;
+            margin-top: 6px;
+            text-align: left;
+        }
+
         .dept-banner-preview {
             width: 100%;
             max-height: 120px;
@@ -1581,6 +1656,9 @@
                         .then(({ data }) => {
                             const departments = Array.isArray(data) ? data : [];
                             departments.forEach((dept) => {
+                                const wrap = document.createElement("div");
+                                wrap.className = "dept-wrap";
+
                                 const btn = document.createElement("button");
                                 btn.type = "button";
                                 btn.className = "role-btn";
@@ -1599,8 +1677,57 @@
                                 btn.appendChild(nameSpan);
                                 btn.setAttribute("data-department-id", dept.id);
                                 btn.setAttribute("data-passcode", dept.passcode || "");
-                                communityDepartments.appendChild(btn);
-                                btn.addEventListener("click", () => handleDepartmentClick(dept));
+                                wrap.appendChild(btn);
+
+                                // Inline passcode box (shown only if the department has a passcode)
+                                const pcBox = document.createElement("div");
+                                pcBox.className = "dept-passcode-box";
+                                pcBox.innerHTML = `
+                                    <label>Enter passcode</label>
+                                    <input type="password" class="dept-pc-input" placeholder="Passcode" />
+                                    <button type="button" class="dept-pc-submit">Enter</button>
+                                    <div class="dept-pc-error">Incorrect passcode.</div>
+                                `;
+                                wrap.appendChild(pcBox);
+
+                                communityDepartments.appendChild(wrap);
+
+                                const pcInput = pcBox.querySelector(".dept-pc-input");
+                                const pcSubmit = pcBox.querySelector(".dept-pc-submit");
+                                const pcError = pcBox.querySelector(".dept-pc-error");
+
+                                function tryEnter() {
+                                    const entered = pcInput ? pcInput.value.trim() : "";
+                                    if (entered === (dept.passcode || "")) {
+                                        openPoliceForDepartment(dept);
+                                        pcBox.classList.remove("open");
+                                        if (pcInput) pcInput.value = "";
+                                        if (pcError) pcError.style.display = "none";
+                                    } else {
+                                        if (pcError) pcError.style.display = "block";
+                                    }
+                                }
+
+                                if (pcSubmit) pcSubmit.addEventListener("click", tryEnter);
+                                if (pcInput) pcInput.addEventListener("keydown", (e) => {
+                                    if (e.key === "Enter") tryEnter();
+                                });
+
+                                btn.addEventListener("click", () => {
+                                    if (!dept.passcode) {
+                                        openPoliceForDepartment(dept);
+                                        return;
+                                    }
+                                    // Close any other open passcode boxes
+                                    document.querySelectorAll(".dept-passcode-box.open").forEach((b) => {
+                                        if (b !== pcBox) b.classList.remove("open");
+                                    });
+                                    pcBox.classList.toggle("open");
+                                    if (pcBox.classList.contains("open") && pcInput) {
+                                        if (pcError) pcError.style.display = "none";
+                                        pcInput.focus();
+                                    }
+                                });
                             });
                         });
                 }
@@ -1663,6 +1790,16 @@
         const deptPasscodeTitle = document.getElementById("deptPasscodeTitle");
         let pendingDepartment = null;
 
+        function openPoliceForDepartment(department) {
+            let erlcKey = (data && data.erlc_api_key) || "";
+            if (!erlcKey) { try { erlcKey = localStorage.getItem("erlcApiKey_" + id) || ""; } catch (e) {} }
+            const params = new URLSearchParams({});
+            params.set("community", id);
+            if (erlcKey) params.set("erlckey", erlcKey);
+            try { localStorage.setItem("policeErkKey", erlcKey); } catch (e) {}
+            window.open("/Police.html?" + params.toString(), "_blank");
+        }
+
         function openDeptPasscodeModal(department) {
             pendingDepartment = department;
             if (deptPasscodeTitle) deptPasscodeTitle.textContent = department.name + " - Passcode";
@@ -1674,12 +1811,7 @@
 
         function handleDepartmentClick(department) {
             if (!department.passcode) {
-                let erlcKey = (data && data.erlc_api_key) || "";
-                if (!erlcKey) { try { erlcKey = localStorage.getItem("erlcApiKey_" + id) || ""; } catch (e) {} }
-                const params = new URLSearchParams({});
-                if (erlcKey) params.set("erlckey", erlcKey);
-                try { localStorage.setItem("policeErkKey", erlcKey); } catch (e) {}
-                window.open("/Police.html?" + params.toString(), "_blank");
+                openPoliceForDepartment(department);
                 return;
             }
             openDeptPasscodeModal(department);
