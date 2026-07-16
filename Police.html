@@ -519,9 +519,12 @@
 
 
         .call-box {
-            width: 100%;
-            max-width: 520px;
-            margin: 0 auto 18px;
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            width: 300px;
+            max-width: calc(100vw - 48px);
+            z-index: 650;
             background: #ffffff;
             border: 1px solid #e2e8f0;
             border-radius: 16px;
@@ -685,7 +688,6 @@
                 <option value="3">Priority 3 (Low)</option>
             </select>
         </div>
-        <button type="button" class="call-submit" id="callSubmitBtn">Save Call</button>
     </div>
 
     <div class="modal-overlay" id="lookupModal">
@@ -1837,38 +1839,11 @@
         const callPostal = document.getElementById("callPostal");
         const callDescription = document.getElementById("callDescription");
         const callPriority = document.getElementById("callPriority");
-        const callSubmitBtn = document.getElementById("callSubmitBtn");
 
         if (callPriority) {
             callPriority.addEventListener("change", () => {
                 callPriority.classList.remove("prio-1", "prio-2", "prio-3");
                 if (callPriority.value) callPriority.classList.add("prio-" + callPriority.value);
-            });
-        }
-
-        if (callSubmitBtn) {
-            callSubmitBtn.addEventListener("click", () => {
-                const call = {
-                    location: callLocation ? callLocation.value.trim() : "",
-                    postal: callPostal ? callPostal.value.trim() : "",
-                    description: callDescription ? callDescription.value.trim() : "",
-                    priority: callPriority ? callPriority.value : "",
-                    time: new Date().toISOString()
-                };
-                if (!call.location && !call.postal && !call.description) {
-                    alert("Enter at least a location, postal, or description.");
-                    return;
-                }
-                try {
-                    const saved = JSON.parse(localStorage.getItem("police_calls") || "[]");
-                    saved.unshift(call);
-                    localStorage.setItem("police_calls", JSON.stringify(saved.slice(0, 50)));
-                } catch (e) { /* ignore */ }
-                if (callLocation) callLocation.value = "";
-                if (callPostal) callPostal.value = "";
-                if (callDescription) callDescription.value = "";
-                if (callPriority) { callPriority.value = ""; callPriority.classList.remove("prio-1", "prio-2", "prio-3"); }
-                alert("Call saved.");
             });
         }
     </script>
