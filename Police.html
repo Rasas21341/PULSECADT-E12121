@@ -551,36 +551,16 @@
             margin-bottom: 6px;
         }
 
-        .call-field input,
-        .call-field textarea,
-        .call-field select {
-            width: 100%;
-            padding: 10px 12px;
-            border: 1px solid #cbd5e1;
-            border-radius: 12px;
+        .call-value {
             font-size: 14px;
             color: #0f172a;
-            background: #ffffff;
-            font-family: inherit;
-            outline: none;
-            box-sizing: border-box;
+            padding: 4px 0;
+            word-break: break-word;
         }
 
-        .call-field textarea {
-            min-height: 72px;
-            resize: vertical;
-        }
-
-        .call-field input:focus,
-        .call-field textarea:focus,
-        .call-field select:focus {
-            border-color: #2563eb;
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
-        }
-
-        .call-priority-select.prio-1 { border-color: #dc2626; color: #dc2626; font-weight: 700; }
-        .call-priority-select.prio-2 { border-color: #f59e0b; color: #b45309; font-weight: 700; }
-        .call-priority-select.prio-3 { border-color: #16a34a; color: #15803d; font-weight: 700; }
+        .call-value.prio-1 { color: #dc2626; font-weight: 700; }
+        .call-value.prio-2 { color: #b45309; font-weight: 700; }
+        .call-value.prio-3 { color: #15803d; font-weight: 700; }
 
         .call-submit {
             width: 100%;
@@ -668,25 +648,20 @@
     <div class="call-box" id="callBox">
         <div class="call-box-title">Call Info</div>
         <div class="call-field">
-            <label for="callLocation">Location</label>
-            <input type="text" id="callLocation" placeholder="e.g. Main St & 3rd Ave" />
+            <label>Location</label>
+            <div class="call-value" id="callLocation">—</div>
         </div>
         <div class="call-field">
-            <label for="callPostal">Postal</label>
-            <input type="text" id="callPostal" placeholder="e.g. 1234" />
+            <label>Postal</label>
+            <div class="call-value" id="callPostal">—</div>
         </div>
         <div class="call-field">
-            <label for="callDescription">Description</label>
-            <textarea id="callDescription" placeholder="Describe the call..."></textarea>
+            <label>Description</label>
+            <div class="call-value" id="callDescription">—</div>
         </div>
         <div class="call-field">
-            <label for="callPriority">Priority</label>
-            <select id="callPriority" class="call-priority-select">
-                <option value="">Select priority</option>
-                <option value="1">Priority 1 (High)</option>
-                <option value="2">Priority 2 (Medium)</option>
-                <option value="3">Priority 3 (Low)</option>
-            </select>
+            <label>Priority</label>
+            <div class="call-value" id="callPriority">—</div>
         </div>
     </div>
 
@@ -1834,18 +1809,11 @@
             });
         }
 
-        // ---- Call Info box ----
+        // ---- Call Info box (read-only display) ----
         const callLocation = document.getElementById("callLocation");
         const callPostal = document.getElementById("callPostal");
         const callDescription = document.getElementById("callDescription");
         const callPriority = document.getElementById("callPriority");
-
-        if (callPriority) {
-            callPriority.addEventListener("change", () => {
-                callPriority.classList.remove("prio-1", "prio-2", "prio-3");
-                if (callPriority.value) callPriority.classList.add("prio-" + callPriority.value);
-            });
-        }
     </script>
 </body>
 </html>s
