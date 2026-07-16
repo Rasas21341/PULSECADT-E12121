@@ -1179,16 +1179,21 @@
                                     
                                     console.log("Saving department:", payload);
                                     
-                                    await localSupabase
+                                    const { data: updated, error } = await localSupabase
                                         .from("departments")
                                         .update(payload)
-                                        .eq("id", department.id);
+                                        .eq("id", department.id)
+                                        .select();
+                                    if (error) throw error;
+                                    if (!updated || updated.length === 0) {
+                                        throw new Error("Update saved 0 rows. This is a database permissions (RLS) issue on the departments table \u2014 enable UPDATE for authenticated users.");
+                                    }
                                     
                                     editModal.classList.remove("open");
                                     loadDepartments();
                                 } catch (err) {
                                     console.error("Failed to update department:", err);
-                                    if (editDeptError) { editDeptError.textContent = "Failed to update department."; editDeptError.style.display = "block"; }
+                                    if (editDeptError) { editDeptError.textContent = "Failed to save: " + (err.message || err); editDeptError.style.display = "block"; }
                                 }
                             };
                             
@@ -1684,7 +1689,7 @@
                                 pcBox.className = "dept-passcode-box";
                                 pcBox.innerHTML = `
                                     <label>Enter passcode</label>
-                                    <input type="password" class="dept-pc-input" placeholder="Passcode" />
+                                    <input type="password" class="dept-pc-input" placeholder="Passcode" autocomplete="new-password" />
                                     <button type="button" class="dept-pc-submit">Enter</button>
                                     <div class="dept-pc-error">Incorrect passcode.</div>
                                 `;
@@ -1698,7 +1703,8 @@
 
                                 function tryEnter() {
                                     const entered = pcInput ? pcInput.value.trim() : "";
-                                    if (entered === (dept.passcode || "")) {
+                                    const expected = (dept.passcode == null ? "" : String(dept.passcode)).trim();
+                                    if (entered === expected) {
                                         openPoliceForDepartment(dept);
                                         pcBox.classList.remove("open");
                                         if (pcInput) pcInput.value = "";
