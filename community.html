@@ -380,6 +380,54 @@
             border-bottom: 1px solid #f1f5f9;
         }
 
+        .discord-invite-link {
+            display: inline-block;
+            padding: 8px 12px;
+            border-radius: 10px;
+            border: 1px solid #5865F2;
+            background: #5865F2;
+            color: #ffffff;
+            font-size: 13px;
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .discord-invite-link:hover {
+            background: #4752c4;
+        }
+
+        .discord-server-link {
+            color: #5865F2;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .discord-join-logs {
+            max-height: 220px;
+            overflow-y: auto;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 6px;
+            background: #f8fafc;
+        }
+
+        .discord-log-item {
+            padding: 6px 8px;
+            border-radius: 6px;
+            font-size: 12px;
+            color: #334155;
+            border-bottom: 1px solid #eef2f7;
+        }
+
+        .discord-log-item:last-child {
+            border-bottom: none;
+        }
+
+        .discord-log-time {
+            color: #94a3b8;
+            font-size: 11px;
+        }
+
         .request-item {
             padding: 8px 10px;
             border-radius: 6px;
@@ -655,6 +703,26 @@
                                                 <div id="documentDeptCheckboxes"><div class="empty">Loading departments...</div></div>
                                                 <button type="button" class="submit-btn" id="addDocumentBtn" style="margin-top:8px; padding:8px 12px; font-size:13px;">Create Document</button>
                                             </div>
+                                        </div>
+                                        <button type="button" class="dropdown-toggle" id="discordDropdownToggle" style="margin-top:8px;">Discord Integration</button>
+                                        <div class="dropdown-menu" id="discordDropdownMenu">
+                                            <div class="field">
+                                                <label>Discord Server Invite</label>
+                                                <input type="text" id="discordServerInviteInput" placeholder="https://discord.gg/..." value="${(communityData.discord_invite || '').replace(/"/g, '&quot;')}" />
+                                                <button type="button" class="submit-btn" id="saveDiscordInviteBtn" style="margin-top:8px; padding:8px 12px; font-size:13px;">Save Invite</button>
+                                            </div>
+                                            <div class="field" style="margin-top:10px;">
+                                                <label>Discord Webhook (for join logs)</label>
+                                                <input type="text" id="discordWebhookInput" placeholder="https://discord.com/api/webhooks/..." value="${(communityData.discord_webhook || '').replace(/"/g, '&quot;')}" />
+                                                <button type="button" class="submit-btn" id="saveDiscordWebhookBtn" style="margin-top:8px; padding:8px 12px; font-size:13px;">Save Webhook</button>
+                                            </div>
+                                            <div class="field" style="margin-top:10px;">
+                                                <div style="font-size:12px; font-weight:600; color:#334155; margin-bottom:4px;">Invite the PulseCAD bot</div>
+                                                <a class="submit-btn discord-invite-link" id="discordBotInviteLink" target="_blank" rel="noopener">Invite Bot to Server</a>
+                                                <a class="discord-server-link" id="discordServerLink" target="_blank" rel="noopener" style="display:block; margin-top:8px; font-size:13px;">Open Community Discord Server</a>
+                                            </div>
+                                            <div style="font-size:12px; font-weight:600; color:#334155; margin-top:14px; margin-bottom:4px;">Join Logs</div>
+                                            <div id="discordJoinLogs" class="discord-join-logs"><div class="empty">No join events yet.</div></div>
                                         </div>
                                     </div>
                                 </div>
@@ -1190,6 +1258,107 @@
                                 if (documentsDropdownMenu.classList.contains("open")) {
                                     loadDocuments();
                                     loadDocumentDeptCheckboxes();
+                                }
+                            });
+                        }
+
+                        // Discord Integration
+                        const discordDropdownToggle = document.getElementById("discordDropdownToggle");
+                        const discordDropdownMenu = document.getElementById("discordDropdownMenu");
+                        const discordServerInviteInput = document.getElementById("discordServerInviteInput");
+                        const saveDiscordInviteBtn = document.getElementById("saveDiscordInviteBtn");
+                        const discordWebhookInput = document.getElementById("discordWebhookInput");
+                        const saveDiscordWebhookBtn = document.getElementById("saveDiscordWebhookBtn");
+                        const discordBotInviteLink = document.getElementById("discordBotInviteLink");
+                        const discordServerLink = document.getElementById("discordServerLink");
+                        const discordJoinLogs = document.getElementById("discordJoinLogs");
+
+                        const DISCORD_BOT_CLIENT_ID = "1526488253237170227";
+                        const DISCORD_BOT_INVITE = "https://discord.com/api/oauth2/authorize?client_id=" + DISCORD_BOT_CLIENT_ID + "&permissions=2048&scope=bot";
+
+                        async function loadDiscordJoinLogs() {
+                            if (!discordJoinLogs || !localSupabase) return;
+                            try {
+                                const { data, error } = await localSupabase
+                                    .from("discord_join_logs")
+                                    .select("*")
+                                    .eq("community_id", id)
+                                    .order("created_at", { ascending: false })
+                                    .limit(50);
+                                if (error) throw error;
+                                const rows = Array.isArray(data) ? data : [];
+                                if (rows.length === 0) {
+                                    discordJoinLogs.innerHTML = '<div class="empty">No join events yet.</div>';
+                                    return;
+                                }
+                                discordJoinLogs.innerHTML = rows.map((r) => `
+                                    <div class="discord-log-item">
+                                        <div>${escHtml(r.message || "A user joined the community.")}</div>
+                                        <div class="discord-log-time">${new Date(r.created_at).toLocaleString()}</div>
+                                    </div>
+                                `).join('');
+                            } catch (err) {
+                                console.error("Failed to load Discord join logs:", err);
+                            }
+                        }
+
+                        if (discordDropdownToggle && discordDropdownMenu) {
+                            discordDropdownToggle.addEventListener("click", () => {
+                                discordDropdownMenu.classList.toggle("open");
+                                if (discordDropdownMenu.classList.contains("open")) {
+                                    if (discordBotInviteLink) discordBotInviteLink.href = DISCORD_BOT_INVITE;
+                                    if (discordServerLink) {
+                                        const invite = (communityData && communityData.discord_invite) || "";
+                                        if (invite) {
+                                            discordServerLink.href = invite;
+                                            discordServerLink.style.display = "block";
+                                        } else {
+                                            discordServerLink.style.display = "none";
+                                        }
+                                    }
+                                    loadDiscordJoinLogs();
+                                }
+                            });
+                        }
+
+                        if (saveDiscordInviteBtn) {
+                            saveDiscordInviteBtn.addEventListener("click", async () => {
+                                const invite = discordServerInviteInput ? discordServerInviteInput.value.trim() : "";
+                                try {
+                                    const { error } = await localSupabase
+                                        .from("communities")
+                                        .update({ discord_invite: invite })
+                                        .eq("id", id);
+                                    if (error) throw error;
+                                    if (communityData) communityData.discord_invite = invite;
+                                    if (discordServerLink) {
+                                        if (invite) { discordServerLink.href = invite; discordServerLink.style.display = "block"; }
+                                        else discordServerLink.style.display = "none";
+                                    }
+                                    alert("Discord server invite saved.");
+                                } catch (err) {
+                                    alert("Failed to save invite: " + (err.message || err));
+                                }
+                            });
+                        }
+
+                        if (saveDiscordWebhookBtn) {
+                            saveDiscordWebhookBtn.addEventListener("click", async () => {
+                                const webhook = discordWebhookInput ? discordWebhookInput.value.trim() : "";
+                                if (webhook && !/^https:\/\/discord\.com\/api\/webhooks\//.test(webhook) && !/^https:\/\/discordapp\.com\/api\/webhooks\//.test(webhook)) {
+                                    alert("Please enter a valid Discord webhook URL (starts with https://discord.com/api/webhooks/).");
+                                    return;
+                                }
+                                try {
+                                    const { error } = await localSupabase
+                                        .from("communities")
+                                        .update({ discord_webhook: webhook })
+                                        .eq("id", id);
+                                    if (error) throw error;
+                                    if (communityData) communityData.discord_webhook = webhook;
+                                    alert("Discord webhook saved.");
+                                } catch (err) {
+                                    alert("Failed to save webhook: " + (err.message || err));
                                 }
                             });
                         }

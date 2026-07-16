@@ -2470,6 +2470,35 @@ enable-ga="false"
             }
         }
 
+        async function notifyDiscordJoin(communityId, userEmail, communityName) {
+            if (!localSupabase) return;
+            try {
+                const { data: community } = await localSupabase
+                    .from("communities")
+                    .select("discord_webhook")
+                    .eq("id", communityId)
+                    .maybeSingle();
+                const webhook = community && community.discord_webhook;
+                if (!webhook) return;
+                const content = `**${userEmail || "A user"}** joined **${communityName || "a community"}**.`;
+                const endpoints = ["/api/discord-webhook", "https://www.pulsecad.xyz/api/discord-webhook"];
+                for (const ep of endpoints) {
+                    try {
+                        await fetch(ep, {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ webhook: webhook, content: content, username: "PulseCAD" })
+                        });
+                        break;
+                    } catch (e) {
+                        /* try next endpoint */
+                    }
+                }
+            } catch (err) {
+                console.error("Discord join notify failed:", err);
+            }
+        }
+
         async function joinCommunity(communityId) {
             if (!localSupabase) return;
             try {
@@ -2478,6 +2507,11 @@ enable-ga="false"
                     alert("You must be logged in to join.");
                     return;
                 }
+                const { data: community } = await localSupabase
+                    .from("communities")
+                    .select("name")
+                    .eq("id", communityId)
+                    .maybeSingle();
                 const { error } = await localSupabase
                     .from("user_communities")
                     .insert([{ user_id: user.id, community_id: communityId, joined_at: new Date().toISOString() }]);
@@ -2485,6 +2519,7 @@ enable-ga="false"
                     alert("Failed to join community: " + error.message);
                     return;
                 }
+                notifyDiscordJoin(communityId, user.email, community ? community.name : "");
                 loadCommunities();
             } catch (err) {
                 alert("Failed to join community: " + (err.message || err));

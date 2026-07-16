@@ -18,7 +18,18 @@ const MIME = {
     ".ico": "image/x-icon"
 };
 
-const server = http.createServer((req, res) => {
+function readBody(req) {
+    return new Promise((resolve) => {
+        let body = "";
+        req.on("data", (chunk) => { body += chunk; });
+        req.on("end", () => {
+            try { resolve(body ? JSON.parse(body) : {}); }
+            catch (e) { resolve({}); }
+        });
+    });
+}
+
+const server = http.createServer(async (req, res) => {
     if (req.method === "OPTIONS") {
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
@@ -46,6 +57,55 @@ const server = http.createServer((req, res) => {
             res.end(JSON.stringify({ error: "Proxy failed: " + err.message }));
         });
         req.pipe(proxyReq);
+        return;
+    }
+
+    if (req.url.startsWith("/api/discord-webhook")) {
+        if (req.method !== "POST") {
+            res.writeHead(405, { "Content-Type": "application/json" });
+            res.end(JSON.stringify({ error: "Method not allowed" }));
+            return;
+        }
+        try {
+            const payload = await readBody(req);
+            const webhook = payload.webhook || "";
+            if (!/^https:\/\/discord(app)?\.com\/api\/webhooks\//.test(webhook)) {
+                res.writeHead(400, { "Content-Type": "application/json" });
+                res.end(JSON.stringify({ error: "Invalid webhook URL" }));
+                return;
+            }
+            const message = {
+                content: payload.content || "PulseCAD notification",
+                username: payload.username || "PulseCAD",
+                avatar_url: payload.avatar_url || ""
+            };
+            const body = JSON.stringify(message);
+            const u = new URL(webhook);
+            const options = {
+                method: "POST",
+                hostname: u.hostname,
+                path: u.pathname + u.search,
+                headers: { "Content-Type": "application/json", "Content-Length": Buffer.byteLength(body) }
+            };
+            const wreq = https.request(options, (wres) => {
+                let data = "";
+                wres.on("data", (c) => { data += c; });
+                wres.on("end", () => {
+                    res.setHeader("Access-Control-Allow-Origin", "*");
+                    res.writeHead(wres.statusCode, { "Content-Type": "application/json" });
+                    res.end(data);
+                });
+            });
+            wreq.on("error", (err) => {
+                res.writeHead(502, { "Content-Type": "application/json" });
+                res.end(JSON.stringify({ error: "Discord request failed: " + err.message }));
+            });
+            wreq.write(body);
+            wreq.end();
+        } catch (err) {
+            res.writeHead(500, { "Content-Type": "application/json" });
+            res.end(JSON.stringify({ error: "Server error: " + err.message }));
+        }
         return;
     }
 
