@@ -966,7 +966,18 @@
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <div class="modal-overlay" id="editDepartmentModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">Edit Department</div>
+                <button class="modal-close" id="editDeptModalClose" type="button" aria-label="Close">×</button>
+            </div>
+            <div class="field">
+                <label for="editDeptName">Department Name</label>
+                <input type="text" id="editDeptName" placeholder="Department name" />
+            </div>
+            <div class="field">
+                <label for="editDeptPasscode">Passcode (leave blank to remove)</label>
                 <input type="text" id="editDeptPasscode" placeholder="Passcode" />
             </div>
             <div class="field">
