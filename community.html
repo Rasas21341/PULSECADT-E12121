@@ -1702,13 +1702,6 @@
                             }
                         }
 
-                        if (departmentsDropdownToggle && departmentsDropdownMenu) {
-                            departmentsDropdownToggle.addEventListener("click", () => {
-                                departmentsDropdownMenu.classList.toggle("open");
-                                loadDepartments();
-                            });
-                        }
-
                         const documentsDropdownToggle = document.getElementById("documentsDropdownToggle");
                         const documentsDropdownMenu = document.getElementById("documentsDropdownMenu");
                         const documentsList = document.getElementById("documentsList");
