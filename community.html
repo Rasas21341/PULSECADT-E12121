@@ -1236,10 +1236,27 @@
                         const requestsDropdownMenu = document.getElementById("requestsDropdownMenu");
                         const requestsStatus = document.getElementById("requestsStatus");
                         const requestsList = document.getElementById("requestsList");
+                        const settingsBtn = document.getElementById("settingsBtn");
+                        const settingsModal = document.getElementById("settingsModal");
+                        const settingsModalClose = document.getElementById("settingsModalClose");
 
                         if (generalTabBtn && generalPanel) {
                             generalTabBtn.addEventListener("click", () => {
                                 generalPanel.classList.toggle("open");
+                            });
+                        }
+
+                        if (settingsBtn && settingsModal) {
+                            settingsBtn.addEventListener("click", () => {
+                                settingsModal.classList.add("open");
+                            });
+                            if (settingsModalClose) {
+                                settingsModalClose.addEventListener("click", () => {
+                                    settingsModal.classList.remove("open");
+                                });
+                            }
+                            settingsModal.addEventListener("click", (e) => {
+                                if (e.target === settingsModal) settingsModal.classList.remove("open");
                             });
                         }
 
