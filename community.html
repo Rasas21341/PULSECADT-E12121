@@ -430,6 +430,52 @@
             border-color: #2563eb;
         }
 
+        .documents-btn {
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: 8px;
+            border: 1px solid transparent;
+            background: transparent;
+            color: #0f172a;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            text-align: left;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .documents-btn:hover {
+            background: rgba(15, 23, 42, 0.04);
+            border-color: #cbd5e1;
+        }
+
+        .documents-btn:active {
+            background: rgba(37, 99, 235, 0.08);
+            border-color: #2563eb;
+        }
+
+        .document-list {
+            display: none;
+            flex-direction: column;
+            gap: 6px;
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: calc(100% + 4px);
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            padding: 8px;
+            z-index: 602;
+        }
+
+        .document-list.open {
+            display: flex;
+        }
+
         .departments-dropdown-menu {
             display: none;
             flex-direction: column;
@@ -1064,9 +1110,16 @@
                                                 <input type="text" id="newDepartmentInput" placeholder="New department..." />
                                                 <input type="text" id="newDepartmentPasscode" placeholder="Passcode (optional)" style="margin-top:8px;" />
                                                 <button type="button" class="submit-btn" id="addDepartmentBtn" style="margin-top:8px; padding:8px 12px; font-size:13px;">Add</button>
-                                            </div>
                                         </div>
                                     </div>
+                                    <div class="btn-dropdown-wrap">
+                                        <button type="button" class="documents-btn" id="documentsBtn">
+                                            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                                            Documents
+                                        </button>
+                                        <div class="document-list" id="documentList"></div>
+                                    </div>
+                                </div>
                                 </div>
                                 <div class="dashboard-general-tab" id="generalTabBtn">General</div>
                                 <div class="dashboard-panel" id="generalPanel">
@@ -1507,6 +1560,7 @@
                             if (vehicleList) vehicleList.classList.remove("open");
                             if (licenseList) licenseList.classList.remove("open");
                             if (departmentsDropdownMenu) departmentsDropdownMenu.classList.remove("open");
+                            if (documentList) documentList.classList.remove("open");
                         });
 
                         if (requestsDropdownToggle && requestsDropdownMenu) {
@@ -1523,6 +1577,8 @@
                         const departmentsList = document.getElementById("departmentsList");
                         const newDepartmentInput = document.getElementById("newDepartmentInput");
                         const addDepartmentBtn = document.getElementById("addDepartmentBtn");
+                        const documentsBtn = document.getElementById("documentsBtn");
+                        const documentList = document.getElementById("documentList");
 
                         if (departmentsBtn && departmentsDropdownMenu) {
                             departmentsBtn.addEventListener("click", (e) => {
@@ -1532,6 +1588,18 @@
                                     departmentsDropdownMenu.classList.remove("open");
                                 } else {
                                     loadDepartments();
+                                }
+                            });
+                        }
+
+                        if (documentsBtn && documentList) {
+                            documentsBtn.addEventListener("click", (e) => {
+                                e.stopPropagation();
+                                const isOpen = documentList.classList.contains("open");
+                                if (isOpen) {
+                                    documentList.classList.remove("open");
+                                } else {
+                                    loadSidebarDocuments();
                                 }
                             });
                         }
@@ -1579,6 +1647,37 @@
                                 });
                             } catch (err) {
                                 departmentsList.innerHTML = '<div class="empty">Failed to load departments.</div>';
+                            }
+                        }
+
+                        async function loadSidebarDocuments() {
+                            if (!documentList || !localSupabase) return;
+                            documentList.classList.add("open");
+                            documentList.innerHTML = '<div class="empty">Loading documents...</div>';
+                            try {
+                                const { data } = await localSupabase
+                                    .from("documents")
+                                    .select("*")
+                                    .eq("community_id", id)
+                                    .order("created_at", { ascending: false });
+                                const docs = Array.isArray(data) ? data : [];
+                                if (docs.length === 0) {
+                                    documentList.innerHTML = '<div class="empty">No documents yet.</div>';
+                                    return;
+                                }
+                                documentList.innerHTML = docs.map((doc) => {
+                                    const title = (doc.title || 'Document').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                                    return `<button type="button" class="member-btn">${title}</button>`;
+                                }).join('');
+                                documentList.querySelectorAll(".member-btn").forEach((btn) => {
+                                    btn.addEventListener("click", (e) => {
+                                        const title = btn.textContent.trim();
+                                        window.open("/document.html?title=" + encodeURIComponent(title), "_blank");
+                                    });
+                                });
+                            } catch (err) {
+                                console.error("Failed to load sidebar documents:", err);
+                                documentList.innerHTML = '<div class="empty">Failed to load documents.</div>';
                             }
                         }
 
