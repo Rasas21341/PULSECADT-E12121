@@ -290,6 +290,45 @@
             user-select: none;
         }
 
+        .members-btn {
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: 8px;
+            border: 1px solid #cbd5e1;
+            background: #f8fafc;
+            color: #0f172a;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            text-align: left;
+        }
+
+        .members-btn:hover {
+            background: #f1f5f9;
+        }
+
+        .member-list {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .member-btn {
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            background: #ffffff;
+            color: #0f172a;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            text-align: left;
+        }
+
+        .member-btn:hover {
+            background: #f8fafc;
+        }
+
         .dashboard-panel {
             position: fixed;
             left: 0;
@@ -758,8 +797,8 @@
                             <div class="dashboard">
                                 <div class="dashboard-top-right">
                                     <div class="dashboard-top-right-badge">People & Property</div>
-                                    <button type="button" class="dropdown-toggle" id="membersDropdownToggle">Members</button>
-                                    <div class="dropdown-menu" id="membersDropdownMenu"></div>
+                                    <button type="button" class="members-btn" id="membersBtn">Members</button>
+                                    <div class="member-list" id="memberList"></div>
                                 </div>
                                 <div class="dashboard-general-tab" id="generalTabBtn">General</div>
                                 <div class="dashboard-panel" id="generalPanel">
@@ -852,8 +891,8 @@
                         const generalPanel = document.getElementById("generalPanel");
                         const serverNameInput = document.getElementById("serverNameInput");
                         const approvalBtns = generalPanel.querySelectorAll(".approval-btn");
-                        const membersDropdownToggle = document.getElementById("membersDropdownToggle");
-                        const membersDropdownMenu = document.getElementById("membersDropdownMenu");
+                        const membersBtn = document.getElementById("membersBtn");
+                        const memberList = document.getElementById("memberList");
                         const requestsDropdownToggle = document.getElementById("requestsDropdownToggle");
                         const requestsDropdownMenu = document.getElementById("requestsDropdownMenu");
                         const requestsStatus = document.getElementById("requestsStatus");
@@ -942,8 +981,8 @@
                         });
 
                         async function loadMembers() {
-                            if (!membersDropdownMenu || !localSupabase) return;
-                            membersDropdownMenu.innerHTML = '<div class="empty">Loading members...</div>';
+                            if (!memberList || !localSupabase) return;
+                            memberList.innerHTML = '<div class="empty">Loading members...</div>';
                             try {
                                 const { data: community } = await localSupabase
                                     .from("communities")
@@ -973,20 +1012,20 @@
                                 const esc = (t) => (t || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
                                 let html = '';
                                 if (community && community.creator_email) {
-                                    html += `<div class="member-item">${esc(community.creator_email)} (Owner)</div>`;
+                                    html += `<button type="button" class="member-btn">${esc(community.creator_email)} (Owner)</button>`;
                                 }
                                 if (rows.length === 0) {
                                     if (!html) html = '<div class="empty">No members yet.</div>';
                                 } else {
-                                    html += rows.map((r) => `<div class="member-item">${esc(emailById[r.user_id] || r.user_id)}</div>`).join('');
+                                    html += rows.map((r) => `<button type="button" class="member-btn">${esc(emailById[r.user_id] || r.user_id)}</button>`).join('');
                                 }
-                                membersDropdownMenu.innerHTML = html;
+                                memberList.innerHTML = html;
                             } catch (err) {
                                 console.error("Failed to load members:", err);
                                 if (err && err.code === "42501" || (err && err.message && /permission|policy|row-level/i.test(err.message))) {
-                                    membersDropdownMenu.innerHTML = '<div class="empty">Members are hidden by database permissions (RLS). Enable read access on user_communities.</div>';
+                                    memberList.innerHTML = '<div class="empty">Members are hidden by database permissions (RLS). Enable read access on user_communities.</div>';
                                 } else {
-                                    membersDropdownMenu.innerHTML = '<div class="empty">Failed to load members.</div>';
+                                    memberList.innerHTML = '<div class="empty">Failed to load members.</div>';
                                 }
                             }
                         }
@@ -1051,9 +1090,8 @@
                             }
                         }
 
-                        if (membersDropdownToggle && membersDropdownMenu) {
-                            membersDropdownToggle.addEventListener("click", () => {
-                                membersDropdownMenu.classList.toggle("open");
+                        if (membersBtn && memberList) {
+                            membersBtn.addEventListener("click", () => {
                                 loadMembers();
                             });
                         }
