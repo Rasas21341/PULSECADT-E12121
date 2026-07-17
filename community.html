@@ -313,6 +313,12 @@
             gap: 6px;
         }
 
+        .civilian-list {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
         .member-btn {
             padding: 8px 12px;
             border-radius: 8px;
@@ -799,6 +805,8 @@
                                     <div class="dashboard-top-right-badge">People & Property</div>
                                     <button type="button" class="members-btn" id="membersBtn">Members</button>
                                     <div class="member-list" id="memberList"></div>
+                                    <button type="button" class="members-btn" id="civilianBtn">Civilian</button>
+                                    <div class="civilian-list" id="civilianList"></div>
                                 </div>
                                 <div class="dashboard-general-tab" id="generalTabBtn">General</div>
                                 <div class="dashboard-panel" id="generalPanel">
@@ -893,6 +901,8 @@
                         const approvalBtns = generalPanel.querySelectorAll(".approval-btn");
                         const membersBtn = document.getElementById("membersBtn");
                         const memberList = document.getElementById("memberList");
+                        const civilianBtn = document.getElementById("civilianBtn");
+                        const civilianList = document.getElementById("civilianList");
                         const requestsDropdownToggle = document.getElementById("requestsDropdownToggle");
                         const requestsDropdownMenu = document.getElementById("requestsDropdownMenu");
                         const requestsStatus = document.getElementById("requestsStatus");
@@ -1030,6 +1040,33 @@
                             }
                         }
 
+                        async function loadCivilians() {
+                            if (!civilianList || !localSupabase) return;
+                            civilianList.innerHTML = '<div class="empty">Loading civilians...</div>';
+                            try {
+                                const { data, error } = await localSupabase
+                                    .from("civilians")
+                                    .select("*")
+                                    .order("created_at", { ascending: false });
+
+                                if (error) throw error;
+
+                                const esc = (t) => (t || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                                if (!Array.isArray(data) || data.length === 0) {
+                                    civilianList.innerHTML = '<div class="empty">No civilians yet.</div>';
+                                    return;
+                                }
+
+                                civilianList.innerHTML = data.map((c) => {
+                                    const meta = [c.age, c.gender, c.address].filter(Boolean).join(" | ") || "No additional details";
+                                    return `<button type="button" class="member-btn">${esc(c.name)} — ${esc(meta)}</button>`;
+                                }).join('');
+                            } catch (err) {
+                                console.error("Failed to load civilians:", err);
+                                civilianList.innerHTML = '<div class="empty">Failed to load civilians.</div>';
+                            }
+                        }
+
                         async function loadRequests() {
                             if (!requestsList) return;
                             try {
@@ -1093,6 +1130,12 @@
                         if (membersBtn && memberList) {
                             membersBtn.addEventListener("click", () => {
                                 loadMembers();
+                            });
+                        }
+
+                        if (civilianBtn && civilianList) {
+                            civilianBtn.addEventListener("click", () => {
+                                loadCivilians();
                             });
                         }
 
