@@ -1801,6 +1801,36 @@
                             }
                         }
 
+                        async function loadPenalCodes() {
+                            if (!penalCodesList || !localSupabase) return;
+                            penalCodesList.classList.add("open");
+                            penalCodesList.innerHTML = '<div class="empty">Loading penal codes...</div>';
+                            try {
+                                const { data, error } = await localSupabase
+                                    .from("penal_codes")
+                                    .select("*")
+                                    .order("created_at", { ascending: false });
+
+                                if (error) throw error;
+
+                                const esc = (t) => (t || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                                if (!Array.isArray(data) || data.length === 0) {
+                                    penalCodesList.innerHTML = '<div class="empty">No penal codes yet.</div>';
+                                    return;
+                                }
+
+                                penalCodesList.innerHTML = data.map((pc) => {
+                                    const title = esc(pc.title || 'Penal Code');
+                                    const code = esc(pc.code || '');
+                                    const detail = [code, pc.description].filter(Boolean).join(" — ");
+                                    return `<button type="button" class="member-btn">${title}${detail ? ' — ' + esc(detail) : ''}</button>`;
+                                }).join('');
+                            } catch (err) {
+                                console.error("Failed to load penal codes:", err);
+                                penalCodesList.innerHTML = '<div class="empty">Failed to load penal codes.</div>';
+                            }
+                        }
+
                         async function addDocument(title, departments) {
                             if (!title || !localSupabase) return;
                             try {
@@ -1838,6 +1868,18 @@
                                     documentList.classList.add("open");
                                     loadDocuments();
                                     loadDocumentDeptCheckboxes();
+                                }
+                            });
+                        }
+
+                        if (penalCodesBtn && penalCodesList) {
+                            penalCodesBtn.addEventListener("click", (e) => {
+                                e.stopPropagation();
+                                const isOpen = penalCodesList.classList.contains("open");
+                                if (isOpen) {
+                                    penalCodesList.classList.remove("open");
+                                } else {
+                                    loadPenalCodes();
                                 }
                             });
                         }
