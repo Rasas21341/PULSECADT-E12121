@@ -1279,6 +1279,13 @@
                                         </div>
                                     </div>
                                 </div>
+                                <div class="members-view" id="membersView">
+                                    <div class="members-view-header">
+                                        <div class="members-view-title">Members</div>
+                                        <button type="button" class="members-view-close" id="membersViewClose" aria-label="Close">×</button>
+                                    </div>
+                                    <div class="members-view-list" id="membersViewList"></div>
+                                </div>
                             </div>
                         `;
 
@@ -1301,6 +1308,9 @@
                         const settingsBtn = document.getElementById("settingsBtn");
                         const settingsModal = document.getElementById("settingsModal");
                         const settingsModalClose = document.getElementById("settingsModalClose");
+                        const membersView = document.getElementById("membersView");
+                        const membersViewList = document.getElementById("membersViewList");
+                        const membersViewClose = document.getElementById("membersViewClose");
 
                         if (generalTabBtn && generalPanel) {
                             generalTabBtn.addEventListener("click", () => {
@@ -1398,10 +1408,10 @@
                             });
                         });
 
-                        async function loadMembers() {
-                            if (!memberList || !localSupabase) return;
-                            memberList.classList.add("open");
-                            memberList.innerHTML = '<div class="empty">Loading members...</div>';
+                        async function loadMembersInto(targetEl, { loadingText = 'Loading members...', openDropdown = true } = {}) {
+                            if (!targetEl || !localSupabase) return;
+                            if (openDropdown) targetEl.classList.add("open");
+                            targetEl.innerHTML = '<div class="empty">' + loadingText + '</div>';
                             try {
                                 const { data: community } = await localSupabase
                                     .from("communities")
@@ -1438,15 +1448,19 @@
                                 } else {
                                     html += rows.map((r) => `<button type="button" class="member-btn">${esc(emailById[r.user_id] || r.user_id)}</button>`).join('');
                                 }
-                                memberList.innerHTML = html;
+                                targetEl.innerHTML = html;
                             } catch (err) {
                                 console.error("Failed to load members:", err);
                                 if (err && err.code === "42501" || (err && err.message && /permission|policy|row-level/i.test(err.message))) {
-                                    memberList.innerHTML = '<div class="empty">Members are hidden by database permissions (RLS). Enable read access on user_communities.</div>';
+                                    targetEl.innerHTML = '<div class="empty">Members are hidden by database permissions (RLS). Enable read access on user_communities.</div>';
                                 } else {
-                                    memberList.innerHTML = '<div class="empty">Failed to load members.</div>';
+                                    targetEl.innerHTML = '<div class="empty">Failed to load members.</div>';
                                 }
                             }
+                        }
+
+                        async function loadMembers() {
+                            await loadMembersInto(memberList);
                         }
 
                         async function loadCivilians() {
