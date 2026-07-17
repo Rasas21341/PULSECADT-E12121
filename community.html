@@ -302,6 +302,9 @@
             font-weight: 700;
             cursor: pointer;
             text-align: left;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .members-btn:hover {
@@ -325,6 +328,9 @@
             font-weight: 700;
             cursor: pointer;
             text-align: left;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .civilian-btn:hover {
@@ -333,6 +339,32 @@
         }
 
         .civilian-btn:active {
+            background: rgba(37, 99, 235, 0.08);
+            border-color: #2563eb;
+        }
+
+        .vehicles-btn {
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: 8px;
+            border: 1px solid transparent;
+            background: transparent;
+            color: #0f172a;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            text-align: left;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .vehicles-btn:hover {
+            background: rgba(15, 23, 42, 0.04);
+            border-color: #cbd5e1;
+        }
+
+        .vehicles-btn:active {
             background: rgba(37, 99, 235, 0.08);
             border-color: #2563eb;
         }
@@ -375,6 +407,32 @@
 
         .civilian-list.open {
             display: flex;
+        }
+
+        .vehicle-list {
+            display: none;
+            flex-direction: column;
+            gap: 6px;
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: calc(100% + 4px);
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            padding: 8px;
+            z-index: 602;
+        }
+
+        .vehicle-list.open {
+            display: flex;
+        }
+
+        .btn-icon {
+            width: 16px;
+            height: 16px;
+            flex-shrink: 0;
         }
 
         .btn-dropdown-wrap {
@@ -866,12 +924,25 @@
                                 <div class="dashboard-top-right">
                                     <div class="dashboard-top-right-badge">People & Property</div>
                                     <div class="btn-dropdown-wrap">
-                                        <button type="button" class="members-btn" id="membersBtn">Members</button>
+                                        <button type="button" class="members-btn" id="membersBtn">
+                                            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                            Members
+                                        </button>
                                         <div class="member-list" id="memberList"></div>
                                     </div>
                                     <div class="btn-dropdown-wrap">
-                                        <button type="button" class="civilian-btn" id="civilianBtn">Civilian</button>
+                                        <button type="button" class="civilian-btn" id="civilianBtn">
+                                            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                            Civilians
+                                        </button>
                                         <div class="civilian-list" id="civilianList"></div>
+                                    </div>
+                                    <div class="btn-dropdown-wrap">
+                                        <button type="button" class="vehicles-btn" id="vehiclesBtn">
+                                            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/></svg>
+                                            Vehicles
+                                        </button>
+                                        <div class="vehicle-list" id="vehicleList"></div>
                                     </div>
                                 </div>
                                 <div class="dashboard-general-tab" id="generalTabBtn">General</div>
@@ -969,6 +1040,8 @@
                         const memberList = document.getElementById("memberList");
                         const civilianBtn = document.getElementById("civilianBtn");
                         const civilianList = document.getElementById("civilianList");
+                        const vehiclesBtn = document.getElementById("vehiclesBtn");
+                        const vehicleList = document.getElementById("vehicleList");
                         const requestsDropdownToggle = document.getElementById("requestsDropdownToggle");
                         const requestsDropdownMenu = document.getElementById("requestsDropdownMenu");
                         const requestsStatus = document.getElementById("requestsStatus");
@@ -1135,6 +1208,34 @@
                             }
                         }
 
+                        async function loadVehicles() {
+                            if (!vehicleList || !localSupabase) return;
+                            vehicleList.classList.add("open");
+                            vehicleList.innerHTML = '<div class="empty">Loading vehicles...</div>';
+                            try {
+                                const { data, error } = await localSupabase
+                                    .from("vehicles")
+                                    .select("*")
+                                    .order("created_at", { ascending: false });
+
+                                if (error) throw error;
+
+                                const esc = (t) => (t || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                                if (!Array.isArray(data) || data.length === 0) {
+                                    vehicleList.innerHTML = '<div class="empty">No vehicles yet.</div>';
+                                    return;
+                                }
+
+                                vehicleList.innerHTML = data.map((v) => {
+                                    const meta = [v.make, v.model, v.color, v.plate].filter(Boolean).join(" | ") || "No additional details";
+                                    return `<button type="button" class="member-btn">${esc(meta)}</button>`;
+                                }).join('');
+                            } catch (err) {
+                                console.error("Failed to load vehicles:", err);
+                                vehicleList.innerHTML = '<div class="empty">Failed to load vehicles.</div>';
+                            }
+                        }
+
                         async function loadRequests() {
                             if (!requestsList) return;
                             try {
@@ -1219,9 +1320,22 @@
                             });
                         }
 
+                        if (vehiclesBtn && vehicleList) {
+                            vehiclesBtn.addEventListener("click", (e) => {
+                                e.stopPropagation();
+                                const isOpen = vehicleList.classList.contains("open");
+                                if (isOpen) {
+                                    vehicleList.classList.remove("open");
+                                } else {
+                                    loadVehicles();
+                                }
+                            });
+                        }
+
                         document.addEventListener("click", () => {
                             if (memberList) memberList.classList.remove("open");
                             if (civilianList) civilianList.classList.remove("open");
+                            if (vehicleList) vehicleList.classList.remove("open");
                         });
 
                         if (requestsDropdownToggle && requestsDropdownMenu) {
