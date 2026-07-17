@@ -297,7 +297,7 @@
             color: #0f172a;
             user-select: none;
             margin-top: 12px;
-            margin-bottom: 8px;
+            margin-bottom: 4px;
         }
 
         .members-btn {
@@ -402,6 +402,52 @@
         .licences-btn:active {
             background: rgba(37, 99, 235, 0.08);
             border-color: #2563eb;
+        }
+
+        .departments-btn {
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: 8px;
+            border: 1px solid transparent;
+            background: transparent;
+            color: #0f172a;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            text-align: left;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .departments-btn:hover {
+            background: rgba(15, 23, 42, 0.04);
+            border-color: #cbd5e1;
+        }
+
+        .departments-btn:active {
+            background: rgba(37, 99, 235, 0.08);
+            border-color: #2563eb;
+        }
+
+        .departments-dropdown-menu {
+            display: none;
+            flex-direction: column;
+            gap: 6px;
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: calc(100% + 4px);
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            padding: 8px;
+            z-index: 602;
+        }
+
+        .departments-dropdown-menu.open {
+            display: flex;
         }
 
         .license-list {
@@ -1007,9 +1053,12 @@
                                         <div class="license-list" id="licenseList"></div>
                                     </div>
                                     <div class="cad-config-badge">CAD Configuration</div>
-                                    <div class="dashboard-dropdown">
-                                        <button type="button" class="dropdown-toggle" id="departmentsDropdownToggle">Departments</button>
-                                        <div class="dropdown-menu" id="departmentsDropdownMenu">
+                                    <div class="btn-dropdown-wrap">
+                                        <button type="button" class="departments-btn" id="departmentsBtn">
+                                            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M3 10h18M5 6l7-3 7 3M4 10v11M20 10v11M8 14v3M12 14v3M16 14v3"/></svg>
+                                            Departments
+                                        </button>
+                                        <div class="departments-dropdown-menu" id="departmentsDropdownMenu">
                                             <div id="departmentsList"></div>
                                             <div class="field" style="margin-top:10px;">
                                                 <input type="text" id="newDepartmentInput" placeholder="New department..." />
@@ -1457,6 +1506,7 @@
                             if (civilianList) civilianList.classList.remove("open");
                             if (vehicleList) vehicleList.classList.remove("open");
                             if (licenseList) licenseList.classList.remove("open");
+                            if (departmentsDropdownMenu) departmentsDropdownMenu.classList.remove("open");
                         });
 
                         if (requestsDropdownToggle && requestsDropdownMenu) {
@@ -1468,12 +1518,23 @@
                             });
                         }
 
-                        const departmentsDropdownToggle = document.getElementById("departmentsDropdownToggle");
+                        const departmentsBtn = document.getElementById("departmentsBtn");
                         const departmentsDropdownMenu = document.getElementById("departmentsDropdownMenu");
                         const departmentsList = document.getElementById("departmentsList");
                         const newDepartmentInput = document.getElementById("newDepartmentInput");
                         const addDepartmentBtn = document.getElementById("addDepartmentBtn");
 
+                        if (departmentsBtn && departmentsDropdownMenu) {
+                            departmentsBtn.addEventListener("click", (e) => {
+                                e.stopPropagation();
+                                const isOpen = departmentsDropdownMenu.classList.contains("open");
+                                if (isOpen) {
+                                    departmentsDropdownMenu.classList.remove("open");
+                                } else {
+                                    loadDepartments();
+                                }
+                            });
+                        }
                         async function loadDepartments() {
                             if (!departmentsList || !localSupabase) return;
                             try {
