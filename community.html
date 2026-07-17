@@ -369,6 +369,52 @@
             border-color: #2563eb;
         }
 
+        .licences-btn {
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: 8px;
+            border: 1px solid transparent;
+            background: transparent;
+            color: #0f172a;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            text-align: left;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .licences-btn:hover {
+            background: rgba(15, 23, 42, 0.04);
+            border-color: #cbd5e1;
+        }
+
+        .licences-btn:active {
+            background: rgba(37, 99, 235, 0.08);
+            border-color: #2563eb;
+        }
+
+        .license-list {
+            display: none;
+            flex-direction: column;
+            gap: 6px;
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: calc(100% + 4px);
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            padding: 8px;
+            z-index: 602;
+        }
+
+        .license-list.open {
+            display: flex;
+        }
+
         .member-list {
             display: none;
             flex-direction: column;
@@ -944,6 +990,13 @@
                                         </button>
                                         <div class="vehicle-list" id="vehicleList"></div>
                                     </div>
+                                    <div class="btn-dropdown-wrap">
+                                        <button type="button" class="licences-btn" id="licencesBtn">
+                                            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2" ry="2"/><line x1="7" y1="9" x2="17" y2="9"/><line x1="7" y1="13" x2="17" y2="13"/><line x1="7" y1="17" x2="12" y2="17"/></svg>
+                                            Licences
+                                        </button>
+                                        <div class="license-list" id="licenseList"></div>
+                                    </div>
                                 </div>
                                 <div class="dashboard-general-tab" id="generalTabBtn">General</div>
                                 <div class="dashboard-panel" id="generalPanel">
@@ -1042,6 +1095,8 @@
                         const civilianList = document.getElementById("civilianList");
                         const vehiclesBtn = document.getElementById("vehiclesBtn");
                         const vehicleList = document.getElementById("vehicleList");
+                        const licencesBtn = document.getElementById("licencesBtn");
+                        const licenseList = document.getElementById("licenseList");
                         const requestsDropdownToggle = document.getElementById("requestsDropdownToggle");
                         const requestsDropdownMenu = document.getElementById("requestsDropdownMenu");
                         const requestsStatus = document.getElementById("requestsStatus");
@@ -1236,6 +1291,47 @@
                             }
                         }
 
+                        async function loadLicences() {
+                            if (!licenseList || !localSupabase) return;
+                            licenseList.classList.add("open");
+                            licenseList.innerHTML = '<div class="empty">Loading licences...</div>';
+                            try {
+                                const { data, error } = await localSupabase
+                                    .from("licenses")
+                                    .select("*")
+                                    .order("created_at", { ascending: false });
+
+                                if (error) throw error;
+
+                                const esc = (t) => (t || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                                if (!Array.isArray(data) || data.length === 0) {
+                                    licenseList.innerHTML = '<div class="empty">No licences yet.</div>';
+                                    return;
+                                }
+
+                                const civilianIds = [...new Set(data.map((l) => l.civilian_id).filter(Boolean))];
+                                let civilianNameById = {};
+                                if (civilianIds.length > 0) {
+                                    const { data: civilians, error: civError } = await localSupabase
+                                        .from("civilians")
+                                        .select("id, name")
+                                        .in("id", civilianIds);
+                                    if (!civError && Array.isArray(civilians)) {
+                                        civilians.forEach((c) => { civilianNameById[c.id] = c.name; });
+                                    }
+                                }
+
+                                licenseList.innerHTML = data.map((l) => {
+                                    const name = esc(civilianNameById[l.civilian_id] || "Unknown Civilian");
+                                    const detail = [l.license_type, l.license_number, l.expiry_date].filter(Boolean).join(" | ") || "No details";
+                                    return `<button type="button" class="member-btn">${name} — ${esc(detail)}</button>`;
+                                }).join('');
+                            } catch (err) {
+                                console.error("Failed to load licences:", err);
+                                licenseList.innerHTML = '<div class="empty">Failed to load licences.</div>';
+                            }
+                        }
+
                         async function loadRequests() {
                             if (!requestsList) return;
                             try {
@@ -1332,10 +1428,23 @@
                             });
                         }
 
+                        if (licencesBtn && licenseList) {
+                            licencesBtn.addEventListener("click", (e) => {
+                                e.stopPropagation();
+                                const isOpen = licenseList.classList.contains("open");
+                                if (isOpen) {
+                                    licenseList.classList.remove("open");
+                                } else {
+                                    loadLicences();
+                                }
+                            });
+                        }
+
                         document.addEventListener("click", () => {
                             if (memberList) memberList.classList.remove("open");
                             if (civilianList) civilianList.classList.remove("open");
                             if (vehicleList) vehicleList.classList.remove("open");
+                            if (licenseList) licenseList.classList.remove("open");
                         });
 
                         if (requestsDropdownToggle && requestsDropdownMenu) {
