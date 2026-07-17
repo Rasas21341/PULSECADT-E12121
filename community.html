@@ -284,6 +284,41 @@
             margin-bottom: 4px;
         }
 
+        .server-admin-badge {
+            font-size: 14px;
+            font-weight: 700;
+            color: #0f172a;
+            user-select: none;
+            margin-top: 12px;
+            margin-bottom: 4px;
+        }
+
+        .settings-btn {
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: 8px;
+            border: 1px solid transparent;
+            background: transparent;
+            color: #0f172a;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            text-align: left;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .settings-btn:hover {
+            background: rgba(15, 23, 42, 0.04);
+            border-color: #cbd5e1;
+        }
+
+        .settings-btn:active {
+            background: rgba(37, 99, 235, 0.08);
+            border-color: #2563eb;
+        }
+
         .btn-dropdown-wrap {
             position: relative;
             width: 100%;
@@ -529,99 +564,6 @@
         }
 
         .penal-codes-btn:hover {
-            background: rgba(15, 23, 42, 0.04);
-            border-color: #cbd5e1;
-        }
-
-        .dashboard-members-bar {
-            position: relative;
-            left: auto;
-            bottom: auto;
-            transform: none;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .dashboard-members-bar .members-btn {
-            width: auto;
-            min-width: 200px;
-            justify-content: center;
-            background: #0f172a;
-            color: #ffffff;
-            box-shadow: 0 8px 24px rgba(15, 23, 42, 0.18);
-            order: 2;
-        }
-
-        .dashboard-members-bar .members-btn:hover {
-            background: #1e293b;
-            border-color: #1e293b;
-        }
-
-        .member-list-centered {
-            position: static;
-            left: auto;
-            right: auto;
-            top: auto;
-            width: min(90vw, 420px);
-            max-height: 50vh;
-            overflow-y: auto;
-            margin-bottom: 8px;
-            order: 1;
-        }
-
-        .dashboard-members-bar .member-list-centered.open {
-            display: flex;
-        }
-
-        .dashboard-departments-bar {
-            position: relative;
-            left: auto;
-            bottom: auto;
-            transform: none;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .dashboard-departments-bar .departments-btn {
-            width: auto;
-            min-width: 200px;
-            justify-content: center;
-            background: #0f172a;
-            color: #ffffff;
-            box-shadow: 0 8px 24px rgba(15, 23, 42, 0.18);
-            order: 2;
-        }
-
-        .dashboard-departments-bar .departments-btn:hover {
-            background: #1e293b;
-            border-color: #1e293b;
-        }
-
-        .departments-list-centered {
-            position: static;
-            left: auto;
-            right: auto;
-            top: auto;
-            width: min(90vw, 420px);
-            max-height: 50vh;
-            overflow-y: auto;
-            margin-bottom: 8px;
-            order: 1;
-            display: none;
-            flex-direction: column;
-            gap: 6px;
-            background: #ffffff;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-            padding: 8px;
-        }
-
-        .dashboard-departments-bar .departments-list-centered.open {
-            display: flex;
-        }
             background: rgba(15, 23, 42, 0.04);
             border-color: #cbd5e1;
         }
@@ -1197,6 +1139,8 @@
                                             </div>
                                         </div>
                                     </div>
+                                    <div class="server-admin-badge">Server admin</div>
+                                    <button type="button" class="settings-btn" id="settingsBtn">Settings</button>
                                 </div>
                                 <div class="dashboard-general-tab" id="generalTabBtn">General</div>
                                 <div class="dashboard-panel" id="generalPanel">
