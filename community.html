@@ -280,7 +280,7 @@
             z-index: 600;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 0;
         }
 
         .dashboard-top-right-badge {
@@ -288,6 +288,7 @@
             font-weight: 700;
             color: #0f172a;
             user-select: none;
+            margin-bottom: 8px;
         }
 
         .members-btn {
@@ -337,15 +338,47 @@
         }
 
         .member-list {
-            display: flex;
+            display: none;
             flex-direction: column;
             gap: 6px;
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: calc(100% + 4px);
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            padding: 8px;
+            z-index: 602;
+        }
+
+        .member-list.open {
+            display: flex;
         }
 
         .civilian-list {
-            display: flex;
+            display: none;
             flex-direction: column;
             gap: 6px;
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: calc(100% + 4px);
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            padding: 8px;
+            z-index: 602;
+        }
+
+        .civilian-list.open {
+            display: flex;
+        }
+
+        .btn-dropdown-wrap {
+            position: relative;
         }
 
         .member-btn {
@@ -832,10 +865,14 @@
                             <div class="dashboard">
                                 <div class="dashboard-top-right">
                                     <div class="dashboard-top-right-badge">People & Property</div>
-                                    <button type="button" class="members-btn" id="membersBtn">Members</button>
-                                    <div class="member-list" id="memberList"></div>
-                                    <button type="button" class="civilian-btn" id="civilianBtn">Civilian</button>
-                                    <div class="civilian-list" id="civilianList"></div>
+                                    <div class="btn-dropdown-wrap">
+                                        <button type="button" class="members-btn" id="membersBtn">Members</button>
+                                        <div class="member-list" id="memberList"></div>
+                                    </div>
+                                    <div class="btn-dropdown-wrap">
+                                        <button type="button" class="civilian-btn" id="civilianBtn">Civilian</button>
+                                        <div class="civilian-list" id="civilianList"></div>
+                                    </div>
                                 </div>
                                 <div class="dashboard-general-tab" id="generalTabBtn">General</div>
                                 <div class="dashboard-panel" id="generalPanel">
@@ -1021,6 +1058,7 @@
 
                         async function loadMembers() {
                             if (!memberList || !localSupabase) return;
+                            memberList.classList.add("open");
                             memberList.innerHTML = '<div class="empty">Loading members...</div>';
                             try {
                                 const { data: community } = await localSupabase
@@ -1071,6 +1109,7 @@
 
                         async function loadCivilians() {
                             if (!civilianList || !localSupabase) return;
+                            civilianList.classList.add("open");
                             civilianList.innerHTML = '<div class="empty">Loading civilians...</div>';
                             try {
                                 const { data, error } = await localSupabase
@@ -1157,16 +1196,33 @@
                         }
 
                         if (membersBtn && memberList) {
-                            membersBtn.addEventListener("click", () => {
-                                loadMembers();
+                            membersBtn.addEventListener("click", (e) => {
+                                e.stopPropagation();
+                                const isOpen = memberList.classList.contains("open");
+                                if (isOpen) {
+                                    memberList.classList.remove("open");
+                                } else {
+                                    loadMembers();
+                                }
                             });
                         }
 
                         if (civilianBtn && civilianList) {
-                            civilianBtn.addEventListener("click", () => {
-                                loadCivilians();
+                            civilianBtn.addEventListener("click", (e) => {
+                                e.stopPropagation();
+                                const isOpen = civilianList.classList.contains("open");
+                                if (isOpen) {
+                                    civilianList.classList.remove("open");
+                                } else {
+                                    loadCivilians();
+                                }
                             });
                         }
+
+                        document.addEventListener("click", () => {
+                            if (memberList) memberList.classList.remove("open");
+                            if (civilianList) civilianList.classList.remove("open");
+                        });
 
                         if (requestsDropdownToggle && requestsDropdownMenu) {
                             requestsDropdownToggle.addEventListener("click", () => {
