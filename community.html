@@ -307,6 +307,30 @@
             background: #f1f5f9;
         }
 
+        .civilian-btn {
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: 8px;
+            border: 1px solid transparent;
+            background: transparent;
+            color: #0f172a;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            text-align: left;
+            margin-top: 4px;
+        }
+
+        .civilian-btn:hover {
+            background: rgba(15, 23, 42, 0.04);
+            border-color: #cbd5e1;
+        }
+
+        .civilian-btn:active {
+            background: rgba(37, 99, 235, 0.08);
+            border-color: #2563eb;
+        }
+
         .member-list {
             display: flex;
             flex-direction: column;
@@ -805,7 +829,7 @@
                                     <div class="dashboard-top-right-badge">People & Property</div>
                                     <button type="button" class="members-btn" id="membersBtn">Members</button>
                                     <div class="member-list" id="memberList"></div>
-                                    <button type="button" class="members-btn" id="civilianBtn">Civilian</button>
+                                    <button type="button" class="civilian-btn" id="civilianBtn">Civilian</button>
                                     <div class="civilian-list" id="civilianList"></div>
                                 </div>
                                 <div class="dashboard-general-tab" id="generalTabBtn">General</div>
