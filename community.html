@@ -528,15 +528,9 @@
             flex-shrink: 0;
         }
 
-        .dashboard-bottom-bar {
-            position: fixed;
-            left: 50%;
-            bottom: 32px;
-            transform: translateX(-50%);
-            z-index: 600;
-            display: flex;
-            gap: 16px;
-            align-items: flex-end;
+        .penal-codes-btn:hover {
+            background: rgba(15, 23, 42, 0.04);
+            border-color: #cbd5e1;
         }
 
         .dashboard-members-bar {
@@ -1139,6 +1133,13 @@
                                 <div class="dashboard-top-right">
                                     <div class="dashboard-top-right-badge">People & Property</div>
                                     <div class="btn-dropdown-wrap">
+                                        <button type="button" class="members-btn" id="membersBtn">
+                                            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                            Members
+                                        </button>
+                                        <div class="member-list" id="memberList"></div>
+                                    </div>
+                                    <div class="btn-dropdown-wrap">
                                         <button type="button" class="civilian-btn" id="civilianBtn">
                                             <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
                                             Civilians
@@ -1181,6 +1182,20 @@
                                             Penal Codes
                                         </button>
                                         <div class="penal-codes-list" id="penalCodesList"></div>
+                                    </div>
+                                    <div class="btn-dropdown-wrap">
+                                        <button type="button" class="departments-btn" id="departmentsBtn">
+                                            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M3 10h18M5 6l7-3 7 3M4 10v11M20 10v11M8 14v3M12 14v3M16 14v3"/></svg>
+                                            Departments
+                                        </button>
+                                        <div class="departments-dropdown-menu" id="departmentsDropdownMenu">
+                                            <div id="departmentsList"></div>
+                                            <div class="field" style="margin-top:10px;">
+                                                <input type="text" id="newDepartmentInput" placeholder="New department..." />
+                                                <input type="text" id="newDepartmentPasscode" placeholder="Passcode (optional)" style="margin-top:8px;" />
+                                                <button type="button" class="submit-btn" id="addDepartmentBtn" style="margin-top:8px; padding:8px 12px; font-size:13px;">Add</button>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="dashboard-general-tab" id="generalTabBtn">General</div>
@@ -1245,29 +1260,6 @@
                                             </div>
                                             <div style="font-size:12px; font-weight:600; color:#334155; margin-top:14px; margin-bottom:4px;">Join Logs</div>
                                             <div id="discordJoinLogs" class="discord-join-logs"><div class="empty">No join events yet.</div></div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="dashboard-bottom-bar">
-                                    <div class="dashboard-members-bar">
-                                        <button type="button" class="members-btn" id="membersBtn">
-                                            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                                            Members
-                                        </button>
-                                        <div class="member-list member-list-centered" id="memberList"></div>
-                                    </div>
-                                    <div class="dashboard-departments-bar">
-                                        <button type="button" class="departments-btn" id="departmentsBtn">
-                                            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M3 10h18M5 6l7-3 7 3M4 10v11M20 10v11M8 14v3M12 14v3M16 14v3"/></svg>
-                                            Departments
-                                        </button>
-                                        <div class="departments-dropdown-menu departments-list-centered" id="departmentsDropdownMenu">
-                                            <div id="departmentsList"></div>
-                                            <div class="field" style="margin-top:10px;">
-                                                <input type="text" id="newDepartmentInput" placeholder="New department..." />
-                                                <input type="text" id="newDepartmentPasscode" placeholder="Passcode (optional)" style="margin-top:8px;" />
-                                                <button type="button" class="submit-btn" id="addDepartmentBtn" style="margin-top:8px; padding:8px 12px; font-size:13px;">Add</button>
-                                            </div>
                                         </div>
                                     </div>
                                 </div>
