@@ -476,7 +476,33 @@
             display: flex;
         }
 
-        .departments-dropdown-menu {
+        .penal-codes-btn {
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: 8px;
+            border: 1px solid transparent;
+            background: transparent;
+            color: #0f172a;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            text-align: left;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .penal-codes-btn:hover {
+            background: rgba(15, 23, 42, 0.04);
+            border-color: #cbd5e1;
+        }
+
+        .penal-codes-btn:active {
+            background: rgba(37, 99, 235, 0.08);
+            border-color: #2563eb;
+        }
+
+        .penal-codes-list {
             display: none;
             flex-direction: column;
             gap: 6px;
@@ -492,98 +518,8 @@
             z-index: 602;
         }
 
-        .departments-dropdown-menu.open {
+        .penal-codes-list.open {
             display: flex;
-        }
-
-        .license-list {
-            display: none;
-            flex-direction: column;
-            gap: 6px;
-            position: absolute;
-            left: 0;
-            right: 0;
-            top: calc(100% + 4px);
-            background: #ffffff;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-            padding: 8px;
-            z-index: 602;
-        }
-
-        .license-list.open {
-            display: flex;
-        }
-
-        .member-list {
-            display: none;
-            flex-direction: column;
-            gap: 6px;
-            position: absolute;
-            left: 0;
-            right: 0;
-            top: calc(100% + 4px);
-            background: #ffffff;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-            padding: 8px;
-            z-index: 602;
-        }
-
-        .member-list.open {
-            display: flex;
-        }
-
-        .civilian-list {
-            display: none;
-            flex-direction: column;
-            gap: 6px;
-            position: absolute;
-            left: 0;
-            right: 0;
-            top: calc(100% + 4px);
-            background: #ffffff;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-            padding: 8px;
-            z-index: 602;
-        }
-
-        .civilian-list.open {
-            display: flex;
-        }
-
-        .vehicle-list {
-            display: none;
-            flex-direction: column;
-            gap: 6px;
-            position: absolute;
-            left: 0;
-            right: 0;
-            top: calc(100% + 4px);
-            background: #ffffff;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-            padding: 8px;
-            z-index: 602;
-        }
-
-        .vehicle-list.open {
-            display: flex;
-        }
-
-        .btn-icon {
-            width: 16px;
-            height: 16px;
-            flex-shrink: 0;
-        }
-
-        .btn-dropdown-wrap {
-            position: relative;
         }
 
         .member-btn {
@@ -1127,7 +1063,14 @@
                                             </div>
                                         </div>
                                     </div>
-                                </div>
+                                    </div>
+                                    <div class="btn-dropdown-wrap">
+                                        <button type="button" class="penal-codes-btn" id="penalCodesBtn">
+                                            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+                                            Penal Codes
+                                        </button>
+                                        <div class="penal-codes-list" id="penalCodesList"></div>
+                                    </div>
                                 </div>
                                 <div class="dashboard-general-tab" id="generalTabBtn">General</div>
                                 <div class="dashboard-panel" id="generalPanel">
@@ -1760,6 +1703,8 @@
                         const newDocumentInput = document.getElementById("newDocumentInput");
                         const documentDeptCheckboxes = document.getElementById("documentDeptCheckboxes");
                         const addDocumentBtn = document.getElementById("addDocumentBtn");
+                        const penalCodesBtn = document.getElementById("penalCodesBtn");
+                        const penalCodesList = document.getElementById("penalCodesList");
 
                         const communityIsPro = !!(communityData && communityData.pro);
                         if (documentsBtn && !communityIsPro) {
