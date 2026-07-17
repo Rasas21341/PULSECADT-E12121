@@ -278,17 +278,15 @@
             top: 24px;
             left: 24px;
             z-index: 600;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
         }
 
         .dashboard-top-right-badge {
-            padding: 8px 16px;
-            border-radius: 999px;
-            font-size: 13px;
+            font-size: 14px;
             font-weight: 700;
             color: #0f172a;
-            background: #ffffff;
-            border: 1px solid #e2e8f0;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
             user-select: none;
         }
 
@@ -760,6 +758,8 @@
                             <div class="dashboard">
                                 <div class="dashboard-top-right">
                                     <div class="dashboard-top-right-badge">People & Property</div>
+                                    <button type="button" class="dropdown-toggle" id="membersDropdownToggle">Members</button>
+                                    <div class="dropdown-menu" id="membersDropdownMenu"></div>
                                 </div>
                                 <div class="dashboard-general-tab" id="generalTabBtn">General</div>
                                 <div class="dashboard-panel" id="generalPanel">
@@ -784,9 +784,7 @@
                                         <input type="text" id="erlcApiKeyInput" placeholder="ERLC API key" value="${initialErkKey.replace(/</g, '&lt;').replace(/>/g, '&gt;')}" />
                                     </div>
                                     <div class="dashboard-dropdown">
-                                        <button type="button" class="dropdown-toggle" id="membersDropdownToggle">Members</button>
-                                        <div class="dropdown-menu" id="membersDropdownMenu"></div>
-                                        <button type="button" class="dropdown-toggle" id="requestsDropdownToggle" style="margin-top:8px;">Requests</button>
+                                        <button type="button" class="dropdown-toggle" id="requestsDropdownToggle">Requests</button>
                                         <div class="dropdown-menu" id="requestsDropdownMenu">
                                             <div class="empty" id="requestsStatus">Requests turned off</div>
                                             <div id="requestsList"></div>
