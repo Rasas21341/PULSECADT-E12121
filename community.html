@@ -294,8 +294,8 @@
             width: 100%;
             padding: 10px 12px;
             border-radius: 8px;
-            border: 1px solid #cbd5e1;
-            background: #f8fafc;
+            border: 1px solid transparent;
+            background: transparent;
             color: #0f172a;
             font-size: 14px;
             font-weight: 700;
@@ -304,7 +304,13 @@
         }
 
         .members-btn:hover {
-            background: #f1f5f9;
+            background: rgba(15, 23, 42, 0.04);
+            border-color: #cbd5e1;
+        }
+
+        .members-btn:active {
+            background: rgba(37, 99, 235, 0.08);
+            border-color: #2563eb;
         }
 
         .civilian-btn {
@@ -318,7 +324,6 @@
             font-weight: 700;
             cursor: pointer;
             text-align: left;
-            margin-top: 4px;
         }
 
         .civilian-btn:hover {
