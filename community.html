@@ -273,6 +273,27 @@
             background: #1e293b;
         }
 
+        .dashboard-top-right {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            z-index: 600;
+            display: flex;
+            gap: 10px;
+        }
+
+        .dashboard-top-right-badge {
+            padding: 8px 16px;
+            border-radius: 999px;
+            font-size: 13px;
+            font-weight: 700;
+            color: #0f172a;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+            user-select: none;
+        }
+
         .dashboard-panel {
             position: fixed;
             left: 0;
@@ -739,6 +760,10 @@
 
                         contentEl.innerHTML = `
                             <div class="dashboard">
+                                <div class="dashboard-top-right">
+                                    <div class="dashboard-top-right-badge">People</div>
+                                    <div class="dashboard-top-right-badge">Property</div>
+                                </div>
                                 <div class="dashboard-general-tab" id="generalTabBtn">General</div>
                                 <div class="dashboard-panel" id="generalPanel">
                                     <div class="dashboard-panel-title">General</div>
