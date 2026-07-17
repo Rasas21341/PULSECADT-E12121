@@ -291,6 +291,15 @@
             margin-bottom: 8px;
         }
 
+        .cad-config-badge {
+            font-size: 14px;
+            font-weight: 700;
+            color: #0f172a;
+            user-select: none;
+            margin-top: 12px;
+            margin-bottom: 8px;
+        }
+
         .members-btn {
             width: 100%;
             padding: 10px 12px;
@@ -997,6 +1006,18 @@
                                         </button>
                                         <div class="license-list" id="licenseList"></div>
                                     </div>
+                                    <div class="cad-config-badge">CAD Configuration</div>
+                                    <div class="dashboard-dropdown">
+                                        <button type="button" class="dropdown-toggle" id="departmentsDropdownToggle">Departments</button>
+                                        <div class="dropdown-menu" id="departmentsDropdownMenu">
+                                            <div id="departmentsList"></div>
+                                            <div class="field" style="margin-top:10px;">
+                                                <input type="text" id="newDepartmentInput" placeholder="New department..." />
+                                                <input type="text" id="newDepartmentPasscode" placeholder="Passcode (optional)" style="margin-top:8px;" />
+                                                <button type="button" class="submit-btn" id="addDepartmentBtn" style="margin-top:8px; padding:8px 12px; font-size:13px;">Add</button>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div class="dashboard-general-tab" id="generalTabBtn">General</div>
                                 <div class="dashboard-panel" id="generalPanel">
@@ -1025,15 +1046,6 @@
                                         <div class="dropdown-menu" id="requestsDropdownMenu">
                                             <div class="empty" id="requestsStatus">Requests turned off</div>
                                             <div id="requestsList"></div>
-                                        </div>
-                                        <button type="button" class="dropdown-toggle" id="departmentsDropdownToggle" style="margin-top:8px;">Departments</button>
-                                        <div class="dropdown-menu" id="departmentsDropdownMenu">
-                                            <div id="departmentsList"></div>
-                                            <div class="field" style="margin-top:10px;">
-                                                <input type="text" id="newDepartmentInput" placeholder="New department..." />
-                                                <input type="text" id="newDepartmentPasscode" placeholder="Passcode (optional)" style="margin-top:8px;" />
-                                                <button type="button" class="submit-btn" id="addDepartmentBtn" style="margin-top:8px; padding:8px 12px; font-size:13px;">Add</button>
-                                            </div>
                                         </div>
                                         <button type="button" class="dropdown-toggle" id="documentsDropdownToggle" style="margin-top:8px;">Documents</button>
                                         <div class="dropdown-menu" id="documentsDropdownMenu">
