@@ -528,12 +528,22 @@
             flex-shrink: 0;
         }
 
-        .dashboard-members-bar {
+        .dashboard-bottom-bar {
             position: fixed;
             left: 50%;
             bottom: 32px;
             transform: translateX(-50%);
             z-index: 600;
+            display: flex;
+            gap: 16px;
+            align-items: flex-end;
+        }
+
+        .dashboard-members-bar {
+            position: relative;
+            left: auto;
+            bottom: auto;
+            transform: none;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -567,6 +577,55 @@
         }
 
         .dashboard-members-bar .member-list-centered.open {
+            display: flex;
+        }
+
+        .dashboard-departments-bar {
+            position: relative;
+            left: auto;
+            bottom: auto;
+            transform: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .dashboard-departments-bar .departments-btn {
+            width: auto;
+            min-width: 200px;
+            justify-content: center;
+            background: #0f172a;
+            color: #ffffff;
+            box-shadow: 0 8px 24px rgba(15, 23, 42, 0.18);
+            order: 2;
+        }
+
+        .dashboard-departments-bar .departments-btn:hover {
+            background: #1e293b;
+            border-color: #1e293b;
+        }
+
+        .departments-list-centered {
+            position: static;
+            left: auto;
+            right: auto;
+            top: auto;
+            width: min(90vw, 420px);
+            max-height: 50vh;
+            overflow-y: auto;
+            margin-bottom: 8px;
+            order: 1;
+            display: none;
+            flex-direction: column;
+            gap: 6px;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            padding: 8px;
+        }
+
+        .dashboard-departments-bar .departments-list-centered.open {
             display: flex;
         }
             background: rgba(15, 23, 42, 0.04);
@@ -1188,24 +1247,26 @@
                                             <div id="discordJoinLogs" class="discord-join-logs"><div class="empty">No join events yet.</div></div>
                                         </div>
                                     </div>
-                                <div class="dashboard-members-bar">
-                                    <button type="button" class="members-btn" id="membersBtn">
-                                        <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                                        Members
-                                    </button>
-                                    <div class="member-list member-list-centered" id="memberList"></div>
-                                </div>
-                                <div class="dashboard-departments-bar">
-                                    <button type="button" class="departments-btn" id="departmentsBtn">
-                                        <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M3 10h18M5 6l7-3 7 3M4 10v11M20 10v11M8 14v3M12 14v3M16 14v3"/></svg>
-                                        Departments
-                                    </button>
-                                    <div class="departments-dropdown-menu departments-list-centered" id="departmentsDropdownMenu">
-                                        <div id="departmentsList"></div>
-                                        <div class="field" style="margin-top:10px;">
-                                            <input type="text" id="newDepartmentInput" placeholder="New department..." />
-                                            <input type="text" id="newDepartmentPasscode" placeholder="Passcode (optional)" style="margin-top:8px;" />
-                                            <button type="button" class="submit-btn" id="addDepartmentBtn" style="margin-top:8px; padding:8px 12px; font-size:13px;">Add</button>
+                                <div class="dashboard-bottom-bar">
+                                    <div class="dashboard-members-bar">
+                                        <button type="button" class="members-btn" id="membersBtn">
+                                            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                            Members
+                                        </button>
+                                        <div class="member-list member-list-centered" id="memberList"></div>
+                                    </div>
+                                    <div class="dashboard-departments-bar">
+                                        <button type="button" class="departments-btn" id="departmentsBtn">
+                                            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M3 10h18M5 6l7-3 7 3M4 10v11M20 10v11M8 14v3M12 14v3M16 14v3"/></svg>
+                                            Departments
+                                        </button>
+                                        <div class="departments-dropdown-menu departments-list-centered" id="departmentsDropdownMenu">
+                                            <div id="departmentsList"></div>
+                                            <div class="field" style="margin-top:10px;">
+                                                <input type="text" id="newDepartmentInput" placeholder="New department..." />
+                                                <input type="text" id="newDepartmentPasscode" placeholder="Passcode (optional)" style="margin-top:8px;" />
+                                                <button type="button" class="submit-btn" id="addDepartmentBtn" style="margin-top:8px; padding:8px 12px; font-size:13px;">Add</button>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
