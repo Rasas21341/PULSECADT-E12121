@@ -300,6 +300,46 @@
             margin-bottom: 4px;
         }
 
+        .btn-dropdown-wrap {
+            position: relative;
+            width: 100%;
+        }
+
+        .member-list,
+        .civilian-list,
+        .vehicle-list,
+        .license-list,
+        .departments-dropdown-menu {
+            display: none;
+            flex-direction: column;
+            gap: 6px;
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: calc(100% + 4px);
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            padding: 8px;
+            z-index: 602;
+        }
+
+        .member-list.open,
+        .civilian-list.open,
+        .vehicle-list.open,
+        .license-list.open,
+        .departments-dropdown-menu.open {
+            display: flex;
+        }
+
+        .member-list .member-btn,
+        .civilian-list .member-btn,
+        .vehicle-list .member-btn,
+        .license-list .member-btn {
+            width: 100%;
+        }
+
         .members-btn {
             width: 100%;
             padding: 10px 12px;
@@ -1062,7 +1102,6 @@
                                                 <button type="button" class="submit-btn" id="addDocumentBtn" style="margin-top:8px; padding:8px 12px; font-size:13px;">Create Document</button>
                                             </div>
                                         </div>
-                                    </div>
                                     </div>
                                     <div class="btn-dropdown-wrap">
                                         <button type="button" class="penal-codes-btn" id="penalCodesBtn">
