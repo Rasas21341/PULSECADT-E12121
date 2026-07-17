@@ -23,22 +23,6 @@
             margin: 0 auto;
         }
 
-        .back-btn {
-            margin-bottom: 20px;
-            padding: 8px 14px;
-            border-radius: 10px;
-            border: 1px solid #e2e8f0;
-            background: #ffffff;
-            color: #0f172a;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-        }
-
-        .back-btn:hover {
-            background: #f1f5f9;
-        }
-
         .community-name {
             font-size: 26px;
             font-weight: 700;
@@ -897,7 +881,6 @@
 </head>
 <body>
     <div class="container">
-        <button class="back-btn" id="backBtn">← Back</button>
         <div id="content"><div class="empty">Loading community...</div></div>
     </div>
 
@@ -969,8 +952,6 @@
         const contentEl = document.getElementById("content");
         let currentCommunityData = null;
         let currentCommunityId = null;
-
-        document.getElementById("backBtn").addEventListener("click", () => window.close());
 
         function getCommunityIdFromUrl() {
             const params = new URLSearchParams(window.location.search);
