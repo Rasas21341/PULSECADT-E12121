@@ -359,6 +359,68 @@
             width: 100%;
         }
 
+        .members-view {
+            position: fixed;
+            top: 0;
+            left: 280px;
+            right: 0;
+            bottom: 0;
+            background: #ffffff;
+            z-index: 550;
+            display: none;
+            flex-direction: column;
+            padding: 24px;
+        }
+
+        .members-view.open {
+            display: flex;
+        }
+
+        .members-view-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .members-view-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .members-view-close {
+            border: none;
+            background: transparent;
+            color: #64748b;
+            font-size: 22px;
+            cursor: pointer;
+            line-height: 1;
+            padding: 4px 10px;
+            border-radius: 999px;
+        }
+
+        .members-view-close:hover {
+            background: #f1f5f9;
+            color: #0f172a;
+        }
+
+        .members-view-list {
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            border-top: 1px solid #f1f5f9;
+            padding-top: 16px;
+        }
+
+        .members-view-list .member-btn {
+            width: 100%;
+            text-align: left;
+            background: #f8fafc;
+        }
+
         .members-btn {
             width: 100%;
             padding: 10px 12px;
