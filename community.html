@@ -1117,7 +1117,15 @@
                                             <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
                                             Documents
                                         </button>
-                                        <div class="document-list" id="documentList"></div>
+                                        <div class="document-list" id="documentList">
+                                            <div id="documentsList"></div>
+                                            <div class="field" style="margin-top:10px;">
+                                                <input type="text" id="newDocumentInput" placeholder="New document title..." />
+                                                <div style="font-size:12px; font-weight:600; color:#334155; margin-top:10px; margin-bottom:4px;">Assign Departments</div>
+                                                <div id="documentDeptCheckboxes"><div class="empty">Loading departments...</div></div>
+                                                <button type="button" class="submit-btn" id="addDocumentBtn" style="margin-top:8px; padding:8px 12px; font-size:13px;">Create Document</button>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                                 </div>
@@ -1148,16 +1156,6 @@
                                         <div class="dropdown-menu" id="requestsDropdownMenu">
                                             <div class="empty" id="requestsStatus">Requests turned off</div>
                                             <div id="requestsList"></div>
-                                        </div>
-                                        <button type="button" class="dropdown-toggle" id="documentsDropdownToggle" style="margin-top:8px;">Documents</button>
-                                        <div class="dropdown-menu" id="documentsDropdownMenu">
-                                            <div id="documentsList"></div>
-                                            <div class="field" style="margin-top:10px;">
-                                                <input type="text" id="newDocumentInput" placeholder="New document title..." />
-                                                <div style="font-size:12px; font-weight:600; color:#334155; margin-top:10px; margin-bottom:4px;">Assign Departments</div>
-                                                <div id="documentDeptCheckboxes"><div class="empty">Loading departments...</div></div>
-                                                <button type="button" class="submit-btn" id="addDocumentBtn" style="margin-top:8px; padding:8px 12px; font-size:13px;">Create Document</button>
-                                            </div>
                                         </div>
                                         <button type="button" class="dropdown-toggle" id="discordDropdownToggle" style="margin-top:8px;">Discord Integration</button>
                                         <div class="dropdown-menu" id="discordDropdownMenu">
@@ -1591,18 +1589,6 @@
                                 }
                             });
                         }
-
-                        if (documentsBtn && documentList) {
-                            documentsBtn.addEventListener("click", (e) => {
-                                e.stopPropagation();
-                                const isOpen = documentList.classList.contains("open");
-                                if (isOpen) {
-                                    documentList.classList.remove("open");
-                                } else {
-                                    loadSidebarDocuments();
-                                }
-                            });
-                        }
                         async function loadDepartments() {
                             if (!departmentsList || !localSupabase) return;
                             try {
@@ -1647,37 +1633,6 @@
                                 });
                             } catch (err) {
                                 departmentsList.innerHTML = '<div class="empty">Failed to load departments.</div>';
-                            }
-                        }
-
-                        async function loadSidebarDocuments() {
-                            if (!documentList || !localSupabase) return;
-                            documentList.classList.add("open");
-                            documentList.innerHTML = '<div class="empty">Loading documents...</div>';
-                            try {
-                                const { data } = await localSupabase
-                                    .from("documents")
-                                    .select("*")
-                                    .eq("community_id", id)
-                                    .order("created_at", { ascending: false });
-                                const docs = Array.isArray(data) ? data : [];
-                                if (docs.length === 0) {
-                                    documentList.innerHTML = '<div class="empty">No documents yet.</div>';
-                                    return;
-                                }
-                                documentList.innerHTML = docs.map((doc) => {
-                                    const title = (doc.title || 'Document').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-                                    return `<button type="button" class="member-btn">${title}</button>`;
-                                }).join('');
-                                documentList.querySelectorAll(".member-btn").forEach((btn) => {
-                                    btn.addEventListener("click", (e) => {
-                                        const title = btn.textContent.trim();
-                                        window.open("/document.html?title=" + encodeURIComponent(title), "_blank");
-                                    });
-                                });
-                            } catch (err) {
-                                console.error("Failed to load sidebar documents:", err);
-                                documentList.innerHTML = '<div class="empty">Failed to load documents.</div>';
                             }
                         }
 
@@ -1801,21 +1756,21 @@
                             }
                         }
 
-                        const documentsDropdownToggle = document.getElementById("documentsDropdownToggle");
-                        const documentsDropdownMenu = document.getElementById("documentsDropdownMenu");
+                        const documentsBtn = document.getElementById("documentsBtn");
+                        const documentList = document.getElementById("documentList");
                         const documentsList = document.getElementById("documentsList");
                         const newDocumentInput = document.getElementById("newDocumentInput");
                         const documentDeptCheckboxes = document.getElementById("documentDeptCheckboxes");
                         const addDocumentBtn = document.getElementById("addDocumentBtn");
 
                         const communityIsPro = !!(communityData && communityData.pro);
-                        if (documentsDropdownToggle && !communityIsPro) {
-                            documentsDropdownToggle.disabled = true;
-                            documentsDropdownToggle.style.opacity = "0.5";
-                            documentsDropdownToggle.style.cursor = "not-allowed";
-                            documentsDropdownToggle.textContent = "Documents (Pro)";
-                            documentsDropdownToggle.title = "Documents is a PulseCAD Pro feature. Upgrade your community to Pro to use it.";
-                            if (documentsDropdownMenu) documentsDropdownMenu.style.display = "none";
+                        if (documentsBtn && !communityIsPro) {
+                            documentsBtn.disabled = true;
+                            documentsBtn.style.opacity = "0.5";
+                            documentsBtn.style.cursor = "not-allowed";
+                            documentsBtn.textContent = "Documents (Pro)";
+                            documentsBtn.title = "Documents is a PulseCAD Pro feature. Upgrade your community to Pro to use it.";
+                            if (documentList) documentList.style.display = "none";
                         }
 
                         async function loadDocumentDeptCheckboxes() {
@@ -1930,10 +1885,14 @@
                             }
                         }
 
-                        if (documentsDropdownToggle && documentsDropdownMenu) {
-                            documentsDropdownToggle.addEventListener("click", () => {
-                                documentsDropdownMenu.classList.toggle("open");
-                                if (documentsDropdownMenu.classList.contains("open")) {
+                        if (documentsBtn && documentList) {
+                            documentsBtn.addEventListener("click", (e) => {
+                                e.stopPropagation();
+                                const isOpen = documentList.classList.contains("open");
+                                if (isOpen) {
+                                    documentList.classList.remove("open");
+                                } else {
+                                    documentList.classList.add("open");
                                     loadDocuments();
                                     loadDocumentDeptCheckboxes();
                                 }
