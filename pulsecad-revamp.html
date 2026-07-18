@@ -1480,8 +1480,6 @@ enable-ga="false"
             <a href="/changelogs" class="changelogs-btn">Changelogs</a>
             <button type="button" class="pro-btn" id="topbarProBtn">Pro</button>
             <button type="button" class="login-btn" id="topbarLoginBtn">Login</button>
-            <button type="button" class="pro-btn" id="topbarMembersBtn">Members</button>
-            <a href="/civilians.html" class="pro-btn" id="topbarCiviliansBtn">Civilians</a>
         </span>
     </div>
     <div class="topbar-right">
@@ -3593,16 +3591,6 @@ enable-ga="false"
         if (membersModalClose) {
             membersModalClose.addEventListener("click", () => {
                 if (membersModal) membersModal.classList.remove("open");
-            });
-        }
-
-        const topbarMembersBtn = document.getElementById("topbarMembersBtn");
-        if (topbarMembersBtn) {
-            topbarMembersBtn.addEventListener("click", async () => {
-                if (membersModal) {
-                    membersModal.classList.add("open");
-                    await loadMembers();
-                }
             });
         }
 
