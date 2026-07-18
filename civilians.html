@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Civilians - PulseCAD</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #ffffff;
+            color: #1a202c;
+            padding: 40px 24px;
+        }
+
+        .container {
+            max-width: 720px;
+            margin: 0 auto;
+        }
+
+        .back-btn {
+            margin-bottom: 20px;
+            padding: 8px 14px;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+            background: #ffffff;
+            color: #0f172a;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .back-btn:hover {
+            background: #f1f5f9;
+        }
+
+        .page-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 20px;
+        }
+
+        .civilian-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 14px;
+            margin-bottom: 10px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        }
+
+        .civilian-card-name {
+            font-size: 15px;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 4px;
+        }
+
+        .civilian-card-meta {
+            font-size: 13px;
+            color: #475569;
+            margin-bottom: 4px;
+        }
+
+        .civilian-card-notes {
+            font-size: 13px;
+            color: #64748b;
+            font-style: italic;
+        }
+
+        .empty-state {
+            font-size: 14px;
+            color: #64748b;
+            padding: 20px;
+            text-align: center;
+            background: #f8fafc;
+            border-radius: 12px;
+            border: 1px dashed #e2e8f0;
+        }
+
+        .loading-state {
+            font-size: 14px;
+            color: #64748b;
+            padding: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="/pulsecad-revamp.html" class="back-btn">← Back</a>
+        <div class="page-title">Civilians</div>
+        <div id="civiliansList">
+            <div class="loading-state">Loading civilians...</div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        const SUPABASE_URL = "https://zwdogalwbczdtvxvhrfd.supabase.co";
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp3ZG9nYWx3YmN6ZHR2eHZocmZkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM2NTA2MjQsImV4cCI6MjA5OTIyNjYyNH0.baPVVTtW0d3FDC2pTd1P3d5aoIc2FZkaD-6bBvDPFWw";
+
+        let localSupabase = null;
+        try {
+            if (typeof window.supabase !== "undefined") {
+                localSupabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            }
+        } catch (err) {
+            console.error("Supabase init failed:", err);
+        }
+
+        function escapeHtml(text) {
+            if (!text) return "";
+            const div = document.createElement("div");
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        async function loadCivilians() {
+            const listEl = document.getElementById("civiliansList");
+            if (!listEl || !localSupabase) {
+                if (listEl) listEl.innerHTML = '<div class="empty-state">Database not loaded.</div>';
+                return;
+            }
+
+            try {
+                const { data, error } = await localSupabase
+                    .from("civilians")
+                    .select("*")
+                    .order("created_at", { ascending: false });
+
+                if (error) {
+                    listEl.innerHTML = `<div class="empty-state">Error loading civilians: ${escapeHtml(error.message)}</div>`;
+                    return;
+                }
+
+                if (!Array.isArray(data) || data.length === 0) {
+                    listEl.innerHTML = '<div class="empty-state">No civilians found.</div>';
+                    return;
+                }
+
+                listEl.innerHTML = "";
+                for (const c of data) {
+                    const card = document.createElement("div");
+                    card.className = "civilian-card";
+
+                    const meta = [c.age, c.gender, c.address].filter(Boolean).join(" | ") || "No additional details";
+
+                    card.innerHTML = `
+                        <div class="civilian-card-name">${escapeHtml(c.name)}</div>
+                        <div class="civilian-card-meta">${escapeHtml(meta)}</div>
+                        ${c.notes ? `<div class="civilian-card-notes">${escapeHtml(c.notes)}</div>` : ""}
+                    `;
+                    listEl.appendChild(card);
+                }
+            } catch (err) {
+                console.error("Failed to load civilians:", err);
+                if (listEl) listEl.innerHTML = '<div class="empty-state">Failed to load civilians.</div>';
+            }
+        }
+
+        loadCivilians();
+    </script>
+</body>
+</html>
