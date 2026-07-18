@@ -716,7 +716,6 @@
         .auth-tab:disabled, .auth-tab.disabled {
             opacity: 0.5;
             cursor: not-allowed;
-            pointer-events: none;
         }
 
         .auth-form {
@@ -1436,149 +1435,11 @@
               padding: 18px;
           }
 
-          .sidebar {
-              position: fixed;
-              top: 0;
-              left: 0;
-              bottom: 0;
-              width: 240px;
-              background: #f8fafc;
-              border-right: 1px solid #e2e8f0;
-              padding: 24px 16px;
-              display: flex;
-              flex-direction: column;
-              gap: 6px;
-              overflow-y: auto;
-              z-index: 600;
-          }
-
-          .sidebar-brand {
-              font-size: 18px;
-              font-weight: 700;
-              color: #0f172a;
-              margin-bottom: 12px;
-              padding: 0 8px;
-          }
-
-          .sidebar-btn {
-              width: 100%;
-              text-align: left;
-              padding: 10px 12px;
-              border-radius: 10px;
-              border: 1px solid #e2e8f0;
-              background: #ffffff;
-              color: #0f172a;
-              font-size: 14px;
-              font-weight: 600;
-              cursor: pointer;
-          }
-
-          .sidebar-btn:hover {
-              background: #f1f5f9;
-          }
-
-          .sidebar-btn.active {
-              background: #0f172a;
-              color: #ffffff;
-              border-color: #0f172a;
-          }
-
-          .sidebar-spacer {
-              flex: 1;
-          }
-
-          .sidebar-user {
-              border-top: 1px solid #e2e8f0;
-              padding-top: 12px;
-              margin-top: 8px;
-          }
-
-          .main-content {
-              margin-left: 240px;
-              min-height: 100vh;
-              padding: 88px 24px 40px;
-              display: flex;
-              flex-direction: column;
-              align-items: center;
-          }
-
-          .main-content .container {
-              width: 100%;
-              max-width: 720px;
-              text-align: left;
-          }
-
-          .logged-in-screen {
-              display: none;
-              position: static;
-              inset: auto;
-              background: transparent;
-              z-index: auto;
-          }
-
-          .logged-in-screen.open {
-              display: block;
-          }
-
-          .logged-in-actions {
-              position: static;
-              transform: none;
-              justify-content: flex-start;
-              flex-wrap: wrap;
-              margin-bottom: 20px;
-          }
-
-          .logged-in-communities {
-              position: static;
-              transform: none;
-              width: 100%;
-              max-width: 720px;
-              margin: 0 auto;
-          }
-
-          .staff-dashboard-card {
-              max-width: 720px;
-              margin: 24px auto 0 auto;
-          }
-
-          .page-loading {
-              font-size: 14px;
-              color: #64748b;
-              padding: 20px;
-          }
-
-          .page-panel {
-              width: 100%;
-              max-width: 960px;
-          }
-
-          .page-panel-header {
-              margin-bottom: 16px;
-          }
-
-          .page-panel-header h1 {
-              font-size: 24px;
-              font-weight: 700;
-              color: #0f172a;
-          }
-
-          .page-frame {
-              width: 100%;
-              height: calc(100vh - 180px);
-              min-height: 520px;
-              border: 1px solid #e2e8f0;
-              border-radius: 16px;
-              background: #ffffff;
-          }
-
-          @media (max-width: 720px) {
-              .sidebar {
-                  width: 200px;
-              }
-              .main-content {
-                  margin-left: 200px;
-                  padding: 88px 16px 32px;
-              }
+          .members-empty {
+              font-size: 13px;
+              color: #94a3b8;
+              text-align: center;
+              padding: 18px;
           }
        </style>
 </head>
@@ -1614,19 +1475,15 @@ enable-ga="false"
 ></call-us>--> 
 <script defer src="https://downloads-global.3cx.com/downloads/livechatandtalk/v1/callus.js" id="tcx-callus-js" charset="utf-8"></script>
 <body>
-    <div class="sidebar" id="sidebar">
-        <div class="sidebar-brand">PulseCAD</div>
-        <button type="button" class="sidebar-btn active" data-page="dashboard" id="navDashboardBtn">Dashboard</button>
-        <button type="button" class="sidebar-btn" data-page="pro" id="navProBtn">Pro</button>
-        <button type="button" class="sidebar-btn" data-page="support" id="navSupportBtn">Support Ticket</button>
-        <button type="button" class="sidebar-btn" data-page="settings" id="navSettingsBtn">Settings</button>
-        <a href="/changelogs" class="sidebar-btn" id="navChangelogsBtn">Changelogs</a>
-        <div class="sidebar-spacer"></div>
-        <div class="sidebar-user">
-            <button type="button" class="sidebar-btn" data-page="logout" id="navLogoutBtn" style="color:#dc2626;border-color:#fecaca;">Logout</button>
-        </div>
+    <div class="topbar" id="topbar">
+        <span class="pill">
+            <a href="/changelogs" class="changelogs-btn">Changelogs</a>
+            <button type="button" class="pro-btn" id="topbarProBtn">Pro</button>
+            <button type="button" class="login-btn" id="topbarLoginBtn">Login</button>
+            <button type="button" class="pro-btn" id="topbarMembersBtn">Members</button>
+            <a href="/civilians.html" class="pro-btn" id="topbarCiviliansBtn">Civilians</a>
+        </span>
     </div>
-    <button type="button" class="login-btn" id="topbarLoginBtn" style="display:none;">Login</button>
     <div class="topbar-right">
         <div class="user-dropdown" id="userDropdown" style="display:none;">
             <button type="button" class="support-ticket-btn" id="supportTicketBtn">Support Ticket</button>
@@ -1649,7 +1506,7 @@ enable-ga="false"
             <div class="auth" id="auth">
                 <div class="auth-tabs">
                     <button class="auth-tab active" id="loginTab" data-tab="login" type="button" onclick="window.switchTab('login')">Login</button>
-                    <button class="auth-tab" id="signupTab" data-tab="signup" type="button" disabled onclick="window.switchTab('signup')">Create Account</button>
+                    <button class="auth-tab" id="signupTab" data-tab="signup" type="button" onclick="window.switchTab('signup')">Create Account</button>
                 </div>
 
                 <form class="auth-form visible" id="loginForm" autocomplete="email">
@@ -1688,17 +1545,10 @@ enable-ga="false"
             </div>
         </div>
     </div>
-    <div class="main-content" id="mainContent">
-    <div class="container" id="homeContainer">
+    <div class="container">
         <h1>PulseCAD Revamp</h1>
         <p>We are actively working on the PulseCAD Revamp. Updates are in progress.</p>
         <span class="status"><span class="status-dot"></span>In Progress</span>
-    </div>
-    <div class="page-panel" id="civiliansPage" style="display:none;">
-        <div class="page-panel-header">
-            <h1>Civilians</h1>
-        </div>
-        <iframe id="civiliansFrame" class="page-frame" src="/civilians.html" title="Civilians"></iframe>
     </div>
     <div class="logged-in-screen" id="loggedInScreen">
         <div class="logged-in-actions">
@@ -1754,7 +1604,6 @@ enable-ga="false"
                 </div>
             </div>
         </div>
-    </div>
     </div>
     <div class="modal-overlay" id="supportModal">
         <div class="modal">
@@ -2023,8 +1872,8 @@ enable-ga="false"
         function enableCreateAccount() {
             const signupTab = document.getElementById("signupTab");
             if (signupTab) {
-                signupTab.disabled = true;
-                signupTab.classList.add("disabled");
+                signupTab.disabled = false;
+                signupTab.classList.remove("disabled");
             }
         }
 
@@ -3744,76 +3593,6 @@ enable-ga="false"
         if (membersModalClose) {
             membersModalClose.addEventListener("click", () => {
                 if (membersModal) membersModal.classList.remove("open");
-            });
-        }
-
-        function setActiveNav(page) {
-            document.querySelectorAll(".sidebar-btn[data-page]").forEach((b) => {
-                b.classList.toggle("active", b.getAttribute("data-page") === page);
-            });
-        }
-
-        const homeContainer = document.getElementById("homeContainer");
-        const loggedInScreen = document.getElementById("loggedInScreen");
-        const civiliansPage = document.getElementById("civiliansPage");
-        const supportModal = document.getElementById("supportModal");
-        const settingsScreen = document.getElementById("settingsScreen");
-        const topbarLoginBtn = document.getElementById("topbarLoginBtn");
-        const dropdownSettingsBtn = document.getElementById("dropdownSettingsBtn");
-        const supportTicketBtn = document.getElementById("supportTicketBtn");
-
-        function hideAllPages() {
-            if (homeContainer) homeContainer.style.display = "none";
-            if (loggedInScreen) loggedInScreen.classList.remove("open");
-            if (civiliansPage) civiliansPage.style.display = "none";
-            if (settingsScreen) settingsScreen.classList.remove("open");
-            if (supportModal) supportModal.classList.remove("open");
-            if (proModal) proModal.classList.remove("open");
-            if (membersModal) membersModal.classList.remove("open");
-        }
-
-        function openPage(page) {
-            if (page === "dashboard") {
-                const wasLoggedIn = !!(loggedInScreen && loggedInScreen.classList.contains("open"));
-                hideAllPages();
-                if (loggedInScreen) loggedInScreen.classList.toggle("open", wasLoggedIn);
-                if (homeContainer) homeContainer.style.display = wasLoggedIn ? "none" : "block";
-                setActiveNav("dashboard");
-                return;
-            }
-            hideAllPages();
-            setActiveNav(page);
-            if (page === "civilians") {
-                if (civiliansPage) civiliansPage.style.display = "block";
-            } else if (page === "members") {
-                if (membersModal) {
-                    membersModal.classList.add("open");
-                    loadMembers();
-                }
-            } else if (page === "pro") {
-                openProModal();
-            } else if (page === "support") {
-                if (supportModal) supportModal.classList.add("open");
-            } else if (page === "settings") {
-                if (settingsScreen) settingsScreen.classList.add("open");
-            } else if (page === "logout") {
-                if (topbarLoginBtn) topbarLoginBtn.click();
-            }
-        }
-
-        document.querySelectorAll(".sidebar-btn[data-page]").forEach((btn) => {
-            btn.addEventListener("click", () => {
-                openPage(btn.getAttribute("data-page"));
-            });
-        });
-
-        if (dropdownSettingsBtn) {
-            dropdownSettingsBtn.addEventListener("click", () => openPage("settings"));
-        }
-        if (supportTicketBtn) {
-            supportTicketBtn.addEventListener("click", (e) => {
-                e.stopPropagation();
-                openPage("support");
             });
         }
 
