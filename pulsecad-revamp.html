@@ -1363,12 +1363,78 @@
         }
 
         .wallet-empty {
-            font-size: 13px;
-            color: #94a3b8;
-            text-align: center;
-            padding: 18px;
-        }
-    </style>
+             font-size: 13px;
+             color: #94a3b8;
+             text-align: center;
+             padding: 18px;
+         }
+
+         .members-modal {
+             max-width: 520px;
+         }
+
+         .members-list {
+             display: flex;
+             flex-direction: column;
+             gap: 8px;
+             max-height: 55vh;
+             overflow-y: auto;
+             padding: 4px;
+         }
+
+         .members-item {
+             display: flex;
+             align-items: center;
+             justify-content: space-between;
+             gap: 12px;
+             padding: 10px 12px;
+             border: 1px solid #e2e8f0;
+             border-radius: 12px;
+             background: #ffffff;
+         }
+
+         .members-item-name {
+             font-size: 14px;
+             font-weight: 700;
+             color: #0f172a;
+             word-break: break-word;
+         }
+
+         .members-item-role {
+             font-size: 12px;
+             color: #475569;
+             margin-top: 2px;
+         }
+
+         .members-badge {
+             display: inline-block;
+             padding: 3px 10px;
+             border-radius: 999px;
+             font-size: 11px;
+             font-weight: 700;
+             text-transform: capitalize;
+             white-space: nowrap;
+         }
+
+         .members-badge-management {
+             background: #f3e8ff;
+             color: #7e22ce;
+             border: 1px solid #e9d5ff;
+         }
+
+         .members-badge-other {
+             background: #f1f5f9;
+             color: #475569;
+             border: 1px solid #e2e8f0;
+         }
+
+         .members-empty {
+             font-size: 13px;
+             color: #94a3b8;
+             text-align: center;
+             padding: 18px;
+         }
+     </style>
 </head>
 <!--<call-us 
 phonesystem-url="https://1416.3cx.cloud/" 
@@ -1407,7 +1473,7 @@ enable-ga="false"
             <a href="/changelogs" class="changelogs-btn">Changelogs</a>
             <button type="button" class="pro-btn" id="topbarProBtn">Pro</button>
             <button type="button" class="login-btn" id="topbarLoginBtn">Login</button>
-            
+            <button type="button" class="pro-btn" id="topbarMembersBtn">Members</button>
         </span>
     </div>
     <div class="topbar-right">
@@ -1617,6 +1683,17 @@ enable-ga="false"
             <div class="wallet-history-title">Recent Activity</div>
             <div class="wallet-history" id="walletHistory">
                 <div class="wallet-empty">No transactions yet.</div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-overlay" id="membersModal">
+        <div class="modal members-modal">
+            <div class="modal-header">
+                <div class="modal-title">Members</div>
+                <button class="modal-close" id="membersModalClose" type="button" aria-label="Close">×</button>
+            </div>
+            <div class="members-list" id="membersList">
+                <div class="members-empty">Loading members...</div>
             </div>
         </div>
     </div>
@@ -3456,6 +3533,68 @@ enable-ga="false"
         if (walletModal) {
             walletModal.addEventListener("click", (e) => {
                 if (e.target === walletModal) walletModal.classList.remove("open");
+            });
+        }
+
+        const membersModal = document.getElementById("membersModal");
+        const membersModalClose = document.getElementById("membersModalClose");
+        const membersList = document.getElementById("membersList");
+
+        async function loadMembers() {
+            if (!membersList || !localSupabase) {
+                if (membersList) membersList.innerHTML = '<div class="members-empty">Service unavailable.</div>';
+                return;
+            }
+            try {
+                const { data, error } = await localSupabase
+                    .from("users")
+                    .select("username, email, department, created_at")
+                    .order("created_at", { ascending: true });
+                if (error || !Array.isArray(data) || data.length === 0) {
+                    if (membersList) membersList.innerHTML = '<div class="members-empty">No members found.</div>';
+                    return;
+                }
+                membersList.innerHTML = "";
+                for (const user of data) {
+                    const item = document.createElement("div");
+                    item.className = "members-item";
+                    const displayName = user.username || user.email || "Unknown";
+                    const dept = user.department || "Unassigned";
+                    const badgeClass = dept === "Management" ? "members-badge-management" : "members-badge-other";
+                    item.innerHTML = `
+                        <div style="min-width:0;flex:1;">
+                            <div class="members-item-name">${displayName.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</div>
+                            <div class="members-item-role">${dept.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</div>
+                        </div>
+                        <span class="members-badge ${badgeClass}">${dept.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</span>
+                    `;
+                    membersList.appendChild(item);
+                }
+            } catch (err) {
+                console.error("Failed to load members:", err);
+                if (membersList) membersList.innerHTML = '<div class="members-empty">Failed to load members.</div>';
+            }
+        }
+
+        if (membersModal) {
+            membersModal.addEventListener("click", (e) => {
+                if (e.target === membersModal) membersModal.classList.remove("open");
+            });
+        }
+
+        if (membersModalClose) {
+            membersModalClose.addEventListener("click", () => {
+                if (membersModal) membersModal.classList.remove("open");
+            });
+        }
+
+        const topbarMembersBtn = document.getElementById("topbarMembersBtn");
+        if (topbarMembersBtn) {
+            topbarMembersBtn.addEventListener("click", async () => {
+                if (membersModal) {
+                    membersModal.classList.add("open");
+                    await loadMembers();
+                }
             });
         }
 

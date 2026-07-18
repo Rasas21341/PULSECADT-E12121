@@ -1620,15 +1620,21 @@
                             }
                         }
 
-                        if (membersBtn && memberList) {
+                        if (membersBtn && membersView) {
                             membersBtn.addEventListener("click", (e) => {
                                 e.stopPropagation();
-                                const isOpen = memberList.classList.contains("open");
-                                if (isOpen) {
-                                    memberList.classList.remove("open");
+                                if (membersView.classList.contains("open")) {
+                                    membersView.classList.remove("open");
                                 } else {
-                                    loadMembers();
+                                    membersView.classList.add("open");
+                                    loadMembersInto(membersViewList, { loadingText: 'Loading members...', openDropdown: false });
                                 }
+                            });
+                        }
+
+                        if (membersViewClose && membersView) {
+                            membersViewClose.addEventListener("click", () => {
+                                membersView.classList.remove("open");
                             });
                         }
 
