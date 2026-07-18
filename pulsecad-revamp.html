@@ -1474,7 +1474,7 @@ enable-ga="false"
             <button type="button" class="pro-btn" id="topbarProBtn">Pro</button>
             <button type="button" class="login-btn" id="topbarLoginBtn">Login</button>
             <button type="button" class="pro-btn" id="topbarMembersBtn">Members</button>
-            <a href="/civilians.html" class="pro-btn" id="topbarCiviliansBtn">Civilians</a>
+            <button type="button" class="pro-btn" id="topbarCiviliansBtn">Civilians</button>
         </span>
     </div>
     <div class="topbar-right">
@@ -1695,6 +1695,17 @@ enable-ga="false"
             </div>
             <div class="members-list" id="membersList">
                 <div class="members-empty">Loading members...</div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-overlay" id="civiliansModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">Civilians</div>
+                <button class="modal-close" id="civiliansModalClose" type="button" aria-label="Close">×</button>
+            </div>
+            <div class="members-list" id="civilianList">
+                <div class="members-empty">Loading civilians...</div>
             </div>
         </div>
     </div>
@@ -3595,6 +3606,67 @@ enable-ga="false"
                 if (membersModal) {
                     membersModal.classList.add("open");
                     await loadMembers();
+                }
+            });
+        }
+
+        const civiliansModal = document.getElementById("civiliansModal");
+        const civiliansModalClose = document.getElementById("civiliansModalClose");
+        const civilianList = document.getElementById("civilianList");
+
+        async function loadCivilians() {
+            if (!civilianList || !localSupabase) {
+                if (civilianList) civilianList.innerHTML = '<div class="members-empty">Service unavailable.</div>';
+                return;
+            }
+            try {
+                const { data, error } = await localSupabase
+                    .from("civilians")
+                    .select("*")
+                    .order("created_at", { ascending: false });
+                if (error || !Array.isArray(data) || data.length === 0) {
+                    if (civilianList) civilianList.innerHTML = '<div class="members-empty">No civilians found.</div>';
+                    return;
+                }
+                civilianList.innerHTML = "";
+                for (const c of data) {
+                    const item = document.createElement("div");
+                    item.className = "members-item";
+                    const name = c.name || "Unknown";
+                    const meta = [c.age, c.gender, c.address].filter(Boolean).join(" | ") || "No additional details";
+                    item.innerHTML = `
+                        <div style="min-width:0;flex:1;">
+                            <div class="members-item-name">${name.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</div>
+                            <div class="members-item-role">${meta.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</div>
+                        </div>
+                        <span class="members-badge members-badge-other">Civilian</span>
+                    `;
+                    civilianList.appendChild(item);
+                }
+            } catch (err) {
+                console.error("Failed to load civilians:", err);
+                if (civilianList) civilianList.innerHTML = '<div class="members-empty">Failed to load civilians.</div>';
+            }
+        }
+
+        if (civiliansModal) {
+            civiliansModal.addEventListener("click", (e) => {
+                if (e.target === civiliansModal) civiliansModal.classList.remove("open");
+            });
+        }
+
+        if (civiliansModalClose) {
+            civiliansModalClose.addEventListener("click", () => {
+                if (civiliansModal) civiliansModal.classList.remove("open");
+            });
+        }
+
+        const topbarCiviliansBtn = document.getElementById("topbarCiviliansBtn");
+        if (topbarCiviliansBtn) {
+            topbarCiviliansBtn.addEventListener("click", async () => {
+                if (civiliansModal) {
+                    civiliansModal.classList.add("open");
+                    await loadCivilians();
                 }
             });
         }
