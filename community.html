@@ -1652,6 +1652,29 @@
                             });
                         }
 
+                        const civilianBtn = document.getElementById("civilianBtn");
+                        const civiliansModal = document.getElementById("civiliansModal");
+                        const civiliansModalClose = document.getElementById("civiliansModalClose");
+
+                        if (civilianBtn && civiliansModal) {
+                            civilianBtn.addEventListener("click", (e) => {
+                                e.stopPropagation();
+                                civiliansModal.classList.add("open");
+                            });
+                        }
+
+                        if (civiliansModalClose && civiliansModal) {
+                            civiliansModalClose.addEventListener("click", () => {
+                                civiliansModal.classList.remove("open");
+                            });
+                        }
+
+                        if (civiliansModal) {
+                            civiliansModal.addEventListener("click", (e) => {
+                                if (e.target === civiliansModal) civiliansModal.classList.remove("open");
+                            });
+                        }
+
                         document.addEventListener("click", () => {
                             if (memberList) memberList.classList.remove("open");
                             if (vehicleList) vehicleList.classList.remove("open");
