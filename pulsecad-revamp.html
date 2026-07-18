@@ -1428,12 +1428,27 @@
              border: 1px solid #e2e8f0;
          }
 
-           .members-empty {
-               font-size: 13px;
-               color: #94a3b8;
-               text-align: center;
-               padding: 18px;
-           }
+          .members-empty {
+              font-size: 13px;
+              color: #94a3b8;
+              text-align: center;
+              padding: 18px;
+          }
+
+          .civilians-modal {
+              max-width: 760px;
+              height: 86vh;
+              display: flex;
+              flex-direction: column;
+          }
+
+          .civilians-frame {
+              width: 100%;
+              flex: 1;
+              border: none;
+              border-radius: 12px;
+              background: #ffffff;
+          }
        </style>
 </head>
 <!--<call-us 
@@ -1474,7 +1489,7 @@ enable-ga="false"
             <button type="button" class="pro-btn" id="topbarProBtn">Pro</button>
             <button type="button" class="login-btn" id="topbarLoginBtn">Login</button>
             <button type="button" class="pro-btn" id="topbarMembersBtn">Members</button>
-            <a href="/civilians.html" class="pro-btn" id="topbarCiviliansBtn">Civilians</a>
+            <button type="button" class="pro-btn" id="topbarCiviliansBtn">Civilians</button>
         </span>
     </div>
     <div class="topbar-right">
@@ -1696,6 +1711,15 @@ enable-ga="false"
             <div class="members-list" id="membersList">
                 <div class="members-empty">Loading members...</div>
             </div>
+        </div>
+    </div>
+    <div class="modal-overlay" id="civiliansModal">
+        <div class="modal civilians-modal">
+            <div class="modal-header">
+                <div class="modal-title">Civilians</div>
+                <button class="modal-close" id="civiliansModalClose" type="button" aria-label="Close">×</button>
+            </div>
+            <iframe id="civiliansFrame" class="civilians-frame" src="/civilians.html" title="Civilians"></iframe>
         </div>
     </div>
     <div class="lockdown" id="lockdown">
@@ -3596,6 +3620,29 @@ enable-ga="false"
                     membersModal.classList.add("open");
                     await loadMembers();
                 }
+            });
+        }
+
+        const topbarCiviliansBtn = document.getElementById("topbarCiviliansBtn");
+        const civiliansModal = document.getElementById("civiliansModal");
+        const civiliansModalClose = document.getElementById("civiliansModalClose");
+
+        if (topbarCiviliansBtn) {
+            topbarCiviliansBtn.addEventListener("click", (e) => {
+                e.stopPropagation();
+                if (civiliansModal) civiliansModal.classList.add("open");
+            });
+        }
+
+        if (civiliansModalClose) {
+            civiliansModalClose.addEventListener("click", () => {
+                if (civiliansModal) civiliansModal.classList.remove("open");
+            });
+        }
+
+        if (civiliansModal) {
+            civiliansModal.addEventListener("click", (e) => {
+                if (e.target === civiliansModal) civiliansModal.classList.remove("open");
             });
         }
 

@@ -325,7 +325,6 @@
         }
 
         .member-list,
-        .civilian-list,
         .vehicle-list,
         .license-list,
         .departments-dropdown-menu {
@@ -345,7 +344,6 @@
         }
 
         .member-list.open,
-        .civilian-list.open,
         .vehicle-list.open,
         .license-list.open,
         .departments-dropdown-menu.open {
@@ -353,7 +351,6 @@
         }
 
         .member-list .member-btn,
-        .civilian-list .member-btn,
         .vehicle-list .member-btn,
         .license-list .member-btn {
             width: 100%;
@@ -1292,8 +1289,6 @@
                         const approvalBtns = generalPanel.querySelectorAll(".approval-btn");
                         const membersBtn = document.getElementById("membersBtn");
                         const memberList = document.getElementById("memberList");
-                        const civilianBtn = document.getElementById("civilianBtn");
-                        const civilianList = document.getElementById("civilianList");
                         const vehiclesBtn = document.getElementById("vehiclesBtn");
                         const vehicleList = document.getElementById("vehicleList");
                         const licencesBtn = document.getElementById("licencesBtn");
@@ -1633,7 +1628,6 @@
 
                         document.addEventListener("click", () => {
                             if (memberList) memberList.classList.remove("open");
-                            if (civilianList) civilianList.classList.remove("open");
                             if (vehicleList) vehicleList.classList.remove("open");
                             if (licenseList) licenseList.classList.remove("open");
                             if (departmentsDropdownMenu) departmentsDropdownMenu.classList.remove("open");
