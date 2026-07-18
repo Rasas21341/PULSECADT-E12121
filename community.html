@@ -142,22 +142,6 @@
             box-shadow: 0 20px 50px rgba(15, 23, 42, 0.18);
         }
 
-        .civilians-modal {
-            max-width: 820px;
-            height: 86vh;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .civilians-frame {
-            width: 100%;
-            flex: 1;
-            border: none;
-            border-radius: 12px;
-            background: #ffffff;
-            margin-top: 12px;
-        }
-
         .modal-title {
             font-size: 18px;
             font-weight: 700;
@@ -432,6 +416,32 @@
             width: 100%;
             text-align: left;
             background: #f8fafc;
+        }
+
+        .civilians-view {
+            position: fixed;
+            top: 0;
+            left: 280px;
+            right: 0;
+            bottom: 0;
+            background: #ffffff;
+            z-index: 550;
+            display: none;
+            flex-direction: column;
+            padding: 24px;
+        }
+
+        .civilians-view.open {
+            display: flex;
+        }
+
+        .civilians-view-frame {
+            flex: 1;
+            width: 100%;
+            border: none;
+            border-radius: 12px;
+            background: #ffffff;
+            margin-top: 16px;
         }
 
         .members-btn {
@@ -1016,16 +1026,6 @@
         </div>
     </div>
 
-    <div class="modal-overlay" id="civiliansModal">
-        <div class="modal civilians-modal">
-            <div class="modal-header">
-                <div class="modal-title">Civilians</div>
-                <button class="modal-close" id="civiliansModalClose" type="button" aria-label="Close">×</button>
-            </div>
-            <iframe id="civiliansFrame" class="civilians-frame" src="/civilians.html" title="Civilians"></iframe>
-        </div>
-    </div>
-
     <div class="modal-overlay" id="departmentPasscodeModal">
         <div class="modal">
             <div class="modal-header">
@@ -1305,6 +1305,13 @@
                                         <button type="button" class="members-view-close" id="membersViewClose" aria-label="Close">×</button>
                                     </div>
                                     <div class="members-view-list" id="membersViewList"></div>
+                                </div>
+                                <div class="civilians-view" id="civiliansView">
+                                    <div class="members-view-header">
+                                        <div class="members-view-title">Civilians</div>
+                                        <button type="button" class="members-view-close" id="civiliansViewClose" aria-label="Close">×</button>
+                                    </div>
+                                    <iframe id="civiliansFrame" class="civilians-view-frame" src="/civilians.html" title="Civilians"></iframe>
                                 </div>
                             </div>
                         `;
@@ -1653,25 +1660,19 @@
                         }
 
                         const civilianBtn = document.getElementById("civilianBtn");
-                        const civiliansModal = document.getElementById("civiliansModal");
-                        const civiliansModalClose = document.getElementById("civiliansModalClose");
+                        const civiliansView = document.getElementById("civiliansView");
+                        const civiliansViewClose = document.getElementById("civiliansViewClose");
 
-                        if (civilianBtn && civiliansModal) {
+                        if (civilianBtn && civiliansView) {
                             civilianBtn.addEventListener("click", (e) => {
                                 e.stopPropagation();
-                                civiliansModal.classList.add("open");
+                                civiliansView.classList.add("open");
                             });
                         }
 
-                        if (civiliansModalClose && civiliansModal) {
-                            civiliansModalClose.addEventListener("click", () => {
-                                civiliansModal.classList.remove("open");
-                            });
-                        }
-
-                        if (civiliansModal) {
-                            civiliansModal.addEventListener("click", (e) => {
-                                if (e.target === civiliansModal) civiliansModal.classList.remove("open");
+                        if (civiliansViewClose && civiliansView) {
+                            civiliansViewClose.addEventListener("click", () => {
+                                civiliansView.classList.remove("open");
                             });
                         }
 
