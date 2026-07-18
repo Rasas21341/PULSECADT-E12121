@@ -444,6 +444,30 @@
             margin-top: 16px;
         }
 
+        .departments-view, .documents-view {
+            position: fixed;
+            top: 0;
+            left: 280px;
+            right: 0;
+            bottom: 0;
+            background: #ffffff;
+            z-index: 550;
+            display: none;
+            flex-direction: column;
+            padding: 24px;
+        }
+
+        .departments-view.open, .documents-view.open {
+            display: flex;
+        }
+
+        .view-body {
+            flex: 1;
+            overflow-y: auto;
+            border-top: 1px solid #f1f5f9;
+            padding-top: 16px;
+        }
+
         .members-btn {
             width: 100%;
             padding: 10px 12px;
@@ -1200,15 +1224,6 @@
                                             <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
                                             Documents
                                         </button>
-                                        <div class="document-list" id="documentList">
-                                            <div id="documentsList"></div>
-                                            <div class="field" style="margin-top:10px;">
-                                                <input type="text" id="newDocumentInput" placeholder="New document title..." />
-                                                <div style="font-size:12px; font-weight:600; color:#334155; margin-top:10px; margin-bottom:4px;">Assign Departments</div>
-                                                <div id="documentDeptCheckboxes"><div class="empty">Loading departments...</div></div>
-                                                <button type="button" class="submit-btn" id="addDocumentBtn" style="margin-top:8px; padding:8px 12px; font-size:13px;">Create Document</button>
-                                            </div>
-                                        </div>
                                     </div>
                                     <div class="btn-dropdown-wrap">
                                         <button type="button" class="penal-codes-btn" id="penalCodesBtn">
@@ -1222,14 +1237,6 @@
                                             <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M3 10h18M5 6l7-3 7 3M4 10v11M20 10v11M8 14v3M12 14v3M16 14v3"/></svg>
                                             Departments
                                         </button>
-                                        <div class="departments-dropdown-menu" id="departmentsDropdownMenu">
-                                            <div id="departmentsList"></div>
-                                            <div class="field" style="margin-top:10px;">
-                                                <input type="text" id="newDepartmentInput" placeholder="New department..." />
-                                                <input type="text" id="newDepartmentPasscode" placeholder="Passcode (optional)" style="margin-top:8px;" />
-                                                <button type="button" class="submit-btn" id="addDepartmentBtn" style="margin-top:8px; padding:8px 12px; font-size:13px;">Add</button>
-                                            </div>
-                                        </div>
                                     </div>
                                     <div class="server-admin-badge">Server admin</div>
                                     <button type="button" class="settings-btn" id="settingsBtn">Settings</button>
@@ -1312,6 +1319,37 @@
                                         <button type="button" class="members-view-close" id="civiliansViewClose" aria-label="Close">×</button>
                                     </div>
                                     <iframe id="civiliansFrame" class="civilians-view-frame" src="/civilians.html" title="Civilians"></iframe>
+                                </div>
+                                <div class="departments-view" id="departmentsView">
+                                    <div class="members-view-header">
+                                        <div class="members-view-title">Departments</div>
+                                        <button type="button" class="members-view-close" id="departmentsViewClose" aria-label="Close">×</button>
+                                    </div>
+                                    <div class="view-body">
+                                        <div id="departmentsList"></div>
+                                        <div class="field" style="margin-top:16px;">
+                                            <label>New department</label>
+                                            <input type="text" id="newDepartmentInput" placeholder="New department..." />
+                                            <input type="text" id="newDepartmentPasscode" placeholder="Passcode (optional)" style="margin-top:8px;" />
+                                            <button type="button" class="submit-btn" id="addDepartmentBtn" style="margin-top:8px; padding:8px 12px; font-size:13px;">Add</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="documents-view" id="documentsView">
+                                    <div class="members-view-header">
+                                        <div class="members-view-title">Documents</div>
+                                        <button type="button" class="members-view-close" id="documentsViewClose" aria-label="Close">×</button>
+                                    </div>
+                                    <div class="view-body">
+                                        <div id="documentsList"></div>
+                                        <div class="field" style="margin-top:16px;">
+                                            <label>New document</label>
+                                            <input type="text" id="newDocumentInput" placeholder="New document title..." />
+                                            <div style="font-size:12px; font-weight:600; color:#334155; margin-top:10px; margin-bottom:4px;">Assign Departments</div>
+                                            <div id="documentDeptCheckboxes"><div class="empty">Loading departments...</div></div>
+                                            <button type="button" class="submit-btn" id="addDocumentBtn" style="margin-top:8px; padding:8px 12px; font-size:13px;">Create Document</button>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         `;
@@ -1676,12 +1714,15 @@
                             });
                         }
 
+                        const departmentsList = document.getElementById("departmentsList");
+                        const newDepartmentInput = document.getElementById("newDepartmentInput");
+                        const newDepartmentPasscode = document.getElementById("newDepartmentPasscode");
+                        const addDepartmentBtn = document.getElementById("addDepartmentBtn");
+
                         document.addEventListener("click", () => {
                             if (memberList) memberList.classList.remove("open");
                             if (vehicleList) vehicleList.classList.remove("open");
                             if (licenseList) licenseList.classList.remove("open");
-                            if (departmentsDropdownMenu) departmentsDropdownMenu.classList.remove("open");
-                            if (documentList) documentList.classList.remove("open");
                             if (penalCodesList) penalCodesList.classList.remove("open");
                         });
 
@@ -1695,20 +1736,20 @@
                         }
 
                         const departmentsBtn = document.getElementById("departmentsBtn");
-                        const departmentsDropdownMenu = document.getElementById("departmentsDropdownMenu");
-                        const departmentsList = document.getElementById("departmentsList");
-                        const newDepartmentInput = document.getElementById("newDepartmentInput");
-                        const addDepartmentBtn = document.getElementById("addDepartmentBtn");
+                        const departmentsView = document.getElementById("departmentsView");
+                        const departmentsViewClose = document.getElementById("departmentsViewClose");
 
-                        if (departmentsBtn && departmentsDropdownMenu) {
+                        if (departmentsBtn && departmentsView) {
                             departmentsBtn.addEventListener("click", (e) => {
                                 e.stopPropagation();
-                                const isOpen = departmentsDropdownMenu.classList.contains("open");
-                                if (isOpen) {
-                                    departmentsDropdownMenu.classList.remove("open");
-                                } else {
-                                    loadDepartments();
-                                }
+                                departmentsView.classList.add("open");
+                                loadDepartments();
+                            });
+                        }
+
+                        if (departmentsViewClose && departmentsView) {
+                            departmentsViewClose.addEventListener("click", () => {
+                                departmentsView.classList.remove("open");
                             });
                         }
                         async function loadDepartments() {
@@ -1879,7 +1920,8 @@
                         }
 
                         const documentsBtn = document.getElementById("documentsBtn");
-                        const documentList = document.getElementById("documentList");
+                        const documentsView = document.getElementById("documentsView");
+                        const documentsViewClose = document.getElementById("documentsViewClose");
                         const documentsList = document.getElementById("documentsList");
                         const newDocumentInput = document.getElementById("newDocumentInput");
                         const documentDeptCheckboxes = document.getElementById("documentDeptCheckboxes");
@@ -1894,7 +1936,7 @@
                             documentsBtn.style.cursor = "not-allowed";
                             documentsBtn.textContent = "Documents (Pro)";
                             documentsBtn.title = "Documents is a PulseCAD Pro feature. Upgrade your community to Pro to use it.";
-                            if (documentList) documentList.style.display = "none";
+                            if (documentsView) documentsView.style.display = "none";
                         }
 
                         async function loadDocumentDeptCheckboxes() {
@@ -2039,17 +2081,18 @@
                             }
                         }
 
-                        if (documentsBtn && documentList) {
+                        if (documentsBtn && documentsView) {
                             documentsBtn.addEventListener("click", (e) => {
                                 e.stopPropagation();
-                                const isOpen = documentList.classList.contains("open");
-                                if (isOpen) {
-                                    documentList.classList.remove("open");
-                                } else {
-                                    documentList.classList.add("open");
-                                    loadDocuments();
-                                    loadDocumentDeptCheckboxes();
-                                }
+                                documentsView.classList.add("open");
+                                loadDocuments();
+                                loadDocumentDeptCheckboxes();
+                            });
+                        }
+
+                        if (documentsViewClose && documentsView) {
+                            documentsViewClose.addEventListener("click", () => {
+                                documentsView.classList.remove("open");
                             });
                         }
 
