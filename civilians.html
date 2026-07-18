@@ -19,54 +19,11 @@
             min-height: 100vh;
         }
 
-        .sidebar {
-            width: 220px;
-            background: #f8fafc;
-            border-right: 1px solid #e2e8f0;
-            padding: 24px 16px;
-            position: fixed;
-            top: 0;
-            left: 0;
-            bottom: 0;
-            overflow-y: auto;
-        }
-
-        .sidebar-title {
-            font-size: 18px;
-            font-weight: 700;
-            color: #0f172a;
-            margin-bottom: 16px;
-        }
-
-        .sidebar-btn {
-            width: 100%;
-            text-align: left;
-            padding: 10px 12px;
-            border-radius: 10px;
-            border: 1px solid #e2e8f0;
-            background: #ffffff;
-            color: #0f172a;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            margin-bottom: 8px;
-        }
-
-        .sidebar-btn:hover {
-            background: #f1f5f9;
-        }
-
-        .sidebar-btn.active {
-            background: #0f172a;
-            color: #ffffff;
-            border-color: #0f172a;
-        }
-
         .main {
-            margin-left: 220px;
+            margin-left: 0;
             padding: 40px 24px;
             flex: 1;
-            width: calc(100% - 220px);
+            width: 100%;
         }
 
         .container {
@@ -128,11 +85,6 @@
     </style>
 </head>
 <body>
-    <div class="sidebar">
-        <div class="sidebar-title">PulseCAD</div>
-        <a href="/pulsecad-revamp.html" class="sidebar-btn">Home</a>
-        <button type="button" class="sidebar-btn active" id="civiliansSidebarBtn">Civilians</button>
-    </div>
     <div class="main">
         <div class="container">
             <h1>Civilians</h1>
