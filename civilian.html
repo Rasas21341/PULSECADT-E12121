@@ -969,14 +969,23 @@
                         <div class="civilian-card-name">${escapeHtml(civilian.name)}</div>
                         <div class="civilian-card-meta">${escapeHtml(meta)}</div>
                         ${civilian.photo_url ? `<img src="${escapeHtml(civilian.photo_url)}" style="max-width: 80px; max-height: 80px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 8px; display: block;" />` : ""}
+                        <div class="civilian-card-actions">
+                            <button type="button" class="civilian-action-btn primary" data-view-license="${civilian.id}">View License</button>
+                        </div>
                         <div class="license-list" id="licenseList-${civilian.id}"></div>
                     `;
 
                     card.addEventListener("click", (e) => {
+                        if (e.target.closest("[data-view-license]")) return;
                         selectCivilianCard(civilian.id, card);
                     });
 
                     listEl.appendChild(card);
+
+                    card.querySelector("[data-view-license]")?.addEventListener("click", (e) => {
+                        e.stopPropagation();
+                        openLicenseFromCivilian(civilian);
+                    });
 
                     loadLicenses(civilian.id);
                 }
@@ -1208,6 +1217,41 @@
         const lcStatus = document.getElementById("lcStatus");
         const lcPrintBtn = document.getElementById("lcPrintBtn");
         const lcCloseBtn = document.getElementById("lcCloseBtn");
+
+        async function openLicenseFromCivilian(civilian) {
+            if (!civilian) return;
+            const photo = civilian.photo_url || civilian.photo || "";
+
+            if (!localSupabase) {
+                openLicenseCard({ name: civilian.name, photo, type: "", number: "", expiry: "" });
+                return;
+            }
+
+            try {
+                const { data, error } = await localSupabase
+                    .from("licenses")
+                    .select("*")
+                    .eq("civilian_id", civilian.id)
+                    .order("created_at", { ascending: false })
+                    .limit(1);
+
+                if (error || !Array.isArray(data) || data.length === 0) {
+                    openLicenseCard({ name: civilian.name, photo, type: "", number: "", expiry: "" });
+                    return;
+                }
+
+                const lic = data[0];
+                openLicenseCard({
+                    name: civilian.name,
+                    photo,
+                    type: lic.license_type,
+                    number: lic.license_number || "",
+                    expiry: lic.expiry_date || ""
+                });
+            } catch (err) {
+                openLicenseCard({ name: civilian.name, photo, type: "", number: "", expiry: "" });
+            }
+        }
 
         function openLicenseCard({ name, photo, type, number, expiry }) {
             if (!licenseCard) return;
