@@ -601,16 +601,21 @@
         .add-department-btn {
             display: inline-flex;
             align-items: center;
-            gap: 6px;
-            padding: 8px 12px;
-            border-radius: 8px;
+            gap: 5px;
+            padding: 5px 10px;
+            border-radius: 6px;
             border: 1px solid #2563eb;
             background: #2563eb;
             color: #fff;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 700;
             cursor: pointer;
             white-space: nowrap;
+        }
+
+        .add-department-btn .btn-icon {
+            width: 14px;
+            height: 14px;
         }
 
         .add-department-btn:hover {
@@ -1124,6 +1129,25 @@
         </div>
     </div>
 
+    <div class="modal-overlay" id="newDocumentModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">New Document</div>
+                <button class="modal-close" id="newDocModalClose" type="button" aria-label="Close">×</button>
+            </div>
+            <div class="field">
+                <label for="newDocTitle">Document Title</label>
+                <input type="text" id="newDocTitle" placeholder="Document title" />
+            </div>
+            <div class="field">
+                <label>Assign Departments</label>
+                <div id="newDocDeptCheckboxes"><div class="empty">Loading departments...</div></div>
+            </div>
+            <button type="button" class="submit-btn" id="newDocSubmitBtn">Create Document</button>
+            <div class="modal-error" id="newDocError"></div>
+        </div>
+    </div>
+
     <div class="modal-overlay" id="editDepartmentModal">
         <div class="modal">
             <div class="modal-header">
@@ -1387,17 +1411,13 @@
                                 <div class="documents-view" id="documentsView">
                                     <div class="members-view-header">
                                         <div class="members-view-title">Documents</div>
-                                        <button type="button" class="members-view-close" id="documentsViewClose" aria-label="Close">×</button>
+                                        <button type="button" class="add-department-btn" id="openAddDocumentBtn">
+                                            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                                            Add document
+                                        </button>
                                     </div>
                                     <div class="view-body">
                                         <div id="documentsList"></div>
-                                        <div class="field" style="margin-top:16px;">
-                                            <label>New document</label>
-                                            <input type="text" id="newDocumentInput" placeholder="New document title..." />
-                                            <div style="font-size:12px; font-weight:600; color:#334155; margin-top:10px; margin-bottom:4px;">Assign Departments</div>
-                                            <div id="documentDeptCheckboxes"><div class="empty">Loading departments...</div></div>
-                                            <button type="button" class="submit-btn" id="addDocumentBtn" style="margin-top:8px; padding:8px 12px; font-size:13px;">Create Document</button>
-                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -1959,11 +1979,7 @@
 
                         const documentsBtn = document.getElementById("documentsBtn");
                         const documentsView = document.getElementById("documentsView");
-                        const documentsViewClose = document.getElementById("documentsViewClose");
                         const documentsList = document.getElementById("documentsList");
-                        const newDocumentInput = document.getElementById("newDocumentInput");
-                        const documentDeptCheckboxes = document.getElementById("documentDeptCheckboxes");
-                        const addDocumentBtn = document.getElementById("addDocumentBtn");
                         const penalCodesBtn = document.getElementById("penalCodesBtn");
                         const penalCodesList = document.getElementById("penalCodesList");
 
@@ -1977,8 +1993,9 @@
                             if (documentsView) documentsView.style.display = "none";
                         }
 
-                        async function loadDocumentDeptCheckboxes() {
-                            if (!documentDeptCheckboxes || !localSupabase) return;
+                        async function loadDocumentDeptCheckboxes(target) {
+                            const container = target || document.getElementById("documentDeptCheckboxes");
+                            if (!container || !localSupabase) return;
                             try {
                                 const { data } = await localSupabase
                                     .from("departments")
@@ -1987,17 +2004,17 @@
                                     .order("created_at", { ascending: true });
                                 const depts = Array.isArray(data) ? data : [];
                                 if (depts.length === 0) {
-                                    documentDeptCheckboxes.innerHTML = '<div class="empty">No departments to assign. Create a department first.</div>';
+                                    container.innerHTML = '<div class="empty">No departments to assign. Create a department first.</div>';
                                     return;
                                 }
-                                documentDeptCheckboxes.innerHTML = depts.map((d) => `
+                                container.innerHTML = depts.map((d) => `
                                     <label style="display:flex; align-items:center; gap:6px; font-size:13px; margin-bottom:4px; cursor:pointer;">
                                         <input type="checkbox" class="doc-dept-cb" value="${(d.name || '').replace(/"/g, '&quot;')}" />
                                         <span>${(d.name || 'Department').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</span>
                                     </label>
                                 `).join('');
                             } catch (err) {
-                                documentDeptCheckboxes.innerHTML = '<div class="empty">Failed to load departments.</div>';
+                                container.innerHTML = '<div class="empty">Failed to load departments.</div>';
                             }
                         }
 
@@ -2098,9 +2115,7 @@
                                 await localSupabase
                                     .from("documents")
                                     .insert([{ community_id: id, title: title.trim(), departments: departments }]);
-                                if (newDocumentInput) newDocumentInput.value = "";
                                 loadDocuments();
-                                loadDocumentDeptCheckboxes();
                             } catch (err) {
                                 alert("Failed to create document.");
                             }
@@ -2125,12 +2140,6 @@
                                 documentsView.classList.add("open");
                                 loadDocuments();
                                 loadDocumentDeptCheckboxes();
-                            });
-                        }
-
-                        if (documentsViewClose && documentsView) {
-                            documentsViewClose.addEventListener("click", () => {
-                                documentsView.classList.remove("open");
                             });
                         }
 
@@ -2346,15 +2355,51 @@
                             });
                         }
 
-                        if (addDocumentBtn) {
-                            addDocumentBtn.addEventListener("click", () => {
-                                const title = newDocumentInput ? newDocumentInput.value.trim() : "";
-                                if (!title) return;
-                                const selected = documentDeptCheckboxes
-                                    ? Array.from(documentDeptCheckboxes.querySelectorAll(".doc-dept-cb:checked")).map((cb) => cb.value)
-                                    : [];
-                                addDocument(title, selected);
+                        const openAddDocumentBtn = document.getElementById("openAddDocumentBtn");
+                        const newDocumentModal = document.getElementById("newDocumentModal");
+                        const newDocTitle = document.getElementById("newDocTitle");
+                        const newDocDeptCheckboxes = document.getElementById("newDocDeptCheckboxes");
+                        const newDocSubmitBtn = document.getElementById("newDocSubmitBtn");
+                        const newDocModalClose = document.getElementById("newDocModalClose");
+                        const newDocError = document.getElementById("newDocError");
+
+                        function openNewDocumentModal() {
+                            if (!newDocumentModal) return;
+                            if (newDocTitle) newDocTitle.value = "";
+                            if (newDocError) { newDocError.textContent = ""; newDocError.style.display = "none"; }
+                            if (newDocDeptCheckboxes) newDocDeptCheckboxes.innerHTML = '<div class="empty">Loading departments...</div>';
+                            loadDocumentDeptCheckboxes(newDocDeptCheckboxes);
+                            newDocumentModal.classList.add("open");
+                        }
+
+                        function closeNewDocumentModal() {
+                            if (newDocumentModal) newDocumentModal.classList.remove("open");
+                        }
+
+                        if (openAddDocumentBtn) {
+                            openAddDocumentBtn.addEventListener("click", openNewDocumentModal);
+                        }
+                        if (newDocModalClose) {
+                            newDocModalClose.addEventListener("click", closeNewDocumentModal);
+                        }
+                        if (newDocumentModal) {
+                            newDocumentModal.addEventListener("click", (e) => {
+                                if (e.target === newDocumentModal) closeNewDocumentModal();
                             });
+                        }
+                        if (newDocSubmitBtn) {
+                            newDocSubmitBtn.onclick = async () => {
+                                const title = newDocTitle ? newDocTitle.value.trim() : "";
+                                if (!title) {
+                                    if (newDocError) { newDocError.textContent = "Document title is required."; newDocError.style.display = "block"; }
+                                    return;
+                                }
+                                const selected = newDocDeptCheckboxes
+                                    ? Array.from(newDocDeptCheckboxes.querySelectorAll(".doc-dept-cb:checked")).map((cb) => cb.value)
+                                    : [];
+                                closeNewDocumentModal();
+                                await addDocument(title, selected);
+                            };
                         }
 
                         const openAddDepartmentBtn = document.getElementById("openAddDepartmentBtn");
