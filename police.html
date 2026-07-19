@@ -27,38 +27,6 @@
             margin: 0;
         }
 
-        .button-row {
-            position: fixed;
-            left: 24px;
-            top: 50%;
-            transform: translateY(-50%);
-            display: flex;
-            gap: 14px;
-            justify-content: center;
-        }
-
-        .lookup-btn {
-            background: transparent;
-            border: none;
-            color: #0f172a;
-            cursor: pointer;
-            padding: 8px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .lookup-btn:hover {
-            background: transparent;
-            opacity: 0.75;
-        }
-
-        .lookup-btn svg {
-            width: 26px;
-            height: 26px;
-            display: block;
-        }
-
         .back-btn {
             position: fixed;
             top: 24px;
@@ -538,6 +506,43 @@
             background: #eff6ff;
         }
 
+        .civilian-lookup-btn {
+            position: fixed;
+            right: 180px;
+            bottom: 24px;
+            padding: 12px 20px;
+            border-radius: 12px;
+            border: 1px solid #2563eb;
+            background: #ffffff;
+            color: #2563eb;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            z-index: 700;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15);
+        }
+
+        .civilian-lookup-btn:hover {
+            background: #eff6ff;
+        }
+
+        .status-select {
+            padding: 8px 12px;
+            border-radius: 10px;
+            border: 1px solid #cbd5e1;
+            background: #ffffff;
+            color: #0f172a;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            outline: none;
+        }
+
+        .status-select:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+        }
+
     </style>
 </head>
 <body>
@@ -547,24 +552,19 @@
             <span id="statusText">Available</span>
         </div>
         <div class="status-buttons">
-            <button type="button" class="status-btn" id="statusAvailable" data-status="available">Available</button>
-            <button type="button" class="status-btn" id="statusUnavailable" data-status="unavailable">Unavailable</button>
-            <button type="button" class="status-btn" id="statusBusy" data-status="busy">Busy</button>
+            <select id="statusSelect" class="status-select">
+                <option value="available">Available</option>
+                <option value="unavailable">Unavailable</option>
+                <option value="busy">Busy</option>
+            </select>
         </div>
     </div>
 
 
     <button class="back-btn" id="backBtn">← Back</button>
-    <div class="button-row">
-        <button type="button" class="lookup-btn" id="lookupBtn" aria-label="Lookup">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="11" cy="11" r="8"></circle>
-                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-            </svg>
-        </button>
-    </div>
 
     <button type="button" class="plate-lookup-btn" id="plateLookupBtn">Plate Lookup</button>
+    <button type="button" class="civilian-lookup-btn" id="civilianLookupBtn">Lookup Civilian</button>
 
     <div class="modal-overlay" id="lookupModal">
         <div class="modal">
@@ -778,7 +778,7 @@
 
         const statusDot = document.getElementById("statusDot");
         const statusText = document.getElementById("statusText");
-        const statusButtons = document.querySelectorAll(".status-btn");
+        const statusSelect = document.getElementById("statusSelect");
 
         let currentStatus = "available";
 
@@ -793,9 +793,9 @@
             if (statusDot) {
                 statusDot.className = "status-dot " + status;
             }
-            statusButtons.forEach((btn) => {
-                btn.classList.toggle("active", btn.getAttribute("data-status") === status);
-            });
+            if (statusSelect) {
+                statusSelect.value = status;
+            }
             try {
                 localStorage.setItem("policeStatus", status);
             } catch (err) {
@@ -803,11 +803,11 @@
             }
         }
 
-        statusButtons.forEach((btn) => {
-            btn.addEventListener("click", () => {
-                setStatus(btn.getAttribute("data-status"));
+        if (statusSelect) {
+            statusSelect.addEventListener("change", () => {
+                setStatus(statusSelect.value);
             });
-        });
+        }
 
         let savedStatus = "available";
         try {
@@ -819,7 +819,6 @@
 
         const lookupModal = document.getElementById("lookupModal");
         const lookupModalClose = document.getElementById("lookupModalClose");
-        const lookupBtn = document.getElementById("lookupBtn");
         const plateInput = document.getElementById("plateInput");
         const plateSubmitBtn = document.getElementById("plateSubmitBtn");
         const plateError = document.getElementById("plateError");
@@ -856,22 +855,8 @@
             });
         }
 
-        if (lookupBtn) {
-            lookupBtn.addEventListener("click", async () => {
-                if (!lookupModal) return;
-                if (plateInput) plateInput.value = "";
-                if (plateError) { plateError.textContent = ""; plateError.style.display = "none"; }
-                if (plateResult) { plateResult.textContent = ""; plateResult.style.display = "none"; }
-                if (civilianInput) civilianInput.value = "";
-                if (civilianError) { civilianError.textContent = ""; civilianError.style.display = "none"; }
-                if (civilianResult) { civilianResult.textContent = ""; civilianResult.style.display = "none"; }
-                lookupModal.classList.add("open");
-                switchLookupTab(document.querySelector('.modal-tab.active'));
-                if (plateInput) plateInput.focus();
-            });
-        }
-
         const plateLookupBtn = document.getElementById("plateLookupBtn");
+        const civilianLookupBtn = document.getElementById("civilianLookupBtn");
         if (plateLookupBtn) {
             plateLookupBtn.addEventListener("click", () => {
                 if (!lookupModal) return;
@@ -882,6 +867,19 @@
                 const plateTab = document.querySelector('.modal-tab[data-tab="plate"]');
                 switchLookupTab(plateTab);
                 if (plateInput) plateInput.focus();
+            });
+        }
+
+        if (civilianLookupBtn) {
+            civilianLookupBtn.addEventListener("click", () => {
+                if (!lookupModal) return;
+                if (civilianInput) civilianInput.value = "";
+                if (civilianError) { civilianError.textContent = ""; civilianError.style.display = "none"; }
+                if (civilianResult) { civilianResult.textContent = ""; civilianResult.style.display = "none"; }
+                lookupModal.classList.add("open");
+                const civilianTab = document.querySelector('.modal-tab[data-tab="civilian"]');
+                switchLookupTab(civilianTab);
+                if (civilianInput) civilianInput.focus();
             });
         }
 
