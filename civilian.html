@@ -249,20 +249,27 @@
              background: #dbeafe;
          }
 
-         @media print {
-             body * {
-                 visibility: hidden;
-             }
-             #licensePrintArea, #licensePrintArea * {
-                 visibility: visible;
-             }
-             #licensePrintArea {
-                 position: absolute;
-                 left: 0;
-                 top: 0;
-                 width: 100%;
-             }
-         }
+          @media print {
+              body * {
+                  visibility: hidden;
+              }
+              #licenseCard, #licenseCard * {
+                  visibility: visible;
+              }
+              #licenseCard {
+                  position: absolute;
+                  left: 0;
+                  top: 0;
+                  width: 100%;
+                  background: #ffffff;
+                  display: flex !important;
+                  align-items: flex-start;
+                  justify-content: center;
+              }
+              .license-card-actions {
+                  display: none !important;
+              }
+          }
 
          .license-card {
              display: none;
@@ -280,83 +287,225 @@
              justify-content: center;
          }
 
-         .license-card-inner {
-             background: #ffffff;
-             border: 3px double #0f172a;
-             border-radius: 16px;
-             padding: 32px;
-             max-width: 500px;
-             width: 100%;
-             box-shadow: 0 20px 50px rgba(15, 23, 42, 0.15);
-             position: relative;
-         }
+          .license-card-inner {
+              background: linear-gradient(135deg, #f8fafc 0%, #eef2ff 100%);
+              border: 1px solid #1e293b;
+              border-radius: 14px;
+              max-width: 520px;
+              width: 100%;
+              box-shadow: 0 20px 50px rgba(15, 23, 42, 0.25);
+              position: relative;
+              overflow: hidden;
+              padding: 0;
+          }
 
-         .license-card-header {
-             text-align: center;
-             border-bottom: 2px solid #e2e8f0;
-             padding-bottom: 16px;
-             margin-bottom: 16px;
-         }
+          .license-card-inner::before {
+              content: "";
+              position: absolute;
+              top: 0; left: 0; right: 0;
+              height: 6px;
+              background: linear-gradient(90deg, #1d4ed8, #7c3aed, #1d4ed8);
+          }
 
-         .license-card-title {
-             font-size: 22px;
-             font-weight: 700;
-             color: #0f172a;
-             text-transform: uppercase;
-             letter-spacing: 2px;
-         }
+          .license-card-header {
+              display: flex;
+              align-items: center;
+              justify-content: space-between;
+              padding: 16px 20px 12px;
+              background: linear-gradient(90deg, #0f172a, #1e293b);
+              color: #ffffff;
+          }
 
-         .license-card-subtitle {
-             font-size: 13px;
-             color: #475569;
-             margin-top: 4px;
-         }
+          .license-card-left-title {
+              display: flex;
+              flex-direction: column;
+          }
 
-         .license-card-body {
-             margin-bottom: 16px;
-         }
+          .license-card-dept {
+              font-size: 11px;
+              letter-spacing: 3px;
+              font-weight: 700;
+              opacity: 0.85;
+              text-transform: uppercase;
+          }
 
-         .license-card-row {
-             display: flex;
-             justify-content: space-between;
-             padding: 8px 0;
-             border-bottom: 1px solid #f1f5f9;
-         }
+          .license-card-title {
+              font-size: 18px;
+              font-weight: 800;
+              letter-spacing: 1px;
+              text-transform: uppercase;
+              margin-top: 2px;
+          }
 
-         .license-card-row:last-child {
-             border-bottom: none;
-         }
+          .license-card-emblem {
+              width: 44px;
+              height: 44px;
+              border-radius: 50%;
+              border: 2px solid rgba(255,255,255,0.7);
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              font-size: 22px;
+              font-weight: 800;
+              background: rgba(255,255,255,0.1);
+          }
 
-         .license-card-label {
-             font-size: 13px;
-             font-weight: 600;
-             color: #475569;
-         }
+          .license-card-main {
+              display: flex;
+              gap: 16px;
+              padding: 18px 20px;
+          }
 
-         .license-card-value {
-             font-size: 14px;
-             font-weight: 700;
-             color: #0f172a;
-             text-align: right;
-         }
+          .license-card-photo {
+              width: 110px;
+              height: 130px;
+              border: 2px solid #1e293b;
+              border-radius: 8px;
+              object-fit: cover;
+              background: #e2e8f0;
+              flex-shrink: 0;
+          }
 
-         .license-card-footer {
-             text-align: center;
-             border-top: 2px solid #e2e8f0;
-             padding-top: 12px;
-             margin-top: 12px;
-         }
+          .license-card-photo-placeholder {
+              width: 110px;
+              height: 130px;
+              border: 2px dashed #94a3b8;
+              border-radius: 8px;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              color: #64748b;
+              font-size: 11px;
+              text-align: center;
+              flex-shrink: 0;
+              background: #f1f5f9;
+          }
 
-         .license-card-badge {
-             display: inline-block;
-             padding: 6px 16px;
-             border-radius: 999px;
-             font-size: 12px;
-             font-weight: 700;
-             background: #f0fdf4;
-             color: #166534;
-             border: 1px solid #bbf7d0;
-         }
+          .license-card-info {
+              flex: 1;
+              min-width: 0;
+          }
+
+          .license-card-row {
+              display: flex;
+              flex-direction: column;
+              padding: 5px 0;
+              border-bottom: 1px solid #e2e8f0;
+          }
+
+          .license-card-row:last-child {
+              border-bottom: none;
+          }
+
+          .license-card-label {
+              font-size: 9px;
+              font-weight: 700;
+              color: #64748b;
+              text-transform: uppercase;
+              letter-spacing: 0.5px;
+          }
+
+          .license-card-value {
+              font-size: 14px;
+              font-weight: 700;
+              color: #0f172a;
+              margin-top: 1px;
+              word-break: break-word;
+          }
+
+          .license-card-barcode {
+              padding: 0 20px 8px;
+              text-align: center;
+          }
+
+          .license-card-barcode-bars {
+              height: 34px;
+              background: repeating-linear-gradient(
+                  to right,
+                  #0f172a 0, #0f172a 2px,
+                  transparent 2px, transparent 4px,
+                  #0f172a 4px, #0f172a 5px,
+                  transparent 5px, transparent 9px,
+                  #0f172a 9px, #0f172a 12px,
+                  transparent 12px, transparent 14px
+              );
+              border-radius: 2px;
+          }
+
+          .license-card-barcode-num {
+              font-family: 'Courier New', monospace;
+              font-size: 12px;
+              letter-spacing: 3px;
+              color: #0f172a;
+              margin-top: 4px;
+              font-weight: 700;
+          }
+
+          .license-card-footer {
+              display: flex;
+              align-items: center;
+              justify-content: space-between;
+              padding: 12px 20px 16px;
+              border-top: 2px solid #1e293b;
+              background: rgba(255,255,255,0.6);
+          }
+
+          .license-card-signature {
+              flex: 1;
+              margin-right: 16px;
+          }
+
+          .license-card-sign-thin {
+              border-bottom: 1px solid #0f172a;
+              height: 28px;
+              font-family: 'Brush Script MT', cursive, serif;
+              font-size: 22px;
+              color: #1d4ed8;
+              padding-left: 4px;
+              line-height: 28px;
+          }
+
+          .license-card-sign-label {
+              font-size: 9px;
+              font-weight: 700;
+              color: #64748b;
+              text-transform: uppercase;
+              letter-spacing: 0.5px;
+              margin-top: 2px;
+          }
+
+          .license-card-badge {
+              flex-shrink: 0;
+              padding: 8px 16px;
+              border-radius: 8px;
+              font-size: 13px;
+              font-weight: 800;
+              text-transform: uppercase;
+              letter-spacing: 1px;
+              background: #16a34a;
+              color: #ffffff;
+              border: 1px solid #15803d;
+              box-shadow: 0 2px 6px rgba(22,163,74,0.3);
+          }
+
+          .license-card-badge.expired {
+              background: #dc2626;
+              border-color: #b91c1c;
+              box-shadow: 0 2px 6px rgba(220,38,38,0.3);
+          }
+
+          .license-card-holo {
+              position: absolute;
+              top: 60px;
+              right: 18px;
+              width: 46px;
+              height: 46px;
+              border-radius: 50%;
+              background: conic-gradient(from 0deg, #60a5fa, #c084fc, #34d399, #fbbf24, #60a5fa);
+              opacity: 0.35;
+              filter: blur(0.5px);
+              pointer-events: none;
+          }
 
          .license-card-actions {
              display: flex;
@@ -724,15 +873,30 @@
 
       <div class="license-card" id="licenseCard">
           <div class="license-card-inner" id="licenseCardInner">
+              <div class="license-card-holo"></div>
               <div class="license-card-header">
-                  <div class="license-card-title" id="lcTitle">LICENSE</div>
-                  <div class="license-card-subtitle">PulseCAD Official Document</div>
+                  <div class="license-card-left-title">
+                      <span class="license-card-dept">PulseCAD Department of Public Safety</span>
+                      <span class="license-card-title" id="lcTitle">LICENSE</span>
+                  </div>
+                  <div class="license-card-emblem">PC</div>
               </div>
-              <div class="license-card-body" id="lcBody"></div>
+              <div class="license-card-main">
+                  <div id="lcPhotoWrap"></div>
+                  <div class="license-card-info" id="lcBody"></div>
+              </div>
+              <div class="license-card-barcode">
+                  <div class="license-card-barcode-bars"></div>
+                  <div class="license-card-barcode-num" id="lcBarcode">LIC-000000</div>
+              </div>
               <div class="license-card-footer">
+                  <div class="license-card-signature">
+                      <div class="license-card-sign-thin" id="lcSignature">—</div>
+                      <div class="license-card-sign-label">Authorized Signature</div>
+                  </div>
                   <span class="license-card-badge" id="lcStatus">Active</span>
               </div>
-              <div class="license-card-actions">
+              <div class="license-card-actions" style="padding: 0 20px 18px;">
                   <button type="button" class="license-card-btn primary" id="lcPrintBtn">Download / Print</button>
                   <button type="button" class="license-card-btn secondary" id="lcCloseBtn">Close</button>
               </div>
@@ -857,13 +1021,15 @@
                     <div class="license-item">
                         <strong>${escapeHtml(lic.license_type)}</strong> — ${escapeHtml(lic.license_number || "No number")}
                         ${lic.expiry_date ? `<br>Expires: ${escapeHtml(lic.expiry_date)}` : ""}
-                        <button type="button" class="license-download-btn" data-id="${lic.id}" data-type="${escapeHtml(lic.license_type)}" data-number="${escapeHtml(lic.license_number || "")}" data-expiry="${escapeHtml(lic.expiry_date || "")}">View License</button>
+                        <button type="button" class="license-download-btn" data-id="${lic.id}" data-name="${escapeHtml(civilian.name || "")}" data-photo="${escapeHtml(civilian.photo_url || civilian.photo || "")}" data-type="${escapeHtml(lic.license_type)}" data-number="${escapeHtml(lic.license_number || "")}" data-expiry="${escapeHtml(lic.expiry_date || "")}">View License</button>
                     </div>
                 `).join("");
 
                 listEl.querySelectorAll(".license-download-btn").forEach((btn) => {
                     btn.addEventListener("click", () => {
                         openLicenseCard({
+                            name: btn.getAttribute("data-name"),
+                            photo: btn.getAttribute("data-photo"),
                             type: btn.getAttribute("data-type"),
                             number: btn.getAttribute("data-number"),
                             expiry: btn.getAttribute("data-expiry")
@@ -1043,36 +1209,59 @@
         const lcPrintBtn = document.getElementById("lcPrintBtn");
         const lcCloseBtn = document.getElementById("lcCloseBtn");
 
-        function openLicenseCard({ type, number, expiry }) {
+        function openLicenseCard({ name, photo, type, number, expiry }) {
             if (!licenseCard) return;
-            if (lcTitle) lcTitle.textContent = type || "LICENSE";
+            if (lcTitle) lcTitle.textContent = (type || "License").toUpperCase();
+
+            const isExpired = expiry && new Date(expiry) < new Date();
             if (lcStatus) {
-                lcStatus.textContent = expiry && new Date(expiry) < new Date() ? "Expired" : "Active";
-                lcStatus.style.background = expiry && new Date(expiry) < new Date() ? "#fef2f2" : "#f0fdf4";
-                lcStatus.style.color = expiry && new Date(expiry) < new Date() ? "#991b1b" : "#166534";
-                lcStatus.style.borderColor = expiry && new Date(expiry) < new Date() ? "#fecaca" : "#bbf7d0";
+                lcStatus.textContent = isExpired ? "Expired" : "Active";
+                lcStatus.classList.toggle("expired", !!isExpired);
             }
+
+            const barcodeNum = (number && number.replace(/[^A-Za-z0-9]/g, "").toUpperCase()) || "LIC000000";
+            if (document.getElementById("lcBarcode")) {
+                document.getElementById("lcBarcode").textContent = barcodeNum;
+            }
+
+            const photoWrap = document.getElementById("lcPhotoWrap");
+            if (photoWrap) {
+                if (photo) {
+                    photoWrap.innerHTML = `<img class="license-card-photo" src="${escapeHtml(photo)}" alt="Photo" />`;
+                } else {
+                    photoWrap.innerHTML = `<div class="license-card-photo-placeholder">NO<br>PHOTO</div>`;
+                }
+            }
+
             const issueDate = new Date().toLocaleDateString();
             if (lcBody) {
                 lcBody.innerHTML = `
                     <div class="license-card-row">
+                        <span class="license-card-label">Full Name</span>
+                        <span class="license-card-value">${escapeHtml(name || "N/A")}</span>
+                    </div>
+                    <div class="license-card-row">
                         <span class="license-card-label">License Type</span>
-                        <span class="license-card-value">${escapeHtml(type)}</span>
+                        <span class="license-card-value">${escapeHtml(type || "N/A")}</span>
                     </div>
                     <div class="license-card-row">
                         <span class="license-card-label">License Number</span>
                         <span class="license-card-value">${escapeHtml(number || "N/A")}</span>
                     </div>
                     <div class="license-card-row">
-                        <span class="license-card-label">Issued Date</span>
+                        <span class="license-card-label">Date Issued</span>
                         <span class="license-card-value">${issueDate}</span>
                     </div>
                     <div class="license-card-row">
-                        <span class="license-card-label">Expiry Date</span>
+                        <span class="license-card-label">Date of Expiry</span>
                         <span class="license-card-value">${expiry ? escapeHtml(expiry) : "N/A"}</span>
                     </div>
                 `;
             }
+
+            const signEl = document.getElementById("lcSignature");
+            if (signEl) signEl.textContent = name ? name : "—";
+
             licenseCard.classList.add("open");
         }
 
