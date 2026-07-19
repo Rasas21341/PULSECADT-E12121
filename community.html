@@ -1734,6 +1734,7 @@
                                 if (membersView.classList.contains("open")) {
                                     membersView.classList.remove("open");
                                 } else {
+                                    closeAllPages();
                                     membersView.classList.add("open");
                                     loadMembersInto(membersViewList, { loadingText: 'Loading members...', openDropdown: false });
                                 }
@@ -1777,7 +1778,12 @@
                         if (civilianBtn && civiliansView) {
                             civilianBtn.addEventListener("click", (e) => {
                                 e.stopPropagation();
-                                civiliansView.classList.add("open");
+                                if (civiliansView.classList.contains("open")) {
+                                    civiliansView.classList.remove("open");
+                                } else {
+                                    closeAllPages();
+                                    civiliansView.classList.add("open");
+                                }
                             });
                         }
 
@@ -1796,6 +1802,11 @@
                             if (penalCodesList) penalCodesList.classList.remove("open");
                         });
 
+                        function closeAllPages() {
+                            const pages = [membersView, civiliansView, departmentsView, documentsView];
+                            pages.forEach((p) => { if (p) p.classList.remove("open"); });
+                        }
+
                         if (requestsDropdownToggle && requestsDropdownMenu) {
                             requestsDropdownToggle.addEventListener("click", () => {
                                 requestsDropdownMenu.classList.toggle("open");
@@ -1811,8 +1822,13 @@
                         if (departmentsBtn && departmentsView) {
                             departmentsBtn.addEventListener("click", (e) => {
                                 e.stopPropagation();
-                                departmentsView.classList.add("open");
-                                loadDepartments();
+                                if (departmentsView.classList.contains("open")) {
+                                    departmentsView.classList.remove("open");
+                                } else {
+                                    closeAllPages();
+                                    departmentsView.classList.add("open");
+                                    loadDepartments();
+                                }
                             });
                         }
                         async function loadDepartments() {
@@ -2141,9 +2157,14 @@
                         if (documentsBtn && documentsView) {
                             documentsBtn.addEventListener("click", (e) => {
                                 e.stopPropagation();
-                                documentsView.classList.add("open");
-                                loadDocuments();
-                                loadDocumentDeptCheckboxes();
+                                if (documentsView.classList.contains("open")) {
+                                    documentsView.classList.remove("open");
+                                } else {
+                                    closeAllPages();
+                                    documentsView.classList.add("open");
+                                    loadDocuments();
+                                    loadDocumentDeptCheckboxes();
+                                }
                             });
                         }
 
