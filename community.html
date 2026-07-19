@@ -598,6 +598,31 @@
             border-color: #2563eb;
         }
 
+        .add-department-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 1px solid #2563eb;
+            background: #2563eb;
+            color: #fff;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .add-department-btn:hover {
+            background: #1d4ed8;
+            border-color: #1d4ed8;
+        }
+
+        .add-department-btn:active {
+            background: #1e40af;
+            border-color: #1e40af;
+        }
+
         .documents-btn {
             width: 100%;
             padding: 10px 12px;
@@ -1075,6 +1100,30 @@
         </div>
     </div>
 
+    <div class="modal-overlay" id="newDepartmentModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">New Department</div>
+                <button class="modal-close" id="newDeptModalClose" type="button" aria-label="Close">×</button>
+            </div>
+            <div class="field">
+                <label for="newDeptName">Department Name</label>
+                <input type="text" id="newDeptName" placeholder="Department name" />
+            </div>
+            <div class="field">
+                <label for="newDeptPasscode">Passcode (optional)</label>
+                <input type="text" id="newDeptPasscode" placeholder="Passcode" />
+            </div>
+            <div class="field">
+                <label>Banner Image</label>
+                <input type="file" id="newDeptBanner" accept="image/*" />
+                <img id="newDeptBannerPreview" class="dept-banner-preview" />
+            </div>
+            <button type="button" class="submit-btn" id="newDeptSubmitBtn">Create Department</button>
+            <div class="modal-error" id="newDeptError"></div>
+        </div>
+    </div>
+
     <div class="modal-overlay" id="editDepartmentModal">
         <div class="modal">
             <div class="modal-header">
@@ -1326,16 +1375,13 @@
                                 <div class="departments-view" id="departmentsView">
                                     <div class="members-view-header">
                                         <div class="members-view-title">Departments</div>
-                                        <button type="button" class="members-view-close" id="departmentsViewClose" aria-label="Close">×</button>
+                                        <button type="button" class="add-department-btn" id="openAddDepartmentBtn">
+                                            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                                            Add department
+                                        </button>
                                     </div>
                                     <div class="view-body">
                                         <div id="departmentsList"></div>
-                                        <div class="field" style="margin-top:16px;">
-                                            <label>New department</label>
-                                            <input type="text" id="newDepartmentInput" placeholder="New department..." />
-                                            <input type="text" id="newDepartmentPasscode" placeholder="Passcode (optional)" style="margin-top:8px;" />
-                                            <button type="button" class="submit-btn" id="addDepartmentBtn" style="margin-top:8px; padding:8px 12px; font-size:13px;">Add</button>
-                                        </div>
                                     </div>
                                 </div>
                                 <div class="documents-view" id="documentsView">
@@ -1718,9 +1764,6 @@
                         }
 
                         const departmentsList = document.getElementById("departmentsList");
-                        const newDepartmentInput = document.getElementById("newDepartmentInput");
-                        const newDepartmentPasscode = document.getElementById("newDepartmentPasscode");
-                        const addDepartmentBtn = document.getElementById("addDepartmentBtn");
 
                         document.addEventListener("click", () => {
                             if (memberList) memberList.classList.remove("open");
@@ -1740,19 +1783,12 @@
 
                         const departmentsBtn = document.getElementById("departmentsBtn");
                         const departmentsView = document.getElementById("departmentsView");
-                        const departmentsViewClose = document.getElementById("departmentsViewClose");
 
                         if (departmentsBtn && departmentsView) {
                             departmentsBtn.addEventListener("click", (e) => {
                                 e.stopPropagation();
                                 departmentsView.classList.add("open");
                                 loadDepartments();
-                            });
-                        }
-
-                        if (departmentsViewClose && departmentsView) {
-                            departmentsViewClose.addEventListener("click", () => {
-                                departmentsView.classList.remove("open");
                             });
                         }
                         async function loadDepartments() {
@@ -1802,17 +1838,16 @@
                             }
                         }
 
-                        async function addDepartment(name, passcode) {
+                        async function addDepartment(name, passcode, banner) {
                             if (!name || !localSupabase) return;
                             try {
                                 const payload = { community_id: id, name: name.trim() };
                                 if (passcode && passcode.trim()) payload.passcode = passcode.trim();
+                                if (banner) payload.banner = banner;
                                 await localSupabase
                                     .from("departments")
                                     .insert([payload]);
                                 loadDepartments();
-                                if (newDepartmentInput) newDepartmentInput.value = "";
-                                if (newDepartmentPasscode) newDepartmentPasscode.value = "";
                             } catch (err) {
                                 alert("Failed to add department.");
                             }
@@ -2322,24 +2357,71 @@
                             });
                         }
 
-                        if (addDepartmentBtn) {
-                            addDepartmentBtn.addEventListener("click", () => {
-                                const name = newDepartmentInput ? newDepartmentInput.value.trim() : "";
-                                if (!name) return;
-                                const passcode = newDepartmentPasscode ? newDepartmentPasscode.value : "";
-                                addDepartment(name, passcode);
-                            });
+                        const openAddDepartmentBtn = document.getElementById("openAddDepartmentBtn");
+                        const newDepartmentModal = document.getElementById("newDepartmentModal");
+                        const newDeptName = document.getElementById("newDeptName");
+                        const newDeptPasscode = document.getElementById("newDeptPasscode");
+                        const newDeptBanner = document.getElementById("newDeptBanner");
+                        const newDeptBannerPreview = document.getElementById("newDeptBannerPreview");
+                        const newDeptSubmitBtn = document.getElementById("newDeptSubmitBtn");
+                        const newDeptModalClose = document.getElementById("newDeptModalClose");
+                        const newDeptError = document.getElementById("newDeptError");
+
+                        function openNewDepartmentModal() {
+                            if (!newDepartmentModal) return;
+                            if (newDeptName) newDeptName.value = "";
+                            if (newDeptPasscode) newDeptPasscode.value = "";
+                            if (newDeptBanner) newDeptBanner.value = "";
+                            if (newDeptBannerPreview) newDeptBannerPreview.style.display = "none";
+                            if (newDeptError) { newDeptError.textContent = ""; newDeptError.style.display = "none"; }
+                            newDepartmentModal.classList.add("open");
                         }
 
-                        if (newDepartmentInput) {
-                            newDepartmentInput.addEventListener("keydown", (e) => {
-                                if (e.key === "Enter") {
-                                    const name = newDepartmentInput.value.trim();
-                                    if (!name) return;
-                                    const passcode = newDepartmentPasscode ? newDepartmentPasscode.value : "";
-                                    addDepartment(name, passcode);
-                                }
+                        function closeNewDepartmentModal() {
+                            if (newDepartmentModal) newDepartmentModal.classList.remove("open");
+                        }
+
+                        if (openAddDepartmentBtn) {
+                            openAddDepartmentBtn.addEventListener("click", openNewDepartmentModal);
+                        }
+                        if (newDeptModalClose) {
+                            newDeptModalClose.addEventListener("click", closeNewDepartmentModal);
+                        }
+                        if (newDepartmentModal) {
+                            newDepartmentModal.addEventListener("click", (e) => {
+                                if (e.target === newDepartmentModal) closeNewDepartmentModal();
                             });
+                        }
+                        if (newDeptBanner) {
+                            newDeptBanner.onchange = (e) => {
+                                const file = e.target.files[0];
+                                if (!file) return;
+                                if (!file.type.startsWith("image/")) {
+                                    if (newDeptError) { newDeptError.textContent = "Please select an image file."; newDeptError.style.display = "block"; }
+                                    return;
+                                }
+                                const reader = new FileReader();
+                                reader.onload = (ev) => {
+                                    if (newDeptBannerPreview) {
+                                        newDeptBannerPreview.src = ev.target.result;
+                                        newDeptBannerPreview.style.display = "block";
+                                    }
+                                };
+                                reader.readAsDataURL(file);
+                            };
+                        }
+                        if (newDeptSubmitBtn) {
+                            newDeptSubmitBtn.onclick = async () => {
+                                const name = newDeptName ? newDeptName.value.trim() : "";
+                                if (!name) {
+                                    if (newDeptError) { newDeptError.textContent = "Department name is required."; newDeptError.style.display = "block"; }
+                                    return;
+                                }
+                                const passcode = newDeptPasscode ? newDeptPasscode.value.trim() : "";
+                                const banner = (newDeptBannerPreview && newDeptBannerPreview.style.display !== "none") ? newDeptBannerPreview.src : null;
+                                closeNewDepartmentModal();
+                                await addDepartment(name, passcode, banner);
+                            };
                         }
 
                         if (approvalMode === "manual") {
