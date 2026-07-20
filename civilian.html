@@ -952,9 +952,16 @@
             }
 
             try {
+                const user = await getCurrentUser();
+                if (!user) {
+                    listEl.innerHTML = '<div class="empty-state">Please log in to view your civilians.</div>';
+                    return;
+                }
+
                 const { data, error } = await localSupabase
                     .from("civilians")
                     .select("*")
+                    .eq("user_id", user.id)
                     .order("created_at", { ascending: false });
 
                 if (error) {
