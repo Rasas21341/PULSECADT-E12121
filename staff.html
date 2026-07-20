@@ -797,7 +797,7 @@
             if (codesBtn && (lower === "management" || lower === "support team")) {
                 codesBtn.style.display = "block";
             }
-            if (masterActionsBtn && lower === "management") {
+            if (masterActionsBtn && (lower === "management" || lower === "support team" || lower === "customer support")) {
                 masterActionsBtn.style.display = "block";
             }
         }
@@ -1003,15 +1003,19 @@
         async function loadMasterActions() {
             const staff = await ensureStaff();
             if (!staff.allowed) return;
-            if (staff.department !== "Management") {
-                showStatus("Access denied. Management only.", "error");
+            const isManagement = staff.department === "Management";
+            const deptLower = (staff.department || "").toLowerCase();
+            const isSupport = deptLower === "support team" || deptLower === "customer support";
+            if (!isManagement && !isSupport) {
+                showStatus("Access denied. Management or Support only.", "error");
                 return;
             }
             pageTitle.textContent = "Master Actions";
             contentEl.innerHTML = `
                 <div class="master-actions">
                     <h2>Master Actions</h2>
-                    <p>Global controls for the PulseCAD website. Management only.</p>
+                    <p>Global controls for the PulseCAD website. ${isManagement ? "Management only." : "Limited view for Support."}</p>
+                    ${isManagement ? `
                     <div class="master-row">
                         <div>
                             <div class="master-row-label">Development Mode</div>
@@ -1029,11 +1033,19 @@
                         </div>
                         <button type="button" class="verified-btn" id="restartServersBtn">Restart</button>
                     </div>
+                    ` : `
+                    <div class="master-row">
+                        <div>
+                            <div class="master-row-label">Restricted</div>
+                            <div class="master-row-sub">Development Mode and Restart Servers are Management only.</div>
+                        </div>
+                    </div>
+                    `}
                 </div>
                 <div class="master-actions" style="margin-top:20px;">
                     <h2>Management</h2>
                     <p>Ban and unban user emails from accessing PulseCAD.</p>
-                    ${staff.department === "Management" ? `
+                    ${isManagement ? `
                     <div class="master-row">
                         <div>
                             <div class="master-row-label">Banned IDs</div>
