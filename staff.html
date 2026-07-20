@@ -619,8 +619,8 @@
                     const suspended = !!row.suspended;
                     const membersOnly = !!row.members_only;
                     const statusCell = suspended
-                        ? `<span class="status-pill" style="background:#dc2626;width:auto;">Suspended</span>`
-                        : `<span class="status-pill" style="background:#16a34a;width:auto;">Active</span>`;
+                        ? `<span style="display:inline-flex;align-items:center;background:#dc2626;color:#ffffff;border-radius:999px;padding:3px 10px;font-size:11px;font-weight:600;width:auto;">Suspended</span>`
+                        : `<span style="display:inline-flex;align-items:center;background:#16a34a;color:#ffffff;border-radius:999px;padding:3px 10px;font-size:11px;font-weight:600;width:auto;">Active</span>`;
                     const membersOnlyCell = membersOnly
                         ? `<span style="display:inline-flex;align-items:center;background:#2563eb;color:#ffffff;border-radius:999px;padding:3px 10px;font-size:11px;font-weight:600;width:auto;">Members Only</span>`
                         : `<span style="color:#94a3b8;font-size:12px;font-weight:600;">Public</span>`;
