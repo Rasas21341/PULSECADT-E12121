@@ -289,11 +289,12 @@
              overflow-y: auto;
          }
 
-         .license-card.open {
-             display: flex;
-             align-items: flex-start;
-             justify-content: center;
-         }
+          .license-card.open {
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              justify-content: flex-start;
+          }
 
           .license-card-inner {
               background: linear-gradient(135deg, #f8fafc 0%, #eef2ff 100%);
@@ -904,10 +905,10 @@
                   </div>
                   <span class="license-card-badge" id="lcStatus">Active</span>
               </div>
-              <div class="license-card-actions" style="padding: 0 20px 18px;">
-                  <button type="button" class="license-card-btn primary" id="lcPrintBtn">Download PNG</button>
-                  <button type="button" class="license-card-btn secondary" id="lcCloseBtn">Close</button>
-              </div>
+          </div>
+          <div class="license-card-actions" style="padding: 0 20px 18px; margin-top: 16px;">
+              <button type="button" class="license-card-btn primary" id="lcPrintBtn">Download PNG</button>
+              <button type="button" class="license-card-btn secondary" id="lcCloseBtn">Close</button>
           </div>
       </div>
 
