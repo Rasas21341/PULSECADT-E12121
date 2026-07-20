@@ -305,7 +305,6 @@
 
         .member-list,
         .vehicle-list,
-        .license-list,
         .departments-dropdown-menu {
             display: none;
             flex-direction: column;
@@ -324,14 +323,12 @@
 
         .member-list.open,
         .vehicle-list.open,
-        .license-list.open,
         .departments-dropdown-menu.open {
             display: flex;
         }
 
         .member-list .member-btn,
-        .vehicle-list .member-btn,
-        .license-list .member-btn {
+        .vehicle-list .member-btn {
             width: 100%;
         }
 
@@ -437,6 +434,23 @@
         }
 
         .departments-view.open, .documents-view.open, .settings-view.open {
+            display: flex;
+        }
+
+        .licences-view {
+            position: fixed;
+            top: 0;
+            left: 280px;
+            right: 0;
+            bottom: 0;
+            background: #ffffff;
+            z-index: 550;
+            display: none;
+            flex-direction: column;
+            padding: 24px;
+        }
+
+        .licences-view.open {
             display: flex;
         }
 
@@ -1240,7 +1254,6 @@
                                             <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2" ry="2"/><line x1="7" y1="9" x2="17" y2="9"/><line x1="7" y1="13" x2="17" y2="13"/><line x1="7" y1="17" x2="12" y2="17"/></svg>
                                             Licences
                                         </button>
-                                        <div class="license-list" id="licenseList"></div>
                                     </div>
                                     <div class="cad-config-badge">CAD Configuration</div>
                                     <div class="btn-dropdown-wrap">
@@ -1373,6 +1386,15 @@
                                         <div id="documentsList"></div>
                                     </div>
                                 </div>
+                                <div class="licences-view" id="licencesView">
+                                    <div class="members-view-header">
+                                        <div class="members-view-title">Licences</div>
+                                        <button type="button" class="members-view-close" id="licencesViewClose" aria-label="Close">×</button>
+                                    </div>
+                                    <div class="view-body">
+                                        <div class="members-view-list" id="licencesViewList"></div>
+                                    </div>
+                                </div>
                             </div>
                         `;
 
@@ -1383,7 +1405,9 @@
                         const vehiclesBtn = document.getElementById("vehiclesBtn");
                         const vehicleList = document.getElementById("vehicleList");
                         const licencesBtn = document.getElementById("licencesBtn");
-                        const licenseList = document.getElementById("licenseList");
+                        const licencesView = document.getElementById("licencesView");
+                        const licencesViewList = document.getElementById("licencesViewList");
+                        const licencesViewClose = document.getElementById("licencesViewClose");
                         const requestsDropdownToggle = document.getElementById("requestsDropdownToggle");
                         const requestsDropdownMenu = document.getElementById("requestsDropdownMenu");
                         const requestsStatus = document.getElementById("requestsStatus");
@@ -1573,9 +1597,8 @@
                         }
 
                         async function loadLicences() {
-                            if (!licenseList || !localSupabase) return;
-                            licenseList.classList.add("open");
-                            licenseList.innerHTML = '<div class="empty">Loading licences...</div>';
+                            if (!licencesViewList || !localSupabase) return;
+                            licencesViewList.innerHTML = '<div class="empty">Loading licences...</div>';
                             try {
                                 const { data, error } = await localSupabase
                                     .from("licenses")
@@ -1586,7 +1609,7 @@
 
                                 const esc = (t) => (t || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
                                 if (!Array.isArray(data) || data.length === 0) {
-                                    licenseList.innerHTML = '<div class="empty">No licences yet.</div>';
+                                    licencesViewList.innerHTML = '<div class="empty">No licences yet.</div>';
                                     return;
                                 }
 
@@ -1602,14 +1625,14 @@
                                     }
                                 }
 
-                                licenseList.innerHTML = data.map((l) => {
+                                licencesViewList.innerHTML = data.map((l) => {
                                     const name = esc(civilianNameById[l.civilian_id] || "Unknown Civilian");
                                     const detail = [l.license_type, l.license_number, l.expiry_date].filter(Boolean).join(" | ") || "No details";
                                     return `<button type="button" class="member-btn">${name} — ${esc(detail)}</button>`;
                                 }).join('');
                             } catch (err) {
                                 console.error("Failed to load licences:", err);
-                                licenseList.innerHTML = '<div class="empty">Failed to load licences.</div>';
+                                licencesViewList.innerHTML = '<div class="empty">Failed to load licences.</div>';
                             }
                         }
 
@@ -1704,15 +1727,22 @@
                             });
                         }
 
-                        if (licencesBtn && licenseList) {
+                        if (licencesBtn && licencesView) {
                             licencesBtn.addEventListener("click", (e) => {
                                 e.stopPropagation();
-                                const isOpen = licenseList.classList.contains("open");
-                                if (isOpen) {
-                                    licenseList.classList.remove("open");
+                                if (licencesView.classList.contains("open")) {
+                                    licencesView.classList.remove("open");
                                 } else {
+                                    closeAllPages();
+                                    licencesView.classList.add("open");
                                     loadLicences();
                                 }
+                            });
+                        }
+
+                        if (licencesViewClose && licencesView) {
+                            licencesViewClose.addEventListener("click", () => {
+                                licencesView.classList.remove("open");
                             });
                         }
 
@@ -1743,12 +1773,11 @@
                         document.addEventListener("click", () => {
                             if (memberList) memberList.classList.remove("open");
                             if (vehicleList) vehicleList.classList.remove("open");
-                            if (licenseList) licenseList.classList.remove("open");
                             if (penalCodesList) penalCodesList.classList.remove("open");
                         });
 
                         function closeAllPages() {
-                            const pages = [membersView, civiliansView, departmentsView, documentsView, settingsView];
+                            const pages = [membersView, civiliansView, departmentsView, documentsView, licencesView, settingsView];
                             pages.forEach((p) => { if (p) p.classList.remove("open"); });
                         }
 
