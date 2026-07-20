@@ -13,518 +13,291 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: #f8fafc;
+            background: #ffffff;
             color: #1a202c;
-            min-height: 100vh;
         }
 
         .topbar {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 12px;
             padding: 16px 24px;
-            background: #ffffff;
+            border-bottom: 1px solid #e2e8f0;
+            background: #f8fafc;
+        }
+
+        .topbar h1 {
+            font-size: 20px;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .topbar-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 8px;
+            padding: 16px 24px 0;
             border-bottom: 1px solid #e2e8f0;
         }
 
-        .topbar-title {
-            font-size: 20px;
-            font-weight: 700;
-            color: #0f172a;
-        }
-
-        .back-btn {
-            padding: 8px 14px;
-            border-radius: 999px;
+        .tab-btn {
+            padding: 10px 18px;
             border: 1px solid #e2e8f0;
-            background: #ffffff;
-            color: #0f172a;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-        }
-
-        .back-btn:hover {
-            background: #f1f5f9;
-        }
-
-        .status {
-            margin: 16px 24px 0;
-            padding: 12px 16px;
-            border-radius: 12px;
-            font-size: 14px;
-            font-weight: 600;
-            display: none;
-        }
-
-        .status.error {
-            background: #fef2f2;
-            color: #991b1b;
-            border: 1px solid #fecaca;
-            display: block;
-        }
-
-        .support-stats {
-            display: flex;
-            gap: 12px;
-            padding: 16px 24px 0;
-            flex-wrap: wrap;
-        }
-
-        .support-stat {
-            display: flex;
-            align-items: baseline;
-            gap: 8px;
-            padding: 10px 16px;
-            border-radius: 12px;
-            background: #ffffff;
-            border: 1px solid #e2e8f0;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
-        }
-
-        .support-stat-num {
-            font-size: 20px;
-            font-weight: 800;
-            color: #0f172a;
-        }
-
-        .support-stat-label {
-            font-size: 12px;
-            font-weight: 700;
-            color: #64748b;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .support-panel {
-            display: flex;
-            gap: 16px;
-            align-items: flex-start;
-            padding: 20px 24px;
-        }
-
-        .support-list {
-            flex: 0 0 340px;
-            max-width: 340px;
-            background: #ffffff;
-            border: 1px solid #e2e8f0;
-            border-radius: 16px;
-            padding: 12px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
-        }
-
-        .support-list-tabs {
-            display: flex;
-            gap: 6px;
-            margin-bottom: 12px;
-        }
-
-        .support-tab {
-            flex: 1;
-            padding: 9px 10px;
-            border-radius: 999px;
-            border: 1px solid #e2e8f0;
+            border-bottom: none;
             background: #ffffff;
             color: #475569;
-            font-size: 12px;
-            font-weight: 700;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 10px 10px 0 0;
             cursor: pointer;
         }
 
-        .support-tab.active {
+        .tab-btn.active {
             background: #0f172a;
             color: #ffffff;
             border-color: #0f172a;
         }
 
-        .support-tickets {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            max-height: 72vh;
-            overflow-y: auto;
+        .panel {
+            padding: 24px;
         }
 
-        .support-ticket-item {
-            border: 1px solid #e2e8f0;
-            border-radius: 12px;
+        .status {
+            margin: 16px 24px 0;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 14px;
+            display: none;
+        }
+
+        .status.error {
+            background: #fef2f2;
+            color: #b91c1c;
+            border: 1px solid #fecaca;
+            display: block;
+        }
+
+        .status.success {
+            background: #f0fdf4;
+            color: #15803d;
+            border: 1px solid #bbf7d0;
+            display: block;
+        }
+
+        /* Tickets */
+        .tickets-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        .tickets-table th,
+        .tickets-table td {
+            text-align: left;
             padding: 10px 12px;
-            cursor: pointer;
-            transition: border-color .15s ease, background .15s ease;
+            border-bottom: 1px solid #e2e8f0;
         }
 
-        .support-ticket-item:hover {
+        .tickets-table th {
             background: #f8fafc;
-        }
-
-        .support-ticket-item.selected {
-            border-color: #2563eb;
-            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
-        }
-
-        .support-ticket-email {
-            font-size: 13px;
             font-weight: 700;
             color: #0f172a;
-            word-break: break-word;
         }
 
-        .support-ticket-preview {
+        .badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 999px;
             font-size: 12px;
-            color: #64748b;
-            margin: 4px 0 6px;
-            word-break: break-word;
+            font-weight: 700;
         }
 
-        .support-ticket-foot {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 8px;
+        .badge-open { background: #fef9c3; color: #854d0e; }
+        .badge-in-progress { background: #dbeafe; color: #1e40af; }
+        .badge-closed { background: #e2e8f0; color: #475569; }
+
+        .open-ticket-btn {
+            background: #2563eb;
+            color: #ffffff;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
         }
 
-        .support-ticket-date {
-            font-size: 11px;
+        .open-ticket-btn:hover { background: #1d4ed8; }
+
+        .empty {
+            padding: 24px;
+            text-align: center;
             color: #94a3b8;
         }
 
-        .support-status {
-            display: inline-block;
-            padding: 2px 10px;
-            border-radius: 999px;
-            font-size: 11px;
-            font-weight: 700;
-            text-transform: capitalize;
-            background: #f0fdf4;
-            color: #166534;
-            border: 1px solid #bbf7d0;
-        }
-
-        .support-status-closed {
-            background: #f1f5f9;
-            color: #475569;
-            border-color: #e2e8f0;
-        }
-
-        .support-empty,
-        .support-detail-empty {
-            font-size: 13px;
-            color: #64748b;
-            padding: 24px;
-            text-align: center;
-        }
-
-        .support-detail {
-            flex: 1 1 auto;
-            min-width: 0;
-        }
-
-        .support-detail-card {
-            background: #ffffff;
-            border: 1px solid #e2e8f0;
-            border-radius: 16px;
-            padding: 20px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
-        }
-
-        .support-detail-header {
-            display: flex;
-            align-items: flex-start;
-            justify-content: space-between;
-            gap: 12px;
-            margin-bottom: 16px;
-            border-bottom: 1px solid #f1f5f9;
-            padding-bottom: 12px;
-        }
-
-        .support-detail-email {
-            font-size: 16px;
-            font-weight: 700;
-            color: #0f172a;
-            word-break: break-word;
-        }
-
-        .support-detail-meta {
-            font-size: 12px;
-            color: #64748b;
-            margin-top: 4px;
-        }
-
-        .support-detail-label {
-            font-size: 12px;
-            font-weight: 700;
-            color: #64748b;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 6px;
-        }
-
-        .support-detail-desc {
+        /* Thread */
+        .thread-back {
+            background: none;
+            border: none;
+            color: #2563eb;
             font-size: 14px;
-            color: #334155;
-            line-height: 1.6;
-            white-space: pre-wrap;
-            word-break: break-word;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 16px;
         }
 
-        .support-detail-actions {
-            display: flex;
-            gap: 10px;
-            margin-top: 20px;
-            flex-wrap: wrap;
+        .thread-header {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 14px;
+            margin-bottom: 16px;
         }
 
-        .support-thread {
-            margin-top: 20px;
-            border-top: 1px solid #f1f5f9;
-            padding-top: 16px;
-        }
-
-        .support-thread-messages {
+        .thread-messages {
             display: flex;
             flex-direction: column;
             gap: 10px;
-            max-height: 320px;
+            max-height: 360px;
             overflow-y: auto;
-            padding: 4px;
-            margin-bottom: 14px;
+            padding: 8px 0;
         }
 
-        .support-msg {
-            max-width: 80%;
-            padding: 10px 12px;
-            border-radius: 14px;
-            font-size: 13px;
-            line-height: 1.5;
-            word-break: break-word;
-            white-space: pre-wrap;
+        .msg {
+            max-width: 75%;
+            padding: 10px 14px;
+            border-radius: 12px;
+            font-size: 14px;
         }
 
-        .support-msg-user {
+        .msg-user {
             align-self: flex-start;
             background: #f1f5f9;
             color: #0f172a;
-            border-bottom-left-radius: 4px;
         }
 
-        .support-msg-staff {
+        .msg-staff {
             align-self: flex-end;
             background: #2563eb;
             color: #ffffff;
-            border-bottom-right-radius: 4px;
         }
 
-        .support-msg-sender {
+        .msg-sender {
             font-size: 11px;
             font-weight: 700;
-            opacity: 0.8;
-            margin-bottom: 3px;
+            margin-bottom: 4px;
+            opacity: 0.85;
         }
 
-        .support-msg-time {
+        .msg-time {
             font-size: 10px;
             opacity: 0.7;
             margin-top: 4px;
         }
 
-        .support-thread-empty {
-            font-size: 13px;
-            color: #94a3b8;
-            text-align: center;
-            padding: 16px;
-        }
-
-        .support-reply-form {
+        .reply-form {
             display: flex;
             gap: 8px;
-            align-items: flex-end;
+            margin-top: 16px;
         }
 
-        .support-reply-input {
+        .reply-input {
             flex: 1;
-            min-height: 44px;
-            max-height: 120px;
-            padding: 10px 12px;
-            border-radius: 12px;
+            padding: 10px 14px;
             border: 1px solid #cbd5e1;
+            border-radius: 10px;
             font-size: 14px;
             font-family: inherit;
-            color: #0f172a;
+        }
+
+        .reply-input:focus {
             outline: none;
-            resize: vertical;
-        }
-
-        .support-reply-input:focus {
             border-color: #2563eb;
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+            box-shadow: 0 0 0 3px rgba(37,99,235,0.15);
         }
 
-        .action-btn {
-            padding: 8px 16px;
-            border-radius: 999px;
+        .reply-send {
+            background: #2563eb;
+            color: #ffffff;
             border: none;
-            font-size: 13px;
+            padding: 10px 18px;
+            border-radius: 10px;
+            font-size: 14px;
             font-weight: 700;
             cursor: pointer;
-            color: #ffffff;
-            background: #2563eb;
         }
 
-        .action-btn:hover {
-            background: #1d4ed8;
-        }
+        .reply-send:hover { background: #1d4ed8; }
 
-        .action-btn.danger {
-            background: #dc2626;
-        }
-
-        .action-btn.danger:hover {
-            background: #b91c1c;
-        }
-
-        .audit-view {
-            padding: 20px 24px;
-        }
-
-        .audit-card {
-            background: #ffffff;
-            border: 1px solid #e2e8f0;
-            border-radius: 16px;
-            padding: 20px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
-        }
-
-        .audit-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 12px;
-            margin-bottom: 16px;
-        }
-
-        .audit-title {
-            font-size: 18px;
-            font-weight: 700;
-            color: #0f172a;
-        }
-
-        .audit-log-list {
+        /* Staff Chat */
+        .chat-wrap {
             display: flex;
             flex-direction: column;
-            gap: 8px;
-            max-height: 72vh;
+            height: 70vh;
+        }
+
+        .chat-messages {
+            flex: 1;
             overflow-y: auto;
-        }
-
-        .audit-entry {
             display: flex;
-            align-items: flex-start;
-            gap: 12px;
-            padding: 10px 12px;
-            border: 1px solid #f1f5f9;
+            flex-direction: column;
+            gap: 10px;
+            padding: 16px;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            background: #f8fafc;
+        }
+
+        .chat-msg {
+            max-width: 75%;
+            padding: 8px 12px;
             border-radius: 12px;
-        }
-
-        .audit-badge {
-            flex: 0 0 auto;
-            padding: 3px 10px;
-            border-radius: 999px;
-            font-size: 11px;
-            font-weight: 700;
-            white-space: nowrap;
-        }
-
-        .audit-badge-opened {
-            background: #eff6ff;
-            color: #1d4ed8;
-            border: 1px solid #bfdbfe;
-        }
-
-        .audit-badge-user {
-            background: #f1f5f9;
-            color: #334155;
+            font-size: 14px;
+            align-self: flex-start;
+            background: #ffffff;
             border: 1px solid #e2e8f0;
         }
 
-        .audit-badge-staff {
-            background: #f0fdf4;
-            color: #166534;
-            border: 1px solid #bbf7d0;
+        .chat-msg-mine {
+            align-self: flex-end;
+            background: #2563eb;
+            color: #ffffff;
+            border: none;
         }
 
-        .audit-entry-body {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .audit-entry-main {
-            font-size: 13px;
-            color: #0f172a;
-            word-break: break-word;
-        }
-
-        .audit-entry-main strong {
-            font-weight: 700;
-        }
-
-        .audit-entry-meta {
+        .chat-sender {
             font-size: 11px;
-            color: #94a3b8;
+            font-weight: 700;
+            margin-bottom: 3px;
+        }
+
+        .chat-time {
+            font-size: 10px;
+            opacity: 0.7;
             margin-top: 3px;
-        }
-
-        .audit-empty {
-            font-size: 13px;
-            color: #64748b;
-            text-align: center;
-            padding: 24px;
-        }
-
-        @media (max-width: 720px) {
-            .support-panel {
-                flex-direction: column;
-            }
-            .support-list {
-                flex: 1 1 auto;
-                max-width: 100%;
-                width: 100%;
-            }
         }
     </style>
 </head>
 <body>
     <div class="topbar">
-        <div class="topbar-title">Support Panel</div>
-        <div style="display:flex; gap:8px; align-items:center;">
-            <button type="button" class="back-btn" id="ticketsViewBtn">Tickets</button>
-            <button type="button" class="back-btn" id="auditLogsBtn">Audit Logs</button>
-            <button type="button" class="back-btn" id="backBtn">← Back</button>
+        <h1>Support Panel</h1>
+        <div class="topbar-actions">
+            <button class="open-ticket-btn" id="backToStaffBtn" style="background:#64748b;">Back to Staff</button>
         </div>
     </div>
+
+    <div class="tabs">
+        <button class="tab-btn active" id="tabTickets" data-tab="tickets">Tickets</button>
+        <button class="tab-btn" id="tabStaffChat" data-tab="staffchat">Staff Chat</button>
+    </div>
+
     <div class="status" id="status"></div>
-    <div class="support-stats" id="supportStats"></div>
-    <div class="support-panel" id="supportPanel">
-        <div class="support-list">
-            <div class="support-list-tabs">
-                <button type="button" class="support-tab active" data-cat="Regular Support">Regular Support</button>
-                <button type="button" class="support-tab" data-cat="Staff Report">Staff Reports</button>
-            </div>
-            <div class="support-tickets" id="supportTickets">Loading...</div>
-        </div>
-        <div class="support-detail" id="supportDetail">
-            <div class="support-detail-empty">Select a ticket to view its details.</div>
-        </div>
-    </div>
-    <div class="audit-view" id="auditView" style="display:none;">
-        <div class="audit-card">
-            <div class="audit-header">
-                <div class="audit-title">Audit Logs</div>
-                <button type="button" class="back-btn" id="auditRefreshBtn">Refresh</button>
-            </div>
-            <div class="audit-log-list" id="auditLogList">Loading...</div>
-        </div>
-    </div>
+
+    <div class="panel" id="panel"></div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
@@ -532,56 +305,18 @@
         const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp3ZG9nYWx3YmN6ZHR2eHZocmZkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM2NTA2MjQsImV4cCI6MjA5OTIyNjYyNH0.baPVVTtW0d3FDC2pTd1P3d5aoIc2FZkaD-6bBvDPFWw";
 
         const statusEl = document.getElementById("status");
-        const ticketsEl = document.getElementById("supportTickets");
-        const detailEl = document.getElementById("supportDetail");
-        const tabs = document.querySelectorAll(".support-tab");
-
-        let currentCategory = "Regular Support";
-        let allTickets = [];
-        let activeMessageChannel = null;
-        let activeMessagePoll = null;
-        let activeTicketId = null;
-        let lastMsgSig = "";
-
-        function stopMessageLive() {
-            if (activeMessageChannel && localSupabase) {
-                try { localSupabase.removeChannel(activeMessageChannel); } catch (e) {}
-            }
-            activeMessageChannel = null;
-            if (activeMessagePoll) {
-                clearInterval(activeMessagePoll);
-                activeMessagePoll = null;
-            }
-            activeTicketId = null;
-        }
-
-        function startMessageLive(ticketId) {
-            stopMessageLive();
-            activeTicketId = ticketId;
-            lastMsgSig = "";
-            if (!localSupabase) return;
-            try {
-                activeMessageChannel = localSupabase
-                    .channel("staff-ticket-" + ticketId)
-                    .on("postgres_changes", {
-                        event: "*",
-                        schema: "public",
-                        table: "support_messages",
-                        filter: "ticket_id=eq." + ticketId
-                    }, () => {
-                        if (activeTicketId === ticketId) loadMessages(ticketId);
-                    })
-                    .subscribe();
-            } catch (err) {
-                console.error("Realtime subscribe failed:", err);
-            }
-            // Polling fallback (covers cases where Realtime is not enabled)
-            activeMessagePoll = setInterval(() => {
-                if (activeTicketId === ticketId) loadMessages(ticketId);
-            }, 4000);
-        }
+        const panelEl = document.getElementById("panel");
+        const tabTickets = document.getElementById("tabTickets");
+        const tabStaffChat = document.getElementById("tabStaffChat");
+        const backToStaffBtn = document.getElementById("backToStaffBtn");
 
         let localSupabase = null;
+        let currentUser = null;
+        let currentTicket = null;
+        let ticketLive = null;
+        let chatLive = null;
+        let chatLastSig = "";
+
         try {
             if (typeof window.supabase !== "undefined") {
                 localSupabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -590,281 +325,194 @@
             console.error("Supabase init failed:", err);
         }
 
-        document.getElementById("backBtn").addEventListener("click", () => {
-            if (window.history.length > 1) {
-                window.history.back();
-            } else {
-                window.location.href = "staff.html";
-            }
-        });
-
-        function showStatus(message) {
+        function showStatus(message, type) {
             if (!statusEl) return;
-            statusEl.className = "status error";
+            statusEl.className = "status " + (type || "");
             statusEl.textContent = message;
         }
 
-        function escapeHtml(text) {
-            if (text === null || text === undefined) return "";
-            const div = document.createElement("div");
-            div.textContent = String(text);
-            return div.innerHTML;
+        function escapeHtml(str) {
+            return String(str == null ? "" : str)
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#39;");
         }
 
-        async function ensureStaff() {
+        function switchTab(tab) {
+            tabTickets.classList.toggle("active", tab === "tickets");
+            tabStaffChat.classList.toggle("active", tab === "staffchat");
+            if (tab === "tickets") showTickets();
+            else showStaffChat();
+        }
+
+        tabTickets.addEventListener("click", () => switchTab("tickets"));
+        tabStaffChat.addEventListener("click", () => switchTab("staffchat"));
+
+        backToStaffBtn.addEventListener("click", () => {
+            if (window.opener) window.close();
+            else window.location.href = "staff.html";
+        });
+
+        async function init() {
             if (!localSupabase) {
-                showStatus("Authentication service unavailable.");
-                return { allowed: false };
+                showStatus("Authentication service unavailable.", "error");
+                return;
             }
             try {
                 const { data: { user } } = await localSupabase.auth.getUser();
                 if (!user) {
-                    showStatus("Access denied. Staff only.");
-                    return { allowed: false };
+                    showStatus("Access denied. Please log in to continue.", "error");
+                    return;
                 }
-                if (user.email === "oceanviewrp1@gmail.com") {
-                    return { allowed: true, department: "Management" };
-                }
-                const { data } = await localSupabase
-                    .from("users")
-                    .select("department")
-                    .eq("email", user.email)
-                    .maybeSingle();
-                if (!data || data.department !== "Management") {
-                    showStatus("Access denied. Management only.");
-                    return { allowed: false };
-                }
-                return { allowed: true, department: data.department };
+                currentUser = user;
+                const initial = window.location.hash === "#staffchat" ? "staffchat" : "tickets";
+                switchTab(initial);
             } catch (err) {
-                console.error("Staff check failed:", err);
-                showStatus("Access denied.");
-                return { allowed: false };
+                showStatus("Access denied. Please log in to continue.", "error");
             }
         }
 
-        function renderList() {
-            if (!ticketsEl) return;
-            updateStats();
-            const filtered = allTickets.filter((t) => (t.report_type || "Regular Support") === currentCategory);
-            if (filtered.length === 0) {
-                ticketsEl.innerHTML = `<div class="support-empty">No ${escapeHtml(currentCategory)} tickets.</div>`;
+        async function getStaffProfile() {
+            const { data } = await localSupabase
+                .from("staff")
+                .select("department, name")
+                .eq("user_id", currentUser.id)
+                .maybeSingle();
+            return data || {};
+        }
+
+        function statusBadge(status) {
+            const s = (status || "open").toLowerCase().replace(/\s+/g, "-");
+            return `<span class="badge badge-${escapeHtml(s)}">${escapeHtml(status || "open")}</span>`;
+        }
+
+        async function showTickets() {
+            stopChatLive();
+            if (ticketLive) { localSupabase.removeChannel(ticketLive); ticketLive = null; }
+            currentTicket = null;
+            showStatus("");
+            const allowedDepts = ["management", "supportteam", "customersupport", "support"];
+            let profile = {};
+            try { profile = await getStaffProfile(); } catch (e) {}
+            const deptLower = (profile.department || "").toLowerCase();
+            if (!allowedDepts.includes(deptLower)) {
+                showStatus("Access denied. Management or Support only.", "error");
                 return;
             }
-            ticketsEl.innerHTML = filtered.map((t) => {
-                const created = t.created_at ? new Date(t.created_at).toLocaleString() : "";
-                const status = t.status || "open";
-                return `
-                    <div class="support-ticket-item" data-id="${escapeHtml(t.id)}">
-                        <div class="support-ticket-email">${escapeHtml(t.email || "Unknown email")}</div>
-                        <div class="support-ticket-preview">${escapeHtml((t.description || "").slice(0, 60))}</div>
-                        <div class="support-ticket-foot">
-                            <span class="support-status support-status-${escapeHtml(status)}">${escapeHtml(status)}</span>
-                            <span class="support-ticket-date">${escapeHtml(created)}</span>
-                        </div>
-                    </div>
-                `;
-            }).join("");
 
-            ticketsEl.querySelectorAll(".support-ticket-item").forEach((item) => {
-                item.addEventListener("click", () => {
-                    ticketsEl.querySelectorAll(".support-ticket-item").forEach((i) => i.classList.remove("selected"));
-                    item.classList.add("selected");
-                    const ticket = allTickets.find((t) => String(t.id) === item.getAttribute("data-id"));
-                    renderDetail(ticket);
-                });
-            });
-        }
-
-        function updateStats() {
-            const el = document.getElementById("supportStats");
-            if (!el) return;
-            const open = allTickets.filter((t) => (t.status || "open") !== "closed").length;
-            const closed = allTickets.filter((t) => (t.status || "open") === "closed").length;
-            el.innerHTML = `
-                <div class="support-stat"><span class="support-stat-num">${open}</span><span class="support-stat-label">Tickets Open</span></div>
-                <div class="support-stat"><span class="support-stat-num">${closed}</span><span class="support-stat-label">Tickets Closed</span></div>
+            panelEl.innerHTML = `
+                <table class="tickets-table">
+                    <thead>
+                        <tr>
+                            <th>Type</th>
+                            <th>From</th>
+                            <th>Description</th>
+                            <th>Status</th>
+                            <th>Submitted</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ticketsBody">
+                        <tr><td colspan="6"><div class="empty">Loading tickets...</div></td></tr>
+                    </tbody>
+                </table>
             `;
+
+            await loadTickets();
         }
 
-        async function closeTicket(ticket) {
-            if (!localSupabase) return;
-            const { error } = await localSupabase
-                .from("support_tickets")
-                .update({ status: "closed" })
-                .eq("id", ticket.id);
-            if (error) {
-                alert("Failed to close ticket: " + error.message);
-                return;
-            }
-            await refreshTicketStatus(ticket);
-            renderList();
-            renderDetail(ticket);
-        }
-
-        async function openTicket(ticket) {
-            if (!localSupabase) return;
-            const { error } = await localSupabase
-                .from("support_tickets")
-                .update({ status: "open" })
-                .eq("id", ticket.id);
-            if (error) {
-                alert("Failed to open ticket: " + error.message);
-                return;
-            }
-            await refreshTicketStatus(ticket);
-            renderList();
-            renderDetail(ticket);
-        }
-
-        async function refreshTicketStatus(ticket) {
-            if (!localSupabase) return;
+        async function loadTickets() {
+            const body = document.getElementById("ticketsBody");
+            if (!body) return;
             try {
-                const { data } = await localSupabase
+                const { data, error } = await localSupabase
                     .from("support_tickets")
-                    .select("status")
-                    .eq("id", ticket.id)
-                    .maybeSingle();
-                const newStatus = (data && data.status) || "open";
-                ticket.status = newStatus;
-                const stored = allTickets.find((t) => String(t.id) === String(ticket.id));
-                if (stored) stored.status = newStatus;
+                    .select("*")
+                    .order("created_at", { ascending: false });
+                if (error) {
+                    body.innerHTML = `<tr><td colspan="6"><div class="empty">Failed to load tickets.</div></td></tr>`;
+                    return;
+                }
+                if (!Array.isArray(data) || data.length === 0) {
+                    body.innerHTML = `<tr><td colspan="6"><div class="empty">No support tickets yet.</div></td></tr>`;
+                    return;
+                }
+                body.innerHTML = data.map((t) => {
+                    const created = t.created_at ? new Date(t.created_at).toLocaleString() : "";
+                    return `
+                        <tr>
+                            <td>${escapeHtml(t.report_type || "Regular Support")}</td>
+                            <td>${escapeHtml(t.email || "")}</td>
+                            <td>${escapeHtml((t.description || "").slice(0, 80))}</td>
+                            <td>${statusBadge(t.status)}</td>
+                            <td>${escapeHtml(created)}</td>
+                            <td><button class="open-ticket-btn" data-id="${escapeHtml(t.id)}">Open</button></td>
+                        </tr>
+                    `;
+                }).join("");
+
+                body.querySelectorAll(".open-ticket-btn").forEach((btn) => {
+                    btn.addEventListener("click", () => {
+                        const ticket = data.find((t) => String(t.id) === btn.getAttribute("data-id"));
+                        if (ticket) openTicket(ticket);
+                    });
+                });
             } catch (err) {
-                console.error("Failed to refresh ticket status:", err);
+                body.innerHTML = `<tr><td colspan="6"><div class="empty">Failed to load tickets.</div></td></tr>`;
             }
         }
 
-        function renderDetail(ticket) {
-            if (!detailEl || !ticket) return;
-            const created = ticket.created_at ? new Date(ticket.created_at).toLocaleString() : "Unknown";
-            const status = ticket.status || "open";
-            detailEl.innerHTML = `
-                <div class="support-detail-card">
-                    <div class="support-detail-header">
-                        <div>
-                            <div class="support-detail-email">${escapeHtml(ticket.email || "Unknown email")}</div>
-                            <div class="support-detail-meta">${escapeHtml(ticket.report_type || "Regular Support")} &middot; ${escapeHtml(created)}</div>
-                        </div>
-                        <span class="support-status support-status-${escapeHtml(status)}">${escapeHtml(status)}</span>
-                    </div>
-                    <div class="support-detail-label">Description</div>
-                    <div class="support-detail-desc">${escapeHtml(ticket.description || "No description provided.")}</div>
-                    <div class="support-detail-actions">
-                        ${status !== "closed" ? `<button type="button" class="action-btn" id="closeTicketBtn">Mark as Closed</button>` : `<button type="button" class="action-btn" id="openTicketBtn">Reopen Ticket</button>`}
-                        <button type="button" class="action-btn danger" id="deleteTicketBtn">Delete Ticket</button>
-                    </div>
-                    <div class="support-thread">
-                        <div class="support-detail-label">Conversation</div>
-                        <div class="support-thread-messages" id="threadMessages"><div class="support-thread-empty">Loading messages...</div></div>
-                        <form class="support-reply-form" id="replyForm">
-                            <textarea class="support-reply-input" id="replyInput" placeholder="Type a reply... or /close to close, /open to reopen" required></textarea>
-                            <button type="submit" class="action-btn" id="replySendBtn">Send</button>
-                        </form>
-                    </div>
+        function openTicket(ticket) {
+            currentTicket = ticket;
+            panelEl.innerHTML = `
+                <button class="thread-back" id="threadBack">&larr; Back to tickets</button>
+                <div class="thread-header">
+                    <strong>${escapeHtml(ticket.report_type || "Regular Support")}</strong> &middot; ${statusBadge(ticket.status)}
+                    <br><span style="color:#94a3b8;">From: ${escapeHtml(ticket.email || "")}</span>
+                    <br>${escapeHtml(ticket.description || "")}
                 </div>
+                <div class="thread-messages" id="threadMessages">
+                    <div class="empty">Loading messages...</div>
+                </div>
+                <form class="reply-form" id="replyForm">
+                    <input class="reply-input" id="replyInput" placeholder="Reply to the user..." autocomplete="off" />
+                    <button class="reply-send" type="submit">Send</button>
+                </form>
             `;
 
-            const closeBtn = document.getElementById("closeTicketBtn");
-            if (closeBtn) {
-                closeBtn.addEventListener("click", () => closeTicket(ticket));
-            }
+            document.getElementById("threadBack").addEventListener("click", () => {
+                if (ticketLive) { localSupabase.removeChannel(ticketLive); ticketLive = null; }
+                showTickets();
+            });
 
-            const openBtn = document.getElementById("openTicketBtn");
-            if (openBtn) {
-                openBtn.addEventListener("click", () => openTicket(ticket));
-            }
+            document.getElementById("replyForm").addEventListener("submit", async (e) => {
+                e.preventDefault();
+                const input = document.getElementById("replyInput");
+                const message = input.value.trim();
+                if (!message || !currentTicket) return;
+                const { error } = await localSupabase
+                    .from("support_messages")
+                    .insert({
+                        ticket_id: currentTicket.id,
+                        message: message,
+                        sender_role: "staff"
+                    });
+                if (error) {
+                    showStatus("Failed to send reply: " + error.message, "error");
+                    return;
+                }
+                input.value = "";
+            });
 
-            const deleteBtn = document.getElementById("deleteTicketBtn");
-            if (deleteBtn) {
-                deleteBtn.addEventListener("click", async () => {
-                    if (!localSupabase) return;
-                    if (!confirm("Delete this ticket permanently?")) return;
-                    const { error } = await localSupabase
-                        .from("support_tickets")
-                        .delete()
-                        .eq("id", ticket.id);
-                    if (error) {
-                        alert("Failed to delete ticket: " + error.message);
-                        return;
-                    }
-                    allTickets = allTickets.filter((t) => t.id !== ticket.id);
-                    renderList();
-                    stopMessageLive();
-                    detailEl.innerHTML = `<div class="support-detail-empty">Select a ticket to view its details.</div>`;
-                });
-            }
-
-            loadMessages(ticket.id);
-            startMessageLive(ticket.id);
-
-            const replyForm = document.getElementById("replyForm");
-            const replyInput = document.getElementById("replyInput");
-            if (replyInput) {
-                replyInput.addEventListener("keydown", (e) => {
-                    if (e.key === "Enter" && !e.shiftKey) {
-                        e.preventDefault();
-                        if (replyForm) replyForm.requestSubmit();
-                    }
-                });
-            }
-            if (replyForm) {
-                replyForm.addEventListener("submit", async (e) => {
-                    e.preventDefault();
-                    const input = document.getElementById("replyInput");
-                    const sendBtn = document.getElementById("replySendBtn");
-                    const message = input ? input.value.trim() : "";
-                    if (!message || !localSupabase) return;
-
-                    const cmd = message.toLowerCase();
-
-                    if (sendBtn) { sendBtn.disabled = true; sendBtn.textContent = "..."; }
-                    try {
-                        if (cmd === "/close") {
-                            if (ticket.status === "closed") {
-                                alert("This ticket is already closed.");
-                                return;
-                            }
-                            await closeTicket(ticket);
-                            if (input) input.value = "";
-                            return;
-                        }
-                        if (cmd === "/open") {
-                            if (ticket.status !== "closed") {
-                                alert("This ticket is already open.");
-                                return;
-                            }
-                            await openTicket(ticket);
-                            if (input) input.value = "";
-                            return;
-                        }
-                        const { data: { user } } = await localSupabase.auth.getUser();
-                        const { error } = await localSupabase
-                            .from("support_messages")
-                            .insert([{
-                                ticket_id: ticket.id,
-                                sender_email: user?.email || "Staff",
-                                sender_role: "staff",
-                                message,
-                                created_at: new Date().toISOString()
-                            }]);
-                        if (error) {
-                            alert("Failed to send reply: " + error.message);
-                            return;
-                        }
-                        if (input) input.value = "";
-                        loadMessages(ticket.id);
-                    } catch (err) {
-                        console.error("Reply failed:", err);
-                        alert("Failed to send reply.");
-                    } finally {
-                        if (sendBtn) { sendBtn.disabled = false; sendBtn.textContent = "Send"; }
-                    }
-                });
-            }
+            loadThreadMessages(ticket.id);
+            startTicketLive(ticket.id);
         }
 
-        async function loadMessages(ticketId) {
+        async function loadThreadMessages(ticketId) {
             const box = document.getElementById("threadMessages");
-            if (!box || !localSupabase) return;
+            if (!box) return;
             try {
                 const { data, error } = await localSupabase
                     .from("support_messages")
@@ -872,190 +520,136 @@
                     .eq("ticket_id", ticketId)
                     .order("created_at", { ascending: true });
                 if (error) {
-                    box.innerHTML = `<div class="support-thread-empty">Failed to load messages.</div>`;
+                    box.innerHTML = `<div class="empty">Failed to load messages.</div>`;
                     return;
                 }
                 if (!Array.isArray(data) || data.length === 0) {
-                    lastMsgSig = "empty";
-                    box.innerHTML = `<div class="support-thread-empty">No messages yet. Send a reply to start the conversation.</div>`;
+                    box.innerHTML = `<div class="empty">No messages yet.</div>`;
                     return;
                 }
-                const sig = data.length + "|" + (data[data.length - 1].id || "") + "|" + (data[data.length - 1].created_at || "");
-                if (sig === lastMsgSig) return;
-                lastMsgSig = sig;
                 box.innerHTML = data.map((m) => {
                     const role = m.sender_role === "staff" ? "staff" : "user";
                     const time = m.created_at ? new Date(m.created_at).toLocaleString() : "";
+                    const sender = role === "staff" ? "Support Team" : "User";
                     return `
-                        <div class="support-msg support-msg-${role}">
-                            <div class="support-msg-sender">${escapeHtml(m.sender_email || (role === "staff" ? "Staff" : "User"))}</div>
+                        <div class="msg msg-${role}">
+                            <div class="msg-sender">${escapeHtml(sender)}</div>
                             <div>${escapeHtml(m.message || "")}</div>
-                            <div class="support-msg-time">${escapeHtml(time)}</div>
+                            <div class="msg-time">${escapeHtml(time)}</div>
                         </div>
                     `;
                 }).join("");
                 box.scrollTop = box.scrollHeight;
             } catch (err) {
-                console.error("Failed to load messages:", err);
-                box.innerHTML = `<div class="support-thread-empty">Failed to load messages.</div>`;
+                box.innerHTML = `<div class="empty">Failed to load messages.</div>`;
             }
         }
 
-        tabs.forEach((tab) => {
-            tab.addEventListener("click", () => {
-                tabs.forEach((t) => t.classList.remove("active"));
-                tab.classList.add("active");
-                currentCategory = tab.getAttribute("data-cat");
-                if (detailEl) detailEl.innerHTML = `<div class="support-detail-empty">Select a ticket to view its details.</div>`;
-                renderList();
+        function startTicketLive(ticketId) {
+            ticketLive = localSupabase
+                .channel("support-ticket-" + ticketId)
+                .on("postgres_changes", {
+                    event: "*",
+                    schema: "public",
+                    table: "support_messages",
+                    filter: "ticket_id=eq." + ticketId
+                }, () => loadThreadMessages(ticketId))
+                .subscribe();
+        }
+
+        async function showStaffChat() {
+            if (ticketLive) { localSupabase.removeChannel(ticketLive); ticketLive = null; }
+            currentTicket = null;
+            showStatus("");
+            panelEl.innerHTML = `
+                <div class="chat-wrap">
+                    <div class="chat-messages" id="chatMessages">
+                        <div class="empty">Loading messages...</div>
+                    </div>
+                    <form class="reply-form" id="chatForm">
+                        <input class="reply-input" id="chatInput" placeholder="Message staff..." autocomplete="off" />
+                        <button class="reply-send" type="submit">Send</button>
+                    </form>
+                </div>
+            `;
+
+            document.getElementById("chatForm").addEventListener("submit", async (e) => {
+                e.preventDefault();
+                const input = document.getElementById("chatInput");
+                const message = input.value.trim();
+                if (!message) return;
+                const { error } = await localSupabase
+                    .from("staff_chat")
+                    .insert({
+                        sender_id: currentUser.id,
+                        sender_name: currentUser.email || "Staff",
+                        message: message
+                    });
+                if (error) {
+                    showStatus("Failed to send message: " + error.message, "error");
+                    return;
+                }
+                input.value = "";
             });
-        });
 
-        async function loadTickets() {
-            const staff = await ensureStaff();
-            if (!staff.allowed) {
-                if (ticketsEl) ticketsEl.innerHTML = `<div class="support-empty">Access denied.</div>`;
-                return;
-            }
+            await loadChatMessages();
+            startChatLive();
+        }
 
-            if (!localSupabase) {
-                if (ticketsEl) ticketsEl.innerHTML = `<div class="support-empty">Service unavailable.</div>`;
-                return;
-            }
-
+        async function loadChatMessages() {
+            const box = document.getElementById("chatMessages");
+            if (!box) return;
             try {
                 const { data, error } = await localSupabase
-                    .from("support_tickets")
+                    .from("staff_chat")
                     .select("*")
-                    .order("created_at", { ascending: false });
+                    .order("created_at", { ascending: true })
+                    .limit(200);
                 if (error) {
-                    if (ticketsEl) ticketsEl.innerHTML = `<div class="support-empty">Failed to load tickets: ${escapeHtml(error.message)}</div>`;
+                    box.innerHTML = `<div class="empty">Failed to load staff chat.</div>`;
                     return;
                 }
-                allTickets = Array.isArray(data) ? data : [];
-                renderList();
-            } catch (err) {
-                console.error("Failed to load support tickets:", err);
-                if (ticketsEl) ticketsEl.innerHTML = `<div class="support-empty">Failed to load tickets.</div>`;
-            }
-        }
-
-        loadTickets();
-
-        // Audit Logs
-        const supportPanelEl = document.getElementById("supportPanel");
-        const auditViewEl = document.getElementById("auditView");
-        const auditLogsBtn = document.getElementById("auditLogsBtn");
-        const ticketsViewBtn = document.getElementById("ticketsViewBtn");
-        const auditRefreshBtn = document.getElementById("auditRefreshBtn");
-        const auditLogList = document.getElementById("auditLogList");
-
-        function showTicketsView() {
-            if (supportPanelEl) supportPanelEl.style.display = "flex";
-            if (auditViewEl) auditViewEl.style.display = "none";
-        }
-
-        function showAuditView() {
-            stopMessageLive();
-            if (supportPanelEl) supportPanelEl.style.display = "none";
-            if (auditViewEl) auditViewEl.style.display = "block";
-            loadAuditLogs();
-        }
-
-        async function loadAuditLogs() {
-            if (!auditLogList) return;
-            const staff = await ensureStaff();
-            if (!staff.allowed) {
-                auditLogList.innerHTML = `<div class="audit-empty">Access denied.</div>`;
-                return;
-            }
-            if (!localSupabase) {
-                auditLogList.innerHTML = `<div class="audit-empty">Service unavailable.</div>`;
-                return;
-            }
-            auditLogList.innerHTML = `<div class="audit-empty">Loading...</div>`;
-            try {
-                const [ticketsRes, messagesRes] = await Promise.all([
-                    localSupabase.from("support_tickets").select("*").order("created_at", { ascending: false }),
-                    localSupabase.from("support_messages").select("*").order("created_at", { ascending: false })
-                ]);
-
-                if (ticketsRes.error) {
-                    auditLogList.innerHTML = `<div class="audit-empty">Failed to load logs: ${escapeHtml(ticketsRes.error.message)}</div>`;
+                if (!Array.isArray(data) || data.length === 0) {
+                    box.innerHTML = `<div class="empty">No messages yet. Start the conversation.</div>`;
                     return;
                 }
-
-                const tickets = Array.isArray(ticketsRes.data) ? ticketsRes.data : [];
-                const messages = Array.isArray(messagesRes.data) ? messagesRes.data : [];
-
-                const ticketMap = {};
-                tickets.forEach((t) => { ticketMap[t.id] = t; });
-
-                const entries = [];
-
-                tickets.forEach((t) => {
-                    entries.push({
-                        kind: "opened",
-                        ts: t.created_at,
-                        email: t.email || "Unknown",
-                        type: t.report_type || "Regular Support",
-                        detail: t.description || "",
-                        status: t.status || "open"
-                    });
-                });
-
-                messages.forEach((m) => {
-                    const t = ticketMap[m.ticket_id];
-                    entries.push({
-                        kind: m.sender_role === "staff" ? "staff" : "user",
-                        ts: m.created_at,
-                        email: t ? (t.email || "Unknown") : "Unknown",
-                        type: t ? (t.report_type || "Regular Support") : "Ticket",
-                        sender: m.sender_email || (m.sender_role === "staff" ? "Staff" : "User"),
-                        detail: m.message || ""
-                    });
-                });
-
-                entries.sort((a, b) => new Date(b.ts || 0) - new Date(a.ts || 0));
-
-                if (entries.length === 0) {
-                    auditLogList.innerHTML = `<div class="audit-empty">No activity logged yet.</div>`;
-                    return;
-                }
-
-                auditLogList.innerHTML = entries.map((e) => {
-                    const time = e.ts ? new Date(e.ts).toLocaleString() : "";
-                    let badge = "";
-                    let main = "";
-                    if (e.kind === "opened") {
-                        badge = `<span class="audit-badge audit-badge-opened">Ticket Opened</span>`;
-                        main = `<strong>${escapeHtml(e.email)}</strong> opened a <strong>${escapeHtml(e.type)}</strong> ticket &mdash; ${escapeHtml((e.detail || "").slice(0, 120))}`;
-                    } else if (e.kind === "staff") {
-                        badge = `<span class="audit-badge audit-badge-staff">Staff Reply</span>`;
-                        main = `<strong>${escapeHtml(e.sender)}</strong> replied on <strong>${escapeHtml(e.email)}</strong>'s ${escapeHtml(e.type)} ticket &mdash; ${escapeHtml((e.detail || "").slice(0, 120))}`;
-                    } else {
-                        badge = `<span class="audit-badge audit-badge-user">User Reply</span>`;
-                        main = `<strong>${escapeHtml(e.email)}</strong> replied on their ${escapeHtml(e.type)} ticket &mdash; ${escapeHtml((e.detail || "").slice(0, 120))}`;
-                    }
+                const sig = data.length + "|" + (data[data.length - 1].id || "");
+                if (sig === chatLastSig) return;
+                chatLastSig = sig;
+                box.innerHTML = data.map((m) => {
+                    const mine = String(m.sender_id) === String(currentUser.id);
+                    const time = m.created_at ? new Date(m.created_at).toLocaleTimeString() : "";
                     return `
-                        <div class="audit-entry">
-                            ${badge}
-                            <div class="audit-entry-body">
-                                <div class="audit-entry-main">${main}</div>
-                                <div class="audit-entry-meta">${escapeHtml(time)}</div>
-                            </div>
+                        <div class="chat-msg ${mine ? "chat-msg-mine" : ""}">
+                            <div class="chat-sender">${escapeHtml(m.sender_name || "Staff")}</div>
+                            <div>${escapeHtml(m.message || "")}</div>
+                            <div class="chat-time">${escapeHtml(time)}</div>
                         </div>
                     `;
                 }).join("");
+                box.scrollTop = box.scrollHeight;
             } catch (err) {
-                console.error("Failed to load audit logs:", err);
-                auditLogList.innerHTML = `<div class="audit-empty">Failed to load logs.</div>`;
+                box.innerHTML = `<div class="empty">Failed to load staff chat.</div>`;
             }
         }
 
-        if (auditLogsBtn) auditLogsBtn.addEventListener("click", showAuditView);
-        if (ticketsViewBtn) ticketsViewBtn.addEventListener("click", showTicketsView);
-        if (auditRefreshBtn) auditRefreshBtn.addEventListener("click", loadAuditLogs);
+        function startChatLive() {
+            chatLive = localSupabase
+                .channel("staff-chat-global")
+                .on("postgres_changes", {
+                    event: "INSERT",
+                    schema: "public",
+                    table: "staff_chat"
+                }, () => loadChatMessages())
+                .subscribe();
+        }
+
+        function stopChatLive() {
+            if (chatLive) { localSupabase.removeChannel(chatLive); chatLive = null; }
+            chatLastSig = "";
+        }
+
+        init();
     </script>
 </body>
 </html>

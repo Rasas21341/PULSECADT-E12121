@@ -1061,6 +1061,7 @@
                             <div class="master-row-sub">View and manage open support tickets.</div>
                         </div>
                         <button type="button" class="verified-btn" id="supportPanelBtn">Support Panel</button>
+                        <button type="button" class="verified-btn" id="staffChatBtn" style="background:#2563eb;margin-left:8px;">Staff Chat</button>
                     </div>
                     <div class="master-row">
                         <div>
@@ -1120,6 +1121,13 @@
             if (supportPanelBtn) {
                 supportPanelBtn.addEventListener("click", () => {
                     window.open("support-panel.html", "_blank");
+                });
+            }
+
+            const staffChatBtn = document.getElementById("staffChatBtn");
+            if (staffChatBtn) {
+                staffChatBtn.addEventListener("click", () => {
+                    window.open("support-panel.html#staffchat", "_blank");
                 });
             }
 
