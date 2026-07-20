@@ -632,12 +632,12 @@
                         : `<span style="color:#94a3b8;font-size:12px;font-weight:600;">No Permission</span>`;
                     const pro = !!row.pro;
                     const proCell = pro
-                        ? `<span class="status-pill" style="background:#16a34a;width:auto;">Pro</span>`
-                        : `<span style="color:#94a3b8;font-size:12px;font-weight:600;">No</span>`;
+                        ? `<span style="color:#16a34a;font-size:11px;font-weight:600;">Pro</span>`
+                        : `<span style="color:#94a3b8;font-size:11px;font-weight:600;">No</span>`;
                     const proToggleBtn = canPro
-                        ? `<button class="verified-btn pro-server-btn" data-id="${row.id}" data-pro="${pro}">${pro ? "Remove Pro" : "Give Pro"}</button>`
+                        ? `<button class="pro-server-btn" data-id="${row.id}" data-pro="${pro}" style="padding:4px 10px;border-radius:999px;font-size:11px;font-weight:700;cursor:pointer;border:1px solid #16a34a;background:#f0fdf4;color:#166534;">${pro ? "Remove Pro" : "Give Pro"}</button>`
                         : `<span style="color:#94a3b8;font-size:12px;font-weight:600;">No Permission</span>`;
-                    html += `<tr><td>${name}</td><td>${owner}</td><td>${created}</td><td>${statusCell}</td><td>${membersOnlyCell}</td><td>${proCell}<br/>${proToggleBtn}</td><td>${suspendBtn} ${deleteBtn}</td></tr>`;
+                    html += `<tr><td>${name}</td><td>${owner}</td><td>${created}</td><td>${statusCell}</td><td>${membersOnlyCell}</td><td>${proCell}<br/>${proToggleBtn}</td><td><div style="display:flex;gap:8px;flex-wrap:wrap;">${suspendBtn} ${deleteBtn}</div></td></tr>`;
                 });
                 html += "</table>";
                 contentEl.innerHTML = html;
