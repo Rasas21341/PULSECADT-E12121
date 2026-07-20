@@ -304,7 +304,6 @@
         }
 
         .member-list,
-        .vehicle-list,
         .departments-dropdown-menu {
             display: none;
             flex-direction: column;
@@ -322,13 +321,11 @@
         }
 
         .member-list.open,
-        .vehicle-list.open,
         .departments-dropdown-menu.open {
             display: flex;
         }
 
-        .member-list .member-btn,
-        .vehicle-list .member-btn {
+        .member-list .member-btn {
             width: 100%;
         }
 
@@ -451,6 +448,23 @@
         }
 
         .licences-view.open {
+            display: flex;
+        }
+
+        .vehicles-view {
+            position: fixed;
+            top: 0;
+            left: 280px;
+            right: 0;
+            bottom: 0;
+            background: #ffffff;
+            z-index: 550;
+            display: none;
+            flex-direction: column;
+            padding: 24px;
+        }
+
+        .vehicles-view.open {
             display: flex;
         }
 
@@ -1247,7 +1261,6 @@
                                             <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/></svg>
                                             Vehicles
                                         </button>
-                                        <div class="vehicle-list" id="vehicleList"></div>
                                     </div>
                                     <div class="btn-dropdown-wrap">
                                         <button type="button" class="licences-btn" id="licencesBtn">
@@ -1395,6 +1408,15 @@
                                         <div class="members-view-list" id="licencesViewList"></div>
                                     </div>
                                 </div>
+                                <div class="vehicles-view" id="vehiclesView">
+                                    <div class="members-view-header">
+                                        <div class="members-view-title">Vehicles</div>
+                                        <button type="button" class="members-view-close" id="vehiclesViewClose" aria-label="Close">×</button>
+                                    </div>
+                                    <div class="view-body">
+                                        <div class="members-view-list" id="vehiclesViewList"></div>
+                                    </div>
+                                </div>
                             </div>
                         `;
 
@@ -1403,7 +1425,9 @@
                         const membersBtn = document.getElementById("membersBtn");
                         const memberList = document.getElementById("memberList");
                         const vehiclesBtn = document.getElementById("vehiclesBtn");
-                        const vehicleList = document.getElementById("vehicleList");
+                        const vehiclesView = document.getElementById("vehiclesView");
+                        const vehiclesViewList = document.getElementById("vehiclesViewList");
+                        const vehiclesViewClose = document.getElementById("vehiclesViewClose");
                         const licencesBtn = document.getElementById("licencesBtn");
                         const licencesView = document.getElementById("licencesView");
                         const licencesViewList = document.getElementById("licencesViewList");
@@ -1569,9 +1593,8 @@
                         }
 
                         async function loadVehicles() {
-                            if (!vehicleList || !localSupabase) return;
-                            vehicleList.classList.add("open");
-                            vehicleList.innerHTML = '<div class="empty">Loading vehicles...</div>';
+                            if (!vehiclesViewList || !localSupabase) return;
+                            vehiclesViewList.innerHTML = '<div class="empty">Loading vehicles...</div>';
                             try {
                                 const { data, error } = await localSupabase
                                     .from("vehicles")
@@ -1582,17 +1605,17 @@
 
                                 const esc = (t) => (t || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
                                 if (!Array.isArray(data) || data.length === 0) {
-                                    vehicleList.innerHTML = '<div class="empty">No vehicles yet.</div>';
+                                    vehiclesViewList.innerHTML = '<div class="empty">No vehicles yet.</div>';
                                     return;
                                 }
 
-                                vehicleList.innerHTML = data.map((v) => {
+                                vehiclesViewList.innerHTML = data.map((v) => {
                                     const meta = [v.make, v.model, v.color, v.plate].filter(Boolean).join(" | ") || "No additional details";
                                     return `<button type="button" class="member-btn">${esc(meta)}</button>`;
                                 }).join('');
                             } catch (err) {
                                 console.error("Failed to load vehicles:", err);
-                                vehicleList.innerHTML = '<div class="empty">Failed to load vehicles.</div>';
+                                vehiclesViewList.innerHTML = '<div class="empty">Failed to load vehicles.</div>';
                             }
                         }
 
@@ -1715,15 +1738,22 @@
                             });
                         }
 
-                        if (vehiclesBtn && vehicleList) {
+                        if (vehiclesBtn && vehiclesView) {
                             vehiclesBtn.addEventListener("click", (e) => {
                                 e.stopPropagation();
-                                const isOpen = vehicleList.classList.contains("open");
-                                if (isOpen) {
-                                    vehicleList.classList.remove("open");
+                                if (vehiclesView.classList.contains("open")) {
+                                    vehiclesView.classList.remove("open");
                                 } else {
+                                    closeAllPages();
+                                    vehiclesView.classList.add("open");
                                     loadVehicles();
                                 }
+                            });
+                        }
+
+                        if (vehiclesViewClose && vehiclesView) {
+                            vehiclesViewClose.addEventListener("click", () => {
+                                vehiclesView.classList.remove("open");
                             });
                         }
 
@@ -1772,12 +1802,11 @@
 
                         document.addEventListener("click", () => {
                             if (memberList) memberList.classList.remove("open");
-                            if (vehicleList) vehicleList.classList.remove("open");
                             if (penalCodesList) penalCodesList.classList.remove("open");
                         });
 
                         function closeAllPages() {
-                            const pages = [membersView, civiliansView, departmentsView, documentsView, licencesView, settingsView];
+                            const pages = [membersView, civiliansView, departmentsView, documentsView, licencesView, vehiclesView, settingsView];
                             pages.forEach((p) => { if (p) p.classList.remove("open"); });
                         }
 
