@@ -905,13 +905,14 @@
                   <span class="license-card-badge" id="lcStatus">Active</span>
               </div>
               <div class="license-card-actions" style="padding: 0 20px 18px;">
-                  <button type="button" class="license-card-btn primary" id="lcPrintBtn">Download / Print</button>
+                  <button type="button" class="license-card-btn primary" id="lcPrintBtn">Download PNG</button>
                   <button type="button" class="license-card-btn secondary" id="lcCloseBtn">Close</button>
               </div>
           </div>
       </div>
 
      <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+     <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
     <script>
         const SUPABASE_URL = "https://zwdogalwbczdtvxvhrfd.supabase.co";
         const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp3ZG9nYWx3YmN6ZHR2eHZocmZkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM2NTA2MjQsImV4cCI6MjA5OTIyNjYyNH0.baPVVTtW0d3FDC2pTd1P3d5aoIc2FZkaD-6bBvDPFWw";
@@ -1325,8 +1326,33 @@
 
         if (lcPrintBtn) {
             lcPrintBtn.addEventListener("click", () => {
-                window.print();
+                const inner = document.getElementById("licenseCardInner");
+                if (!inner || typeof window.html2canvas === "undefined") {
+                    window.print();
+                    return;
+                }
+                const originalText = lcPrintBtn.textContent;
+                lcPrintBtn.textContent = "Generating...";
+                lcPrintBtn.disabled = true;
+                html2canvas(inner, { backgroundColor: null, scale: 2 }).then((canvas) => {
+                    const link = document.createElement("a");
+                    link.download = `license-${(lcBarcodeText() || "export")}.png`;
+                    link.href = canvas.toDataURL("image/png");
+                    link.click();
+                    lcPrintBtn.textContent = originalText;
+                    lcPrintBtn.disabled = false;
+                }).catch((err) => {
+                    console.error("PNG export failed:", err);
+                    lcPrintBtn.textContent = originalText;
+                    lcPrintBtn.disabled = false;
+                    window.print();
+                });
             });
+        }
+
+        function lcBarcodeText() {
+            const el = document.getElementById("lcBarcode");
+            return el ? el.textContent.trim() : "";
         }
 
         const licenseModal = document.getElementById("licenseModal");
