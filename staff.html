@@ -740,7 +740,8 @@
                     const currentDept = row.department || "";
                     const ipCell = isManagement ? `<td>${(row.ip || "N/A").replace(/</g, "&lt;").replace(/>/g, "&gt;")}</td>` : "";
                     const giveKeyBtn = userDepartment === "Management" ? `<button type="button" class="give-key-btn" data-user-id="${row.id}" data-email="${email.replace(/"/g, '&quot;')}">Give Key</button>` : `<span style="color:#94a3b8;font-size:12px;font-weight:600;">No Permission</span>`;
-                    html += `<tr><td>${email}</td><td>${created}</td><td><select class="department-select" data-user-id="${row.id}"><option value="">Unassigned</option><option value="Management" ${currentDept === 'Management' ? 'selected' : ''}>Management</option><option value="Support Team" ${currentDept === 'Support Team' ? 'selected' : ''}>Support Team</option><option value="Development Team" ${currentDept === 'Development Team' ? 'selected' : ''}>Development Team</option></select></td>${ipCell}<td>${giveKeyBtn}</td></tr>`;
+                    const deptDisabled = isManagement ? "" : "disabled";
+                    html += `<tr><td>${email}</td><td>${created}</td><td><select class="department-select" data-user-id="${row.id}" ${deptDisabled}><option value="">Unassigned</option><option value="Management" ${currentDept === 'Management' ? 'selected' : ''}>Management</option><option value="Support Team" ${currentDept === 'Support Team' ? 'selected' : ''}>Support Team</option><option value="Development Team" ${currentDept === 'Development Team' ? 'selected' : ''}>Development Team</option></select></td>${ipCell}<td>${giveKeyBtn}</td></tr>`;
                 });
                 html += "</table>";
                 contentEl.innerHTML = html;
