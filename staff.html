@@ -622,7 +622,7 @@
                         ? `<span class="status-pill" style="background:#dc2626;width:auto;">Suspended</span>`
                         : `<span class="status-pill" style="background:#16a34a;width:auto;">Active</span>`;
                     const membersOnlyCell = membersOnly
-                        ? `<span class="status-pill" style="background:#2563eb;width:auto;">Members Only</span>`
+                        ? `<span style="display:inline-flex;align-items:center;background:#2563eb;color:#ffffff;border-radius:999px;padding:3px 10px;font-size:11px;font-weight:600;width:auto;">Members Only</span>`
                         : `<span style="color:#94a3b8;font-size:12px;font-weight:600;">Public</span>`;
                     const suspendBtn = canSuspend
                         ? `<button class="verified-btn suspend-server-btn" data-id="${row.id}" data-suspended="${suspended}">${suspended ? "Unsuspend" : "Suspend"}</button>`
