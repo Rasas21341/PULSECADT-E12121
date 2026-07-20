@@ -691,6 +691,16 @@
             border-color: #2563eb;
         }
 
+        .penal-codes-btn.locked {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .penal-codes-btn.locked:hover {
+            background: rgba(15, 23, 42, 0.04);
+            border-color: #e2e8f0;
+        }
+
         .penal-codes-list {
             display: none;
             flex-direction: column;
@@ -1242,7 +1252,7 @@
                                     <div class="btn-dropdown-wrap">
                                         <button type="button" class="penal-codes-btn" id="penalCodesBtn">
                                             <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
-                                            Penal Codes
+                                            Penal Codes (Coming Soon)
                                         </button>
                                         <div class="penal-codes-list" id="penalCodesList"></div>
                                     </div>
@@ -2104,14 +2114,12 @@
                         }
 
                         if (penalCodesBtn && penalCodesList) {
+                            penalCodesBtn.disabled = true;
+                            penalCodesBtn.classList.add("locked");
                             penalCodesBtn.addEventListener("click", (e) => {
                                 e.stopPropagation();
-                                const isOpen = penalCodesList.classList.contains("open");
-                                if (isOpen) {
-                                    penalCodesList.classList.remove("open");
-                                } else {
-                                    loadPenalCodes();
-                                }
+                                penalCodesList.classList.add("open");
+                                penalCodesList.innerHTML = '<div class="empty">Coming soon.</div>';
                             });
                         }
 
