@@ -1884,6 +1884,14 @@
                         async function addDepartment(name, passcode, banner) {
                             if (!name || !localSupabase) return;
                             try {
+                                const { count, error: countError } = await localSupabase
+                                    .from("departments")
+                                    .select("*", { count: "exact", head: true })
+                                    .eq("community_id", id);
+                                if (!countError && typeof count === "number" && count >= 5) {
+                                    alert("This community already has the maximum of 5 departments.");
+                                    return;
+                                }
                                 const payload = { community_id: id, name: name.trim() };
                                 if (passcode && passcode.trim()) payload.passcode = passcode.trim();
                                 if (banner) payload.banner = banner;
