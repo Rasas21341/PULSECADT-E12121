@@ -1053,6 +1053,13 @@
                         </div>
                         <button type="button" class="verified-btn" id="viewSuggestionsBtn">View Suggestions</button>
                     </div>
+                    <div class="master-row">
+                        <div>
+                            <div class="master-row-label">Suggestion Form</div>
+                            <div class="master-row-sub">Open the public suggestion submission page.</div>
+                        </div>
+                        <button type="button" class="verified-btn" id="openSuggestionFormBtn">Open Form</button>
+                    </div>
                 </div>
             `;
 
@@ -1103,6 +1110,13 @@
             const viewSuggestionsBtn = document.getElementById("viewSuggestionsBtn");
             if (viewSuggestionsBtn) {
                 viewSuggestionsBtn.addEventListener("click", loadSuggestions);
+            }
+
+            const openSuggestionFormBtn = document.getElementById("openSuggestionFormBtn");
+            if (openSuggestionFormBtn) {
+                openSuggestionFormBtn.addEventListener("click", () => {
+                    window.open("/suggestionmake", "_blank");
+                });
             }
         }
 
