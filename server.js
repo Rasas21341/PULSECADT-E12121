@@ -194,6 +194,7 @@ const server = http.createServer(async (req, res) => {
     let urlPath = decodeURIComponent(req.url.split("?")[0]);
     if (urlPath === "/") urlPath = "/index.html";
     if (urlPath.startsWith("/community/")) urlPath = "/community.html";
+    if (urlPath === "/suggestionmake") urlPath = "/suggestionmake.html";
     const filePath = path.join(ROOT, urlPath);
     if (!filePath.startsWith(ROOT)) {
         res.writeHead(403);
