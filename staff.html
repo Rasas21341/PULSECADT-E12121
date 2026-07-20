@@ -1046,6 +1046,13 @@
                         </div>
                         <button type="button" class="verified-btn" id="supportPanelBtn">Support Panel</button>
                     </div>
+                    <div class="master-row">
+                        <div>
+                            <div class="master-row-label">View Suggestions</div>
+                            <div class="master-row-sub">Review suggestions submitted through /suggestionmake.</div>
+                        </div>
+                        <button type="button" class="verified-btn" id="viewSuggestionsBtn">View Suggestions</button>
+                    </div>
                 </div>
             `;
 
@@ -1090,6 +1097,118 @@
             if (supportPanelBtn) {
                 supportPanelBtn.addEventListener("click", () => {
                     window.open("support-panel.html", "_blank");
+                });
+            }
+
+            const viewSuggestionsBtn = document.getElementById("viewSuggestionsBtn");
+            if (viewSuggestionsBtn) {
+                viewSuggestionsBtn.addEventListener("click", loadSuggestions);
+            }
+        }
+
+        async function loadSuggestions() {
+            const staff = await ensureStaff();
+            if (!staff.allowed) return;
+            if (staff.department !== "Management") {
+                showStatus("Access denied. Management only.", "error");
+                return;
+            }
+            pageTitle.textContent = "Suggestions";
+            contentEl.innerHTML = `
+                <div class="codes-list-section">
+                    <h2>User Suggestions</h2>
+                    <p>Suggestions submitted through the /suggestionmake page.</p>
+                    <div class="codes-search-row">
+                        <select class="codes-search-input" id="sugFilterSelect">
+                            <option value="">All statuses</option>
+                            <option value="open">Open</option>
+                            <option value="reviewed">Reviewed</option>
+                            <option value="closed">Closed</option>
+                        </select>
+                    </div>
+                    <div class="codes-count" id="sugCount"></div>
+                    <table class="codes-list-table">
+                        <tr><th>Title</th><th>Category</th><th>From</th><th>Submitted</th><th>Status</th><th>Actions</th></tr>
+                        <tbody id="sugListBody"><tr><td colspan="6"><div class="empty">Loading...</div></td></tr></tbody>
+                    </table>
+                </div>
+            `;
+
+            const filterSelect = document.getElementById("sugFilterSelect");
+            const sugListBody = document.getElementById("sugListBody");
+            const sugCount = document.getElementById("sugCount");
+
+            async function renderSuggestions(filter = "") {
+                if (!sugListBody || !localSupabase) return;
+                try {
+                    let query = localSupabase
+                        .from("suggestions")
+                        .select("*")
+                        .order("created_at", { ascending: false });
+                    if (filter) {
+                        query = query.eq("status", filter);
+                    }
+                    const { data, error } = await query;
+                    if (error) {
+                        sugListBody.innerHTML = `<tr><td colspan="6"><div class="empty">Failed to load suggestions: ${error.message}</div></td></tr>`;
+                        return;
+                    }
+                    const rows = Array.isArray(data) ? data : [];
+                    if (sugCount) sugCount.textContent = `${rows.length} suggestion${rows.length === 1 ? '' : 's'}`;
+                    if (rows.length === 0) {
+                        sugListBody.innerHTML = `<tr><td colspan="6"><div class="empty">No suggestions found.</div></td></tr>`;
+                        return;
+                    }
+                    sugListBody.innerHTML = rows.map((row) => {
+                        const title = (row.title || "").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+                        const category = (row.category || "—").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+                        const from = ((row.author_name || row.email) || "Anonymous").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+                        const created = row.created_at ? new Date(row.created_at).toLocaleString() : "";
+                        const status = row.status || "open";
+                        const statusClass = status === "open" ? "codes-used-no" : "codes-used-yes";
+                        return `<tr>
+                            <td>
+                                <strong>${title}</strong><br/>
+                                <span style="font-size:12px;color:#64748b;">${(row.message || "").replace(/</g, "&lt;").replace(/>/g, "&gt;")}</span>
+                            </td>
+                            <td>${category}</td>
+                            <td>${from}</td>
+                            <td>${created}</td>
+                            <td class="${statusClass}">${status}</td>
+                            <td>
+                                <button type="button" class="delete-code-btn" data-id="${row.id}" data-status="${status}" data-action="reviewed" style="background:#2563eb;">Mark Reviewed</button>
+                                <button type="button" class="delete-code-btn" data-id="${row.id}" data-status="${status}" data-action="closed">Close</button>
+                                <button type="button" class="delete-code-btn" data-id="${row.id}" data-status="${status}" data-action="open">Reopen</button>
+                            </td>
+                        </tr>`;
+                    }).join("");
+
+                    sugListBody.querySelectorAll(".delete-code-btn").forEach((btn) => {
+                        btn.addEventListener("click", async () => {
+                            const id = btn.getAttribute("data-id");
+                            const action = btn.getAttribute("data-action");
+                            const { error } = await localSupabase
+                                .from("suggestions")
+                                .update({ status: action, updated_at: new Date().toISOString() })
+                                .eq("id", id);
+                            if (error) {
+                                alert("Failed to update suggestion: " + error.message);
+                                return;
+                            }
+                            renderSuggestions(filterSelect.value);
+                        });
+                    });
+                } catch (err) {
+                    sugListBody.innerHTML = `<tr><td colspan="6"><div class="empty">An unexpected error occurred.</div></td></tr>`;
+                    console.error(err);
+                }
+            }
+
+            renderSuggestions();
+
+            if (filterSelect) {
+                filterSelect.addEventListener("change", () => {
+                    renderSuggestions(filterSelect.value);
                 });
             }
         }
