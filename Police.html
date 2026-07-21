@@ -27,38 +27,6 @@
             margin: 0;
         }
 
-        .button-row {
-            position: fixed;
-            left: 24px;
-            top: 50%;
-            transform: translateY(-50%);
-            display: flex;
-            gap: 14px;
-            justify-content: center;
-        }
-
-        .lookup-btn {
-            background: transparent;
-            border: none;
-            color: #0f172a;
-            cursor: pointer;
-            padding: 8px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .lookup-btn:hover {
-            background: transparent;
-            opacity: 0.75;
-        }
-
-        .lookup-btn svg {
-            width: 26px;
-            height: 26px;
-            display: block;
-        }
-
         .back-btn {
             position: fixed;
             top: 24px;
@@ -518,201 +486,6 @@
         }
 
 
-        .onduty-box {
-            position: fixed;
-            top: 140px;
-            left: 24px;
-            width: 260px;
-            max-width: calc(100vw - 48px);
-            z-index: 650;
-            background: #ffffff;
-            border: 1px solid #e2e8f0;
-            border-radius: 16px;
-            padding: 16px;
-            box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
-        }
-
-        .onduty-title {
-            font-size: 15px;
-            font-weight: 700;
-            color: #0f172a;
-            margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .onduty-count {
-            font-size: 12px;
-            font-weight: 700;
-            color: #15803d;
-            background: #f0fdf4;
-            border: 1px solid #bbf7d0;
-            border-radius: 999px;
-            padding: 2px 8px;
-        }
-
-        .onduty-list {
-            max-height: 320px;
-            overflow-y: auto;
-        }
-
-        .onduty-item {
-            display: flex;
-            flex-direction: column;
-            padding: 8px 10px;
-            border: 1px solid #eef2f7;
-            border-radius: 10px;
-            margin-bottom: 6px;
-        }
-
-        .onduty-item .od-name {
-            font-size: 13px;
-            font-weight: 700;
-            color: #0f172a;
-        }
-
-        .onduty-item .od-sub {
-            font-size: 11px;
-            color: #64748b;
-            margin-top: 2px;
-        }
-
-        .onduty-empty {
-            font-size: 12px;
-            color: #94a3b8;
-            text-align: center;
-            padding: 12px;
-        }
-
-        .onduty-toggle {
-            width: 100%;
-            margin-top: 10px;
-            padding: 9px;
-            border: none;
-            border-radius: 10px;
-            font-size: 13px;
-            font-weight: 700;
-            cursor: pointer;
-            background: #16a34a;
-            color: #ffffff;
-        }
-
-        .onduty-toggle.off {
-            background: #dc2626;
-        }
-
-        .call-box {
-            position: fixed;
-            top: 140px;
-            right: 24px;
-            width: 300px;
-            max-width: calc(100vw - 48px);
-            z-index: 650;
-            background: #ffffff;
-            border: 1px solid #e2e8f0;
-            border-radius: 16px;
-            padding: 18px;
-            box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
-        }
-
-        .stats-panel {
-            position: fixed;
-            top: 520px;
-            right: 24px;
-            width: 300px;
-            max-width: calc(100vw - 48px);
-            z-index: 650;
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-
-        .stats-card {
-            background: #0f172a;
-            color: #e2e8f0;
-            border: 1px solid rgba(148, 163, 184, 0.18);
-            border-radius: 16px;
-            padding: 18px;
-            box-shadow: 0 6px 18px rgba(15, 23, 42, 0.12);
-        }
-
-        .stats-card-title {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            font-size: 14px;
-            font-weight: 700;
-            color: #f8fafc;
-            margin-bottom: 8px;
-            letter-spacing: 0.01em;
-        }
-
-        .stats-badge {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            min-width: 32px;
-            padding: 4px 10px;
-            border-radius: 999px;
-            background: #111827;
-            color: #f8fafc;
-            font-size: 13px;
-            font-weight: 700;
-        }
-
-        .stats-card-text {
-            font-size: 13px;
-            line-height: 1.5;
-            color: #cbd5e1;
-        }
-
-        .call-box-title {
-            font-size: 15px;
-            font-weight: 700;
-            color: #0f172a;
-            margin-bottom: 14px;
-        }
-
-        .call-field {
-            margin-bottom: 12px;
-        }
-
-        .call-field label {
-            display: block;
-            font-size: 12px;
-            font-weight: 700;
-            color: #475569;
-            margin-bottom: 6px;
-        }
-
-        .call-value {
-            font-size: 14px;
-            color: #0f172a;
-            padding: 4px 0;
-            word-break: break-word;
-        }
-
-        .call-value.prio-1 { color: #dc2626; font-weight: 700; }
-        .call-value.prio-2 { color: #b45309; font-weight: 700; }
-        .call-value.prio-3 { color: #15803d; font-weight: 700; }
-
-        .call-submit {
-            width: 100%;
-            padding: 12px;
-            border: none;
-            border-radius: 12px;
-            background: #2563eb;
-            color: #ffffff;
-            font-size: 14px;
-            font-weight: 700;
-            cursor: pointer;
-        }
-
-        .call-submit:hover {
-            background: #1d4ed8;
-        }
-
         .plate-lookup-btn {
             position: fixed;
             right: 24px;
@@ -733,14 +506,153 @@
             background: #eff6ff;
         }
 
-        .panel-banner {
-            width: 100%;
-            max-width: 520px;
-            height: auto;
-            border-radius: 16px;
+        .civilian-lookup-btn {
+            position: fixed;
+            right: 180px;
+            bottom: 24px;
+            padding: 12px 20px;
+            border-radius: 12px;
+            border: 1px solid #2563eb;
+            background: #ffffff;
+            color: #2563eb;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            z-index: 700;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15);
+        }
+
+        .civilian-lookup-btn:hover {
+            background: #eff6ff;
+        }
+
+        .status-select {
+            padding: 8px 12px;
+            border-radius: 10px;
+            border: 1px solid #cbd5e1;
+            background: #ffffff;
+            color: #0f172a;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            outline: none;
+        }
+
+        .status-select:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+        }
+
+        .id-picture-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.55);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1100;
+            padding: 16px;
+        }
+
+        .id-picture-overlay.open {
+            display: flex;
+        }
+
+        .id-picture-modal {
+            background: #ffffff;
+            border-radius: 20px;
             border: 1px solid #e2e8f0;
-            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
-            margin-bottom: 4px;
+            padding: 22px;
+            width: 100%;
+            max-width: 420px;
+            box-shadow: 0 20px 50px rgba(15, 23, 42, 0.18);
+            text-align: center;
+        }
+
+        .id-picture-modal img {
+            max-width: 100%;
+            max-height: 60vh;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .id-picture-placeholder {
+            padding: 40px 20px;
+            color: #64748b;
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        .suspend-license-btn {
+            padding: 8px 14px;
+            border-radius: 10px;
+            border: 1px solid #dc2626;
+            background: #ffffff;
+            color: #dc2626;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 10px;
+            width: 100%;
+        }
+
+        .suspend-license-btn:hover {
+            background: #fef2f2;
+        }
+
+        .unsuspend-license-btn {
+            padding: 8px 14px;
+            border-radius: 10px;
+            border: 1px solid #22c55e;
+            background: #ffffff;
+            color: #16a34a;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 10px;
+            width: 100%;
+        }
+
+        .unsuspend-license-btn:hover {
+            background: #f0fdf4;
+        }
+
+        .license-status-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 700;
+            margin-left: 6px;
+            vertical-align: middle;
+        }
+
+        .license-status-badge.active {
+            color: #166534;
+            background: #dcfce7;
+            border: 1px solid #bbf7d0;
+        }
+
+        .license-status-badge.suspended {
+            color: #991b1b;
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+        }
+
+        .civilian-name-btn {
+            background: none;
+            border: none;
+            color: #2563eb;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            padding: 0;
+            text-decoration: underline;
+            text-underline-offset: 2px;
+        }
+
+        .civilian-name-btn:hover {
+            color: #1d4ed8;
         }
 
     </style>
@@ -752,83 +664,19 @@
             <span id="statusText">Available</span>
         </div>
         <div class="status-buttons">
-            <button type="button" class="status-btn" id="statusAvailable" data-status="available">Available</button>
-            <button type="button" class="status-btn" id="statusUnavailable" data-status="unavailable">Unavailable</button>
-            <button type="button" class="status-btn" id="statusBusy" data-status="busy">Busy</button>
+            <select id="statusSelect" class="status-select">
+                <option value="available">Available</option>
+                <option value="unavailable">Unavailable</option>
+                <option value="busy">Busy</option>
+            </select>
         </div>
     </div>
 
-
-    <img class="panel-banner" src="https://imgv2-1-f.scribdassets.com/img/document/865053056/original/2dedda0f99/1?v=1" alt="Police panel banner" />
 
     <button class="back-btn" id="backBtn">← Back</button>
-    <div class="button-row">
-        <button type="button" class="lookup-btn" id="lookupBtn" aria-label="Lookup">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="11" cy="11" r="8"></circle>
-                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-            </svg>
-        </button>
-        <button type="button" class="lookup-btn" id="liveMapBtn" aria-label="Live Map" title="Live Map (ER:LC)">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <polygon points="1 6 8 3 16 6 23 3 23 18 16 21 8 18 1 21"></polygon>
-                <line x1="8" y1="3" x2="8" y2="18"></line>
-                <line x1="16" y1="6" x2="16" y2="21"></line>
-            </svg>
-        </button>
-    </div>
 
     <button type="button" class="plate-lookup-btn" id="plateLookupBtn">Plate Lookup</button>
-
-    <div class="call-box" id="callBox">
-        <div class="call-box-title">Call Info</div>
-        <div class="call-field">
-            <label>Location</label>
-            <div class="call-value" id="callLocation">—</div>
-        </div>
-        <div class="call-field">
-            <label>Postal</label>
-            <div class="call-value" id="callPostal">—</div>
-        </div>
-        <div class="call-field">
-            <label>Description</label>
-            <div class="call-value" id="callDescription">—</div>
-        </div>
-        <div class="call-field">
-            <label>Priority</label>
-            <div class="call-value" id="callPriority">—</div>
-        </div>
-    </div>
-
-    <div class="stats-panel" id="statsPanel">
-        <div class="stats-card">
-            <div class="stats-card-title">
-                <span>ACTIVE 911 CALLS</span>
-                <span class="stats-badge" id="callsCount">0</span>
-            </div>
-            <div class="stats-card-text" id="callsText">No active calls.</div>
-        </div>
-        <div class="stats-card">
-            <div class="stats-card-title">
-                <span>ACTIVE BOLOS</span>
-                <span class="stats-badge" id="boloCount">0</span>
-            </div>
-            <div class="stats-card-text" id="boloText">No active BOLOs.</div>
-        </div>
-        <div class="stats-card">
-            <div class="stats-card-title">
-                <span>ACTIVE TRAFFIC STOPS</span>
-                <span class="stats-badge" id="trafficCount">0</span>
-            </div>
-            <div class="stats-card-text" id="trafficText">No active traffic stops.</div>
-        </div>
-    </div>
-
-    <div class="onduty-box" id="ondutyBox">
-        <div class="onduty-title">On Duty <span class="onduty-count" id="ondutyCount">0</span></div>
-        <div class="onduty-list" id="ondutyList"><div class="onduty-empty">No one on duty.</div></div>
-        <button type="button" class="onduty-toggle" id="ondutyToggleBtn">Go On Duty</button>
-    </div>
+    <button type="button" class="civilian-lookup-btn" id="civilianLookupBtn">Lookup Civilian</button>
 
     <div class="modal-overlay" id="lookupModal">
         <div class="modal">
@@ -977,15 +825,13 @@
         </div>
     </div>
 
-    <div class="modal-overlay" id="liveMapModal">
-        <div class="modal" style="max-width:600px;">
+    <div class="id-picture-overlay" id="idPictureOverlay">
+        <div class="id-picture-modal">
             <div class="modal-header">
-                <div class="modal-title">Live Map (ER:LC)</div>
-                <button class="modal-close" id="liveMapModalClose" type="button" aria-label="Close">×</button>
+                <div class="modal-title">ID Picture</div>
+                <button class="modal-close" id="idPictureClose" type="button" aria-label="Close">×</button>
             </div>
-            <canvas id="liveMapCanvas" width="560" height="340" style="width:100%; border-radius:12px; background:#0b1220; display:block;"></canvas>
-            <div id="liveMapStatus" style="font-size:13px; color:#64748b; margin:8px 0;"></div>
-            <div id="liveMapList" style="max-height:200px; overflow:auto;"></div>
+            <div id="idPictureContent"></div>
         </div>
     </div>
 
@@ -1017,23 +863,18 @@
 
         let officerName = "Officer";
         let officerRank = "";
-        let officerCallsign = "";
-        let communityId = new URLSearchParams(window.location.search).get("community") || "default";
 
         (function loadOfficerDetails() {
             const officerInfo = document.getElementById("officerInfo");
             const params = new URLSearchParams(window.location.search);
             const pName = params.get("name");
             const pRank = params.get("rank");
-            const pCallsign = params.get("callsign");
             if (pName) {
                 officerName = pName;
                 officerRank = pRank || "";
-                officerCallsign = pCallsign || "";
                 try {
                     localStorage.setItem("policeOfficerName", officerName);
                     localStorage.setItem("policeOfficerRank", officerRank);
-                    localStorage.setItem("policeOfficerCallsign", officerCallsign);
                 } catch (err) {
                     console.error("Could not save officer details:", err);
                 }
@@ -1041,7 +882,6 @@
                 try {
                     officerName = localStorage.getItem("policeOfficerName") || "Officer";
                     officerRank = localStorage.getItem("policeOfficerRank") || "";
-                    officerCallsign = localStorage.getItem("policeOfficerCallsign") || "";
                 } catch (err) {
                     console.error("Could not read officer details:", err);
                 }
@@ -1060,7 +900,7 @@
 
         const statusDot = document.getElementById("statusDot");
         const statusText = document.getElementById("statusText");
-        const statusButtons = document.querySelectorAll(".status-btn");
+        const statusSelect = document.getElementById("statusSelect");
 
         let currentStatus = "available";
 
@@ -1075,9 +915,9 @@
             if (statusDot) {
                 statusDot.className = "status-dot " + status;
             }
-            statusButtons.forEach((btn) => {
-                btn.classList.toggle("active", btn.getAttribute("data-status") === status);
-            });
+            if (statusSelect) {
+                statusSelect.value = status;
+            }
             try {
                 localStorage.setItem("policeStatus", status);
             } catch (err) {
@@ -1085,11 +925,11 @@
             }
         }
 
-        statusButtons.forEach((btn) => {
-            btn.addEventListener("click", () => {
-                setStatus(btn.getAttribute("data-status"));
+        if (statusSelect) {
+            statusSelect.addEventListener("change", () => {
+                setStatus(statusSelect.value);
             });
-        });
+        }
 
         let savedStatus = "available";
         try {
@@ -1101,7 +941,6 @@
 
         const lookupModal = document.getElementById("lookupModal");
         const lookupModalClose = document.getElementById("lookupModalClose");
-        const lookupBtn = document.getElementById("lookupBtn");
         const plateInput = document.getElementById("plateInput");
         const plateSubmitBtn = document.getElementById("plateSubmitBtn");
         const plateError = document.getElementById("plateError");
@@ -1138,22 +977,8 @@
             });
         }
 
-        if (lookupBtn) {
-            lookupBtn.addEventListener("click", async () => {
-                if (!lookupModal) return;
-                if (plateInput) plateInput.value = "";
-                if (plateError) { plateError.textContent = ""; plateError.style.display = "none"; }
-                if (plateResult) { plateResult.textContent = ""; plateResult.style.display = "none"; }
-                if (civilianInput) civilianInput.value = "";
-                if (civilianError) { civilianError.textContent = ""; civilianError.style.display = "none"; }
-                if (civilianResult) { civilianResult.textContent = ""; civilianResult.style.display = "none"; }
-                lookupModal.classList.add("open");
-                switchLookupTab(document.querySelector('.modal-tab.active'));
-                if (plateInput) plateInput.focus();
-            });
-        }
-
         const plateLookupBtn = document.getElementById("plateLookupBtn");
+        const civilianLookupBtn = document.getElementById("civilianLookupBtn");
         if (plateLookupBtn) {
             plateLookupBtn.addEventListener("click", () => {
                 if (!lookupModal) return;
@@ -1164,6 +989,19 @@
                 const plateTab = document.querySelector('.modal-tab[data-tab="plate"]');
                 switchLookupTab(plateTab);
                 if (plateInput) plateInput.focus();
+            });
+        }
+
+        if (civilianLookupBtn) {
+            civilianLookupBtn.addEventListener("click", () => {
+                if (!lookupModal) return;
+                if (civilianInput) civilianInput.value = "";
+                if (civilianError) { civilianError.textContent = ""; civilianError.style.display = "none"; }
+                if (civilianResult) { civilianResult.textContent = ""; civilianResult.style.display = "none"; }
+                lookupModal.classList.add("open");
+                const civilianTab = document.querySelector('.modal-tab[data-tab="civilian"]');
+                switchLookupTab(civilianTab);
+                if (civilianInput) civilianInput.focus();
             });
         }
 
@@ -1310,14 +1148,29 @@
             if (civilianDetails) civilianDetails.style.display = "block";
             if (selectedCivilianInfo) {
                 selectedCivilianInfo.innerHTML = `
-                    <strong>${(civilian.name || 'N/A').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</strong>
+                    <button type="button" class="civilian-name-btn" id="civilianNameBtn">${escapeHtml(civilian.name || 'N/A')}</button>
                     <span>ID: ${civilian.id} | Age: ${civilian.age || 'N/A'} | Gender: ${civilian.gender || 'N/A'}</span><br>
-                    <span>Address: ${(civilian.address || 'N/A').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</span><br>
-                    <span>Notes: ${(civilian.notes || 'N/A').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</span>
+                    <span>Address: ${escapeHtml(civilian.address || 'N/A')}</span><br>
+                    <span>Notes: ${escapeHtml(civilian.notes || 'N/A')}</span>
+                    <div id="licenseStatusArea" style="margin-top: 8px;"></div>
                 `;
             }
+            const civilianNameBtn = document.getElementById("civilianNameBtn");
+            if (civilianNameBtn) {
+                civilianNameBtn.addEventListener("click", () => {
+                    showIdPicture(civilian);
+                });
+            }
+            loadCivilianLicenseStatus(civilian.id);
             loadCivilianRecords(civilian.id);
             switchTab(document.querySelector('.tab-btn.active'));
+        }
+
+        function escapeHtml(text) {
+            if (!text) return "";
+            const div = document.createElement("div");
+            div.textContent = text;
+            return div.innerHTML;
         }
 
         function switchTab(activeTabBtn) {
@@ -1391,6 +1244,79 @@
             } catch (err) {
                 civilianRecordsList.innerHTML = '<div class="empty">Failed to load records.</div>';
                 console.error(err);
+            }
+        }
+
+        function showIdPicture(civilian) {
+            const overlay = document.getElementById("idPictureOverlay");
+            const content = document.getElementById("idPictureContent");
+            if (!overlay || !content) return;
+
+            const photo = civilian.photo_url || civilian.photo || "";
+            if (photo) {
+                content.innerHTML = `<img src="${escapeHtml(photo)}" alt="ID Picture" />`;
+            } else {
+                content.innerHTML = `<div class="id-picture-placeholder">No ID picture on record.</div>`;
+            }
+
+            overlay.classList.add("open");
+        }
+
+        async function loadCivilianLicenseStatus(civilianId) {
+            const licenseStatusArea = document.getElementById("licenseStatusArea");
+            if (!licenseStatusArea || !localSupabase) return;
+
+            try {
+                const { data, error } = await localSupabase
+                    .from("licenses")
+                    .select("id, license_type, license_number, suspended")
+                    .eq("civilian_id", civilianId)
+                    .order("created_at", { ascending: false })
+                    .limit(1);
+
+                if (error || !Array.isArray(data) || data.length === 0) {
+                    licenseStatusArea.innerHTML = '<span style="font-size: 13px; color: #94a3b8;">No license on record.</span>';
+                    return;
+                }
+
+                const lic = data[0];
+                const isSuspended = !!lic.suspended;
+
+                licenseStatusArea.innerHTML = `
+                    <span style="font-size: 13px; color: #475569;">
+                        License: ${escapeHtml(lic.license_type || 'N/A')} — ${escapeHtml(lic.license_number || 'N/A')}
+                        <span class="license-status-badge ${isSuspended ? 'suspended' : 'active'}">${isSuspended ? 'SUSPENDED' : 'ACTIVE'}</span>
+                    </span>
+                    <button type="button" class="${isSuspended ? 'unsuspend-license-btn' : 'suspend-license-btn'}" id="suspendLicenseBtn" data-license-id="${lic.id}">
+                        ${isSuspended ? 'Unsuspend License' : 'Suspend License'}
+                    </button>
+                `;
+
+                const suspendBtn = document.getElementById("suspendLicenseBtn");
+                if (suspendBtn) {
+                    suspendBtn.addEventListener("click", async () => {
+                        if (!confirm(`Are you sure you want to ${isSuspended ? 'unsuspend' : 'suspend'} this license?`)) return;
+
+                        try {
+                            const { error } = await localSupabase
+                                .from("licenses")
+                                .update({ suspended: !isSuspended })
+                                .eq("id", lic.id);
+
+                            if (error) {
+                                alert("Failed to update license status: " + error.message);
+                                return;
+                            }
+
+                            loadCivilianLicenseStatus(civilianId);
+                        } catch (err) {
+                            alert("Failed to update license status.");
+                            console.error(err);
+                        }
+                    });
+                }
+            } catch (err) {
+                console.error("Failed to load license status:", err);
             }
         }
 
@@ -1677,6 +1603,23 @@
             });
         }
 
+        const idPictureOverlay = document.getElementById("idPictureOverlay");
+        const idPictureClose = document.getElementById("idPictureClose");
+
+        if (idPictureClose) {
+            idPictureClose.addEventListener("click", () => {
+                if (idPictureOverlay) idPictureOverlay.classList.remove("open");
+            });
+        }
+
+        if (idPictureOverlay) {
+            idPictureOverlay.addEventListener("click", (e) => {
+                if (e.target === idPictureOverlay) {
+                    idPictureOverlay.classList.remove("open");
+                }
+            });
+        }
+
         function getText(id) {
             const el = document.getElementById(id);
             return el ? el.value.trim() : "";
@@ -1855,313 +1798,6 @@
         if (arrestDownloadPdfBtn) {
             arrestDownloadPdfBtn.addEventListener("click", generateArrestPdf);
         }
-
-        // ---- ERLC Live Map ----
-        let erlcApiKey = new URLSearchParams(window.location.search).get("erlckey") || "";
-        if (!erlcApiKey) {
-            try { erlcApiKey = localStorage.getItem("policeErkKey") || ""; } catch (e) {}
-        }
-
-        function esc(s) {
-            return String(s == null ? "" : s).replace(/</g, "&lt;").replace(/>/g, "&gt;");
-        }
-
-        const liveMapBtn = document.getElementById("liveMapBtn");
-        const liveMapModal = document.getElementById("liveMapModal");
-        const liveMapModalClose = document.getElementById("liveMapModalClose");
-        const liveMapCanvas = document.getElementById("liveMapCanvas");
-        const liveMapStatus = document.getElementById("liveMapStatus");
-        const liveMapList = document.getElementById("liveMapList");
-
-        if (liveMapBtn && !erlcApiKey) liveMapBtn.style.display = "none";
-
-        let liveMapTimer = null;
-        function stopLiveMap() {
-            if (liveMapTimer) { clearInterval(liveMapTimer); liveMapTimer = null; }
-        }
-
-        async function fetchErkPlayers() {
-            const res = await fetch("/api/erlc/v2/server?Players=true", {
-                headers: { "server-key": erlcApiKey, "Accept": "application/json" }
-            });
-            if (!res.ok) throw new Error("HTTP " + res.status);
-            const json = await res.json();
-            return Array.isArray(json.Players) ? json.Players : [];
-        }
-
-        function drawLiveMap(players) {
-            if (!liveMapCanvas) return;
-            const ctx = liveMapCanvas.getContext("2d");
-            const W = liveMapCanvas.width, H = liveMapCanvas.height;
-            ctx.clearRect(0, 0, W, H);
-            ctx.fillStyle = "#0b1220";
-            ctx.fillRect(0, 0, W, H);
-            ctx.strokeStyle = "rgba(148,163,184,0.15)";
-            ctx.lineWidth = 1;
-            for (let i = 0; i <= W; i += 40) { ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, H); ctx.stroke(); }
-            for (let j = 0; j <= H; j += 40) { ctx.beginPath(); ctx.moveTo(0, j); ctx.lineTo(W, j); ctx.stroke(); }
-
-            if (!players.length) return;
-            let minX = Infinity, maxX = -Infinity, minZ = Infinity, maxZ = -Infinity;
-            players.forEach((p) => {
-                const l = p.Location || {};
-                if (typeof l.LocationX === "number") { minX = Math.min(minX, l.LocationX); maxX = Math.max(maxX, l.LocationX); }
-                if (typeof l.LocationZ === "number") { minZ = Math.min(minZ, l.LocationZ); maxZ = Math.max(maxZ, l.LocationZ); }
-            });
-            if (!isFinite(minX)) { minX = maxX = 0; }
-            if (!isFinite(minZ)) { minZ = maxZ = 0; }
-            const pad = 30;
-            const sx = (maxX === minX) ? 0 : (W - 2 * pad) / (maxX - minX);
-            const sz = (maxZ === minZ) ? 0 : (H - 2 * pad) / (maxZ - minZ);
-            const s = Math.min(sx, sz) || 1;
-            const ox = pad - minX * s + (W - 2 * pad - (maxX - minX) * s) / 2;
-            const oz = pad - minZ * s + (H - 2 * pad - (maxZ - minZ) * s) / 2;
-            const officerLower = (officerName || "").trim().toLowerCase();
-            players.forEach((p) => {
-                const l = p.Location || {};
-                const x = l.LocationX, z = l.LocationZ;
-                if (typeof x !== "number" || typeof z !== "number") return;
-                const px = ox + x * s, py = oz + z * s;
-                const pname = (p.Player || "").split(":")[0];
-                const isOfficer = officerLower && pname.toLowerCase().indexOf(officerLower) !== -1;
-                ctx.beginPath();
-                ctx.arc(px, py, isOfficer ? 7 : 5, 0, Math.PI * 2);
-                ctx.fillStyle = isOfficer ? "#22c55e" : (p.Team === "Civilian" ? "#94a3b8" : "#ef4444");
-                ctx.fill();
-                ctx.fillStyle = "#e2e8f0";
-                ctx.font = "11px sans-serif";
-                ctx.fillText(pname + (p.Callsign ? (" · " + p.Callsign) : ""), px + 8, py + 3);
-            });
-        }
-
-        function renderLiveMapList(players) {
-            if (!liveMapList) return;
-            if (!players.length) { liveMapList.innerHTML = '<div class="empty">No players in server.</div>'; return; }
-            liveMapList.innerHTML = players.map((p) => {
-                const pname = (p.Player || "?").split(":")[0];
-                const l = p.Location || {};
-                const addr = [l.StreetName, l.BuildingNumber, l.PostalCode].filter(Boolean).join(" ");
-                const stars = p.WantedStars ? "★".repeat(Math.min(p.WantedStars, 5)) : "";
-                return `<div class="record-item"><div class="record-text"><strong>${esc(pname)}${p.Callsign ? (" · " + esc(p.Callsign)) : ""}</strong><span>${esc(p.Team || "")}${stars ? (" · " + stars) : ""}${addr ? (" · " + esc(addr)) : ""}</span></div></div>`;
-            }).join("");
-        }
-
-        async function refreshLiveMap() {
-            if (!liveMapModal || !liveMapModal.classList.contains("open")) return;
-            try {
-                const players = await fetchErkPlayers();
-                drawLiveMap(players);
-                renderLiveMapList(players);
-                if (liveMapStatus) liveMapStatus.textContent = players.length + " players currently in server";
-            } catch (err) {
-                if (liveMapStatus) liveMapStatus.textContent = "Live map unavailable: " + err.message + " — check API key / browser CORS";
-                console.error("ERLC live map failed:", err);
-            }
-        }
-
-        function startLiveMap() {
-            refreshLiveMap();
-            stopLiveMap();
-            liveMapTimer = setInterval(refreshLiveMap, 5000);
-        }
-
-        if (liveMapBtn && erlcApiKey) {
-            liveMapBtn.addEventListener("click", () => {
-                if (liveMapModal) liveMapModal.classList.add("open");
-                startLiveMap();
-            });
-        }
-        if (liveMapModalClose) {
-            liveMapModalClose.addEventListener("click", () => { stopLiveMap(); if (liveMapModal) liveMapModal.classList.remove("open"); });
-        }
-        if (liveMapModal) {
-            liveMapModal.addEventListener("click", (e) => {
-                if (e.target === liveMapModal) { stopLiveMap(); liveMapModal.classList.remove("open"); }
-            });
-        }
-
-        const callsCountEl = document.getElementById("callsCount");
-        const boloCountEl = document.getElementById("boloCount");
-        const trafficCountEl = document.getElementById("trafficCount");
-        const callsText = document.getElementById("callsText");
-        const boloText = document.getElementById("boloText");
-        const trafficText = document.getElementById("trafficText");
-
-        async function refreshSidebarStats() {
-            let activeCalls = 0;
-            let activeBolos = 0;
-            let activeTraffic = 0;
-
-            if (localSupabase) {
-                try {
-                    const callsRes = await localSupabase.from("calls").select("id", { count: "exact", head: true });
-                    if (!callsRes.error) activeCalls = callsRes.count || 0;
-                } catch (err) {
-                    console.warn("Calls stats unavailable:", err);
-                }
-
-                try {
-                    const bolosRes = await localSupabase.from("bolos").select("id", { count: "exact", head: true });
-                    if (!bolosRes.error) activeBolos = bolosRes.count || 0;
-                } catch (err) {
-                    console.warn("BOLO stats unavailable:", err);
-                }
-
-                try {
-                    const trafficRes = await localSupabase.from("traffic_stops").select("id", { count: "exact", head: true });
-                    if (!trafficRes.error) activeTraffic = trafficRes.count || 0;
-                } catch (err) {
-                    console.warn("Traffic stop stats unavailable:", err);
-                }
-            }
-
-            if (callsCountEl) callsCountEl.textContent = String(activeCalls);
-            if (boloCountEl) boloCountEl.textContent = String(activeBolos);
-            if (trafficCountEl) trafficCountEl.textContent = String(activeTraffic);
-            if (callsText) callsText.textContent = activeCalls === 0 ? "No active calls." : `${activeCalls} active call${activeCalls === 1 ? "" : "s"}.`;
-            if (boloText) boloText.textContent = activeBolos === 0 ? "No active BOLOs." : `${activeBolos} active BOLO${activeBolos === 1 ? "" : "s"}.`;
-            if (trafficText) trafficText.textContent = activeTraffic === 0 ? "No active traffic stops." : `${activeTraffic} active traffic stop${activeTraffic === 1 ? "" : "s"}.`;
-        }
-
-        setTimeout(refreshSidebarStats, 0);
-        setInterval(refreshSidebarStats, 15000);
-
-        // ---- Call Info box (read-only display) ----
-        const callLocation = document.getElementById("callLocation");
-        const callPostal = document.getElementById("callPostal");
-        const callDescription = document.getElementById("callDescription");
-        const callPriority = document.getElementById("callPriority");
-
-        // ---- On Duty ----
-        const ondutyList = document.getElementById("ondutyList");
-        const ondutyCount = document.getElementById("ondutyCount");
-        const ondutyToggleBtn = document.getElementById("ondutyToggleBtn");
-        let isOnDuty = false;
-        let ondutyTimer = null;
-
-        function odEsc(t) {
-            return (t == null ? "" : String(t)).replace(/</g, "&lt;").replace(/>/g, "&gt;");
-        }
-
-        function renderOnDuty(rows) {
-            if (!ondutyList) return;
-            const list = Array.isArray(rows) ? rows : [];
-            if (ondutyCount) ondutyCount.textContent = String(list.length);
-            if (list.length === 0) {
-                ondutyList.innerHTML = '<div class="onduty-empty">No one on duty.</div>';
-                return;
-            }
-            ondutyList.innerHTML = list.map((r) => {
-                const nm = (r.rank ? r.rank + " " : "") + (r.name || "Officer");
-                const sub = r.callsign ? ("Callsign: " + r.callsign) : "";
-                return `<div class="onduty-item"><div class="od-name">${odEsc(nm)}</div>${sub ? `<div class="od-sub">${odEsc(sub)}</div>` : ""}</div>`;
-            }).join("");
-        }
-
-        async function loadOnDuty() {
-            if (localSupabase) {
-                try {
-                    const { data, error } = await localSupabase
-                        .from("police_on_duty")
-                        .select("*")
-                        .eq("community_id", communityId)
-                        .order("created_at", { ascending: true });
-                    if (!error) {
-                        renderOnDuty(data || []);
-                        return;
-                    }
-                } catch (err) {
-                    console.error("Load on-duty failed:", err);
-                }
-            }
-            try {
-                const all = JSON.parse(localStorage.getItem("police_on_duty_" + communityId) || "[]");
-                renderOnDuty(all);
-            } catch (e) {
-                renderOnDuty([]);
-            }
-        }
-
-        function saveLocalOnDuty(record, add) {
-            try {
-                let all = JSON.parse(localStorage.getItem("police_on_duty_" + communityId) || "[]");
-                all = all.filter((r) => r.officer_id !== officerId);
-                if (add) all.push(record);
-                localStorage.setItem("police_on_duty_" + communityId, JSON.stringify(all));
-            } catch (e) { /* ignore */ }
-        }
-
-        async function goOnDuty() {
-            const record = {
-                community_id: communityId,
-                officer_id: officerId,
-                name: officerName,
-                rank: officerRank,
-                callsign: officerCallsign,
-                created_at: new Date().toISOString()
-            };
-            if (localSupabase) {
-                try {
-                    await localSupabase.from("police_on_duty").delete().eq("officer_id", officerId).eq("community_id", communityId);
-                    const { error } = await localSupabase.from("police_on_duty").insert([record]);
-                    if (error) throw error;
-                } catch (err) {
-                    console.error("Go on-duty failed, using local fallback:", err);
-                    saveLocalOnDuty(record, true);
-                }
-            } else {
-                saveLocalOnDuty(record, true);
-            }
-            isOnDuty = true;
-            updateDutyButton();
-            loadOnDuty();
-        }
-
-        async function goOffDuty() {
-            if (localSupabase) {
-                try {
-                    await localSupabase.from("police_on_duty").delete().eq("officer_id", officerId).eq("community_id", communityId);
-                } catch (err) {
-                    console.error("Go off-duty failed:", err);
-                }
-            }
-            saveLocalOnDuty({ officer_id: officerId }, false);
-            isOnDuty = false;
-            updateDutyButton();
-            loadOnDuty();
-        }
-
-        function updateDutyButton() {
-            if (!ondutyToggleBtn) return;
-            if (isOnDuty) {
-                ondutyToggleBtn.textContent = "Go Off Duty";
-                ondutyToggleBtn.classList.add("off");
-            } else {
-                ondutyToggleBtn.textContent = "Go On Duty";
-                ondutyToggleBtn.classList.remove("off");
-            }
-        }
-
-        if (ondutyToggleBtn) {
-            ondutyToggleBtn.addEventListener("click", () => {
-                if (isOnDuty) goOffDuty();
-                else goOnDuty();
-            });
-        }
-
-        window.addEventListener("beforeunload", () => {
-            if (isOnDuty) {
-                try {
-                    if (localSupabase) {
-                        localSupabase.from("police_on_duty").delete().eq("officer_id", officerId).eq("community_id", communityId);
-                    }
-                    saveLocalOnDuty({ officer_id: officerId }, false);
-                } catch (e) { /* ignore */ }
-            }
-        });
-
-        loadOnDuty();
-        ondutyTimer = setInterval(loadOnDuty, 8000);
     </script>
 </body>
-</html>
+</html>s
