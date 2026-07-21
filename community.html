@@ -1604,14 +1604,28 @@
                                 if (error) throw error;
 
                                 const esc = (t) => (t || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+                                const civilianIds = [...new Set((data || []).map((v) => v.civilian_id).filter(Boolean))];
+                                let civilianNameById = {};
+                                if (civilianIds.length > 0) {
+                                    const { data: civilians, error: civError } = await localSupabase
+                                        .from("civilians")
+                                        .select("id, name")
+                                        .in("id", civilianIds);
+                                    if (!civError && Array.isArray(civilians)) {
+                                        civilians.forEach((c) => { civilianNameById[c.id] = c.name; });
+                                    }
+                                }
+
                                 if (!Array.isArray(data) || data.length === 0) {
                                     vehiclesViewList.innerHTML = '<div class="empty">No vehicles yet.</div>';
                                     return;
                                 }
 
                                 vehiclesViewList.innerHTML = data.map((v) => {
-                                    const meta = [v.make, v.model, v.color, v.plate].filter(Boolean).join(" | ") || "No additional details";
-                                    return `<button type="button" class="member-btn">${esc(meta)}</button>`;
+                                    const name = esc(civilianNameById[v.civilian_id] || "Unknown Civilian");
+                                    const detail = [v.make, v.model, v.color, v.plate].filter(Boolean).join(" | ") || "No details";
+                                    return `<button type="button" class="member-btn">${name} — ${esc(detail)}</button>`;
                                 }).join('');
                             } catch (err) {
                                 console.error("Failed to load vehicles:", err);

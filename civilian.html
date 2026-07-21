@@ -245,9 +245,111 @@
              margin-left: 8px;
          }
 
-         .license-download-btn:hover {
-             background: #dbeafe;
-         }
+          .license-download-btn:hover {
+              background: #dbeafe;
+          }
+
+          .vehicle-list {
+              margin-top: 8px;
+          }
+
+          .vehicle-item {
+              font-size: 13px;
+              color: #334155;
+              padding: 4px 0;
+              border-bottom: 1px solid #f1f5f9;
+          }
+
+          .vehicle-item:last-child {
+              border-bottom: none;
+          }
+
+          .vehicle-delete-btn {
+              padding: 2px 8px;
+              border-radius: 999px;
+              font-size: 11px;
+              font-weight: 700;
+              color: #dc2626;
+              background: #fef2f2;
+              border: 1px solid #fecaca;
+              cursor: pointer;
+              margin-left: 8px;
+          }
+
+          .vehicle-delete-btn:hover {
+              background: #fee2e2;
+          }
+
+          .my-civilians-actions {
+              display: flex;
+              gap: 8px;
+              flex-wrap: wrap;
+          }
+
+          .my-civilians-action-btn {
+              padding: 6px 12px;
+              border-radius: 999px;
+              font-size: 12px;
+              font-weight: 700;
+              cursor: pointer;
+              border: 1px solid;
+          }
+
+          .my-civilians-action-btn.primary {
+              color: #2563eb;
+              background: #ffffff;
+              border-color: #2563eb;
+          }
+
+          .my-civilians-action-btn.primary:hover {
+              background: #eff6ff;
+          }
+
+          .my-civilians-action-btn.danger {
+              color: #dc2626;
+              background: #ffffff;
+              border-color: #dc2626;
+          }
+
+          .my-civilians-action-btn.danger:hover {
+              background: #fef2f2;
+          }
+
+          .vehicle-card-actions {
+              display: flex;
+              gap: 8px;
+              flex-wrap: wrap;
+          }
+
+          .vehicle-action-btn {
+              padding: 6px 12px;
+              border-radius: 999px;
+              font-size: 12px;
+              font-weight: 700;
+              cursor: pointer;
+              border: 1px solid;
+          }
+
+          .vehicle-action-btn.primary {
+              color: #2563eb;
+              background: #ffffff;
+              border-color: #2563eb;
+          }
+
+          .vehicle-action-btn.primary:hover {
+              background: #eff6ff;
+          }
+
+          .vehicle-action-btn.danger {
+              color: #dc2626;
+              background: #ffffff;
+              border-color: #dc2626;
+          }
+
+          .vehicle-action-btn.danger:hover {
+              background: #fef2f2;
+          }
+
 
           @media print {
               body {
@@ -800,6 +902,7 @@
                     <div class="my-civilians-actions">
                         <button type="button" class="my-civilians-action-btn primary" id="sectionEditBtn" disabled>Edit Selected</button>
                         <button type="button" class="my-civilians-action-btn primary" id="sectionLicenseBtn" disabled>Create License</button>
+                        <button type="button" class="my-civilians-action-btn primary" id="sectionVehicleBtn" disabled>Add Vehicle</button>
                         <button type="button" class="my-civilians-action-btn danger" id="sectionDeleteBtn" disabled>Delete Selected</button>
                     </div>
                 </div>
@@ -910,9 +1013,37 @@
               <button type="button" class="license-card-btn primary" id="lcPrintBtn">Download PNG</button>
               <button type="button" class="license-card-btn secondary" id="lcCloseBtn">Close</button>
           </div>
-      </div>
+       </div>
 
-     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+      <div class="modal-overlay" id="vehicleModal">
+          <div class="modal">
+              <div class="modal-header">
+                  <div class="modal-title">Add Vehicle</div>
+                  <button class="modal-close" id="vehicleModalClose" type="button" aria-label="Close">×</button>
+              </div>
+              <div class="form-field">
+                  <label for="vehicleMake">Make</label>
+                  <input type="text" id="vehicleMake" placeholder="e.g. Toyota" required />
+              </div>
+              <div class="form-field">
+                  <label for="vehicleModel">Model</label>
+                  <input type="text" id="vehicleModel" placeholder="e.g. Camry" required />
+              </div>
+              <div class="form-field">
+                  <label for="vehicleColor">Color</label>
+                  <input type="text" id="vehicleColor" placeholder="e.g. Blue" />
+              </div>
+              <div class="form-field">
+                  <label for="vehiclePlate">Plate</label>
+                  <input type="text" id="vehiclePlate" placeholder="e.g. ABC 123" required />
+              </div>
+              <button type="button" class="submit-btn" id="vehicleSubmitBtn">Add Vehicle</button>
+              <div class="form-error" id="vehicleError"></div>
+              <div class="form-success" id="vehicleSuccess"></div>
+           </div>
+       </div>
+
+      <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
      <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
     <script>
         const SUPABASE_URL = "https://zwdogalwbczdtvxvhrfd.supabase.co";
@@ -988,12 +1119,15 @@
                         ${civilian.photo_url ? `<img src="${escapeHtml(civilian.photo_url)}" style="max-width: 80px; max-height: 80px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 8px; display: block;" />` : ""}
                         <div class="civilian-card-actions">
                             <button type="button" class="civilian-action-btn primary" data-view-license="${civilian.id}">View License</button>
+                            <button type="button" class="civilian-action-btn primary" data-add-vehicle="${civilian.id}">Add Vehicle</button>
                         </div>
                         <div class="license-list" id="licenseList-${civilian.id}"></div>
+                        <div class="vehicle-list" id="vehicleList-${civilian.id}"></div>
                     `;
 
                     card.addEventListener("click", (e) => {
                         if (e.target.closest("[data-view-license]")) return;
+                        if (e.target.closest("[data-add-vehicle]")) return;
                         selectCivilianCard(civilian.id, card);
                     });
 
@@ -1004,7 +1138,14 @@
                         openLicenseFromCivilian(civilian);
                     });
 
+                    card.querySelector("[data-add-vehicle]")?.addEventListener("click", (e) => {
+                        e.stopPropagation();
+                        currentCivilianId = civilian.id;
+                        openVehicleModal();
+                    });
+
                     loadLicenses(civilian.id);
+                    loadVehicles(civilian.id);
                 }
             } catch (err) {
                 console.error("Failed to load civilians:", err);
@@ -1021,9 +1162,11 @@
 
             const sectionEditBtn = document.getElementById("sectionEditBtn");
             const sectionLicenseBtn = document.getElementById("sectionLicenseBtn");
+            const sectionVehicleBtn = document.getElementById("sectionVehicleBtn");
             const sectionDeleteBtn = document.getElementById("sectionDeleteBtn");
             if (sectionEditBtn) sectionEditBtn.disabled = false;
             if (sectionLicenseBtn) sectionLicenseBtn.disabled = false;
+            if (sectionVehicleBtn) sectionVehicleBtn.disabled = false;
             if (sectionDeleteBtn) sectionDeleteBtn.disabled = false;
         }
 
@@ -1064,6 +1207,48 @@
                 });
             } catch (err) {
                 console.error("Failed to load licenses:", err);
+            }
+        }
+
+        async function loadVehicles(civilianId) {
+            const listEl = document.getElementById(`vehicleList-${civilianId}`);
+            if (!listEl || !localSupabase) return;
+
+            try {
+                const { data, error } = await localSupabase
+                    .from("vehicles")
+                    .select("*")
+                    .eq("civilian_id", civilianId)
+                    .order("created_at", { ascending: false });
+
+                if (error || !Array.isArray(data) || data.length === 0) {
+                    listEl.innerHTML = "";
+                    return;
+                }
+
+                listEl.innerHTML = data.map((v) => `
+                    <div class="vehicle-item">
+                        <strong>${escapeHtml(v.make || "")} ${escapeHtml(v.model || "")}</strong>
+                        ${v.color ? `<span style="color:#64748b;"> — ${escapeHtml(v.color)}</span>` : ""}
+                        ${v.plate ? `<span style="color:#2563eb; font-weight:700;"> — ${escapeHtml(v.plate)}</span>` : ""}
+                        <button type="button" class="vehicle-delete-btn" data-vehicle-id="${v.id}">Remove</button>
+                    </div>
+                `).join("");
+
+                listEl.querySelectorAll(".vehicle-delete-btn").forEach((btn) => {
+                    btn.addEventListener("click", async (e) => {
+                        e.stopPropagation();
+                        if (!confirm("Remove this vehicle?")) return;
+                        try {
+                            await localSupabase.from("vehicles").delete().eq("id", btn.getAttribute("data-vehicle-id"));
+                            loadVehicles(civilianId);
+                        } catch (err) {
+                            console.error("Failed to delete vehicle:", err);
+                        }
+                    });
+                });
+            } catch (err) {
+                console.error("Failed to load vehicles:", err);
             }
         }
 
@@ -1481,7 +1666,112 @@
             });
         }
 
-        document.getElementById("backBtn").addEventListener("click", () => history.back());
+        const vehicleModal = document.getElementById("vehicleModal");
+        const vehicleModalClose = document.getElementById("vehicleModalClose");
+        const vehicleSubmitBtn = document.getElementById("vehicleSubmitBtn");
+        const vehicleError = document.getElementById("vehicleError");
+        const vehicleSuccess = document.getElementById("vehicleSuccess");
+
+        if (vehicleModalClose) {
+            vehicleModalClose.addEventListener("click", () => {
+                if (vehicleModal) vehicleModal.classList.remove("open");
+            });
+        }
+
+        if (vehicleModal) {
+            vehicleModal.addEventListener("click", (e) => {
+                if (e.target === vehicleModal) vehicleModal.classList.remove("open");
+            });
+        }
+
+        function openVehicleModal() {
+            if (!vehicleModal) return;
+            if (vehicleError) { vehicleError.textContent = ""; vehicleError.style.display = "none"; }
+            if (vehicleSuccess) { vehicleSuccess.textContent = ""; vehicleSuccess.style.display = "none"; }
+            vehicleModal.classList.add("open");
+        }
+
+        if (vehicleSubmitBtn) {
+            vehicleSubmitBtn.addEventListener("click", async () => {
+                if (!currentCivilianId) {
+                    if (vehicleError) { vehicleError.textContent = "No civilian selected."; vehicleError.style.display = "block"; }
+                    return;
+                }
+
+                const user = await getCurrentUser();
+                if (!user) {
+                    if (vehicleError) { vehicleError.textContent = "You must be logged in."; vehicleError.style.display = "block"; }
+                    return;
+                }
+
+                const make = document.getElementById("vehicleMake")?.value.trim() || "";
+                const model = document.getElementById("vehicleModel")?.value.trim() || "";
+                const color = document.getElementById("vehicleColor")?.value.trim() || "";
+                const plate = document.getElementById("vehiclePlate")?.value.trim() || "";
+
+                if (!make || !model || !plate) {
+                    if (vehicleError) { vehicleError.textContent = "Make, Model, and Plate are required."; vehicleError.style.display = "block"; }
+                    return;
+                }
+
+                if (!localSupabase) {
+                    if (vehicleError) { vehicleError.textContent = "Database unavailable."; vehicleError.style.display = "block"; }
+                    return;
+                }
+
+                if (vehicleError) { vehicleError.textContent = ""; vehicleError.style.display = "none"; }
+                if (vehicleSuccess) { vehicleSuccess.textContent = ""; vehicleSuccess.style.display = "none"; }
+
+                try {
+                    const { error } = await localSupabase
+                        .from("vehicles")
+                        .insert([{
+                            civilian_id: currentCivilianId,
+                            user_id: user.id,
+                            make,
+                            model,
+                            color: color || null,
+                            plate,
+                            created_at: new Date().toISOString()
+                        }]);
+
+                    if (error) {
+                        if (vehicleError) { vehicleError.textContent = error.message || "Failed to add vehicle."; vehicleError.style.display = "block"; }
+                        console.error("Vehicle insert failed:", error);
+                        return;
+                    }
+
+                    if (vehicleSuccess) { vehicleSuccess.textContent = "Vehicle added successfully."; vehicleSuccess.style.display = "block"; }
+
+                    document.getElementById("vehicleMake").value = "";
+                    document.getElementById("vehicleModel").value = "";
+                    document.getElementById("vehicleColor").value = "";
+                    document.getElementById("vehiclePlate").value = "";
+
+                    loadVehicles(currentCivilianId);
+
+                    setTimeout(() => {
+                        if (vehicleModal) vehicleModal.classList.remove("open");
+                    }, 800);
+                } catch (err) {
+                    if (vehicleError) { vehicleError.textContent = "Failed to add vehicle."; vehicleError.style.display = "block"; }
+                    console.error(err);
+                }
+            });
+        }
+
+        const sectionVehicleBtn = document.getElementById("sectionVehicleBtn");
+        if (sectionVehicleBtn) {
+            sectionVehicleBtn.addEventListener("click", () => {
+                if (!selectedCivilianId) {
+                    alert("Select a civilian first by clicking on their card.");
+                    return;
+                }
+                currentCivilianId = selectedCivilianId;
+                openVehicleModal();
+            });
+        }
+
 
         const form = document.getElementById("createCivilianForm");
         const formError = document.getElementById("formError");
@@ -1612,15 +1902,17 @@
                     alert("Select a civilian first by clicking on their card.");
                     return;
                 }
-                if (!confirm("Delete this civilian and all associated licenses?")) return;
+                if (!confirm("Delete this civilian and all associated licenses and vehicles?")) return;
                 if (!localSupabase) return;
                 try {
+                    await localSupabase.from("vehicles").delete().eq("civilian_id", selectedCivilianId);
                     await localSupabase.from("licenses").delete().eq("civilian_id", selectedCivilianId);
                     await localSupabase.from("civilians").delete().eq("id", selectedCivilianId);
                     selectedCivilianId = null;
                     document.querySelectorAll(".civilian-card").forEach((c) => c.classList.remove("selected"));
                     if (sectionEditBtn) sectionEditBtn.disabled = true;
                     if (sectionLicenseBtn) sectionLicenseBtn.disabled = true;
+                    if (sectionVehicleBtn) sectionVehicleBtn.disabled = true;
                     if (sectionDeleteBtn) sectionDeleteBtn.disabled = true;
                     loadMyCivilians();
                 } catch (err) {
