@@ -2329,11 +2329,11 @@
         function renderBolos() {
             if (!boloPanel || !boloList) return;
             const bolos = loadBolos();
+            boloPanel.style.display = "block";
             if (bolos.length === 0) {
-                boloPanel.style.display = "none";
+                boloList.innerHTML = '<div style="font-size: 13px; color: #64748b; text-align: center; padding: 10px 0;">No active BOLOs.</div>';
                 return;
             }
-            boloPanel.style.display = "block";
             boloList.innerHTML = bolos.map((b, idx) => `
                 <div class="bolo-item">
                     <div class="bolo-item-header">
