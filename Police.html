@@ -39,10 +39,33 @@
             font-size: 14px;
             font-weight: 600;
             cursor: pointer;
+            z-index: 700;
         }
 
         .back-btn:hover {
             background: #f1f5f9;
+        }
+
+        .create-civilian-btn {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            padding: 10px 18px;
+            border-radius: 12px;
+            border: 1px solid #2563eb;
+            background: #2563eb;
+            color: #ffffff;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            z-index: 700;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+            transition: background .15s ease, border-color .15s ease;
+        }
+
+        .create-civilian-btn:hover {
+            background: #1d4ed8;
+            border-color: #1d4ed8;
         }
 
         .status-bar {
@@ -270,7 +293,8 @@
         }
 
         .report-field input,
-        .report-field textarea {
+        .report-field textarea,
+        .report-field select {
             width: 100%;
             padding: 12px 14px;
             border-radius: 12px;
@@ -284,7 +308,8 @@
         }
 
         .report-field input:focus,
-        .report-field textarea:focus {
+        .report-field textarea:focus,
+        .report-field select:focus {
             border-color: #2563eb;
             box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
         }
@@ -452,39 +477,6 @@
             background: #fee2e2;
             color: #ef4444;
         }
-
-        .modal-tabs {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 14px;
-        }
-
-        .modal-tab {
-            flex: 1;
-            padding: 8px 12px;
-            border-radius: 8px;
-            border: 1px solid #cbd5e1;
-            background: #ffffff;
-            color: #0f172a;
-            font-size: 14px;
-            font-weight: 700;
-            cursor: pointer;
-        }
-
-        .modal-tab.active {
-            background: #eff6ff;
-            border-color: #2563eb;
-            color: #1d4ed8;
-        }
-
-        .modal-tab-panel {
-            display: none;
-        }
-
-        .modal-tab-panel.active {
-            display: block;
-        }
-
 
         .plate-lookup-btn {
             position: fixed;
@@ -674,53 +666,97 @@
 
 
     <button class="back-btn" id="backBtn">← Back</button>
+    <button class="create-civilian-btn" id="createCivilianBtn">+ Create Civilian</button>
+
+    <div class="modal-overlay" id="createCivilianModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">Create Civilian</div>
+                <button class="modal-close" id="createCivilianClose" type="button" aria-label="Close">×</button>
+            </div>
+            <div class="report-field">
+                <label for="ccName">Full Name</label>
+                <input type="text" id="ccName" placeholder="John Doe" required />
+            </div>
+            <div class="report-field">
+                <label for="ccAge">Age</label>
+                <input type="number" id="ccAge" placeholder="25" min="0" max="120" />
+            </div>
+            <div class="report-field">
+                <label for="ccGender">Gender</label>
+                <select id="ccGender">
+                    <option value="">Select</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Other">Other</option>
+                </select>
+            </div>
+            <div class="report-field">
+                <label for="ccAddress">Address</label>
+                <input type="text" id="ccAddress" placeholder="123 Main St" />
+            </div>
+            <div class="report-field">
+                <label for="ccNotes">Notes</label>
+                <textarea id="ccNotes" placeholder="Any relevant details..."></textarea>
+            </div>
+            <div class="report-field">
+                <label>Photo</label>
+                <input type="file" id="ccPhoto" accept="image/*" />
+                <img id="ccPhotoPreview" style="max-width: 120px; max-height: 120px; margin-top: 8px; border-radius: 8px; border: 1px solid #e2e8f0; display: none;" />
+            </div>
+            <button type="button" class="report-submit" id="createCivilianSubmitBtn">Create Civilian</button>
+            <div class="lookup-error" id="createCivilianError"></div>
+            <div class="lookup-result" id="createCivilianSuccess"></div>
+        </div>
+    </div>
 
     <button type="button" class="plate-lookup-btn" id="plateLookupBtn">Plate Lookup</button>
     <button type="button" class="civilian-lookup-btn" id="civilianLookupBtn">Lookup Civilian</button>
 
-    <div class="modal-overlay" id="lookupModal">
+    <div class="modal-overlay" id="plateLookupModal">
         <div class="modal">
             <div class="modal-header">
-                <div class="modal-title">Lookup</div>
-                <button class="modal-close" id="lookupModalClose" type="button" aria-label="Close">×</button>
+                <div class="modal-title">Plate Lookup</div>
+                <button class="modal-close" id="plateLookupClose" type="button" aria-label="Close">×</button>
             </div>
-            <div class="modal-tabs">
-                <button type="button" class="modal-tab active" data-tab="plate" data-target="lookupPlatePanel">Plate</button>
-                <button type="button" class="modal-tab" data-tab="civilian" data-target="lookupCivilianPanel">Civilian</button>
+            <div class="lookup-field">
+                <label for="plateInput">Plate number</label>
+                <input type="text" id="plateInput" placeholder="e.g. ABC 123" />
             </div>
-            <div class="modal-tab-panel active" id="lookupPlatePanel">
-                <div class="lookup-field">
-                    <label for="plateInput">Plate number</label>
-                    <input type="text" id="plateInput" placeholder="e.g. ABC 123" />
+            <button type="button" class="lookup-submit" id="plateSubmitBtn">Search</button>
+            <div class="lookup-error" id="plateError"></div>
+            <div class="lookup-result" id="plateResult"></div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="civilianLookupModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">Civilian Lookup</div>
+                <button class="modal-close" id="civilianLookupClose" type="button" aria-label="Close">×</button>
+            </div>
+            <div class="lookup-field">
+                <label for="civilianInput">Name or ID</label>
+                <input type="text" id="civilianInput" placeholder="e.g. John Doe" />
+            </div>
+            <button type="button" class="lookup-submit" id="civilianSubmitBtn">Search</button>
+            <div class="lookup-error" id="civilianError"></div>
+            <div class="lookup-result" id="civilianResult"></div>
+            <div id="civilianDetails" style="display:none; margin-top:14px;">
+                <div class="tabs">
+                    <button type="button" class="tab-btn active" data-tab="details" data-target="civilianDetailsPanel">Details</button>
+                    <button type="button" class="tab-btn" data-tab="records" data-target="civilianRecordsPanel">Records</button>
                 </div>
-                <button type="button" class="lookup-submit" id="plateSubmitBtn">Search</button>
-                <div class="lookup-error" id="plateError"></div>
-                <div class="lookup-result" id="plateResult"></div>
-            </div>
-            <div class="modal-tab-panel" id="lookupCivilianPanel">
-                <div class="lookup-field">
-                    <label for="civilianInput">Name or ID</label>
-                    <input type="text" id="civilianInput" placeholder="e.g. John Doe" />
+                <div class="tab-panel active" id="civilianDetailsPanel">
+                    <div class="record-item" id="selectedCivilianInfo"></div>
+                    <div class="record-actions">
+                        <button type="button" class="record-action-btn" id="openTrafficStopBtn">Traffic Stop</button>
+                        <button type="button" class="record-action-btn citation" id="openCitationBtn">Citation</button>
+                        <button type="button" class="record-action-btn arrest" id="openArrestBtn">Arrest</button>
+                    </div>
                 </div>
-                <button type="button" class="lookup-submit" id="civilianSubmitBtn">Search</button>
-                <div class="lookup-error" id="civilianError"></div>
-                <div class="lookup-result" id="civilianResult"></div>
-                <div id="civilianDetails" style="display:none; margin-top:14px;">
-                    <div class="tabs">
-                        <button type="button" class="tab-btn active" data-tab="details" data-target="civilianDetailsPanel">Details</button>
-                        <button type="button" class="tab-btn" data-tab="records" data-target="civilianRecordsPanel">Records</button>
-                    </div>
-                    <div class="tab-panel active" id="civilianDetailsPanel">
-                        <div class="record-item" id="selectedCivilianInfo"></div>
-                        <div class="record-actions">
-                            <button type="button" class="record-action-btn" id="openTrafficStopBtn">Traffic Stop</button>
-                            <button type="button" class="record-action-btn citation" id="openCitationBtn">Citation</button>
-                            <button type="button" class="record-action-btn arrest" id="openArrestBtn">Arrest</button>
-                        </div>
-                    </div>
-                    <div class="tab-panel" id="civilianRecordsPanel">
-                        <div id="civilianRecordsList"><div class="empty">Loading records...</div></div>
-                    </div>
+                <div class="tab-panel" id="civilianRecordsPanel">
+                    <div id="civilianRecordsList"><div class="empty">Loading records...</div></div>
                 </div>
             </div>
         </div>
@@ -850,6 +886,139 @@
             console.error("Supabase init failed:", err);
         }
 
+        async function getCurrentUser() {
+            if (!localSupabase) return null;
+            try {
+                const { data: { user } } = await localSupabase.auth.getUser();
+                return user;
+            } catch (err) {
+                return null;
+            }
+        }
+
+        const createCivilianBtn = document.getElementById("createCivilianBtn");
+        const createCivilianModal = document.getElementById("createCivilianModal");
+        const createCivilianClose = document.getElementById("createCivilianClose");
+        const createCivilianSubmitBtn = document.getElementById("createCivilianSubmitBtn");
+        const createCivilianError = document.getElementById("createCivilianError");
+        const createCivilianSuccess = document.getElementById("createCivilianSuccess");
+        const ccPhotoInput = document.getElementById("ccPhoto");
+        const ccPhotoPreview = document.getElementById("ccPhotoPreview");
+        let createPhotoBase64 = null;
+
+        if (createCivilianBtn && createCivilianModal) {
+            createCivilianBtn.addEventListener("click", () => {
+                createCivilianModal.classList.add("open");
+                if (createCivilianError) { createCivilianError.textContent = ""; createCivilianError.style.display = "none"; }
+                if (createCivilianSuccess) { createCivilianSuccess.textContent = ""; createCivilianSuccess.style.display = "none"; }
+            });
+        }
+
+        if (createCivilianClose) {
+            createCivilianClose.addEventListener("click", () => {
+                if (createCivilianModal) createCivilianModal.classList.remove("open");
+            });
+        }
+
+        if (createCivilianModal) {
+            createCivilianModal.addEventListener("click", (e) => {
+                if (e.target === createCivilianModal) createCivilianModal.classList.remove("open");
+            });
+        }
+
+        if (ccPhotoInput) {
+            ccPhotoInput.addEventListener("change", (e) => {
+                const file = e.target.files[0];
+                if (!file) {
+                    if (ccPhotoPreview) ccPhotoPreview.style.display = "none";
+                    createPhotoBase64 = null;
+                    return;
+                }
+                if (!file.type.startsWith("image/")) {
+                    if (createCivilianError) { createCivilianError.textContent = "Please select an image file."; createCivilianError.style.display = "block"; }
+                    return;
+                }
+                const reader = new FileReader();
+                reader.onload = (ev) => {
+                    createPhotoBase64 = ev.target.result;
+                    if (ccPhotoPreview) {
+                        ccPhotoPreview.src = createPhotoBase64;
+                        ccPhotoPreview.style.display = "block";
+                    }
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        if (createCivilianSubmitBtn) {
+            createCivilianSubmitBtn.addEventListener("click", async () => {
+                const name = document.getElementById("ccName")?.value.trim() || "";
+                const age = document.getElementById("ccAge")?.value.trim() || "";
+                const gender = document.getElementById("ccGender")?.value || "";
+                const address = document.getElementById("ccAddress")?.value.trim() || "";
+                const notes = document.getElementById("ccNotes")?.value.trim() || "";
+
+                if (!name) {
+                    if (createCivilianError) { createCivilianError.textContent = "Name is required."; createCivilianError.style.display = "block"; }
+                    return;
+                }
+
+                if (!localSupabase) {
+                    if (createCivilianError) { createCivilianError.textContent = "Database unavailable."; createCivilianError.style.display = "block"; }
+                    return;
+                }
+
+                if (createCivilianError) { createCivilianError.textContent = ""; createCivilianError.style.display = "none"; }
+                if (createCivilianSuccess) { createCivilianSuccess.textContent = ""; createCivilianSuccess.style.display = "none"; }
+
+                try {
+                    const user = await getCurrentUser();
+                    const payload = {
+                        name,
+                        age: age ? parseInt(age, 10) : null,
+                        gender: gender || null,
+                        address: address || null,
+                        notes: notes || null,
+                        created_at: new Date().toISOString()
+                    };
+                    if (user) {
+                        payload.user_id = user.id;
+                    }
+                    if (createPhotoBase64) {
+                        payload.photo_url = createPhotoBase64;
+                    }
+
+                    const { error } = await localSupabase
+                        .from("civilians")
+                        .insert([payload]);
+
+                    if (error) {
+                        if (createCivilianError) { createCivilianError.textContent = error.message || "Failed to create civilian."; createCivilianError.style.display = "block"; }
+                        console.error("Create civilian failed:", error);
+                        return;
+                    }
+
+                    if (createCivilianSuccess) { createCivilianSuccess.textContent = "Civilian created successfully."; createCivilianSuccess.style.display = "block"; }
+
+                    document.getElementById("ccName").value = "";
+                    document.getElementById("ccAge").value = "";
+                    document.getElementById("ccGender").value = "";
+                    document.getElementById("ccAddress").value = "";
+                    document.getElementById("ccNotes").value = "";
+                    if (ccPhotoInput) ccPhotoInput.value = "";
+                    createPhotoBase64 = null;
+                    if (ccPhotoPreview) ccPhotoPreview.style.display = "none";
+
+                    setTimeout(() => {
+                        if (createCivilianModal) createCivilianModal.classList.remove("open");
+                    }, 800);
+                } catch (err) {
+                    if (createCivilianError) { createCivilianError.textContent = "Failed to create civilian."; createCivilianError.style.display = "block"; }
+                    console.error(err);
+                }
+            });
+        }
+
         document.getElementById("backBtn").addEventListener("click", () => window.close());
 
         let officerId = "officer-" + Math.random().toString(36).slice(2, 10);
@@ -939,8 +1108,10 @@
         }
         setStatus(savedStatus);
 
-        const lookupModal = document.getElementById("lookupModal");
-        const lookupModalClose = document.getElementById("lookupModalClose");
+        const plateLookupModal = document.getElementById("plateLookupModal");
+        const plateLookupClose = document.getElementById("plateLookupClose");
+        const civilianLookupModal = document.getElementById("civilianLookupModal");
+        const civilianLookupClose = document.getElementById("civilianLookupClose");
         const plateInput = document.getElementById("plateInput");
         const plateSubmitBtn = document.getElementById("plateSubmitBtn");
         const plateError = document.getElementById("plateError");
@@ -950,30 +1121,27 @@
         const civilianError = document.getElementById("civilianError");
         const civilianResult = document.getElementById("civilianResult");
 
-        function switchLookupTab(activeTabBtn) {
-            document.querySelectorAll('.modal-tab').forEach((btn) => btn.classList.remove('active'));
-            document.querySelectorAll('.modal-tab-panel').forEach((panel) => panel.classList.remove('active'));
-            if (activeTabBtn) activeTabBtn.classList.add('active');
-            const targetId = activeTabBtn ? activeTabBtn.getAttribute('data-target') : null;
-            const targetPanel = targetId ? document.getElementById(targetId) : null;
-            if (targetPanel) targetPanel.classList.add('active');
-        }
-
-        document.querySelectorAll('.modal-tab').forEach((btn) => {
-            btn.addEventListener('click', () => switchLookupTab(btn));
-        });
-
-        if (lookupModalClose) {
-            lookupModalClose.addEventListener("click", () => {
-                if (lookupModal) lookupModal.classList.remove("open");
+        if (plateLookupClose) {
+            plateLookupClose.addEventListener("click", () => {
+                if (plateLookupModal) plateLookupModal.classList.remove("open");
             });
         }
 
-        if (lookupModal) {
-            lookupModal.addEventListener("click", (e) => {
-                if (e.target === lookupModal) {
-                    lookupModal.classList.remove("open");
-                }
+        if (plateLookupModal) {
+            plateLookupModal.addEventListener("click", (e) => {
+                if (e.target === plateLookupModal) plateLookupModal.classList.remove("open");
+            });
+        }
+
+        if (civilianLookupClose) {
+            civilianLookupClose.addEventListener("click", () => {
+                if (civilianLookupModal) civilianLookupModal.classList.remove("open");
+            });
+        }
+
+        if (civilianLookupModal) {
+            civilianLookupModal.addEventListener("click", (e) => {
+                if (e.target === civilianLookupModal) civilianLookupModal.classList.remove("open");
             });
         }
 
@@ -981,26 +1149,22 @@
         const civilianLookupBtn = document.getElementById("civilianLookupBtn");
         if (plateLookupBtn) {
             plateLookupBtn.addEventListener("click", () => {
-                if (!lookupModal) return;
+                if (!plateLookupModal) return;
                 if (plateInput) plateInput.value = "";
                 if (plateError) { plateError.textContent = ""; plateError.style.display = "none"; }
                 if (plateResult) { plateResult.textContent = ""; plateResult.style.display = "none"; }
-                lookupModal.classList.add("open");
-                const plateTab = document.querySelector('.modal-tab[data-tab="plate"]');
-                switchLookupTab(plateTab);
+                plateLookupModal.classList.add("open");
                 if (plateInput) plateInput.focus();
             });
         }
 
         if (civilianLookupBtn) {
             civilianLookupBtn.addEventListener("click", () => {
-                if (!lookupModal) return;
+                if (!civilianLookupModal) return;
                 if (civilianInput) civilianInput.value = "";
                 if (civilianError) { civilianError.textContent = ""; civilianError.style.display = "none"; }
                 if (civilianResult) { civilianResult.textContent = ""; civilianResult.style.display = "none"; }
-                lookupModal.classList.add("open");
-                const civilianTab = document.querySelector('.modal-tab[data-tab="civilian"]');
-                switchLookupTab(civilianTab);
+                civilianLookupModal.classList.add("open");
                 if (civilianInput) civilianInput.focus();
             });
         }
