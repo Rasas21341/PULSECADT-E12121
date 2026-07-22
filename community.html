@@ -2629,7 +2629,7 @@
                                 function tryEnter() {
                                     const entered = pcInput ? pcInput.value.trim() : "";
                                     const expected = (dept.passcode == null ? "" : String(dept.passcode)).trim();
-                                    if (entered === expected) {
+                                    if (entered === expected && expected !== "") {
                                         openPoliceForDepartment(dept);
                                         pcBox.classList.remove("open");
                                         if (pcInput) pcInput.value = "";
@@ -2645,11 +2645,11 @@
                                 });
 
                                 btn.addEventListener("click", () => {
-                                    if (!dept.passcode) {
+                                    const hasPasscode = dept.passcode != null && String(dept.passcode).trim() !== "";
+                                    if (!hasPasscode) {
                                         openPoliceForDepartment(dept);
                                         return;
                                     }
-                                    // Close any other open passcode boxes
                                     document.querySelectorAll(".dept-passcode-box.open").forEach((b) => {
                                         if (b !== pcBox) b.classList.remove("open");
                                     });
@@ -2681,8 +2681,13 @@
         const poError = document.getElementById("poError");
 
         function openPoliceModal() {
-            if (policeModal) policeModal.classList.add("open");
-            if (poName) poName.focus();
+            if (policeModal) {
+                policeModal.classList.add("open");
+                policeModal.style.display = "flex";
+            }
+            if (poName) {
+                setTimeout(() => poName.focus(), 50);
+            }
         }
 
         if (policeModal) {
@@ -2799,7 +2804,8 @@
             deptPasscodeSubmitBtn.addEventListener("click", () => {
                 if (!pendingDepartment) return;
                 const entered = deptPasscodeInput ? deptPasscodeInput.value.trim() : "";
-                if (entered === pendingDepartment.passcode) {
+                const expected = (pendingDepartment.passcode == null ? "" : String(pendingDepartment.passcode)).trim();
+                if (entered === expected && expected !== "") {
                     if (deptPasscodeModal) deptPasscodeModal.classList.remove("open");
                     openPoliceModal();
                 } else {
