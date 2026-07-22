@@ -1061,6 +1061,7 @@
         let selectedCivilianId = null;
         let loadedCivilians = [];
         let currentCommunityId = null;
+        let communityIdResolved = false;
 
         try {
             if (typeof window.supabase !== "undefined") {
@@ -1070,24 +1071,41 @@
             console.error("Supabase init failed:", err);
         }
 
-        try {
-            const urlParams = new URLSearchParams(window.location.search);
-            currentCommunityId = urlParams.get("communityId");
-        } catch (e) {
-            currentCommunityId = null;
-        }
+        const isInIframe = window.self !== window.top;
 
-        if (!currentCommunityId) {
+        function tryResolveCommunityId() {
+            if (communityIdResolved) return;
             try {
-                currentCommunityId = window.parent?.currentCommunityId || null;
-            } catch (e) {
+                const urlParams = new URLSearchParams(window.location.search);
+                const fromUrl = urlParams.get("communityId");
+                if (fromUrl) {
+                    currentCommunityId = fromUrl;
+                    communityIdResolved = true;
+                    return;
+                }
+            } catch (e) {}
+            if (isInIframe) {
+                try {
+                    const fromParent = window.parent?.currentCommunityId || null;
+                    if (fromParent) {
+                        currentCommunityId = fromParent;
+                        communityIdResolved = true;
+                        return;
+                    }
+                } catch (e) {}
+            }
+            if (!isInIframe) {
                 currentCommunityId = null;
+                communityIdResolved = true;
             }
         }
+
+        tryResolveCommunityId();
 
         window.addEventListener("message", (event) => {
             if (event.data && event.data.type === "SET_COMMUNITY_ID" && event.data.communityId) {
                 currentCommunityId = event.data.communityId;
+                communityIdResolved = true;
                 if (typeof loadMyCivilians === "function") loadMyCivilians();
             }
         });
@@ -1111,6 +1129,20 @@
                 if (listEl) listEl.innerHTML = '<div class="empty-state">Database not loaded. Check console for errors.</div>';
                 return;
             }
+
+                if (isInIframe && !communityIdResolved) {
+                    listEl.innerHTML = '<div class="empty-state">Loading community data...</div>';
+                    if (!window._civLoadRetry) {
+                        window._civLoadRetry = 0;
+                    }
+                    if (window._civLoadRetry < 20) {
+                        window._civLoadRetry += 1;
+                        setTimeout(loadMyCivilians, 250);
+                    } else {
+                        listEl.innerHTML = '<div class="empty-state">Failed to load community context. Please reopen this panel.</div>';
+                    }
+                    return;
+                }
 
             try {
                 const user = await getCurrentUser();

@@ -1847,11 +1847,18 @@
                                     closeAllPages();
                                     const frame = document.getElementById("civiliansFrame");
                                     if (frame && currentCommunityId) {
-                                        frame.src = `/civilians.html?communityId=${currentCommunityId}&t=${Date.now()}`;
                                         window.currentCommunityId = currentCommunityId;
-                                        setTimeout(() => {
-                                            try { frame.contentWindow.postMessage({ type: "SET_COMMUNITY_ID", communityId: currentCommunityId }, "*"); } catch (e) {}
-                                        }, 300);
+                                        frame.src = `/civilians.html?communityId=${currentCommunityId}&t=${Date.now()}`;
+                                        const sendCommunityId = (attempt) => {
+                                            try {
+                                                if (frame.contentWindow) {
+                                                    frame.contentWindow.postMessage({ type: "SET_COMMUNITY_ID", communityId: currentCommunityId }, "*");
+                                                }
+                                            } catch (err) {
+                                                if (attempt < 5) setTimeout(() => sendCommunityId(attempt + 1), 250);
+                                            }
+                                        };
+                                        setTimeout(() => sendCommunityId(0), 400);
                                     }
                                     civiliansView.classList.add("open");
                                 }
