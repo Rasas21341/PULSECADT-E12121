@@ -408,13 +408,169 @@
             display: flex;
         }
 
-        .civilians-view-frame {
+        .view-body {
             flex: 1;
-            width: 100%;
-            border: none;
-            border-radius: 12px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            border-top: 1px solid #f1f5f9;
+            padding-top: 16px;
+        }
+
+        .community-form {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: flex-end;
+            margin-bottom: 8px;
+        }
+
+        .community-form input,
+        .community-form textarea {
+            flex: 1 1 160px;
+            padding: 10px 12px;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
             background: #ffffff;
-            margin-top: 16px;
+            color: #0f172a;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .community-form input:focus,
+        .community-form textarea:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+        }
+
+        .community-form .submit-btn {
+            padding: 10px 16px;
+            border-radius: 10px;
+            border: none;
+            background: #2563eb;
+            color: #ffffff;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .community-form .submit-btn:hover {
+            background: #1d4ed8;
+        }
+
+        .civilians-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .civilian-card {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 14px;
+        }
+
+        .civilian-card.selected {
+            border-color: #2563eb;
+            background: #eff6ff;
+        }
+
+        .civilian-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .civilian-card-name {
+            font-size: 15px;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .civilian-card-meta {
+            font-size: 13px;
+            color: #64748b;
+            margin-top: 4px;
+        }
+
+        .civilian-card-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+
+        .civilian-card-actions input {
+            flex: 1 1 120px;
+            padding: 8px 10px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            background: #ffffff;
+            color: #0f172a;
+            font-size: 13px;
+        }
+
+        .civilian-card-actions button {
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: none;
+            background: #2563eb;
+            color: #ffffff;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .civilian-card-actions button:hover {
+            background: #1d4ed8;
+        }
+
+        .civilian-vehicle-list {
+            margin-top: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .civilian-vehicle-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 8px 10px;
+            font-size: 13px;
+        }
+
+        .civilian-vehicle-item button {
+            padding: 4px 10px;
+            border-radius: 8px;
+            border: none;
+            background: #dc2626;
+            color: #ffffff;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .civilian-delete-btn {
+            padding: 6px 12px;
+            border-radius: 8px;
+            border: none;
+            background: #dc2626;
+            color: #ffffff;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .civilian-delete-btn:hover {
+            background: #b91c1c;
         }
 
         .departments-view, .documents-view, .settings-view {
@@ -1411,7 +1567,17 @@
                                         <div class="members-view-title">Civilians</div>
                                         <button type="button" class="members-view-close" id="civiliansViewClose" aria-label="Close">×</button>
                                     </div>
-                                    <iframe id="civiliansFrame" class="civilians-view-frame" src="/civilians.html" title="Civilians"></iframe>
+                                    <div class="view-body">
+                                        <form id="civilianForm" class="community-form">
+                                            <input type="text" id="civilianName" placeholder="Civilian name" required />
+                                            <input type="text" id="civilianAge" placeholder="Age" />
+                                            <input type="text" id="civilianGender" placeholder="Gender" />
+                                            <input type="text" id="civilianAddress" placeholder="Address" />
+                                            <textarea id="civilianNotes" placeholder="Notes"></textarea>
+                                            <button type="submit" class="submit-btn">Create Civilian</button>
+                                        </form>
+                                        <div id="civiliansList"></div>
+                                    </div>
                                 </div>
                                 <div class="departments-view" id="departmentsView">
                                     <div class="members-view-header">
@@ -1837,6 +2003,9 @@
                         const civilianBtn = document.getElementById("civilianBtn");
                         const civiliansView = document.getElementById("civiliansView");
                         const civiliansViewClose = document.getElementById("civiliansViewClose");
+                        const civilianForm = document.getElementById("civilianForm");
+                        const civiliansList = document.getElementById("civiliansList");
+                        let selectedCommunityCivilianId = null;
 
                         if (civilianBtn && civiliansView) {
                             civilianBtn.addEventListener("click", (e) => {
@@ -1845,23 +2014,8 @@
                                     civiliansView.classList.remove("open");
                                 } else {
                                     closeAllPages();
-                                    const frame = document.getElementById("civiliansFrame");
-                                    if (frame && currentCommunityId) {
-                                        window.currentCommunityId = currentCommunityId;
-                                        try { sessionStorage.setItem("currentCommunityId", currentCommunityId); } catch (e) {}
-                                        frame.src = `/civilians.html?communityId=${currentCommunityId}&t=${Date.now()}`;
-                                        const sendCommunityId = (attempt) => {
-                                            try {
-                                                if (frame.contentWindow) {
-                                                    frame.contentWindow.postMessage({ type: "SET_COMMUNITY_ID", communityId: currentCommunityId }, "*");
-                                                }
-                                            } catch (err) {
-                                                if (attempt < 10) setTimeout(() => sendCommunityId(attempt + 1), 300);
-                                            }
-                                        };
-                                        setTimeout(() => sendCommunityId(0), 500);
-                                    }
                                     civiliansView.classList.add("open");
+                                    loadCommunityCivilians();
                                 }
                             });
                         }
@@ -1870,6 +2024,174 @@
                             civiliansViewClose.addEventListener("click", () => {
                                 civiliansView.classList.remove("open");
                             });
+                        }
+
+                        if (civilianForm) {
+                            civilianForm.addEventListener("submit", async (e) => {
+                                e.preventDefault();
+                                if (!currentCommunityId || !localSupabase) return;
+                                const name = document.getElementById("civilianName")?.value.trim() || "";
+                                const age = document.getElementById("civilianAge")?.value.trim() || "";
+                                const gender = document.getElementById("civilianGender")?.value.trim() || "";
+                                const address = document.getElementById("civilianAddress")?.value.trim() || "";
+                                const notes = document.getElementById("civilianNotes")?.value.trim() || "";
+                                if (!name) return;
+                                try {
+                                    const { error } = await localSupabase
+                                        .from("civilians")
+                                        .insert([{
+                                            name,
+                                            age: age ? parseInt(age, 10) : null,
+                                            gender: gender || null,
+                                            address: address || null,
+                                            notes: notes || null,
+                                            user_id: (await localSupabase.auth.getUser()).data?.user?.id || null,
+                                            community_id: currentCommunityId,
+                                            created_at: new Date().toISOString()
+                                        }]);
+                                    if (error) throw error;
+                                    civilianForm.reset();
+                                    loadCommunityCivilians();
+                                } catch (err) {
+                                    console.error("Failed to create civilian:", err);
+                                    alert("Failed to create civilian.");
+                                }
+                            });
+                        }
+
+                        async function loadCommunityCivilians() {
+                            if (!civiliansList || !localSupabase || !currentCommunityId) return;
+                            civiliansList.innerHTML = '<div class="empty">Loading...</div>';
+                            try {
+                                const { data, error } = await localSupabase
+                                    .from("civilians")
+                                    .select("*")
+                                    .eq("community_id", currentCommunityId)
+                                    .order("created_at", { ascending: false });
+                                if (error) throw error;
+                                if (!Array.isArray(data) || data.length === 0) {
+                                    civiliansList.innerHTML = '<div class="empty">No civilians in this community yet.</div>';
+                                    return;
+                                }
+                                const esc = (t) => (t || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                                civiliansList.innerHTML = data.map((c) => {
+                                    const meta = [c.age, c.gender, c.address].filter(Boolean).join(" | ") || "No additional details";
+                                    return `
+                                        <div class="civilian-card ${selectedCommunityCivilianId === c.id ? 'selected' : ''}" data-civilian-id="${c.id}">
+                                            <div class="civilian-card-header">
+                                                <div>
+                                                    <div class="civilian-card-name">${esc(c.name)}</div>
+                                                    <div class="civilian-card-meta">${esc(meta)}</div>
+                                                </div>
+                                                <button type="button" class="civilian-delete-btn" data-delete-civilian="${c.id}">Delete</button>
+                                            </div>
+                                            <div class="civilian-card-actions">
+                                                <input type="text" placeholder="Make" data-make-input="${c.id}" />
+                                                <input type="text" placeholder="Model" data-model-input="${c.id}" />
+                                                <input type="text" placeholder="Color" data-color-input="${c.id}" />
+                                                <input type="text" placeholder="Plate" data-plate-input="${c.id}" />
+                                                <button type="button" data-add-vehicle="${c.id}">Add Vehicle</button>
+                                            </div>
+                                            <div class="civilian-vehicle-list" id="communityVehicleList-${c.id}"></div>
+                                        </div>
+                                    `;
+                                }).join('');
+                                civiliansList.querySelectorAll("[data-delete-civilian]").forEach((btn) => {
+                                    btn.addEventListener("click", async (e) => {
+                                        e.stopPropagation();
+                                        const cid = btn.getAttribute("data-delete-civilian");
+                                        if (!confirm("Delete this civilian and all vehicles?")) return;
+                                        try {
+                                            await localSupabase.from("vehicles").delete().eq("civilian_id", cid);
+                                            await localSupabase.from("civilians").delete().eq("id", cid);
+                                            if (selectedCommunityCivilianId === cid) selectedCommunityCivilianId = null;
+                                            loadCommunityCivilians();
+                                        } catch (err) {
+                                            console.error("Failed to delete civilian:", err);
+                                        }
+                                    });
+                                });
+                                civiliansList.querySelectorAll("[data-add-vehicle]").forEach((btn) => {
+                                    btn.addEventListener("click", async (e) => {
+                                        e.stopPropagation();
+                                        const cid = btn.getAttribute("data-add-vehicle");
+                                        const make = document.querySelector(`[data-make-input="${cid}"]`)?.value.trim() || "";
+                                        const model = document.querySelector(`[data-model-input="${cid}"]`)?.value.trim() || "";
+                                        const color = document.querySelector(`[data-color-input="${cid}"]`)?.value.trim() || "";
+                                        const plate = document.querySelector(`[data-plate-input="${cid}"]`)?.value.trim() || "";
+                                        if (!make || !model || !plate) {
+                                            alert("Make, Model, and Plate are required.");
+                                            return;
+                                        }
+                                        try {
+                                            const { error } = await localSupabase
+                                                .from("vehicles")
+                                                .insert([{
+                                                    civilian_id: cid,
+                                                    make,
+                                                    model,
+                                                    color: color || null,
+                                                    plate,
+                                                    community_id: currentCommunityId,
+                                                    created_at: new Date().toISOString()
+                                                }]);
+                                            if (error) throw error;
+                                            document.querySelector(`[data-make-input="${cid}"]`).value = "";
+                                            document.querySelector(`[data-model-input="${cid}"]`).value = "";
+                                            document.querySelector(`[data-color-input="${cid}"]`).value = "";
+                                            document.querySelector(`[data-plate-input="${cid}"]`).value = "";
+                                            loadCommunityVehicles(cid);
+                                        } catch (err) {
+                                            console.error("Failed to add vehicle:", err);
+                                        }
+                                    });
+                                });
+                                for (const c of data) {
+                                    loadCommunityVehicles(c.id);
+                                }
+                            } catch (err) {
+                                console.error("Failed to load civilians:", err);
+                                civiliansList.innerHTML = '<div class="empty">Failed to load civilians.</div>';
+                            }
+                        }
+
+                        async function loadCommunityVehicles(civilianId) {
+                            const listEl = document.getElementById(`communityVehicleList-${civilianId}`);
+                            if (!listEl || !localSupabase || !currentCommunityId) return;
+                            try {
+                                const { data, error } = await localSupabase
+                                    .from("vehicles")
+                                    .select("*")
+                                    .eq("civilian_id", civilianId)
+                                    .eq("community_id", currentCommunityId)
+                                    .order("created_at", { ascending: false });
+                                if (error || !Array.isArray(data) || data.length === 0) {
+                                    listEl.innerHTML = "";
+                                    return;
+                                }
+                                const esc = (t) => (t || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                                listEl.innerHTML = data.map((v) => `
+                                    <div class="civilian-vehicle-item">
+                                        <span>${esc(v.make || "")} ${esc(v.model || "")}${v.color ? ' — ' + esc(v.color) : ''}${v.plate ? ' — ' + esc(v.plate) : ''}</span>
+                                        <button type="button" data-delete-vehicle="${v.id}" data-civilian-id="${civilianId}">Remove</button>
+                                    </div>
+                                `).join('');
+                                listEl.querySelectorAll("[data-delete-vehicle]").forEach((btn) => {
+                                    btn.addEventListener("click", async (e) => {
+                                        e.stopPropagation();
+                                        const vid = btn.getAttribute("data-delete-vehicle");
+                                        const cid = btn.getAttribute("data-civilian-id");
+                                        try {
+                                            await localSupabase.from("vehicles").delete().eq("id", vid);
+                                            loadCommunityVehicles(cid);
+                                        } catch (err) {
+                                            console.error("Failed to delete vehicle:", err);
+                                        }
+                                    });
+                                });
+                            } catch (err) {
+                                console.error("Failed to load vehicles:", err);
+                            }
                         }
 
                         const departmentsList = document.getElementById("departmentsList");
