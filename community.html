@@ -2707,9 +2707,28 @@
                 const params = new URLSearchParams({ name, rank, callsign });
                 params.set("community", currentCommunityId || "");
                 if (erlcKey) params.set("erlckey", erlcKey);
-                try { localStorage.setItem("policeErkKey", erlcKey); } catch (e) {}
+                if (pendingDepartment) params.set("department", pendingDepartment.id);
+                try {
+                    localStorage.setItem("policeErkKey", erlcKey);
+                    localStorage.setItem("policeOfficerName", name);
+                    localStorage.setItem("policeOfficerRank", rank);
+                    localStorage.setItem("policeOfficerCallsign", callsign);
+                    const officerId = localStorage.getItem("policeOfficerId") || ("officer-" + Math.random().toString(36).slice(2, 10));
+                    localStorage.setItem("policeOfficerId", officerId);
+                    const unitsRaw = localStorage.getItem("policeActiveUnits");
+                    let units = unitsRaw ? JSON.parse(unitsRaw) : [];
+                    const existing = units.findIndex(u => u.id === officerId);
+                    const entry = { id: officerId, name, rank, callsign, status: "available", updated_at: new Date().toISOString() };
+                    if (existing !== -1) {
+                        units[existing] = entry;
+                    } else {
+                        units.push(entry);
+                    }
+                    localStorage.setItem("policeActiveUnits", JSON.stringify(units));
+                } catch (e) {}
                 window.open("/Police.html?" + params.toString(), "_blank");
                 if (policeModal) policeModal.classList.remove("open");
+                pendingDepartment = null;
             });
         }
 
@@ -2722,13 +2741,8 @@
         let pendingDepartment = null;
 
         function openPoliceForDepartment(department) {
-            let erlcKey = (currentCommunityData && currentCommunityData.erlc_api_key) || "";
-            if (!erlcKey) { try { erlcKey = localStorage.getItem("erlcApiKey_" + currentCommunityId) || ""; } catch (e) {} }
-            const params = new URLSearchParams({});
-            params.set("community", currentCommunityId || "");
-            if (erlcKey) params.set("erlckey", erlcKey);
-            try { localStorage.setItem("policeErkKey", erlcKey); } catch (e) {}
-            window.open("/Police.html?" + params.toString(), "_blank");
+            pendingDepartment = department;
+            openPoliceModal();
         }
 
         function openDeptPasscodeModal(department) {
@@ -2787,8 +2801,7 @@
                 const entered = deptPasscodeInput ? deptPasscodeInput.value.trim() : "";
                 if (entered === pendingDepartment.passcode) {
                     if (deptPasscodeModal) deptPasscodeModal.classList.remove("open");
-                    window.open("/Police.html", "_blank");
-                    pendingDepartment = null;
+                    openPoliceModal();
                 } else {
                     if (deptPasscodeError) { deptPasscodeError.textContent = "Incorrect passcode."; deptPasscodeError.style.display = "block"; }
                 }

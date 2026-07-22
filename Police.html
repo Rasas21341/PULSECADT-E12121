@@ -663,6 +663,82 @@
             color: #0f172a;
         }
 
+        .active-units-panel {
+            position: fixed;
+            top: 70px;
+            right: 24px;
+            width: 320px;
+            max-height: calc(100vh - 140px);
+            background: #ffffff;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            padding: 14px;
+            z-index: 700;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            overflow-y: auto;
+        }
+
+        .active-units-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 10px;
+        }
+
+        .active-unit-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 10px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            background: #f8fafc;
+            margin-bottom: 8px;
+        }
+
+        .active-unit-info {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .active-unit-name {
+            font-size: 14px;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .active-unit-meta {
+            font-size: 12px;
+            color: #475569;
+        }
+
+        .active-unit-status {
+            padding: 4px 8px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .active-unit-status.available {
+            background: #dcfce7;
+            color: #166534;
+            border: 1px solid #bbf7d0;
+        }
+
+        .active-unit-status.unavailable {
+            background: #fef2f2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+        }
+
+        .active-unit-status.busy {
+            background: #fef9c3;
+            color: #854d0e;
+            border: 1px solid #fde68a;
+        }
+
     </style>
 </head>
 <body>
@@ -688,6 +764,11 @@
         <div class="call-info-box" id="activeCallBox">
             <div style="font-size: 14px; font-weight: 700; color: #0f172a; margin-bottom: 6px;">No active call</div>
         </div>
+    </div>
+
+    <div class="active-units-panel" id="activeUnitsPanel" style="display: none;">
+        <div class="active-units-title">Active Units</div>
+        <div id="activeUnitsList"></div>
     </div>
 
     <button type="button" class="plate-lookup-btn" id="plateLookupBtn">Plate Lookup</button>
@@ -1877,6 +1958,109 @@
         }
 
         renderCalls();
+
+        const activeUnitsPanel = document.getElementById("activeUnitsPanel");
+        const activeUnitsList = document.getElementById("activeUnitsList");
+
+        function loadActiveUnits() {
+            try {
+                const raw = localStorage.getItem("policeActiveUnits");
+                return raw ? JSON.parse(raw) : [];
+            } catch (err) {
+                console.error("Could not load active units:", err);
+                return [];
+            }
+        }
+
+        function saveActiveUnits(units) {
+            localStorage.setItem("policeActiveUnits", JSON.stringify(units));
+        }
+
+        function getCurrentOfficerInfo() {
+            const params = new URLSearchParams(window.location.search);
+            const urlName = params.get("name");
+            const urlRank = params.get("rank");
+            const urlCallsign = params.get("callsign");
+            const storedName = localStorage.getItem("policeOfficerName") || "Officer";
+            const storedRank = localStorage.getItem("policeOfficerRank") || "";
+            const storedCallsign = localStorage.getItem("policeOfficerCallsign") || "";
+            return {
+                id: getCurrentOfficerId(),
+                name: urlName || storedName,
+                rank: urlRank || storedRank,
+                callsign: urlCallsign || storedCallsign,
+                status: getCurrentStatus()
+            };
+        }
+
+        function upsertActiveUnit(officerInfo) {
+            let units = loadActiveUnits();
+            const idx = units.findIndex(u => u.id === officerInfo.id);
+            if (idx !== -1) {
+                units[idx] = { ...units[idx], ...officerInfo, updated_at: new Date().toISOString() };
+            } else {
+                units.push({ ...officerInfo, updated_at: new Date().toISOString() });
+            }
+            saveActiveUnits(units);
+        }
+
+        function removeActiveUnit(officerId) {
+            let units = loadActiveUnits();
+            units = units.filter(u => u.id !== officerId);
+            saveActiveUnits(units);
+        }
+
+        function renderActiveUnits() {
+            if (!activeUnitsPanel || !activeUnitsList) return;
+            const units = loadActiveUnits();
+            const now = Date.now();
+            const fifteenMinutes = 15 * 60 * 1000;
+            const activeUnits = units.filter(u => {
+                const updated = u.updated_at ? new Date(u.updated_at).getTime() : 0;
+                return now - updated < fifteenMinutes;
+            });
+
+            if (activeUnits.length === 0) {
+                activeUnitsList.innerHTML = '<div style="font-size: 13px; color: #64748b; text-align: center; padding: 10px 0;">No active units.</div>';
+                activeUnitsPanel.style.display = "block";
+                return;
+            }
+
+            activeUnitsPanel.style.display = "block";
+            activeUnitsList.innerHTML = activeUnits.map(u => `
+                <div class="active-unit-item">
+                    <div class="active-unit-info">
+                        <div class="active-unit-name">${escapeHtml(u.name || "Officer")}</div>
+                        <div class="active-unit-meta">${escapeHtml(u.callsign || "")} ${escapeHtml(u.rank ? "• " + u.rank : "")}</div>
+                    </div>
+                    <span class="active-unit-status ${u.status || "available"}">${u.status || "available"}</span>
+                </div>
+            `).join("");
+        }
+
+        const currentOfficerInfo = getCurrentOfficerInfo();
+        if (currentOfficerInfo.name && currentOfficerInfo.name !== "Officer") {
+            upsertActiveUnit(currentOfficerInfo);
+            renderActiveUnits();
+        }
+
+        const originalSetStatus = setStatus;
+        setStatus = function(status) {
+            originalSetStatus(status);
+            const info = getCurrentOfficerInfo();
+            if (info.name && info.name !== "Officer") {
+                upsertActiveUnit({ ...info, status });
+                renderActiveUnits();
+            }
+        };
+
+        setInterval(() => {
+            renderActiveUnits();
+        }, 15000);
+
+        window.addEventListener("beforeunload", () => {
+            removeActiveUnit(getCurrentOfficerId());
+        });
     </script>
 </body>
 </html>
