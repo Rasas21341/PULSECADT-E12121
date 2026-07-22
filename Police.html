@@ -1852,7 +1852,14 @@
             const myCall = calls.find(c => c.assigned_officer_id === officerId && c.status !== "closed") || null;
 
             if (!myCall) {
-                activeCallBox.innerHTML = '<div style="font-size: 13px; color: #64748b;">No active call.</div>';
+                activeCallBox.innerHTML = `
+                    <div style="font-size: 14px; font-weight: 700; color: #0f172a; margin-bottom: 6px;">Call Info</div>
+                    <div style="font-size: 12px; color: #334155; line-height: 1.4;">
+                        <strong>Priority:</strong> <br>
+                        <strong>Code:</strong> <br>
+                        <strong>Description:</strong> 
+                    </div>
+                `;
                 callsPanel.style.display = "block";
                 return;
             }
