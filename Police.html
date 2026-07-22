@@ -627,6 +627,49 @@
             border: 1px solid #fecaca;
         }
 
+        .signature-field {
+            margin-bottom: 14px;
+        }
+
+        .signature-field label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: #334155;
+            margin-bottom: 6px;
+        }
+
+        .signature-canvas {
+            width: 100%;
+            height: 100px;
+            border-radius: 12px;
+            border: 1px solid #cbd5e1;
+            background: #ffffff;
+            touch-action: none;
+            cursor: crosshair;
+        }
+
+        .signature-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 6px;
+        }
+
+        .signature-clear-btn {
+            padding: 6px 12px;
+            border-radius: 8px;
+            border: 1px solid #cbd5e1;
+            background: #ffffff;
+            color: #0f172a;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .signature-clear-btn:hover {
+            background: #f1f5f9;
+        }
+
         .civilian-name-btn {
             background: none;
             border: none;
@@ -1025,7 +1068,6 @@
                 <div class="tab-panel active" id="civilianDetailsPanel">
                     <div class="record-item" id="selectedCivilianInfo"></div>
                     <div class="record-actions">
-                        <button type="button" class="record-action-btn" id="openTrafficStopBtn">Traffic Stop</button>
                         <button type="button" class="record-action-btn citation" id="openCitationBtn">Citation</button>
                         <button type="button" class="record-action-btn arrest" id="openArrestBtn">Arrest</button>
                     </div>
@@ -1034,39 +1076,6 @@
                     <div id="civilianRecordsList"><div class="empty">Loading records...</div></div>
                 </div>
             </div>
-        </div>
-    </div>
-
-    <div class="modal-overlay" id="trafficStopModal">
-        <div class="modal">
-            <div class="modal-header">
-                <div class="modal-title">Traffic Stop Report</div>
-                <button class="modal-close" id="trafficStopModalClose" type="button" aria-label="Close">×</button>
-            </div>
-            <div class="report-field">
-                <label for="tsCivilianId">Civilian ID</label>
-                <input type="text" id="tsCivilianId" readonly />
-            </div>
-            <div class="report-field">
-                <label for="tsCivilianName">Civilian Name</label>
-                <input type="text" id="tsCivilianName" readonly />
-            </div>
-            <div class="report-field">
-                <label for="tsReason">Reason for Stop</label>
-                <input type="text" id="tsReason" placeholder="e.g. Speeding" />
-            </div>
-            <div class="report-field">
-                <label for="tsLocation">Location</label>
-                <input type="text" id="tsLocation" placeholder="e.g. Highway 1" />
-            </div>
-            <div class="report-field">
-                <label for="tsNotes">Notes</label>
-                <textarea id="tsNotes" placeholder="Any details..."></textarea>
-            </div>
-            <button type="button" class="report-submit" id="tsSubmitBtn">Submit Report</button>
-            <button type="button" class="report-submit" id="tsDownloadPdfBtn" style="background:#334155;">Download PDF</button>
-            <div class="lookup-error" id="tsError"></div>
-            <div class="lookup-result" id="tsSuccess"></div>
         </div>
     </div>
 
@@ -1095,6 +1104,13 @@
             <div class="report-field">
                 <label for="citationNotes">Notes</label>
                 <textarea id="citationNotes" placeholder="Any details..."></textarea>
+            </div>
+            <div class="signature-field">
+                <label>Signature</label>
+                <canvas class="signature-canvas" id="citationSignatureCanvas"></canvas>
+                <div class="signature-actions">
+                    <button type="button" class="signature-clear-btn" id="citationSignatureClear">Clear</button>
+                </div>
             </div>
             <button type="button" class="report-submit" id="citationSubmitBtn">Issue Citation</button>
             <button type="button" class="report-submit" id="citationDownloadPdfBtn" style="background:#334155;">Download PDF</button>
@@ -1128,6 +1144,13 @@
             <div class="report-field">
                 <label for="arrestNotes">Notes</label>
                 <textarea id="arrestNotes" placeholder="Any details..."></textarea>
+            </div>
+            <div class="signature-field">
+                <label>Signature</label>
+                <canvas class="signature-canvas" id="arrestSignatureCanvas"></canvas>
+                <div class="signature-actions">
+                    <button type="button" class="signature-clear-btn" id="arrestSignatureClear">Clear</button>
+                </div>
             </div>
             <button type="button" class="report-submit" id="arrestSubmitBtn">Make Arrest</button>
             <button type="button" class="report-submit" id="arrestDownloadPdfBtn" style="background:#334155;">Download PDF</button>
@@ -1697,31 +1720,6 @@
             }
         }
 
-        const openTrafficStopBtn = document.getElementById("openTrafficStopBtn");
-        const openCitationBtn = document.getElementById("openCitationBtn");
-        const openArrestBtn = document.getElementById("openArrestBtn");
-
-        if (openTrafficStopBtn) {
-            openTrafficStopBtn.addEventListener("click", () => {
-                if (!selectedCivilian) return;
-                const tsCivilianId = document.getElementById("tsCivilianId");
-                const tsCivilianName = document.getElementById("tsCivilianName");
-                const tsReason = document.getElementById("tsReason");
-                const tsLocation = document.getElementById("tsLocation");
-                const tsNotes = document.getElementById("tsNotes");
-                const tsError = document.getElementById("tsError");
-                const tsSuccess = document.getElementById("tsSuccess");
-                if (tsCivilianId) tsCivilianId.value = selectedCivilian.id || "";
-                if (tsCivilianName) tsCivilianName.value = selectedCivilian.name || "";
-                if (tsReason) tsReason.value = "";
-                if (tsLocation) tsLocation.value = "";
-                if (tsNotes) tsNotes.value = "";
-                if (tsError) { tsError.textContent = ""; tsError.style.display = "none"; }
-                if (tsSuccess) { tsSuccess.textContent = ""; tsSuccess.style.display = "none"; }
-                if (trafficStopModal) trafficStopModal.classList.add("open");
-            });
-        }
-
         if (openCitationBtn) {
             openCitationBtn.addEventListener("click", () => {
                 if (!selectedCivilian) return;
@@ -1737,6 +1735,7 @@
                 if (citationReason) citationReason.value = "";
                 if (citationLocation) citationLocation.value = "";
                 if (citationNotes) citationNotes.value = "";
+                clearSignature("citationSignatureCanvas");
                 if (citationError) { citationError.textContent = ""; citationError.style.display = "none"; }
                 if (citationSuccess) { citationSuccess.textContent = ""; citationSuccess.style.display = "none"; }
                 if (citationModal) citationModal.classList.add("open");
@@ -1758,82 +1757,12 @@
                 if (arrestCharges) arrestCharges.value = "";
                 if (arrestLocation) arrestLocation.value = "";
                 if (arrestNotes) arrestNotes.value = "";
+                clearSignature("arrestSignatureCanvas");
                 if (arrestError) { arrestError.textContent = ""; arrestError.style.display = "none"; }
                 if (arrestSuccess) { arrestSuccess.textContent = ""; arrestSuccess.style.display = "none"; }
                 if (arrestModal) arrestModal.classList.add("open");
             });
         }
-        const trafficStopModal = document.getElementById("trafficStopModal");
-        const trafficStopModalClose = document.getElementById("trafficStopModalClose");
-        const tsSubmitBtn = document.getElementById("tsSubmitBtn");
-
-        if (trafficStopModalClose) {
-            trafficStopModalClose.addEventListener("click", () => {
-                if (trafficStopModal) trafficStopModal.classList.remove("open");
-            });
-        }
-
-        if (trafficStopModal) {
-            trafficStopModal.addEventListener("click", (e) => {
-                if (e.target === trafficStopModal) {
-                    trafficStopModal.classList.remove("open");
-                }
-            });
-        }
-
-        if (tsSubmitBtn) {
-            tsSubmitBtn.addEventListener("click", async () => {
-                const civilianId = document.getElementById("tsCivilianId")?.value.trim() || "";
-                const civilianName = document.getElementById("tsCivilianName")?.value.trim() || "";
-                const reason = document.getElementById("tsReason")?.value.trim() || "";
-                const location = document.getElementById("tsLocation")?.value.trim() || "";
-                const notes = document.getElementById("tsNotes")?.value.trim() || "";
-                const tsError = document.getElementById("tsError");
-                const tsSuccess = document.getElementById("tsSuccess");
-
-                if (!reason || !location) {
-                    if (tsError) { tsError.textContent = "Reason and location are required."; tsError.style.display = "block"; }
-                    return;
-                }
-
-                if (!localSupabase) {
-                    if (tsError) { tsError.textContent = "Database unavailable."; tsError.style.display = "block"; }
-                    return;
-                }
-
-                if (tsError) { tsError.textContent = ""; tsError.style.display = "none"; }
-                if (tsSuccess) { tsSuccess.textContent = ""; tsSuccess.style.display = "none"; }
-
-                try {
-                    const { error } = await localSupabase
-                        .from("traffic_stops")
-                        .insert([{
-                            civilian_id: civilianId || null,
-                            civilian_name: civilianName || null,
-                            reason,
-                            location,
-                            notes: notes || null,
-                            created_at: new Date().toISOString()
-                        }]);
-
-                    if (error) {
-                        if (tsError) { tsError.textContent = error.message || "Failed to save report."; tsError.style.display = "block"; }
-                        console.error("Insert failed:", error);
-                        return;
-                    }
-
-                    if (tsSuccess) {
-                        tsSuccess.textContent = "Traffic stop report submitted.";
-                        tsSuccess.style.display = "block";
-                    }
-                    if (selectedCivilian && selectedCivilian.id) loadCivilianRecords(selectedCivilian.id);
-                } catch (err) {
-                    if (tsError) { tsError.textContent = "Failed to submit report."; tsError.style.display = "block"; }
-                    console.error(err);
-                }
-            });
-        }
-
         const citationModal = document.getElementById("citationModal");
         const citationModalClose = document.getElementById("citationModalClose");
         const citationSubmitBtn = document.getElementById("citationSubmitBtn");
@@ -1876,6 +1805,7 @@
                 if (citationSuccess) { citationSuccess.textContent = ""; citationSuccess.style.display = "none"; }
 
                 try {
+                    const signature = getSignatureData("citationSignatureCanvas");
                     const { error } = await localSupabase
                         .from("citations")
                         .insert([{
@@ -1886,6 +1816,7 @@
                             reason,
                             location,
                             notes: notes || null,
+                            signature: signature || null,
                             created_at: new Date().toISOString()
                         }]);
 
@@ -1949,6 +1880,7 @@
                 if (arrestSuccess) { arrestSuccess.textContent = ""; arrestSuccess.style.display = "none"; }
 
                 try {
+                    const signature = getSignatureData("arrestSignatureCanvas");
                     const { error } = await localSupabase
                         .from("arrests")
                         .insert([{
@@ -1959,6 +1891,7 @@
                             charges,
                             location,
                             notes: notes || null,
+                            signature: signature || null,
                             created_at: new Date().toISOString()
                         }]);
 
@@ -2002,56 +1935,82 @@
             return el ? el.value.trim() : "";
         }
 
-        async function generateTrafficStopPdf() {
-            try {
-                const { jsPDF } = window.jspdf;
-                const doc = new jsPDF();
-                doc.setFontSize(20);
-                doc.setFont(undefined, "bold");
-                doc.text("Traffic Stop Report", 14, 16);
-                doc.setFont(undefined, "normal");
-                doc.setFontSize(11);
-                doc.text("PulseCAD Police Records", 14, 22);
-                doc.setLineWidth(0.3);
-                doc.line(14, 24, 196, 24);
+        function getSignatureData(canvasId) {
+            const canvas = document.getElementById(canvasId);
+            if (!canvas) return null;
+            return canvas.toDataURL("image/png");
+        }
 
-                const fields = [
-                    ["Officer", (officerRank ? officerRank + " " : "") + officerName],
-                    ["Date", new Date().toLocaleString()],
-                    ["Civilian ID", getText("tsCivilianId")],
-                    ["Civilian Name", getText("tsCivilianName")],
-                    ["Reason for Stop", getText("tsReason")],
-                    ["Location", getText("tsLocation")],
-                    ["Notes", getText("tsNotes")]
-                ];
+        function clearSignature(canvasId) {
+            const canvas = document.getElementById(canvasId);
+            if (!canvas) return;
+            const ctx = canvas.getContext("2d");
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
 
-                let y = 30;
-                const lineHeight = 7;
-                const labelX = 14;
-                const fieldX = 60;
+        function initSignatureCanvas(canvasId, clearBtnId) {
+            const canvas = document.getElementById(canvasId);
+            const clearBtn = document.getElementById(clearBtnId);
+            if (!canvas) return;
 
-                fields.forEach(([label, value], index) => {
-                    if (y > 280) {
-                        doc.addPage();
-                        y = 20;
-                    }
-                    doc.setFont(undefined, "bold");
-                    doc.text(label + ":", labelX, y);
-                    doc.setFont(undefined, "normal");
-                    const lines = doc.splitTextToSize(value || "", 120);
-                    doc.text(lines, fieldX, y);
-                    y += Math.max(lineHeight, lines.length * lineHeight);
-                    if (index < fields.length - 1) {
-                        doc.setDrawColor(220, 220, 220);
-                        doc.line(labelX, y + 1, 196, y + 1);
-                        y += 4;
-                    }
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width || 300;
+            canvas.height = 100;
+
+            const ctx = canvas.getContext("2d");
+            ctx.lineWidth = 2;
+            ctx.lineCap = "round";
+            ctx.strokeStyle = "#0f172a";
+
+            let drawing = false;
+            let lastX = 0;
+            let lastY = 0;
+
+            function getPos(e) {
+                const r = canvas.getBoundingClientRect();
+                const touch = e.touches ? e.touches[0] : e;
+                return {
+                    x: (touch.clientX - r.left) * (canvas.width / r.width),
+                    y: (touch.clientY - r.top) * (canvas.height / r.height)
+                };
+            }
+
+            function start(e) {
+                drawing = true;
+                const pos = getPos(e);
+                lastX = pos.x;
+                lastY = pos.y;
+                e.preventDefault();
+            }
+
+            function move(e) {
+                if (!drawing) return;
+                const pos = getPos(e);
+                ctx.beginPath();
+                ctx.moveTo(lastX, lastY);
+                ctx.lineTo(pos.x, pos.y);
+                ctx.stroke();
+                lastX = pos.x;
+                lastY = pos.y;
+                e.preventDefault();
+            }
+
+            function end() {
+                drawing = false;
+            }
+
+            canvas.addEventListener("mousedown", start);
+            canvas.addEventListener("mousemove", move);
+            canvas.addEventListener("mouseup", end);
+            canvas.addEventListener("mouseleave", end);
+            canvas.addEventListener("touchstart", start, { passive: false });
+            canvas.addEventListener("touchmove", move, { passive: false });
+            canvas.addEventListener("touchend", end);
+
+            if (clearBtn) {
+                clearBtn.addEventListener("click", () => {
+                    clearSignature(canvasId);
                 });
-
-                doc.save("traffic-stop-" + Date.now() + ".pdf");
-            } catch (err) {
-                alert("Failed to generate PDF.");
-                console.error(err);
             }
         }
 
@@ -2100,6 +2059,13 @@
                         y += 4;
                     }
                 });
+
+                const citationSignature = getSignatureData("citationSignatureCanvas");
+                if (citationSignature) {
+                    doc.setFont(undefined, "bold");
+                    doc.text("Signature:", labelX, y + 6);
+                    doc.addImage(citationSignature, "PNG", labelX, y + 10, 80, 30);
+                }
 
                 doc.save("citation-" + Date.now() + ".pdf");
             } catch (err) {
@@ -2154,16 +2120,18 @@
                     }
                 });
 
+                const arrestSignature = getSignatureData("arrestSignatureCanvas");
+                if (arrestSignature) {
+                    doc.setFont(undefined, "bold");
+                    doc.text("Signature:", labelX, y + 6);
+                    doc.addImage(arrestSignature, "PNG", labelX, y + 10, 80, 30);
+                }
+
                 doc.save("arrest-" + Date.now() + ".pdf");
             } catch (err) {
                 alert("Failed to generate PDF.");
                 console.error(err);
             }
-        }
-
-        const tsDownloadPdfBtn = document.getElementById("tsDownloadPdfBtn");
-        if (tsDownloadPdfBtn) {
-            tsDownloadPdfBtn.addEventListener("click", generateTrafficStopPdf);
         }
 
         const citationDownloadPdfBtn = document.getElementById("citationDownloadPdfBtn");
@@ -2527,6 +2495,9 @@
         makeDraggable(document.getElementById("callsPanel"), ".calls-panel-title");
         makeDraggable(document.getElementById("boloPanel"), ".bolo-panel-title");
         makeDraggable(document.getElementById("activeUnitsPanel"), ".active-units-title");
+
+        initSignatureCanvas("citationSignatureCanvas", "citationSignatureClear");
+        initSignatureCanvas("arrestSignatureCanvas", "arrestSignatureClear");
 
         (function updateMilitaryTime() {
             const el = document.getElementById("militaryTime");
