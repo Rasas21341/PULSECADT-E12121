@@ -497,6 +497,26 @@
             background: #eff6ff;
         }
 
+        .supervisor-panel-btn {
+            position: fixed;
+            right: 336px;
+            bottom: 24px;
+            padding: 12px 20px;
+            border-radius: 12px;
+            border: 1px solid #2563eb;
+            background: #ffffff;
+            color: #2563eb;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            z-index: 700;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15);
+        }
+
+        .supervisor-panel-btn:hover {
+            background: #eff6ff;
+        }
+
         .status-select {
             padding: 8px 12px;
             border-radius: 10px;
@@ -968,6 +988,7 @@
 
     <button type="button" class="plate-lookup-btn" id="plateLookupBtn">Plate Lookup</button>
     <button type="button" class="civilian-lookup-btn" id="civilianLookupBtn">Lookup Civilian</button>
+    <button type="button" class="supervisor-panel-btn" id="supervisorPanelBtn">Supervisor Panel</button>
 
     <div class="modal-overlay" id="plateLookupModal">
         <div class="modal">
@@ -1127,6 +1148,21 @@
         </div>
     </div>
 
+    <div class="modal-overlay" id="supervisorPanelModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">Supervisor Panel</div>
+                <button class="modal-close" id="supervisorPanelClose" type="button" aria-label="Close">×</button>
+            </div>
+            <div class="lookup-field">
+                <label for="supervisorPassword">Supervisor Password</label>
+                <input type="password" id="supervisorPassword" placeholder="Enter password" />
+            </div>
+            <button type="button" class="lookup-submit" id="supervisorSubmitBtn">Access Panel</button>
+            <div class="lookup-error" id="supervisorError"></div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script>
@@ -1280,6 +1316,52 @@
 
         const plateLookupBtn = document.getElementById("plateLookupBtn");
         const civilianLookupBtn = document.getElementById("civilianLookupBtn");
+        const supervisorPanelBtn = document.getElementById("supervisorPanelBtn");
+        const supervisorPanelModal = document.getElementById("supervisorPanelModal");
+        const supervisorPanelClose = document.getElementById("supervisorPanelClose");
+        const supervisorSubmitBtn = document.getElementById("supervisorSubmitBtn");
+        const supervisorPassword = document.getElementById("supervisorPassword");
+        const supervisorError = document.getElementById("supervisorError");
+
+        if (supervisorPanelBtn) {
+            supervisorPanelBtn.addEventListener("click", () => {
+                if (!supervisorPanelModal) return;
+                if (supervisorPassword) supervisorPassword.value = "";
+                if (supervisorError) { supervisorError.textContent = ""; supervisorError.style.display = "none"; }
+                supervisorPanelModal.classList.add("open");
+                if (supervisorPassword) supervisorPassword.focus();
+            });
+        }
+
+        if (supervisorPanelClose) {
+            supervisorPanelClose.addEventListener("click", () => {
+                if (supervisorPanelModal) supervisorPanelModal.classList.remove("open");
+            });
+        }
+
+        if (supervisorPanelModal) {
+            supervisorPanelModal.addEventListener("click", (e) => {
+                if (e.target === supervisorPanelModal) supervisorPanelModal.classList.remove("open");
+            });
+        }
+
+        if (supervisorSubmitBtn) {
+            supervisorSubmitBtn.addEventListener("click", () => {
+                const password = supervisorPassword ? supervisorPassword.value.trim() : "";
+                if (!password) {
+                    if (supervisorError) { supervisorError.textContent = "Enter a password."; supervisorError.style.display = "block"; }
+                    return;
+                }
+                if (password !== "admin123") {
+                    if (supervisorError) { supervisorError.textContent = "Invalid password."; supervisorError.style.display = "block"; }
+                    return;
+                }
+                if (supervisorError) { supervisorError.textContent = ""; supervisorError.style.display = "none"; }
+                if (supervisorPanelModal) supervisorPanelModal.classList.remove("open");
+                alert("Supervisor panel access granted.");
+            });
+        }
+
         if (plateLookupBtn) {
             plateLookupBtn.addEventListener("click", () => {
                 if (!plateLookupModal) return;

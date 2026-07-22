@@ -1585,8 +1585,8 @@
             const civilianSelect = document.getElementById("licenseCivilian");
             if (civilianSelect) {
                 civilianSelect.innerHTML = '<option value="">Select a civilian</option>';
-                if (Array.isArray(myCivilians)) {
-                    myCivilians.forEach(c => {
+                if (Array.isArray(loadedCivilians)) {
+                    loadedCivilians.forEach(c => {
                         const option = document.createElement("option");
                         option.value = c.id;
                         option.textContent = c.name || "Unnamed Civilian";
