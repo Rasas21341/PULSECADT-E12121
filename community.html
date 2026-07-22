@@ -1634,10 +1634,16 @@
                             if (!vehiclesViewList || !localSupabase) return;
                             vehiclesViewList.innerHTML = '<div class="empty">Loading vehicles...</div>';
                             try {
-                                const { data, error } = await localSupabase
+                                let query = localSupabase
                                     .from("vehicles")
                                     .select("*")
                                     .order("created_at", { ascending: false });
+
+                                if (currentCommunityId) {
+                                    query = query.eq("community_id", currentCommunityId);
+                                }
+
+                                const { data, error } = await query;
 
                                 if (error) throw error;
 
@@ -1839,6 +1845,8 @@
                                     civiliansView.classList.remove("open");
                                 } else {
                                     closeAllPages();
+                                    const frame = document.getElementById("civiliansFrame");
+                                    if (frame && currentCommunityId) frame.src = `/civilians.html?communityId=${currentCommunityId}`;
                                     civiliansView.classList.add("open");
                                 }
                             });

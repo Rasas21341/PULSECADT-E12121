@@ -1060,6 +1060,7 @@
         let currentCivilianId = null;
         let selectedCivilianId = null;
         let loadedCivilians = [];
+        let currentCommunityId = null;
 
         try {
             if (typeof window.supabase !== "undefined") {
@@ -1067,6 +1068,13 @@
             }
         } catch (err) {
             console.error("Supabase init failed:", err);
+        }
+
+        try {
+            const urlParams = new URLSearchParams(window.location.search);
+            currentCommunityId = urlParams.get("communityId");
+        } catch (e) {
+            currentCommunityId = null;
         }
 
         async function getCurrentUser() {
@@ -1096,11 +1104,17 @@
                     return;
                 }
 
-                const { data, error } = await localSupabase
+                let query = localSupabase
                     .from("civilians")
                     .select("*")
                     .eq("user_id", user.id)
                     .order("created_at", { ascending: false });
+
+                if (currentCommunityId) {
+                    query = query.eq("community_id", currentCommunityId);
+                }
+
+                const { data, error } = await query;
 
                 loadedCivilians = Array.isArray(data) ? data : [];
 
@@ -1224,11 +1238,17 @@
             if (!listEl || !localSupabase) return;
 
             try {
-                const { data, error } = await localSupabase
+                let query = localSupabase
                     .from("vehicles")
                     .select("*")
                     .eq("civilian_id", civilianId)
                     .order("created_at", { ascending: false });
+
+                if (currentCommunityId) {
+                    query = query.eq("community_id", currentCommunityId);
+                }
+
+                const { data, error } = await query;
 
                 if (error || !Array.isArray(data) || data.length === 0) {
                     listEl.innerHTML = "";
@@ -1763,6 +1783,7 @@
                             model,
                             color: color || null,
                             plate,
+                            community_id: currentCommunityId || null,
                             created_at: new Date().toISOString()
                         }]);
 
@@ -1869,6 +1890,9 @@
                     };
                     if (user) {
                         payload.user_id = user.id;
+                    }
+                    if (currentCommunityId) {
+                        payload.community_id = currentCommunityId;
                     }
                     if (createPhotoBase64) {
                         payload.photo_url = createPhotoBase64;
