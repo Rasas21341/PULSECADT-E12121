@@ -952,36 +952,42 @@
           </div>
       </div>
 
-     <div class="modal-overlay" id="licenseModal">
-         <div class="modal">
-             <div class="modal-header">
-                 <div class="modal-title">Create License</div>
-                 <button class="modal-close" id="licenseModalClose" type="button" aria-label="Close">×</button>
-             </div>
-             <div class="form-field">
-                 <label for="licenseType">License Type</label>
-                  <select id="licenseType">
-                      <option value="">Select</option>
-                      <option value="Driver's License">Driver's License</option>
-                      <option value="Weapon License">Weapon License</option>
-                      <option value="Fishing License">Fishing License</option>
-                      <option value="Boating License">Boating License</option>
-                      <option value="Other">Other</option>
+      <div class="modal-overlay" id="licenseModal">
+          <div class="modal">
+              <div class="modal-header">
+                  <div class="modal-title">Create License</div>
+                  <button class="modal-close" id="licenseModalClose" type="button" aria-label="Close">×</button>
+              </div>
+              <div class="form-field">
+                  <label for="licenseCivilian">Civilian</label>
+                  <select id="licenseCivilian">
+                      <option value="">Select a civilian</option>
                   </select>
               </div>
               <div class="form-field">
-                  <label for="licenseNumber">License Number</label>
-                  <input type="text" id="licenseNumber" placeholder="Auto-generated on type select" readonly />
-             </div>
-             <div class="form-field">
-                 <label for="licenseExpiry">Expiry Date</label>
-                 <input type="date" id="licenseExpiry" />
-             </div>
-             <button type="button" class="submit-btn" id="licenseSubmitBtn">Create License</button>
-             <div class="form-error" id="licenseError"></div>
-             <div class="form-success" id="licenseSuccess"></div>
-          </div>
-      </div>
+                  <label for="licenseType">License Type</label>
+                   <select id="licenseType">
+                       <option value="">Select</option>
+                       <option value="Driver's License">Driver's License</option>
+                       <option value="Weapon License">Weapon License</option>
+                       <option value="Fishing License">Fishing License</option>
+                       <option value="Boating License">Boating License</option>
+                       <option value="Other">Other</option>
+                   </select>
+               </div>
+               <div class="form-field">
+                   <label for="licenseNumber">License Number</label>
+                   <input type="text" id="licenseNumber" placeholder="Auto-generated on type select" readonly />
+              </div>
+              <div class="form-field">
+                  <label for="licenseExpiry">Expiry Date</label>
+                  <input type="date" id="licenseExpiry" />
+              </div>
+              <button type="button" class="submit-btn" id="licenseSubmitBtn">Create License</button>
+              <div class="form-error" id="licenseError"></div>
+              <div class="form-success" id="licenseSuccess"></div>
+           </div>
+       </div>
 
       <div class="license-card" id="licenseCard">
           <div class="license-card-inner" id="licenseCardInner">
@@ -1053,6 +1059,7 @@
         let currentUserId = null;
         let currentCivilianId = null;
         let selectedCivilianId = null;
+        let loadedCivilians = [];
 
         try {
             if (typeof window.supabase !== "undefined") {
@@ -1094,6 +1101,8 @@
                     .select("*")
                     .eq("user_id", user.id)
                     .order("created_at", { ascending: false });
+
+                loadedCivilians = Array.isArray(data) ? data : [];
 
                 if (error) {
                     listEl.innerHTML = `<div class="empty-state">Error loading civilians: ${escapeHtml(error.message)}</div>`;
@@ -1572,6 +1581,23 @@
             if (!licenseModal) return;
             if (licenseError) { licenseError.textContent = ""; licenseError.style.display = "none"; }
             if (licenseSuccess) { licenseSuccess.textContent = ""; licenseSuccess.style.display = "none"; }
+            
+            const civilianSelect = document.getElementById("licenseCivilian");
+            if (civilianSelect) {
+                civilianSelect.innerHTML = '<option value="">Select a civilian</option>';
+                if (Array.isArray(myCivilians)) {
+                    myCivilians.forEach(c => {
+                        const option = document.createElement("option");
+                        option.value = c.id;
+                        option.textContent = c.name || "Unnamed Civilian";
+                        civilianSelect.appendChild(option);
+                    });
+                }
+                if (selectedCivilianId) {
+                    civilianSelect.value = selectedCivilianId;
+                }
+            }
+            
             licenseModal.classList.add("open");
         }
 
@@ -1602,8 +1628,10 @@
 
         if (licenseSubmitBtn) {
             licenseSubmitBtn.addEventListener("click", async () => {
-                if (!currentCivilianId) {
-                    if (licenseError) { licenseError.textContent = "No civilian selected."; licenseError.style.display = "block"; }
+                const civilianSelect = document.getElementById("licenseCivilian");
+                const selectedCivilianFromModal = civilianSelect ? civilianSelect.value : "";
+                if (!selectedCivilianFromModal) {
+                    if (licenseError) { licenseError.textContent = "Select a civilian."; licenseError.style.display = "block"; }
                     return;
                 }
 
@@ -1634,7 +1662,7 @@
                     const { error } = await localSupabase
                         .from("licenses")
                         .insert([{
-                            civilian_id: currentCivilianId,
+                            civilian_id: selectedCivilianFromModal,
                             user_id: user.id,
                             license_type: licenseType,
                             license_number: licenseNumber || null,
@@ -1650,11 +1678,14 @@
 
                     if (licenseSuccess) { licenseSuccess.textContent = "License created successfully."; licenseSuccess.style.display = "block"; }
 
-                    document.getElementById("licenseType").value = "";
-                    document.getElementById("licenseNumber").value = "";
-                    document.getElementById("licenseExpiry").value = "";
+                     document.getElementById("licenseType").value = "";
+                     document.getElementById("licenseNumber").value = "";
+                     document.getElementById("licenseExpiry").value = "";
 
-                    loadLicenses(currentCivilianId);
+                     const selectedCivilianFromModal = document.getElementById("licenseCivilian")?.value || "";
+                     if (selectedCivilianFromModal) {
+                         loadLicenses(selectedCivilianFromModal);
+                     }
 
                     setTimeout(() => {
                         if (licenseModal) licenseModal.classList.remove("open");
@@ -1886,11 +1917,7 @@
 
         if (sectionLicenseBtn) {
             sectionLicenseBtn.addEventListener("click", () => {
-                if (!selectedCivilianId) {
-                    alert("Select a civilian first by clicking on their card.");
-                    return;
-                }
-                currentCivilianId = selectedCivilianId;
+                currentCivilianId = selectedCivilianId || null;
                 openLicenseModal();
             });
         }
