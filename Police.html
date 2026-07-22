@@ -497,6 +497,23 @@
             background: #eff6ff;
         }
 
+        .military-time {
+            position: fixed;
+            right: 24px;
+            bottom: 70px;
+            padding: 6px 10px;
+            border-radius: 8px;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            color: #0f172a;
+            font-size: 12px;
+            font-weight: 700;
+            font-variant-numeric: tabular-nums;
+            z-index: 700;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+            pointer-events: none;
+        }
+
         .status-select {
             padding: 8px 12px;
             border-radius: 10px;
@@ -967,6 +984,7 @@
         <div id="activeUnitsList"></div>
     </div>
 
+    <div class="military-time" id="militaryTime">00:00</div>
     <button type="button" class="plate-lookup-btn" id="plateLookupBtn">Plate Lookup</button>
     <button type="button" class="civilian-lookup-btn" id="civilianLookupBtn">Lookup Civilian</button>
 
@@ -2509,6 +2527,16 @@
         makeDraggable(document.getElementById("callsPanel"), ".calls-panel-title");
         makeDraggable(document.getElementById("boloPanel"), ".bolo-panel-title");
         makeDraggable(document.getElementById("activeUnitsPanel"), ".active-units-title");
+
+        (function updateMilitaryTime() {
+            const el = document.getElementById("militaryTime");
+            if (!el) return;
+            const now = new Date();
+            const h = String(now.getHours()).padStart(2, "0");
+            const m = String(now.getMinutes()).padStart(2, "0");
+            el.textContent = h + ":" + m;
+            setTimeout(updateMilitaryTime, 1000);
+        })();
     </script>
 </body>
 </html>
