@@ -497,26 +497,6 @@
             background: #eff6ff;
         }
 
-        .supervisor-panel-btn {
-            position: fixed;
-            right: 336px;
-            bottom: 24px;
-            padding: 12px 20px;
-            border-radius: 12px;
-            border: 1px solid #2563eb;
-            background: #ffffff;
-            color: #2563eb;
-            font-size: 14px;
-            font-weight: 700;
-            cursor: pointer;
-            z-index: 700;
-            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15);
-        }
-
-        .supervisor-panel-btn:hover {
-            background: #eff6ff;
-        }
-
         .status-select {
             padding: 8px 12px;
             border-radius: 10px;
@@ -944,6 +924,7 @@
                 <option value="unavailable">Unavailable</option>
                 <option value="busy">Busy</option>
             </select>
+            <button type="button" class="status-btn" id="supervisorPanelBtn">Supervisor Panel</button>
         </div>
     </div>
 
@@ -988,7 +969,6 @@
 
     <button type="button" class="plate-lookup-btn" id="plateLookupBtn">Plate Lookup</button>
     <button type="button" class="civilian-lookup-btn" id="civilianLookupBtn">Lookup Civilian</button>
-    <button type="button" class="supervisor-panel-btn" id="supervisorPanelBtn">Supervisor Panel</button>
 
     <div class="modal-overlay" id="plateLookupModal">
         <div class="modal">
