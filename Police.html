@@ -646,6 +646,12 @@
             font-weight: 700;
             color: #0f172a;
             margin-bottom: 10px;
+            cursor: grab;
+            user-select: none;
+        }
+
+        .calls-panel-title:active {
+            cursor: grabbing;
         }
 
         .call-info-box {
@@ -683,6 +689,12 @@
             font-weight: 700;
             color: #0f172a;
             margin-bottom: 10px;
+            cursor: grab;
+            user-select: none;
+        }
+
+        .active-units-title:active {
+            cursor: grabbing;
         }
 
         .active-unit-item {
@@ -759,6 +771,12 @@
             font-weight: 700;
             color: #0f172a;
             margin-bottom: 10px;
+            cursor: grab;
+            user-select: none;
+        }
+
+        .bolo-panel-title:active {
+            cursor: grabbing;
         }
 
         .bolo-form {
@@ -884,6 +902,12 @@
 
         .bolo-priority.low {
             color: #16a34a;
+        }
+
+        .panel-dragging {
+            opacity: 0.9;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+            cursor: grabbing;
         }
 
     </style>
@@ -2371,6 +2395,58 @@
         }
 
         renderBolos();
+
+        function makeDraggable(panel, handleSelector) {
+            if (!panel) return;
+            const handle = panel.querySelector(handleSelector);
+            if (!handle) return;
+
+            let isDragging = false;
+            let startX = 0;
+            let startY = 0;
+            let startLeft = 0;
+            let startTop = 0;
+
+            const getStart = (clientX, clientY) => {
+                const rect = panel.getBoundingClientRect();
+                startLeft = rect.left;
+                startTop = rect.top;
+                startX = clientX;
+                startY = clientY;
+            };
+
+            const move = (clientX, clientY) => {
+                const dx = clientX - startX;
+                const dy = clientY - startY;
+                const newLeft = startLeft + dx;
+                const newTop = startTop + dy;
+                panel.style.left = Math.max(0, newLeft) + "px";
+                panel.style.top = Math.max(0, newTop) + "px";
+                panel.style.right = "auto";
+            };
+
+            handle.addEventListener("mousedown", (e) => {
+                isDragging = true;
+                panel.classList.add("panel-dragging");
+                getStart(e.clientX, e.clientY);
+                e.preventDefault();
+            });
+
+            window.addEventListener("mousemove", (e) => {
+                if (!isDragging) return;
+                move(e.clientX, e.clientY);
+            });
+
+            window.addEventListener("mouseup", () => {
+                if (!isDragging) return;
+                isDragging = false;
+                panel.classList.remove("panel-dragging");
+            });
+        }
+
+        makeDraggable(document.getElementById("callsPanel"), ".calls-panel-title");
+        makeDraggable(document.getElementById("boloPanel"), ".bolo-panel-title");
+        makeDraggable(document.getElementById("activeUnitsPanel"), ".active-units-title");
     </script>
 </body>
 </html>
