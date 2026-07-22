@@ -1961,6 +1961,7 @@
 
         const activeUnitsPanel = document.getElementById("activeUnitsPanel");
         const activeUnitsList = document.getElementById("activeUnitsList");
+        const POLICE_COMMUNITY_ID = (new URLSearchParams(window.location.search).get("community")) || "";
 
         function loadActiveUnits() {
             try {
@@ -2002,20 +2003,91 @@
                 units.push({ ...officerInfo, updated_at: new Date().toISOString() });
             }
             saveActiveUnits(units);
+            syncUnitToSupabase(officerInfo);
         }
 
         function removeActiveUnit(officerId) {
             let units = loadActiveUnits();
             units = units.filter(u => u.id !== officerId);
             saveActiveUnits(units);
+            removeUnitFromSupabase(officerId);
         }
 
-        function renderActiveUnits() {
+        async function syncUnitToSupabase(officerInfo) {
+            if (!localSupabase) return;
+            try {
+                const payload = {
+                    id: officerInfo.id,
+                    name: officerInfo.name || "Officer",
+                    rank: officerInfo.rank || "",
+                    callsign: officerInfo.callsign || "",
+                    status: officerInfo.status || "available",
+                    updated_at: new Date().toISOString(),
+                    community_id: POLICE_COMMUNITY_ID || null
+                };
+                const { error } = await localSupabase
+                    .from("police_active_units")
+                    .upsert([payload], { onConflict: "id" });
+                if (error) console.error("syncUnitToSupabase failed:", error);
+            } catch (err) {
+                console.error("syncUnitToSupabase error:", err);
+            }
+        }
+
+        async function removeUnitFromSupabase(officerId) {
+            if (!localSupabase) return;
+            try {
+                const { error } = await localSupabase
+                    .from("police_active_units")
+                    .delete()
+                    .eq("id", officerId);
+                if (error) console.error("removeUnitFromSupabase failed:", error);
+            } catch (err) {
+                console.error("removeUnitFromSupabase error:", err);
+            }
+        }
+
+        async function loadRemoteUnits() {
+            if (!localSupabase) return [];
+            try {
+                const fifteenMinutesAgo = new Date(Date.now() - 15 * 60 * 1000).toISOString();
+                const query = localSupabase
+                    .from("police_active_units")
+                    .select("*")
+                    .gte("updated_at", fifteenMinutesAgo)
+                    .neq("id", getCurrentOfficerId());
+                if (POLICE_COMMUNITY_ID) {
+                    query.eq("community_id", POLICE_COMMUNITY_ID);
+                }
+                const { data, error } = await query;
+                if (error) {
+                    console.error("loadRemoteUnits failed:", error);
+                    return [];
+                }
+                return (data || []).map(u => ({
+                    id: u.id,
+                    name: u.name || "Officer",
+                    rank: u.rank || "",
+                    callsign: u.callsign || "",
+                    status: u.status || "available",
+                    updated_at: u.updated_at || new Date().toISOString()
+                }));
+            } catch (err) {
+                console.error("loadRemoteUnits error:", err);
+                return [];
+            }
+        }
+
+        async function refreshActiveUnits() {
             if (!activeUnitsPanel || !activeUnitsList) return;
-            const units = loadActiveUnits();
+            const local = loadActiveUnits();
+            const remote = await loadRemoteUnits();
+            const merged = new Map();
+            for (const u of local) merged.set(u.id, u);
+            for (const u of remote) merged.set(u.id, u);
             const now = Date.now();
             const fifteenMinutes = 15 * 60 * 1000;
-            const activeUnits = units.filter(u => {
+            const activeUnits = Array.from(merged.values()).filter(u => {
                 const updated = u.updated_at ? new Date(u.updated_at).getTime() : 0;
                 return now - updated < fifteenMinutes;
             });
@@ -2041,7 +2113,7 @@
         const currentOfficerInfo = getCurrentOfficerInfo();
         if (currentOfficerInfo.name && currentOfficerInfo.name !== "Officer") {
             upsertActiveUnit(currentOfficerInfo);
-            renderActiveUnits();
+            refreshActiveUnits();
         }
 
         const originalSetStatus = setStatus;
@@ -2050,13 +2122,13 @@
             const info = getCurrentOfficerInfo();
             if (info.name && info.name !== "Officer") {
                 upsertActiveUnit({ ...info, status });
-                renderActiveUnits();
+                refreshActiveUnits();
             }
         };
 
         setInterval(() => {
-            renderActiveUnits();
-        }, 15000);
+            refreshActiveUnits();
+        }, 3000);
 
         window.addEventListener("beforeunload", () => {
             removeActiveUnit(getCurrentOfficerId());
