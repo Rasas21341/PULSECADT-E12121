@@ -148,6 +148,24 @@
             padding: 20px 0;
         }
 
+        .search-box {
+            width: 100%;
+            padding: 10px 14px;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+            background: #ffffff;
+            color: #0f172a;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            outline: none;
+        }
+
+        .search-box:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+        }
+
         .verified-btn {
             padding: 6px 12px;
             border-radius: 999px;
@@ -608,7 +626,7 @@
                     return;
                 }
 
-                let html = `<table><tr><th>Name</th><th>Owner</th><th>Created</th><th>Status</th><th>Members Only</th><th>Pro</th><th>Actions</th></tr>`;
+                let html = `<input type="text" class="search-box" id="serverSearch" placeholder="Search servers by name or owner..." /><table><tr><th>Name</th><th>Owner</th><th>Created</th><th>Status</th><th>Members Only</th><th>Pro</th><th>Actions</th></tr>`;
                 const canSuspend = userDepartment !== "Support Team";
                 const canDelete = userDepartment !== "Support Team";
                 const canPro = userDepartment !== "Support Team";
@@ -641,6 +659,19 @@
                 });
                 html += "</table>";
                 contentEl.innerHTML = html;
+
+                const serverSearch = document.getElementById("serverSearch");
+                if (serverSearch) {
+                    serverSearch.addEventListener("input", (e) => {
+                        const term = (e.target.value || "").toLowerCase();
+                        const rows = contentEl.querySelectorAll("table tr");
+                        rows.forEach((row, idx) => {
+                            if (idx === 0) return;
+                            const text = row.textContent || "";
+                            row.style.display = text.toLowerCase().includes(term) ? "" : "none";
+                        });
+                    });
+                }
 
                 contentEl.querySelectorAll(".suspend-server-btn").forEach((btn) => {
                     btn.addEventListener("click", async () => {
@@ -733,7 +764,7 @@
 
                 const userDepartment = await getUserDepartment();
                 const isManagement = userDepartment === "Management";
-                let html = `<table><tr><th>Email</th><th>Created</th><th>Department</th>${isManagement ? "<th>IP</th>" : ""}<th>Actions</th></tr>`;
+                let html = `<input type="text" class="search-box" id="userSearch" placeholder="Search users by email..." /><table><tr><th>Email</th><th>Created</th><th>Department</th>${isManagement ? "<th>IP</th>" : ""}<th>Actions</th></tr>`;
                 data.forEach((row) => {
                     const email = (row.email || "N/A").replace(/</g, "&lt;").replace(/>/g, "&gt;");
                     const created = row.created_at ? new Date(row.created_at).toLocaleString() : "";
@@ -745,6 +776,19 @@
                 });
                 html += "</table>";
                 contentEl.innerHTML = html;
+
+                const userSearch = document.getElementById("userSearch");
+                if (userSearch) {
+                    userSearch.addEventListener("input", (e) => {
+                        const term = (e.target.value || "").toLowerCase();
+                        const rows = contentEl.querySelectorAll("table tr");
+                        rows.forEach((row, idx) => {
+                            if (idx === 0) return;
+                            const text = row.textContent || "";
+                            row.style.display = text.toLowerCase().includes(term) ? "" : "none";
+                        });
+                    });
+                }
 
                 contentEl.querySelectorAll(".department-select").forEach((select) => {
                     select.addEventListener("change", async () => {
