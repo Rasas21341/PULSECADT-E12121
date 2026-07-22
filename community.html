@@ -1846,7 +1846,13 @@
                                 } else {
                                     closeAllPages();
                                     const frame = document.getElementById("civiliansFrame");
-                                    if (frame && currentCommunityId) frame.src = `/civilians.html?communityId=${currentCommunityId}`;
+                                    if (frame && currentCommunityId) {
+                                        frame.src = `/civilians.html?communityId=${currentCommunityId}&t=${Date.now()}`;
+                                        window.currentCommunityId = currentCommunityId;
+                                        setTimeout(() => {
+                                            try { frame.contentWindow.postMessage({ type: "SET_COMMUNITY_ID", communityId: currentCommunityId }, "*"); } catch (e) {}
+                                        }, 300);
+                                    }
                                     civiliansView.classList.add("open");
                                 }
                             });

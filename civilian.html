@@ -1077,6 +1077,21 @@
             currentCommunityId = null;
         }
 
+        if (!currentCommunityId) {
+            try {
+                currentCommunityId = window.parent?.currentCommunityId || null;
+            } catch (e) {
+                currentCommunityId = null;
+            }
+        }
+
+        window.addEventListener("message", (event) => {
+            if (event.data && event.data.type === "SET_COMMUNITY_ID" && event.data.communityId) {
+                currentCommunityId = event.data.communityId;
+                if (typeof loadMyCivilians === "function") loadMyCivilians();
+            }
+        });
+
         async function getCurrentUser() {
             if (!localSupabase) return null;
             try {
