@@ -648,32 +648,6 @@
             margin-bottom: 10px;
         }
 
-        .calls-list {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .call-item {
-            padding: 10px;
-            border-radius: 10px;
-            border: 1px solid #e2e8f0;
-            background: #f8fafc;
-            cursor: pointer;
-        }
-
-        .call-item-header {
-            font-size: 14px;
-            font-weight: 700;
-            color: #0f172a;
-        }
-
-        .call-item-meta {
-            font-size: 12px;
-            color: #475569;
-            margin-top: 2px;
-        }
-
         .call-info-box {
             margin-top: 8px;
             padding: 8px;
@@ -687,49 +661,6 @@
 
         .call-info-box strong {
             color: #0f172a;
-        }
-
-        .call-detach-btn {
-            margin-top: 8px;
-            padding: 4px 10px;
-            border-radius: 8px;
-            border: 1px solid #dc2626;
-            background: #ffffff;
-            color: #dc2626;
-            font-size: 12px;
-            font-weight: 700;
-            cursor: pointer;
-        }
-
-        .call-attach-row {
-            display: flex;
-            gap: 8px;
-            margin-top: 10px;
-        }
-
-        .call-attach-input {
-            flex: 1;
-            padding: 8px 10px;
-            border-radius: 8px;
-            border: 1px solid #cbd5e1;
-            font-size: 13px;
-            outline: none;
-        }
-
-        .call-attach-input:focus {
-            border-color: #2563eb;
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
-        }
-
-        .call-attach-btn {
-            padding: 8px 12px;
-            border-radius: 8px;
-            border: none;
-            background: #2563eb;
-            color: #ffffff;
-            font-size: 13px;
-            font-weight: 700;
-            cursor: pointer;
         }
 
     </style>
@@ -753,11 +684,9 @@
     <button class="back-btn" id="backBtn">← Back</button>
 
     <div class="calls-panel" id="callsPanel" style="display: none;">
-        <div class="calls-panel-title">My Calls</div>
-        <div class="calls-list" id="callsList"></div>
-        <div class="call-attach-row">
-            <input type="text" class="call-attach-input" id="attachCallInput" placeholder="Call ID to attach" />
-            <button type="button" class="call-attach-btn" id="attachCallBtn">Attach</button>
+        <div class="calls-panel-title">Active Call</div>
+        <div class="call-info-box" id="activeCallBox">
+            <div style="font-size: 14px; font-weight: 700; color: #0f172a; margin-bottom: 6px;">No active call</div>
         </div>
     </div>
 
@@ -1891,10 +1820,8 @@
             arrestDownloadPdfBtn.addEventListener("click", generateArrestPdf);
         }
 
-        const callsList = document.getElementById("callsList");
         const callsPanel = document.getElementById("callsPanel");
-        const attachCallInput = document.getElementById("attachCallInput");
-        const attachCallBtn = document.getElementById("attachCallBtn");
+        const activeCallBox = document.getElementById("activeCallBox");
 
         function loadPoliceCalls() {
             try {
@@ -1919,73 +1846,27 @@
         }
 
         function renderCalls() {
-            if (!callsList || !callsPanel) return;
+            if (!callsPanel || !activeCallBox) return;
             const calls = loadPoliceCalls();
             const officerId = getCurrentOfficerId();
-            const myCalls = calls.filter(c => c.assigned_officer_id === officerId && c.status !== "closed");
+            const myCall = calls.find(c => c.assigned_officer_id === officerId && c.status !== "closed") || null;
 
-            if (myCalls.length === 0) {
-                callsList.innerHTML = '<div style="font-size: 13px; color: #64748b;">No active calls.</div>';
+            if (!myCall) {
+                activeCallBox.innerHTML = '<div style="font-size: 13px; color: #64748b;">No active call.</div>';
                 callsPanel.style.display = "block";
                 return;
             }
 
             callsPanel.style.display = "block";
-            callsList.innerHTML = myCalls.map(call => `
-                <div class="call-item">
-                    <div class="call-item-header">${escapeHtml(call.title || "Untitled Call")}</div>
-                    <div class="call-item-meta">${escapeHtml(call.location || "")}</div>
-                    <div class="call-info-box">
-                        <strong>Priority:</strong> ${escapeHtml(call.priority || "Normal")}<br>
-                        <strong>Code:</strong> ${escapeHtml(call.code || "Unknown")}<br>
-                        <strong>Description:</strong> ${escapeHtml(call.description || "No description.")}
-                    </div>
-                    <button type="button" class="call-detach-btn" data-call-id="${call.id}">Detach</button>
+            activeCallBox.innerHTML = `
+                <div style="font-size: 14px; font-weight: 700; color: #0f172a; margin-bottom: 6px;">${escapeHtml(myCall.title || "Untitled Call")}</div>
+                <div style="font-size: 12px; color: #475569; margin-bottom: 4px;">${escapeHtml(myCall.location || "")}</div>
+                <div style="font-size: 12px; color: #334155; line-height: 1.4;">
+                    <strong>Priority:</strong> ${escapeHtml(myCall.priority || "Normal")}<br>
+                    <strong>Code:</strong> ${escapeHtml(myCall.code || "Unknown")}<br>
+                    <strong>Description:</strong> ${escapeHtml(myCall.description || "No description.")}
                 </div>
-            `).join("");
-
-            callsList.querySelectorAll(".call-detach-btn").forEach(btn => {
-                btn.addEventListener("click", () => {
-                    const callId = btn.getAttribute("data-call-id");
-                    let calls = loadPoliceCalls();
-                    const idx = calls.findIndex(c => c.id === callId && c.assigned_officer_id === officerId);
-                    if (idx !== -1) {
-                        calls.splice(idx, 1);
-                        savePoliceCalls(calls);
-                        renderCalls();
-                    }
-                });
-            });
-        }
-
-        if (attachCallBtn) {
-            attachCallBtn.addEventListener("click", () => {
-                const callId = attachCallInput ? attachCallInput.value.trim() : "";
-                if (!callId) return;
-                
-                const calls = loadPoliceCalls();
-                const officerId = getCurrentOfficerId();
-                
-                const exists = calls.some(c => c.id === callId && c.assigned_officer_id === officerId);
-                if (exists) {
-                    alert("Already attached to this call.");
-                    return;
-                }
-                
-                calls.push({
-                    id: callId,
-                    title: callId,
-                    location: "",
-                    priority: "Normal",
-                    status: "active",
-                    assigned_officer_id: officerId,
-                    created_at: new Date().toISOString()
-                });
-                
-                savePoliceCalls(calls);
-                if (attachCallInput) attachCallInput.value = "";
-                renderCalls();
-            });
+            `;
         }
 
         renderCalls();
