@@ -1074,30 +1074,41 @@
         const isInIframe = window.self !== window.top;
 
         function tryResolveCommunityId() {
-            if (communityIdResolved) return;
+            if (communityIdResolved) return null;
             try {
                 const urlParams = new URLSearchParams(window.location.search);
                 const fromUrl = urlParams.get("communityId");
                 if (fromUrl) {
                     currentCommunityId = fromUrl;
                     communityIdResolved = true;
-                    return;
+                    console.log("[civilians] Resolved communityId from URL:", currentCommunityId);
+                    return currentCommunityId;
                 }
-            } catch (e) {}
-            if (isInIframe) {
-                try {
-                    const fromParent = window.parent?.currentCommunityId || null;
-                    if (fromParent) {
-                        currentCommunityId = fromParent;
-                        communityIdResolved = true;
-                        return;
-                    }
-                } catch (e) {}
-            }
+            } catch (e) { console.error("[civilians] URL read failed", e); }
+            try {
+                const fromParent = window.parent?.currentCommunityId || null;
+                if (fromParent) {
+                    currentCommunityId = fromParent;
+                    communityIdResolved = true;
+                    console.log("[civilians] Resolved communityId from parent:", currentCommunityId);
+                    return currentCommunityId;
+                }
+            } catch (e) { console.error("[civilians] Parent read failed", e); }
+            try {
+                const fromStorage = sessionStorage.getItem("currentCommunityId");
+                if (fromStorage) {
+                    currentCommunityId = fromStorage;
+                    communityIdResolved = true;
+                    console.log("[civilians] Resolved communityId from sessionStorage:", currentCommunityId);
+                    return currentCommunityId;
+                }
+            } catch (e) { console.error("[civilians] sessionStorage read failed", e); }
             if (!isInIframe) {
                 currentCommunityId = null;
                 communityIdResolved = true;
+                console.log("[civilians] Standalone mode, no community filter");
             }
+            return currentCommunityId;
         }
 
         tryResolveCommunityId();
@@ -1106,6 +1117,7 @@
             if (event.data && event.data.type === "SET_COMMUNITY_ID" && event.data.communityId) {
                 currentCommunityId = event.data.communityId;
                 communityIdResolved = true;
+                console.log("[civilians] Resolved communityId from postMessage:", currentCommunityId);
                 if (typeof loadMyCivilians === "function") loadMyCivilians();
             }
         });
@@ -1130,19 +1142,17 @@
                 return;
             }
 
-                if (isInIframe && !communityIdResolved) {
-                    listEl.innerHTML = '<div class="empty-state">Loading community data...</div>';
-                    if (!window._civLoadRetry) {
-                        window._civLoadRetry = 0;
-                    }
-                    if (window._civLoadRetry < 20) {
-                        window._civLoadRetry += 1;
-                        setTimeout(loadMyCivilians, 250);
-                    } else {
-                        listEl.innerHTML = '<div class="empty-state">Failed to load community context. Please reopen this panel.</div>';
-                    }
-                    return;
+            if (isInIframe && !communityIdResolved) {
+                listEl.innerHTML = '<div class="empty-state">Loading community data...</div>';
+                if (!window._civLoadRetry) window._civLoadRetry = 0;
+                if (window._civLoadRetry < 40) {
+                    window._civLoadRetry += 1;
+                    setTimeout(loadMyCivilians, 250);
+                } else {
+                    listEl.innerHTML = '<div class="empty-state">Failed to load community context. Please reopen this panel.</div>';
                 }
+                return;
+            }
 
             try {
                 const user = await getCurrentUser();
@@ -1159,6 +1169,9 @@
 
                 if (currentCommunityId) {
                     query = query.eq("community_id", currentCommunityId);
+                } else if (isInIframe) {
+                    listEl.innerHTML = '<div class="empty-state">No community selected.</div>';
+                    return;
                 }
 
                 const { data, error } = await query;
