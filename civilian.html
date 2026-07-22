@@ -1061,7 +1061,6 @@
         let selectedCivilianId = null;
         let loadedCivilians = [];
         let currentCommunityId = null;
-        let communityIdResolved = false;
 
         try {
             if (typeof window.supabase !== "undefined") {
@@ -1071,56 +1070,12 @@
             console.error("Supabase init failed:", err);
         }
 
-        const isInIframe = window.self !== window.top;
-
-        function tryResolveCommunityId() {
-            if (communityIdResolved) return null;
-            try {
-                const urlParams = new URLSearchParams(window.location.search);
-                const fromUrl = urlParams.get("communityId");
-                if (fromUrl) {
-                    currentCommunityId = fromUrl;
-                    communityIdResolved = true;
-                    console.log("[civilians] Resolved communityId from URL:", currentCommunityId);
-                    return currentCommunityId;
-                }
-            } catch (e) { console.error("[civilians] URL read failed", e); }
-            try {
-                const fromParent = window.parent?.currentCommunityId || null;
-                if (fromParent) {
-                    currentCommunityId = fromParent;
-                    communityIdResolved = true;
-                    console.log("[civilians] Resolved communityId from parent:", currentCommunityId);
-                    return currentCommunityId;
-                }
-            } catch (e) { console.error("[civilians] Parent read failed", e); }
-            try {
-                const fromStorage = sessionStorage.getItem("currentCommunityId");
-                if (fromStorage) {
-                    currentCommunityId = fromStorage;
-                    communityIdResolved = true;
-                    console.log("[civilians] Resolved communityId from sessionStorage:", currentCommunityId);
-                    return currentCommunityId;
-                }
-            } catch (e) { console.error("[civilians] sessionStorage read failed", e); }
-            if (!isInIframe) {
-                currentCommunityId = null;
-                communityIdResolved = true;
-                console.log("[civilians] Standalone mode, no community filter");
-            }
-            return currentCommunityId;
+        try {
+            const urlParams = new URLSearchParams(window.location.search);
+            currentCommunityId = urlParams.get("communityId") || null;
+        } catch (e) {
+            currentCommunityId = null;
         }
-
-        tryResolveCommunityId();
-
-        window.addEventListener("message", (event) => {
-            if (event.data && event.data.type === "SET_COMMUNITY_ID" && event.data.communityId) {
-                currentCommunityId = event.data.communityId;
-                communityIdResolved = true;
-                console.log("[civilians] Resolved communityId from postMessage:", currentCommunityId);
-                if (typeof loadMyCivilians === "function") loadMyCivilians();
-            }
-        });
 
         async function getCurrentUser() {
             if (!localSupabase) return null;
