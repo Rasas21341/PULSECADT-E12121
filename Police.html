@@ -626,6 +626,96 @@
             color: #1d4ed8;
         }
 
+        .calls-panel {
+            position: fixed;
+            top: 70px;
+            left: 24px;
+            width: 320px;
+            max-height: calc(100vh - 140px);
+            background: #ffffff;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            padding: 14px;
+            z-index: 700;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            overflow-y: auto;
+        }
+
+        .calls-panel-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 10px;
+        }
+
+        .calls-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .call-item {
+            padding: 10px;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+            background: #f8fafc;
+        }
+
+        .call-item-header {
+            font-size: 14px;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .call-item-meta {
+            font-size: 12px;
+            color: #475569;
+            margin-top: 2px;
+        }
+
+        .call-detach-btn {
+            margin-top: 8px;
+            padding: 4px 10px;
+            border-radius: 8px;
+            border: 1px solid #dc2626;
+            background: #ffffff;
+            color: #dc2626;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .call-attach-row {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .call-attach-input {
+            flex: 1;
+            padding: 8px 10px;
+            border-radius: 8px;
+            border: 1px solid #cbd5e1;
+            font-size: 13px;
+            outline: none;
+        }
+
+        .call-attach-input:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+        }
+
+        .call-attach-btn {
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: none;
+            background: #2563eb;
+            color: #ffffff;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
     </style>
 </head>
 <body>
@@ -645,6 +735,15 @@
 
 
     <button class="back-btn" id="backBtn">← Back</button>
+
+    <div class="calls-panel" id="callsPanel" style="display: none;">
+        <div class="calls-panel-title">My Calls</div>
+        <div class="calls-list" id="callsList"></div>
+        <div class="call-attach-row">
+            <input type="text" class="call-attach-input" id="attachCallInput" placeholder="Call ID to attach" />
+            <button type="button" class="call-attach-btn" id="attachCallBtn">Attach</button>
+        </div>
+    </div>
 
     <button type="button" class="plate-lookup-btn" id="plateLookupBtn">Plate Lookup</button>
     <button type="button" class="civilian-lookup-btn" id="civilianLookupBtn">Lookup Civilian</button>
@@ -1775,6 +1874,103 @@
         if (arrestDownloadPdfBtn) {
             arrestDownloadPdfBtn.addEventListener("click", generateArrestPdf);
         }
+
+        const callsList = document.getElementById("callsList");
+        const callsPanel = document.getElementById("callsPanel");
+        const attachCallInput = document.getElementById("attachCallInput");
+        const attachCallBtn = document.getElementById("attachCallBtn");
+
+        function loadPoliceCalls() {
+            try {
+                const raw = localStorage.getItem("policeCalls");
+                return raw ? JSON.parse(raw) : [];
+            } catch (err) {
+                console.error("Could not load calls:", err);
+                return [];
+            }
+        }
+
+        function savePoliceCalls(calls) {
+            localStorage.setItem("policeCalls", JSON.stringify(calls));
+        }
+
+        function getCurrentOfficerId() {
+            try {
+                return localStorage.getItem("policeOfficerId") || "";
+            } catch {
+                return "";
+            }
+        }
+
+        function renderCalls() {
+            if (!callsList || !callsPanel) return;
+            const calls = loadPoliceCalls();
+            const officerId = getCurrentOfficerId();
+            const myCalls = calls.filter(c => c.assigned_officer_id === officerId && c.status !== "closed");
+
+            if (myCalls.length === 0) {
+                callsList.innerHTML = '<div style="font-size: 13px; color: #64748b;">No active calls.</div>';
+                callsPanel.style.display = "block";
+                return;
+            }
+
+            callsPanel.style.display = "block";
+            callsList.innerHTML = myCalls.map(call => `
+                <div class="call-item">
+                    <div class="call-item-header">${escapeHtml(call.title || "Untitled Call")}</div>
+                    <div class="call-item-meta">${escapeHtml(call.location || "")}</div>
+                    <div class="call-item-meta">Priority: ${call.priority || "Normal"}</div>
+                    <div class="call-item-meta">Status: ${call.status || "active"}</div>
+                    <div class="call-item-meta">Opened: ${call.created_at ? new Date(call.created_at).toLocaleString() : "Unknown"}</div>
+                    <button type="button" class="call-detach-btn" data-call-id="${call.id}">Detach</button>
+                </div>
+            `).join("");
+
+            callsList.querySelectorAll(".call-detach-btn").forEach(btn => {
+                btn.addEventListener("click", () => {
+                    const callId = btn.getAttribute("data-call-id");
+                    let calls = loadPoliceCalls();
+                    const idx = calls.findIndex(c => c.id === callId && c.assigned_officer_id === officerId);
+                    if (idx !== -1) {
+                        calls.splice(idx, 1);
+                        savePoliceCalls(calls);
+                        renderCalls();
+                    }
+                });
+            });
+        }
+
+        if (attachCallBtn) {
+            attachCallBtn.addEventListener("click", () => {
+                const callId = attachCallInput ? attachCallInput.value.trim() : "";
+                if (!callId) return;
+                
+                const calls = loadPoliceCalls();
+                const officerId = getCurrentOfficerId();
+                
+                const exists = calls.some(c => c.id === callId && c.assigned_officer_id === officerId);
+                if (exists) {
+                    alert("Already attached to this call.");
+                    return;
+                }
+                
+                calls.push({
+                    id: callId,
+                    title: callId,
+                    location: "",
+                    priority: "Normal",
+                    status: "active",
+                    assigned_officer_id: officerId,
+                    created_at: new Date().toISOString()
+                });
+                
+                savePoliceCalls(calls);
+                if (attachCallInput) attachCallInput.value = "";
+                renderCalls();
+            });
+        }
+
+        renderCalls();
     </script>
 </body>
 </html>
