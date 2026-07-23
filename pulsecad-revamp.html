@@ -845,6 +845,24 @@
             display: block;
         }
 
+        .top-left-logo {
+            position: fixed;
+            top: 24px;
+            left: 24px;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            object-fit: cover;
+            z-index: 800;
+            display: none;
+            border: 2px solid #e2e8f0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .top-left-logo.visible {
+            display: block;
+        }
+
         .create-community-centered-btn {
             padding: 10px 18px;
             border-radius: 999px;
@@ -1490,6 +1508,7 @@ enable-ga="false"
 ></call-us>--> 
 <script defer src="https://downloads-global.3cx.com/downloads/livechatandtalk/v1/callus.js" id="tcx-callus-js" charset="utf-8"></script>
 <body>
+    <img class="top-left-logo" id="topLeftLogo" src="https://cdn.discordapp.com/icons/1498000979101093999/c96c547fbd94e68254d8335dadb2e437.webp?size=1024" alt="Logo" />
     <div class="topbar" id="topbar">
         <span class="pill">
             <a href="/changelogs" class="changelogs-btn">Changelogs</a>
@@ -2725,6 +2744,7 @@ enable-ga="false"
             const container = document.querySelector(".container");
             const loggedInScreen = document.getElementById("loggedInScreen");
             const authModal = document.getElementById("authModal");
+            const topLeftLogo = document.getElementById("topLeftLogo");
             if (topbar) topbar.style.display = "none";
             if (topbarLoginBtn) topbarLoginBtn.textContent = "Logout";
             if (userDropdown) userDropdown.style.display = "inline-flex";
@@ -2732,6 +2752,7 @@ enable-ga="false"
             if (container) container.style.display = "none";
             if (loggedInScreen) loggedInScreen.classList.add("open");
             if (authModal) authModal.classList.remove("open");
+            if (topLeftLogo) topLeftLogo.classList.add("visible");
             const trustedFooter = document.getElementById("trustedFooter");
             if (trustedFooter) trustedFooter.style.display = "none";
             updateStaffButtonVisibility();
@@ -2744,12 +2765,14 @@ enable-ga="false"
             const container = document.querySelector(".container");
             const loggedInScreen = document.getElementById("loggedInScreen");
             const settingsScreen = document.getElementById("settingsScreen");
+            const topLeftLogo = document.getElementById("topLeftLogo");
             if (topbar) topbar.style.display = "block";
             if (topbarLoginBtn) topbarLoginBtn.textContent = "Login";
             if (userDropdown) userDropdown.style.display = "none";
             if (loggedInScreen) loggedInScreen.classList.remove("open");
             if (settingsScreen) settingsScreen.classList.remove("open");
             if (container) container.style.display = "block";
+            if (topLeftLogo) topLeftLogo.classList.remove("visible");
             const trustedFooter = document.getElementById("trustedFooter");
             if (trustedFooter) trustedFooter.style.display = "block";
         }
