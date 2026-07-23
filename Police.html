@@ -13,8 +13,8 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: #ffffff;
-            color: #1a202c;
+            background: #1E293B;
+            color: #f1f5f9;
             min-height: 100vh;
             padding: 24px;
             padding-top: 200px;
@@ -692,19 +692,19 @@
             left: 24px;
             width: 320px;
             max-height: calc(100vh - 140px);
-            background: #ffffff;
+            background: #1E293B;
             border-radius: 12px;
-            border: 1px solid #e2e8f0;
+            border: 1px solid #334155;
             padding: 14px;
             z-index: 700;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
             overflow-y: auto;
         }
 
         .calls-panel-title {
             font-size: 16px;
             font-weight: 700;
-            color: #1E293B;
+            color: #f1f5f9;
             margin-bottom: 10px;
             cursor: grab;
             user-select: none;
@@ -718,15 +718,15 @@
             margin-top: 8px;
             padding: 8px;
             border-radius: 8px;
-            background: #ffffff;
-            border: 1px solid #e2e8f0;
+            background: #0f172a;
+            border: 1px solid #334155;
             font-size: 12px;
-            color: #334155;
+            color: #ffffff;
             line-height: 1.4;
         }
 
         .call-info-box strong {
-            color: #1E293B;
+            color: #f1f5f9;
         }
 
         .active-units-panel {
@@ -735,19 +735,19 @@
             right: 24px;
             width: 320px;
             max-height: calc(100vh - 140px);
-            background: #ffffff;
+            background: #1E293B;
             border-radius: 12px;
-            border: 1px solid #e2e8f0;
+            border: 1px solid #334155;
             padding: 14px;
             z-index: 700;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
             overflow-y: auto;
         }
 
         .active-units-title {
             font-size: 16px;
             font-weight: 700;
-            color: #1E293B;
+            color: #f1f5f9;
             margin-bottom: 10px;
             cursor: grab;
             user-select: none;
@@ -763,8 +763,8 @@
             justify-content: space-between;
             padding: 8px 10px;
             border-radius: 8px;
-            border: 1px solid #e2e8f0;
-            background: #f8fafc;
+            border: 1px solid #334155;
+            background: #0f172a;
             margin-bottom: 8px;
         }
 
@@ -777,12 +777,12 @@
         .active-unit-name {
             font-size: 14px;
             font-weight: 700;
-            color: #1E293B;
+            color: #f1f5f9;
         }
 
         .active-unit-meta {
             font-size: 12px;
-            color: #475569;
+            color: #94a3b8;
         }
 
         .active-unit-status {
@@ -794,15 +794,15 @@
         }
 
         .active-unit-status.available {
-            background: #dcfce7;
-            color: #166534;
-            border: 1px solid #bbf7d0;
+            background: #14532d;
+            color: #bbf7d0;
+            border: 1px solid #166534;
         }
 
         .active-unit-status.unavailable {
-            background: #fef2f2;
-            color: #991b1b;
-            border: 1px solid #fecaca;
+            background: #7f1d1d;
+            color: #fecaca;
+            border: 1px solid #991b1b;
         }
 
         .active-unit-status.busy {
@@ -817,19 +817,19 @@
             left: 24px;
             width: 320px;
             max-height: calc(100vh - 340px);
-            background: #ffffff;
+            background: #1E293B;
             border-radius: 12px;
-            border: 1px solid #e2e8f0;
+            border: 1px solid #334155;
             padding: 14px;
             z-index: 700;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
             overflow-y: auto;
         }
 
         .bolo-panel-title {
             font-size: 16px;
             font-weight: 700;
-            color: #1E293B;
+            color: #f1f5f9;
             margin-bottom: 10px;
             cursor: grab;
             user-select: none;
@@ -1034,7 +1034,7 @@
     <div class="calls-panel" id="callsPanel" style="display: none;">
         <div class="calls-panel-title">Active Call</div>
         <div class="call-info-box" id="activeCallBox">
-            <div style="font-size: 14px; font-weight: 700; color: #1E293B; margin-bottom: 6px;">No active call</div>
+            <div style="font-size: 14px; font-weight: 700; color: #ffffff; margin-bottom: 6px;">No active call</div>
         </div>
     </div>
 
@@ -2284,8 +2284,8 @@
 
             if (!myCall) {
                 activeCallBox.innerHTML = `
-                    <div style="font-size: 14px; font-weight: 700; color: #1E293B; margin-bottom: 6px;">Call Info</div>
-                    <div style="font-size: 12px; color: #334155; line-height: 1.4;">
+                    <div style="font-size: 14px; font-weight: 700; color: #ffffff; margin-bottom: 6px;">Call Info</div>
+                    <div style="font-size: 12px; color: #cbd5e1; line-height: 1.4;">
                         <strong>Priority:</strong> <br>
                         <strong>Code:</strong> <br>
                         <strong>Description:</strong> 
@@ -2297,9 +2297,9 @@
 
             callsPanel.style.display = "block";
             activeCallBox.innerHTML = `
-                <div style="font-size: 14px; font-weight: 700; color: #1E293B; margin-bottom: 6px;">${escapeHtml(myCall.title || "Untitled Call")}</div>
-                <div style="font-size: 12px; color: #475569; margin-bottom: 4px;">${escapeHtml(myCall.location || "")}</div>
-                <div style="font-size: 12px; color: #334155; line-height: 1.4;">
+                <div style="font-size: 14px; font-weight: 700; color: #ffffff; margin-bottom: 6px;">${escapeHtml(myCall.title || "Untitled Call")}</div>
+                <div style="font-size: 12px; color: #cbd5e1; margin-bottom: 4px;">${escapeHtml(myCall.location || "")}</div>
+                <div style="font-size: 12px; color: #f1f5f9; line-height: 1.4;">
                     <strong>Priority:</strong> ${escapeHtml(myCall.priority || "Normal")}<br>
                     <strong>Code:</strong> ${escapeHtml(myCall.code || "Unknown")}<br>
                     <strong>Description:</strong> ${escapeHtml(myCall.description || "No description.")}
