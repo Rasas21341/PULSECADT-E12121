@@ -1122,7 +1122,6 @@
                 </div>
             </div>
             <button type="button" class="report-submit" id="citationSubmitBtn">Issue Citation</button>
-            <button type="button" class="report-submit" id="citationDownloadPdfBtn" style="background:#334155;">Download PDF</button>
             <div class="lookup-error" id="citationError"></div>
             <div class="lookup-result" id="citationSuccess"></div>
         </div>
@@ -1167,7 +1166,6 @@
                 </div>
             </div>
             <button type="button" class="report-submit" id="arrestSubmitBtn">Make Arrest</button>
-            <button type="button" class="report-submit" id="arrestDownloadPdfBtn" style="background:#334155;">Download PDF</button>
             <div class="lookup-error" id="arrestError"></div>
             <div class="lookup-result" id="arrestSuccess"></div>
         </div>
@@ -1199,7 +1197,6 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script>
         const SUPABASE_URL = "https://zwdogalwbczdtvxvhrfd.supabase.co";
         const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp3ZG9nYWx3YmN6ZHR2eHZocmZkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM2NTA2MjQsImV4cCI6MjA5OTIyNjYyNH0.baPVVTtW0d3FDC2pTd1P3d5aoIc2FZkaD-6bBvDPFWw";
@@ -1808,6 +1805,7 @@
                     const reason = document.getElementById("citationReason")?.value.trim() || "";
                     const location = document.getElementById("citationLocation")?.value.trim() || "";
                     const charges = getCharges("citationChargesList");
+                    const totalFine = getTotalFine("citationChargesList");
                     const notes = document.getElementById("citationNotes")?.value.trim() || "";
                     const citationError = document.getElementById("citationError");
                     const citationSuccess = document.getElementById("citationSuccess");
@@ -1837,6 +1835,7 @@
                                 reason,
                                 location,
                                 charges: charges.join(", "),
+                                fine: totalFine || null,
                                 notes: notes || null,
                                 signature: signature || null,
                                 created_at: new Date().toISOString()
@@ -1883,6 +1882,7 @@
                     const civilianId = document.getElementById("arrestCivilianId")?.value.trim() || "";
                     const civilianName = document.getElementById("arrestCivilianName")?.value.trim() || "";
                     const charges = getCharges("arrestChargesList");
+                    const totalFine = getTotalFine("arrestChargesList");
                     const location = document.getElementById("arrestLocation")?.value.trim() || "";
                     const notes = document.getElementById("arrestNotes")?.value.trim() || "";
                     const arrestError = document.getElementById("arrestError");
@@ -1911,6 +1911,7 @@
                                 officer_id: officerId,
                                 officer_name: officerName,
                                 charges: charges.join(", "),
+                                fine: totalFine || null,
                                 location,
                                 notes: notes || null,
                                 signature: signature || null,
@@ -1955,6 +1956,28 @@
         function getText(id) {
             const el = document.getElementById(id);
             return el ? el.value.trim() : "";
+        }
+
+        function getTotalFine(containerId) {
+            const container = document.getElementById(containerId);
+            if (!container) return 0;
+            let total = 0;
+            Array.from(container.querySelectorAll(".charge-item")).forEach((el) => {
+                const raw = (el.dataset.fine || "").trim();
+                const num = parseFloat(raw);
+                if (!isNaN(num) && num > 0) total += num;
+            });
+            return total;
+        }
+
+        async function getCurrentUser() {
+            if (!localSupabase) return null;
+            try {
+                const { data: { user } } = await localSupabase.auth.getUser();
+                return user;
+            } catch (err) {
+                return null;
+            }
         }
 
         function getSignatureData(canvasId) {
@@ -2053,7 +2076,7 @@
                     const charge = escapeHtml(el.dataset.charge || "");
                     const fine = escapeHtml(el.dataset.fine || "");
                     return `
-                        <div class="charge-item" data-charge-idx="${idx}" style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+                        <div class="charge-item" data-charge-idx="${idx}" data-charge="${escapeHtml(el.dataset.charge || "")}" data-fine="${escapeHtml(el.dataset.fine || "")}" style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
                             <span style="flex:2;font-size:13px;color:#334155;">${charge}</span>
                             <span style="flex:1;font-size:13px;color:#2563eb;font-weight:600;">${fine ? "$" + fine : ""}</span>
                             <button type="button" class="remove-charge-btn" data-remove-charge="${idx}" style="padding:2px 8px;border-radius:6px;border:1px solid #dc2626;background:#ffffff;color:#dc2626;font-size:11px;font-weight:700;cursor:pointer;">Remove</button>
@@ -2110,139 +2133,6 @@
                 if (!charge) return null;
                 return fine ? `${charge} ($${fine})` : charge;
             }).filter(Boolean);
-        }
-
-        async function generateCitationPdf() {
-            try {
-                const { jsPDF } = window.jspdf;
-                const doc = new jsPDF();
-                doc.setFontSize(14);
-                doc.setFont(undefined, "bold");
-                doc.text("Citation", 14, 12);
-                doc.setFont(undefined, "normal");
-                doc.setFontSize(9);
-                doc.text("PulseCAD Police Records", 14, 16);
-                doc.setLineWidth(0.2);
-                doc.line(14, 17.5, 196, 17.5);
-
-                const charges = getCharges("citationChargesList");
-                const fields = [
-                    ["Officer", (officerRank ? officerRank + " " : "") + officerName],
-                    ["Date", new Date().toLocaleString()],
-                    ["Civilian ID", getText("citationCivilianId")],
-                    ["Civilian Name", getText("citationCivilianName")],
-                    ["Violation", getText("citationReason")],
-                    ["Charges", charges.join(", ")],
-                    ["Location", getText("citationLocation")],
-                    ["Notes", getText("citationNotes")]
-                ];
-
-                let y = 21;
-                const lineHeight = 5;
-                const labelX = 14;
-                const fieldX = 54;
-
-                fields.forEach(([label, value], index) => {
-                    if (y > 270) {
-                        doc.addPage();
-                        y = 15;
-                    }
-                    doc.setFont(undefined, "bold");
-                    doc.text(label + ":", labelX, y);
-                    doc.setFont(undefined, "normal");
-                    const lines = doc.splitTextToSize(value || "", 120);
-                    doc.text(lines, fieldX, y);
-                    y += Math.max(lineHeight, lines.length * lineHeight);
-                    if (index < fields.length - 1) {
-                        doc.setDrawColor(220, 220, 220);
-                        doc.line(labelX, y + 0.5, 196, y + 0.5);
-                        y += 3;
-                    }
-                });
-
-                const citationSignature = getSignatureData("citationSignatureCanvas");
-                if (citationSignature) {
-                    doc.setFont(undefined, "bold");
-                    doc.text("Signature:", labelX, y + 4);
-                    doc.addImage(citationSignature, "PNG", labelX, y + 7, 60, 22);
-                }
-
-                doc.save("citation-" + Date.now() + ".pdf");
-            } catch (err) {
-                alert("Failed to generate PDF.");
-                console.error(err);
-            }
-        }
-
-        async function generateArrestPdf() {
-            try {
-                const { jsPDF } = window.jspdf;
-                const doc = new jsPDF();
-                doc.setFontSize(14);
-                doc.setFont(undefined, "bold");
-                doc.text("Arrest Report", 14, 12);
-                doc.setFont(undefined, "normal");
-                doc.setFontSize(9);
-                doc.text("PulseCAD Police Records", 14, 16);
-                doc.setLineWidth(0.2);
-                doc.line(14, 17.5, 196, 17.5);
-
-                const charges = getCharges("arrestChargesList");
-                const fields = [
-                    ["Officer", (officerRank ? officerRank + " " : "") + officerName],
-                    ["Date", new Date().toLocaleString()],
-                    ["Civilian ID", getText("arrestCivilianId")],
-                    ["Civilian Name", getText("arrestCivilianName")],
-                    ["Charges", charges.join(", ")],
-                    ["Location", getText("arrestLocation")],
-                    ["Notes", getText("arrestNotes")]
-                ];
-
-                let y = 21;
-                const lineHeight = 5;
-                const labelX = 14;
-                const fieldX = 54;
-
-                fields.forEach(([label, value], index) => {
-                    if (y > 270) {
-                        doc.addPage();
-                        y = 15;
-                    }
-                    doc.setFont(undefined, "bold");
-                    doc.text(label + ":", labelX, y);
-                    doc.setFont(undefined, "normal");
-                    const lines = doc.splitTextToSize(value || "", 120);
-                    doc.text(lines, fieldX, y);
-                    y += Math.max(lineHeight, lines.length * lineHeight);
-                    if (index < fields.length - 1) {
-                        doc.setDrawColor(220, 220, 220);
-                        doc.line(labelX, y + 0.5, 196, y + 0.5);
-                        y += 3;
-                    }
-                });
-
-                const arrestSignature = getSignatureData("arrestSignatureCanvas");
-                if (arrestSignature) {
-                    doc.setFont(undefined, "bold");
-                    doc.text("Signature:", labelX, y + 4);
-                    doc.addImage(arrestSignature, "PNG", labelX, y + 7, 60, 22);
-                }
-
-                doc.save("arrest-" + Date.now() + ".pdf");
-            } catch (err) {
-                alert("Failed to generate PDF.");
-                console.error(err);
-            }
-        }
-
-        const citationDownloadPdfBtn = document.getElementById("citationDownloadPdfBtn");
-        if (citationDownloadPdfBtn) {
-            citationDownloadPdfBtn.addEventListener("click", generateCitationPdf);
-        }
-
-        const arrestDownloadPdfBtn = document.getElementById("arrestDownloadPdfBtn");
-        if (arrestDownloadPdfBtn) {
-            arrestDownloadPdfBtn.addEventListener("click", generateArrestPdf);
         }
 
         const callsPanel = document.getElementById("callsPanel");
