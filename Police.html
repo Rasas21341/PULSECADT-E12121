@@ -1102,6 +1102,10 @@
                 <input type="text" id="citationLocation" placeholder="e.g. Highway 1" />
             </div>
             <div class="report-field">
+                <label for="citationCharges">Charges</label>
+                <input type="text" id="citationCharges" placeholder="e.g. Speeding" />
+            </div>
+            <div class="report-field">
                 <label for="citationNotes">Notes</label>
                 <textarea id="citationNotes" placeholder="Any details..."></textarea>
             </div>
@@ -1734,6 +1738,7 @@
                 if (citationCivilianName) citationCivilianName.value = selectedCivilian.name || "";
                 if (citationReason) citationReason.value = "";
                 if (citationLocation) citationLocation.value = "";
+                if (citationCharges) citationCharges.value = "";
                 if (citationNotes) citationNotes.value = "";
                 clearSignature("citationSignatureCanvas");
                 if (citationError) { citationError.textContent = ""; citationError.style.display = "none"; }
@@ -1781,44 +1786,46 @@
             });
         }
 
-        if (citationSubmitBtn) {
-            citationSubmitBtn.addEventListener("click", async () => {
-                const civilianId = document.getElementById("citationCivilianId")?.value.trim() || "";
-                const civilianName = document.getElementById("citationCivilianName")?.value.trim() || "";
-                const reason = document.getElementById("citationReason")?.value.trim() || "";
-                const location = document.getElementById("citationLocation")?.value.trim() || "";
-                const notes = document.getElementById("citationNotes")?.value.trim() || "";
-                const citationError = document.getElementById("citationError");
-                const citationSuccess = document.getElementById("citationSuccess");
+            if (citationSubmitBtn) {
+                citationSubmitBtn.addEventListener("click", async () => {
+                    const civilianId = document.getElementById("citationCivilianId")?.value.trim() || "";
+                    const civilianName = document.getElementById("citationCivilianName")?.value.trim() || "";
+                    const reason = document.getElementById("citationReason")?.value.trim() || "";
+                    const location = document.getElementById("citationLocation")?.value.trim() || "";
+                    const charges = document.getElementById("citationCharges")?.value.trim() || "";
+                    const notes = document.getElementById("citationNotes")?.value.trim() || "";
+                    const citationError = document.getElementById("citationError");
+                    const citationSuccess = document.getElementById("citationSuccess");
 
-                if (!reason || !location) {
-                    if (citationError) { citationError.textContent = "Violation and location are required."; citationError.style.display = "block"; }
-                    return;
-                }
+                    if (!reason || !location || !charges) {
+                        if (citationError) { citationError.textContent = "Violation, charges, and location are required."; citationError.style.display = "block"; }
+                        return;
+                    }
 
-                if (!localSupabase) {
-                    if (citationError) { citationError.textContent = "Database unavailable."; citationError.style.display = "block"; }
-                    return;
-                }
+                    if (!localSupabase) {
+                        if (citationError) { citationError.textContent = "Database unavailable."; citationError.style.display = "block"; }
+                        return;
+                    }
 
-                if (citationError) { citationError.textContent = ""; citationError.style.display = "none"; }
-                if (citationSuccess) { citationSuccess.textContent = ""; citationSuccess.style.display = "none"; }
+                    if (citationError) { citationError.textContent = ""; citationError.style.display = "none"; }
+                    if (citationSuccess) { citationSuccess.textContent = ""; citationSuccess.style.display = "none"; }
 
-                try {
-                    const signature = getSignatureData("citationSignatureCanvas");
-                    const { error } = await localSupabase
-                        .from("citations")
-                        .insert([{
-                            civilian_id: civilianId || null,
-                            civilian_name: civilianName || null,
-                            officer_id: officerId,
-                            officer_name: officerName,
-                            reason,
-                            location,
-                            notes: notes || null,
-                            signature: signature || null,
-                            created_at: new Date().toISOString()
-                        }]);
+                    try {
+                        const signature = getSignatureData("citationSignatureCanvas");
+                        const { error } = await localSupabase
+                            .from("citations")
+                            .insert([{
+                                civilian_id: civilianId || null,
+                                civilian_name: civilianName || null,
+                                officer_id: officerId,
+                                officer_name: officerName,
+                                reason,
+                                location,
+                                charges: charges || null,
+                                notes: notes || null,
+                                signature: signature || null,
+                                created_at: new Date().toISOString()
+                            }]);
 
                     if (error) {
                         if (citationError) { citationError.textContent = error.message || "Failed to issue citation."; citationError.style.display = "block"; }
@@ -2033,6 +2040,7 @@
                     ["Civilian ID", getText("citationCivilianId")],
                     ["Civilian Name", getText("citationCivilianName")],
                     ["Violation", getText("citationReason")],
+                    ["Charges", getText("citationCharges")],
                     ["Location", getText("citationLocation")],
                     ["Notes", getText("citationNotes")]
                 ];

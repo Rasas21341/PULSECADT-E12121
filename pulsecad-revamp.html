@@ -2410,22 +2410,23 @@ enable-ga="false"
                                 } else {
                                     settingsUsernameDisplay.textContent = "Not set";
                                 }
+                            } catch (err) {
+                                console.error("Failed to load username:", err);
+                                settingsUsernameDisplay.textContent = "Not set";
+                            }
+                        }
+                        const settingsManagementBadge = document.getElementById("settingsManagementBadge");
+                        const settingsSupporterBadge = document.getElementById("settingsSupporterBadge");
+                        const isGod = user?.email === "oceanviewrp1@gmail.com";
+                        if (settingsManagementBadge) settingsManagementBadge.style.display = isGod ? "" : "none";
+                        if (settingsSupporterBadge) settingsSupporterBadge.style.display = isGod ? "" : "none";
                     } catch (err) {
-                        console.error("Failed to load username:", err);
-                        settingsUsernameDisplay.textContent = "Not set";
+                        console.error("Failed to load user email:", err);
                     }
                 }
-                const settingsManagementBadge = document.getElementById("settingsManagementBadge");
-                const settingsSupporterBadge = document.getElementById("settingsSupporterBadge");
-                const isGod = user?.email === "oceanviewrp1@gmail.com";
-                if (settingsManagementBadge) settingsManagementBadge.style.display = isGod ? "" : "none";
-                if (settingsSupporterBadge) settingsSupporterBadge.style.display = isGod ? "" : "none";
-            } catch (err) {
-                console.error("Failed to load user email:", err);
-            }
-            if (settingsScreen) settingsScreen.classList.add("open");
-        });
-    }
+                if (settingsScreen) settingsScreen.classList.add("open");
+            });
+        }
 
         const settingsClose = document.getElementById("settingsClose");
         const settingsScreen = document.getElementById("settingsScreen");
