@@ -1595,9 +1595,9 @@ enable-ga="false"
             </div>
             <div class="settings-row">
                 <div class="settings-label">Roles</div>
-                <div class="settings-value">
-                    <span class="badge badge-blue">PulseCAD Supporter</span>
-                    <span class="badge badge-purple">PulseCAD Management</span>
+                <div class="settings-value" id="settingsRoles">
+                    <span class="badge badge-blue" id="settingsSupporterBadge" style="display:none;">PulseCAD Supporter</span>
+                    <span class="badge badge-purple" id="settingsManagementBadge" style="display:none;">PulseCAD Management</span>
                     <span class="badge badge-gold" id="settingsPremiumBadge" style="display:none;">Premium</span>
                 </div>
             </div>
@@ -2410,18 +2410,22 @@ enable-ga="false"
                                 } else {
                                     settingsUsernameDisplay.textContent = "Not set";
                                 }
-                            } catch (err) {
-                                console.error("Failed to load username:", err);
-                                settingsUsernameDisplay.textContent = "Not set";
-                            }
-                        }
                     } catch (err) {
-                        console.error("Failed to load user email:", err);
+                        console.error("Failed to load username:", err);
+                        settingsUsernameDisplay.textContent = "Not set";
                     }
                 }
-                if (settingsScreen) settingsScreen.classList.add("open");
-            });
-        }
+                const settingsManagementBadge = document.getElementById("settingsManagementBadge");
+                const settingsSupporterBadge = document.getElementById("settingsSupporterBadge");
+                const isGod = user?.email === "oceanviewrp1@gmail.com";
+                if (settingsManagementBadge) settingsManagementBadge.style.display = isGod ? "" : "none";
+                if (settingsSupporterBadge) settingsSupporterBadge.style.display = isGod ? "" : "none";
+            } catch (err) {
+                console.error("Failed to load user email:", err);
+            }
+            if (settingsScreen) settingsScreen.classList.add("open");
+        });
+    }
 
         const settingsClose = document.getElementById("settingsClose");
         const settingsScreen = document.getElementById("settingsScreen");
@@ -3581,13 +3585,14 @@ enable-ga="false"
                     item.className = "members-item";
                     const displayName = user.username || user.email || "Unknown";
                     const dept = user.department || "Unassigned";
-                    const badgeClass = dept === "Management" ? "members-badge-management" : "members-badge-other";
+                    const isGod = user.email === "oceanviewrp1@gmail.com";
+                    const badgeClass = (isGod && dept === "Management") ? "members-badge-management" : "members-badge-other";
                     item.innerHTML = `
                         <div style="min-width:0;flex:1;">
                             <div class="members-item-name">${displayName.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</div>
                             <div class="members-item-role">${dept.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</div>
                         </div>
-                        <span class="members-badge ${badgeClass}">${dept.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</span>
+                        <span class="members-badge ${badgeClass}">${isGod ? dept.replace(/</g, "&lt;").replace(/>/g, "&gt;") : dept.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</span>
                     `;
                     membersList.appendChild(item);
                 }
