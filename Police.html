@@ -1102,8 +1102,10 @@
                 <input type="text" id="citationLocation" placeholder="e.g. Highway 1" />
             </div>
             <div class="report-field">
-                <label for="citationCharges">Charges</label>
-                <input type="text" id="citationCharges" placeholder="e.g. Speeding" />
+                <label>Charges</label>
+                <div id="citationChargesList" style="display:flex;flex-direction:column;gap:6px;margin-bottom:6px;"></div>
+                <input type="text" id="citationChargesInput" placeholder="e.g. Speeding" />
+                <button type="button" class="add-charge-btn" id="addCitationChargeBtn" style="margin-top:6px;padding:6px 12px;border-radius:8px;border:1px solid #2563eb;background:#ffffff;color:#2563eb;font-size:12px;font-weight:700;cursor:pointer;">Add Charge</button>
             </div>
             <div class="report-field">
                 <label for="citationNotes">Notes</label>
@@ -1138,8 +1140,10 @@
                 <input type="text" id="arrestCivilianName" readonly />
             </div>
             <div class="report-field">
-                <label for="arrestCharges">Charges</label>
-                <input type="text" id="arrestCharges" placeholder="e.g. Grand Theft Auto" />
+                <label>Charges</label>
+                <div id="arrestChargesList" style="display:flex;flex-direction:column;gap:6px;margin-bottom:6px;"></div>
+                <input type="text" id="arrestChargesInput" placeholder="e.g. Grand Theft Auto" />
+                <button type="button" class="add-charge-btn" id="addArrestChargeBtn" style="margin-top:6px;padding:6px 12px;border-radius:8px;border:1px solid #2563eb;background:#ffffff;color:#2563eb;font-size:12px;font-weight:700;cursor:pointer;">Add Charge</button>
             </div>
             <div class="report-field">
                 <label for="arrestLocation">Location</label>
@@ -1738,7 +1742,9 @@
                 if (citationCivilianName) citationCivilianName.value = selectedCivilian.name || "";
                 if (citationReason) citationReason.value = "";
                 if (citationLocation) citationLocation.value = "";
-                if (citationCharges) citationCharges.value = "";
+                if (citationChargesInput) citationChargesInput.value = "";
+                const citationChargesList = document.getElementById("citationChargesList");
+                if (citationChargesList) citationChargesList.innerHTML = "";
                 if (citationNotes) citationNotes.value = "";
                 clearSignature("citationSignatureCanvas");
                 if (citationError) { citationError.textContent = ""; citationError.style.display = "none"; }
@@ -1752,14 +1758,15 @@
                 if (!selectedCivilian) return;
                 const arrestCivilianId = document.getElementById("arrestCivilianId");
                 const arrestCivilianName = document.getElementById("arrestCivilianName");
-                const arrestCharges = document.getElementById("arrestCharges");
                 const arrestLocation = document.getElementById("arrestLocation");
                 const arrestNotes = document.getElementById("arrestNotes");
                 const arrestError = document.getElementById("arrestError");
                 const arrestSuccess = document.getElementById("arrestSuccess");
                 if (arrestCivilianId) arrestCivilianId.value = selectedCivilian.id || "";
                 if (arrestCivilianName) arrestCivilianName.value = selectedCivilian.name || "";
-                if (arrestCharges) arrestCharges.value = "";
+                if (arrestChargesInput) arrestChargesInput.value = "";
+                const arrestChargesList = document.getElementById("arrestChargesList");
+                if (arrestChargesList) arrestChargesList.innerHTML = "";
                 if (arrestLocation) arrestLocation.value = "";
                 if (arrestNotes) arrestNotes.value = "";
                 clearSignature("arrestSignatureCanvas");
@@ -1792,13 +1799,13 @@
                     const civilianName = document.getElementById("citationCivilianName")?.value.trim() || "";
                     const reason = document.getElementById("citationReason")?.value.trim() || "";
                     const location = document.getElementById("citationLocation")?.value.trim() || "";
-                    const charges = document.getElementById("citationCharges")?.value.trim() || "";
+                    const charges = getCharges("citationChargesList");
                     const notes = document.getElementById("citationNotes")?.value.trim() || "";
                     const citationError = document.getElementById("citationError");
                     const citationSuccess = document.getElementById("citationSuccess");
 
-                    if (!reason || !location || !charges) {
-                        if (citationError) { citationError.textContent = "Violation, charges, and location are required."; citationError.style.display = "block"; }
+                    if (!reason || !location || charges.length === 0) {
+                        if (citationError) { citationError.textContent = "Violation, at least one charge, and location are required."; citationError.style.display = "block"; }
                         return;
                     }
 
@@ -1821,7 +1828,7 @@
                                 officer_name: officerName,
                                 reason,
                                 location,
-                                charges: charges || null,
+                                charges: charges.join(", "),
                                 notes: notes || null,
                                 signature: signature || null,
                                 created_at: new Date().toISOString()
@@ -1865,18 +1872,18 @@
 
         if (arrestSubmitBtn) {
             arrestSubmitBtn.addEventListener("click", async () => {
-                const civilianId = document.getElementById("arrestCivilianId")?.value.trim() || "";
-                const civilianName = document.getElementById("arrestCivilianName")?.value.trim() || "";
-                const charges = document.getElementById("arrestCharges")?.value.trim() || "";
-                const location = document.getElementById("arrestLocation")?.value.trim() || "";
-                const notes = document.getElementById("arrestNotes")?.value.trim() || "";
-                const arrestError = document.getElementById("arrestError");
-                const arrestSuccess = document.getElementById("arrestSuccess");
+                    const civilianId = document.getElementById("arrestCivilianId")?.value.trim() || "";
+                    const civilianName = document.getElementById("arrestCivilianName")?.value.trim() || "";
+                    const charges = getCharges("arrestChargesList");
+                    const location = document.getElementById("arrestLocation")?.value.trim() || "";
+                    const notes = document.getElementById("arrestNotes")?.value.trim() || "";
+                    const arrestError = document.getElementById("arrestError");
+                    const arrestSuccess = document.getElementById("arrestSuccess");
 
-                if (!charges || !location) {
-                    if (arrestError) { arrestError.textContent = "Charges and location are required."; arrestError.style.display = "block"; }
-                    return;
-                }
+                    if (charges.length === 0 || !location) {
+                        if (arrestError) { arrestError.textContent = "At least one charge and location are required."; arrestError.style.display = "block"; }
+                        return;
+                    }
 
                 if (!localSupabase) {
                     if (arrestError) { arrestError.textContent = "Database unavailable."; arrestError.style.display = "block"; }
@@ -1890,17 +1897,17 @@
                     const signature = getSignatureData("arrestSignatureCanvas");
                     const { error } = await localSupabase
                         .from("arrests")
-                        .insert([{
-                            civilian_id: civilianId || null,
-                            civilian_name: civilianName || null,
-                            officer_id: officerId,
-                            officer_name: officerName,
-                            charges,
-                            location,
-                            notes: notes || null,
-                            signature: signature || null,
-                            created_at: new Date().toISOString()
-                        }]);
+                            .insert([{
+                                civilian_id: civilianId || null,
+                                civilian_name: civilianName || null,
+                                officer_id: officerId,
+                                officer_name: officerName,
+                                charges: charges.join(", "),
+                                location,
+                                notes: notes || null,
+                                signature: signature || null,
+                                created_at: new Date().toISOString()
+                            }]);
 
                     if (error) {
                         if (arrestError) { arrestError.textContent = error.message || "Failed to record arrest."; arrestError.style.display = "block"; }
@@ -2021,39 +2028,93 @@
             }
         }
 
+        function addChargeInput(containerId, inputId, btnId) {
+            const container = document.getElementById(containerId);
+            const input = document.getElementById(inputId);
+            const btn = document.getElementById(btnId);
+            if (!container || !input || !btn) return;
+
+            function render() {
+                const items = container.querySelectorAll(".charge-item");
+                if (items.length === 0) {
+                    container.innerHTML = "";
+                    return;
+                }
+                container.innerHTML = Array.from(items).map((el, idx) => `
+                    <div class="charge-item" data-charge-idx="${idx}" style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+                        <span style="flex:1;font-size:13px;color:#334155;">${escapeHtml(el.dataset.charge || "")}</span>
+                        <button type="button" class="remove-charge-btn" data-remove-charge="${idx}" style="padding:2px 8px;border-radius:6px;border:1px solid #dc2626;background:#ffffff;color:#dc2626;font-size:11px;font-weight:700;cursor:pointer;">Remove</button>
+                    </div>
+                `).join("");
+                container.querySelectorAll("[data-remove-charge]").forEach((b) => {
+                    b.addEventListener("click", () => {
+                        const idx = parseInt(b.getAttribute("data-remove-charge"), 10);
+                        const current = container.querySelectorAll(".charge-item");
+                        if (current[idx]) current[idx].remove();
+                        render();
+                    });
+                });
+            }
+
+            btn.addEventListener("click", () => {
+                const val = input.value.trim();
+                if (!val) return;
+                const div = document.createElement("div");
+                div.className = "charge-item";
+                div.dataset.charge = val;
+                container.appendChild(div);
+                input.value = "";
+                render();
+            });
+
+            input.addEventListener("keydown", (e) => {
+                if (e.key === "Enter") {
+                    e.preventDefault();
+                    btn.click();
+                }
+            });
+        }
+
+        function getCharges(containerId) {
+            const container = document.getElementById(containerId);
+            if (!container) return [];
+            return Array.from(container.querySelectorAll(".charge-item")).map((el) => el.dataset.charge || "").filter(Boolean);
+        }
+
         async function generateCitationPdf() {
             try {
                 const { jsPDF } = window.jspdf;
                 const doc = new jsPDF();
-                doc.setFontSize(20);
+                doc.setFontSize(14);
                 doc.setFont(undefined, "bold");
-                doc.text("Citation", 14, 16);
+                doc.text("Citation", 14, 12);
                 doc.setFont(undefined, "normal");
-                doc.setFontSize(11);
-                doc.text("PulseCAD Police Records", 14, 22);
-                doc.setLineWidth(0.3);
-                doc.line(14, 24, 196, 24);
+                doc.setFontSize(9);
+                doc.text("PulseCAD Police Records", 14, 16);
+                doc.setLineWidth(0.2);
+                doc.line(14, 17.5, 196, 17.5);
 
+                const charges = getCharges("citationChargesList");
                 const fields = [
                     ["Officer", (officerRank ? officerRank + " " : "") + officerName],
                     ["Date", new Date().toLocaleString()],
                     ["Civilian ID", getText("citationCivilianId")],
                     ["Civilian Name", getText("citationCivilianName")],
                     ["Violation", getText("citationReason")],
-                    ["Charges", getText("citationCharges")],
+                    ["Charges", charges.join(", ")],
                     ["Location", getText("citationLocation")],
                     ["Notes", getText("citationNotes")]
                 ];
 
-                let y = 30;
-                const lineHeight = 7;
+                let y = 21;
+                const lineHeight = 5;
                 const labelX = 14;
-                const fieldX = 60;
+                const fieldX = 54;
 
                 fields.forEach(([label, value], index) => {
-                    if (y > 280) {
+                    if (y > 270) {
                         doc.addPage();
-                        y = 20;
+                        y = 15;
                     }
                     doc.setFont(undefined, "bold");
                     doc.text(label + ":", labelX, y);
@@ -2063,16 +2124,16 @@
                     y += Math.max(lineHeight, lines.length * lineHeight);
                     if (index < fields.length - 1) {
                         doc.setDrawColor(220, 220, 220);
-                        doc.line(labelX, y + 1, 196, y + 1);
-                        y += 4;
+                        doc.line(labelX, y + 0.5, 196, y + 0.5);
+                        y += 3;
                     }
                 });
 
                 const citationSignature = getSignatureData("citationSignatureCanvas");
                 if (citationSignature) {
                     doc.setFont(undefined, "bold");
-                    doc.text("Signature:", labelX, y + 6);
-                    doc.addImage(citationSignature, "PNG", labelX, y + 10, 80, 30);
+                    doc.text("Signature:", labelX, y + 4);
+                    doc.addImage(citationSignature, "PNG", labelX, y + 7, 60, 22);
                 }
 
                 doc.save("citation-" + Date.now() + ".pdf");
@@ -2086,34 +2147,35 @@
             try {
                 const { jsPDF } = window.jspdf;
                 const doc = new jsPDF();
-                doc.setFontSize(20);
+                doc.setFontSize(14);
                 doc.setFont(undefined, "bold");
-                doc.text("Arrest Report", 14, 16);
+                doc.text("Arrest Report", 14, 12);
                 doc.setFont(undefined, "normal");
-                doc.setFontSize(11);
-                doc.text("PulseCAD Police Records", 14, 22);
-                doc.setLineWidth(0.3);
-                doc.line(14, 24, 196, 24);
+                doc.setFontSize(9);
+                doc.text("PulseCAD Police Records", 14, 16);
+                doc.setLineWidth(0.2);
+                doc.line(14, 17.5, 196, 17.5);
 
+                const charges = getCharges("arrestChargesList");
                 const fields = [
                     ["Officer", (officerRank ? officerRank + " " : "") + officerName],
                     ["Date", new Date().toLocaleString()],
                     ["Civilian ID", getText("arrestCivilianId")],
                     ["Civilian Name", getText("arrestCivilianName")],
-                    ["Charges", getText("arrestCharges")],
+                    ["Charges", charges.join(", ")],
                     ["Location", getText("arrestLocation")],
                     ["Notes", getText("arrestNotes")]
                 ];
 
-                let y = 30;
-                const lineHeight = 7;
+                let y = 21;
+                const lineHeight = 5;
                 const labelX = 14;
-                const fieldX = 60;
+                const fieldX = 54;
 
                 fields.forEach(([label, value], index) => {
-                    if (y > 280) {
+                    if (y > 270) {
                         doc.addPage();
-                        y = 20;
+                        y = 15;
                     }
                     doc.setFont(undefined, "bold");
                     doc.text(label + ":", labelX, y);
@@ -2122,17 +2184,17 @@
                     doc.text(lines, fieldX, y);
                     y += Math.max(lineHeight, lines.length * lineHeight);
                     if (index < fields.length - 1) {
-                        doc.setDrawColor(220, 220, 240);
-                        doc.line(labelX, y + 1, 196, y + 1);
-                        y += 4;
+                        doc.setDrawColor(220, 220, 220);
+                        doc.line(labelX, y + 0.5, 196, y + 0.5);
+                        y += 3;
                     }
                 });
 
                 const arrestSignature = getSignatureData("arrestSignatureCanvas");
                 if (arrestSignature) {
                     doc.setFont(undefined, "bold");
-                    doc.text("Signature:", labelX, y + 6);
-                    doc.addImage(arrestSignature, "PNG", labelX, y + 10, 80, 30);
+                    doc.text("Signature:", labelX, y + 4);
+                    doc.addImage(arrestSignature, "PNG", labelX, y + 7, 60, 22);
                 }
 
                 doc.save("arrest-" + Date.now() + ".pdf");
@@ -2506,6 +2568,8 @@
 
         initSignatureCanvas("citationSignatureCanvas", "citationSignatureClear");
         initSignatureCanvas("arrestSignatureCanvas", "arrestSignatureClear");
+        addChargeInput("citationChargesList", "citationChargesInput", "addCitationChargeBtn");
+        addChargeInput("arrestChargesList", "arrestChargesInput", "addArrestChargeBtn");
 
         (function updateMilitaryTime() {
             const el = document.getElementById("militaryTime");
