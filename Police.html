@@ -970,6 +970,46 @@
             cursor: grabbing;
         }
 
+        .record-detail-content {
+            font-size: 14px;
+            color: #334155;
+            line-height: 1.6;
+        }
+
+        .record-detail-content strong {
+            color: #0f172a;
+        }
+
+        .record-detail-row {
+            margin-bottom: 8px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .record-detail-row:last-child {
+            border-bottom: none;
+        }
+
+        .record-detail-image {
+            max-width: 100%;
+            max-height: 50vh;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            margin-top: 8px;
+        }
+
+        .record-view-btn {
+            cursor: pointer;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .record-view-btn:hover {
+            background: #f1f5f9;
+            border-radius: 10px;
+            padding: 8px;
+            margin: -8px;
+        }
     </style>
 </head>
 <body>
@@ -1193,6 +1233,16 @@
             </div>
             <button type="button" class="lookup-submit" id="supervisorSubmitBtn">Access Panel</button>
             <div class="lookup-error" id="supervisorError"></div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="recordDetailModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title" id="recordDetailTitle">Record</div>
+                <button class="modal-close" id="recordDetailClose" type="button" aria-label="Close">×</button>
+            </div>
+            <div id="recordDetailContent" class="record-detail-content"></div>
         </div>
     </div>
 
@@ -1620,19 +1670,29 @@
                 civilianRecordsList.innerHTML = records.map((record) => {
                     const date = record.row.created_at ? new Date(record.row.created_at).toLocaleString() : '';
                     const details = [record.row.reason, record.row.charges, record.row.location, record.row.notes].filter(Boolean).join(' | ');
+                    const rowData = encodeURIComponent(JSON.stringify(record.row));
                     return `<div class="record-item">
-                        <div class="record-text">
+                        <div class="record-text record-view-btn" data-record="${encodeURIComponent(JSON.stringify(record.row))}">
                             <strong>${record.type} - ${date}</strong>
                             <span>${details || 'No details'}</span>
                         </div>
                         <button type="button" class="record-delete-btn" data-table="${record.table}" data-id="${record.row.id}" title="Delete record">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <polyline points="3 6 5 6 21 6"></polyline>
-                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2v2"></path>
                             </svg>
                         </button>
                     </div>`;
                 }).join('');
+
+                civilianRecordsList.querySelectorAll('.record-view-btn').forEach((btn) => {
+                    btn.addEventListener('click', () => {
+                        const raw = btn.getAttribute('data-record');
+                        if (!raw) return;
+                        const record = JSON.parse(decodeURIComponent(raw));
+                        openRecordDetail(record);
+                    });
+                });
 
                 civilianRecordsList.querySelectorAll('.record-delete-btn').forEach((btn) => {
                     btn.addEventListener('click', async (e) => {
@@ -1951,6 +2011,62 @@
                     idPictureOverlay.classList.remove("open");
                 }
             });
+        }
+
+        const recordDetailModal = document.getElementById("recordDetailModal");
+        const recordDetailClose = document.getElementById("recordDetailClose");
+
+        if (recordDetailClose) {
+            recordDetailClose.addEventListener("click", () => {
+                if (recordDetailModal) recordDetailModal.classList.remove("open");
+            });
+        }
+
+        if (recordDetailModal) {
+            recordDetailModal.addEventListener("click", (e) => {
+                if (e.target === recordDetailModal) {
+                    recordDetailModal.classList.remove("open");
+                }
+            });
+        }
+
+        function openRecordDetail(record) {
+            const title = document.getElementById("recordDetailTitle");
+            const content = document.getElementById("recordDetailContent");
+            if (!title || !content || !recordDetailModal) return;
+
+            let typeLabel = "Record";
+            if (record.officer_id) typeLabel = "Citation";
+            else if (record.id && record.charges && record.location) typeLabel = "Arrest";
+            else if (record.reason && record.location) typeLabel = "Traffic Stop";
+
+            title.textContent = typeLabel;
+
+            const fields = [
+                ["Officer", escapeHtml(record.officer_name || "")],
+                ["Civilian", escapeHtml(record.civilian_name || record.civilian_id || "")],
+                ["Date", record.created_at ? new Date(record.created_at).toLocaleString() : ""],
+                ["Reason", escapeHtml(record.reason || "")],
+                ["Charges", escapeHtml(record.charges || "")],
+                ["Fine", record.fine ? `$${Number(record.fine).toFixed(2)}` : ""],
+                ["Location", escapeHtml(record.location || "")],
+                ["Notes", escapeHtml(record.notes || "")]
+            ];
+
+            content.innerHTML = fields.map(([label, value]) => {
+                if (!value) return "";
+                return `<div class="record-detail-row"><strong>${label}:</strong> ${value}</div>`;
+            }).join("");
+
+            if (record.signature) {
+                content.innerHTML += `<img class="record-detail-image" src="${escapeHtml(record.signature)}" alt="Signature" />`;
+            }
+
+            if (!content.innerHTML.trim()) {
+                content.innerHTML = '<div class="empty">No details available.</div>';
+            }
+
+            recordDetailModal.classList.add("open");
         }
 
         function getText(id) {

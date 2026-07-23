@@ -2602,6 +2602,35 @@ enable-ga="false"
             }
         }
 
+        async function notifyDiscordLeave(communityId, userEmail, communityName) {
+            if (!localSupabase) return;
+            try {
+                const { data: community } = await localSupabase
+                    .from("communities")
+                    .select("discord_webhook")
+                    .eq("id", communityId)
+                    .maybeSingle();
+                const webhook = community && community.discord_webhook;
+                if (!webhook) return;
+                const content = `**${userEmail || "A user"}** left **${communityName || "a community"}**.`;
+                const endpoints = ["/api/discord-webhook", "https://www.pulsecad.xyz/api/discord-webhook"];
+                for (const ep of endpoints) {
+                    try {
+                        await fetch(ep, {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ webhook: webhook, content: content, username: "PulseCAD" })
+                        });
+                        break;
+                    } catch (e) {
+                        /* try next endpoint */
+                    }
+                }
+            } catch (err) {
+                console.error("Discord leave notify failed:", err);
+            }
+        }
+
         async function joinCommunity(communityId) {
             if (!localSupabase) return;
             try {
@@ -2642,11 +2671,17 @@ enable-ga="false"
                     .delete()
                     .eq("user_id", user.id)
                     .eq("community_id", communityId);
-                if (error) {
-                    alert("Failed to leave community: " + error.message);
-                    return;
-                }
-                loadCommunities();
+                    if (error) {
+                        alert("Failed to leave community: " + error.message);
+                        return;
+                    }
+                    const { data: leftCommunity } = await localSupabase
+                        .from("communities")
+                        .select("name")
+                        .eq("id", communityId)
+                        .maybeSingle();
+                    notifyDiscordLeave(communityId, user.email, leftCommunity ? leftCommunity.name : "");
+                    loadCommunities();
             } catch (err) {
                 alert("Failed to leave community: " + (err.message || err));
             }

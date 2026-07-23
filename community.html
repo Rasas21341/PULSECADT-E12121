@@ -1697,6 +1697,11 @@
 
                         async function handleRequest(requestId, status) {
                             try {
+                                const { data: request } = await localSupabase
+                                    .from("join_requests")
+                                    .select("user_email, community_id")
+                                    .eq("id", requestId)
+                                    .maybeSingle();
                                 await localSupabase
                                     .from("join_requests")
                                     .update({ status })
@@ -1709,6 +1714,31 @@
                                         .eq("creator_email", currentEmail);
                                 }
                                 loadRequests();
+                                if (request && request.community_id) {
+                                    const { data: community } = await localSupabase
+                                        .from("communities")
+                                        .select("name, discord_webhook")
+                                        .eq("id", request.community_id)
+                                        .maybeSingle();
+                                    const webhook = community && community.discord_webhook;
+                                    if (webhook) {
+                                        const actionText = status === "approved" ? "approved" : "denied";
+                                        const content = `**${request.user_email || "A user"}** join request was **${actionText}** for **${community ? community.name : "a community"}**.`;
+                                        const endpoints = ["/api/discord-webhook", "https://www.pulsecad.xyz/api/discord-webhook"];
+                                        for (const ep of endpoints) {
+                                            try {
+                                                await fetch(ep, {
+                                                    method: "POST",
+                                                    headers: { "Content-Type": "application/json" },
+                                                    body: JSON.stringify({ webhook: webhook, content: content, username: "PulseCAD" })
+                                                });
+                                                break;
+                                            } catch (e) {
+                                                /* try next endpoint */
+                                            }
+                                        }
+                                    }
+                                }
                             } catch (err) {
                                 alert("Failed to update request.");
                             }
