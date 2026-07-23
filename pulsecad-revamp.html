@@ -2574,60 +2574,90 @@ enable-ga="false"
         }
 
         async function notifyDiscordJoin(communityId, userEmail, communityName) {
-            if (!localSupabase) return;
+            if (!localSupabase) {
+                console.warn("[webhook] notifyDiscordJoin skipped: no supabase");
+                return;
+            }
             try {
                 const { data: community } = await localSupabase
                     .from("communities")
-                    .select("discord_webhook")
+                    .select("discord_webhook, name")
                     .eq("id", communityId)
                     .maybeSingle();
                 const webhook = community && community.discord_webhook;
-                if (!webhook) return;
-                const content = `**${userEmail || "A user"}** joined **${communityName || "a community"}**.`;
+                console.log("[webhook] join webhook check:", communityId, !!webhook, community ? community.name : "");
+                if (!webhook) {
+                    console.warn("[webhook] no webhook for join:", communityId);
+                    return;
+                }
+                const content = `**${userEmail || "A user"}** joined **${communityName || community ? community.name : "a community"}**.`;
                 const endpoints = ["/api/discord-webhook", "https://www.pulsecad.xyz/api/discord-webhook"];
+                let sent = false;
                 for (const ep of endpoints) {
                     try {
-                        await fetch(ep, {
+                        const res = await fetch(ep, {
                             method: "POST",
                             headers: { "Content-Type": "application/json" },
                             body: JSON.stringify({ webhook: webhook, content: content, username: "PulseCAD" })
                         });
-                        break;
+                        console.log("[webhook] join attempt", ep, res.status);
+                        if (res.ok) {
+                            sent = true;
+                            break;
+                        }
                     } catch (e) {
-                        /* try next endpoint */
+                        console.warn("[webhook] join fetch error", ep, e);
                     }
                 }
+                if (!sent) {
+                    console.warn("[webhook] join failed for all endpoints:", communityId);
+                }
             } catch (err) {
-                console.error("Discord join notify failed:", err);
+                console.error("[webhook] Discord join notify failed:", err);
             }
         }
 
         async function notifyDiscordLeave(communityId, userEmail, communityName) {
-            if (!localSupabase) return;
+            if (!localSupabase) {
+                console.warn("[webhook] notifyDiscordLeave skipped: no supabase");
+                return;
+            }
             try {
                 const { data: community } = await localSupabase
                     .from("communities")
-                    .select("discord_webhook")
+                    .select("discord_webhook, name")
                     .eq("id", communityId)
                     .maybeSingle();
                 const webhook = community && community.discord_webhook;
-                if (!webhook) return;
-                const content = `**${userEmail || "A user"}** left **${communityName || "a community"}**.`;
+                console.log("[webhook] leave webhook check:", communityId, !!webhook, community ? community.name : "");
+                if (!webhook) {
+                    console.warn("[webhook] no webhook for leave:", communityId);
+                    return;
+                }
+                const content = `**${userEmail || "A user"}** left **${communityName || community ? community.name : "a community"}**.`;
                 const endpoints = ["/api/discord-webhook", "https://www.pulsecad.xyz/api/discord-webhook"];
+                let sent = false;
                 for (const ep of endpoints) {
                     try {
-                        await fetch(ep, {
+                        const res = await fetch(ep, {
                             method: "POST",
                             headers: { "Content-Type": "application/json" },
                             body: JSON.stringify({ webhook: webhook, content: content, username: "PulseCAD" })
                         });
-                        break;
+                        console.log("[webhook] leave attempt", ep, res.status);
+                        if (res.ok) {
+                            sent = true;
+                            break;
+                        }
                     } catch (e) {
-                        /* try next endpoint */
+                        console.warn("[webhook] leave fetch error", ep, e);
                     }
                 }
+                if (!sent) {
+                    console.warn("[webhook] leave failed for all endpoints:", communityId);
+                }
             } catch (err) {
-                console.error("Discord leave notify failed:", err);
+                console.error("[webhook] Discord leave notify failed:", err);
             }
         }
 
