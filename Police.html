@@ -1104,8 +1104,11 @@
             <div class="report-field">
                 <label>Charges</label>
                 <div id="citationChargesList" style="display:flex;flex-direction:column;gap:6px;margin-bottom:6px;"></div>
-                <input type="text" id="citationChargesInput" placeholder="e.g. Speeding" />
-                <button type="button" class="add-charge-btn" id="addCitationChargeBtn" style="margin-top:6px;padding:6px 12px;border-radius:8px;border:1px solid #2563eb;background:#ffffff;color:#2563eb;font-size:12px;font-weight:700;cursor:pointer;">Add Charge</button>
+                <div style="display:flex;gap:8px;align-items:center;">
+                    <input type="text" id="citationChargesInput" placeholder="e.g. Speeding" style="flex:2;" />
+                    <input type="text" id="citationFineInput" placeholder="Fine $" style="flex:1;" />
+                    <button type="button" class="add-charge-btn" id="addCitationChargeBtn" style="padding:6px 12px;border-radius:8px;border:1px solid #2563eb;background:#ffffff;color:#2563eb;font-size:12px;font-weight:700;cursor:pointer;">Add</button>
+                </div>
             </div>
             <div class="report-field">
                 <label for="citationNotes">Notes</label>
@@ -1142,8 +1145,11 @@
             <div class="report-field">
                 <label>Charges</label>
                 <div id="arrestChargesList" style="display:flex;flex-direction:column;gap:6px;margin-bottom:6px;"></div>
-                <input type="text" id="arrestChargesInput" placeholder="e.g. Grand Theft Auto" />
-                <button type="button" class="add-charge-btn" id="addArrestChargeBtn" style="margin-top:6px;padding:6px 12px;border-radius:8px;border:1px solid #2563eb;background:#ffffff;color:#2563eb;font-size:12px;font-weight:700;cursor:pointer;">Add Charge</button>
+                <div style="display:flex;gap:8px;align-items:center;">
+                    <input type="text" id="arrestChargesInput" placeholder="e.g. Grand Theft Auto" style="flex:2;" />
+                    <input type="text" id="arrestFineInput" placeholder="Fine $" style="flex:1;" />
+                    <button type="button" class="add-charge-btn" id="addArrestChargeBtn" style="padding:6px 12px;border-radius:8px;border:1px solid #2563eb;background:#ffffff;color:#2563eb;font-size:12px;font-weight:700;cursor:pointer;">Add</button>
+                </div>
             </div>
             <div class="report-field">
                 <label for="arrestLocation">Location</label>
@@ -1745,6 +1751,7 @@
                 if (citationChargesInput) citationChargesInput.value = "";
                 const citationChargesList = document.getElementById("citationChargesList");
                 if (citationChargesList) citationChargesList.innerHTML = "";
+                if (citationFineInput) citationFineInput.value = "";
                 if (citationNotes) citationNotes.value = "";
                 clearSignature("citationSignatureCanvas");
                 if (citationError) { citationError.textContent = ""; citationError.style.display = "none"; }
@@ -1767,6 +1774,7 @@
                 if (arrestChargesInput) arrestChargesInput.value = "";
                 const arrestChargesList = document.getElementById("arrestChargesList");
                 if (arrestChargesList) arrestChargesList.innerHTML = "";
+                if (arrestFineInput) arrestFineInput.value = "";
                 if (arrestLocation) arrestLocation.value = "";
                 if (arrestNotes) arrestNotes.value = "";
                 clearSignature("arrestSignatureCanvas");
@@ -2028,10 +2036,11 @@
             }
         }
 
-        function addChargeInput(containerId, inputId, btnId) {
+        function addChargeInput(containerId, inputId, btnId, fineInputId) {
             const container = document.getElementById(containerId);
             const input = document.getElementById(inputId);
             const btn = document.getElementById(btnId);
+            const fineInput = fineInputId ? document.getElementById(fineInputId) : null;
             if (!container || !input || !btn) return;
 
             function render() {
@@ -2040,12 +2049,17 @@
                     container.innerHTML = "";
                     return;
                 }
-                container.innerHTML = Array.from(items).map((el, idx) => `
-                    <div class="charge-item" data-charge-idx="${idx}" style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
-                        <span style="flex:1;font-size:13px;color:#334155;">${escapeHtml(el.dataset.charge || "")}</span>
-                        <button type="button" class="remove-charge-btn" data-remove-charge="${idx}" style="padding:2px 8px;border-radius:6px;border:1px solid #dc2626;background:#ffffff;color:#dc2626;font-size:11px;font-weight:700;cursor:pointer;">Remove</button>
-                    </div>
-                `).join("");
+                container.innerHTML = Array.from(items).map((el, idx) => {
+                    const charge = escapeHtml(el.dataset.charge || "");
+                    const fine = escapeHtml(el.dataset.fine || "");
+                    return `
+                        <div class="charge-item" data-charge-idx="${idx}" style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+                            <span style="flex:2;font-size:13px;color:#334155;">${charge}</span>
+                            <span style="flex:1;font-size:13px;color:#2563eb;font-weight:600;">${fine ? "$" + fine : ""}</span>
+                            <button type="button" class="remove-charge-btn" data-remove-charge="${idx}" style="padding:2px 8px;border-radius:6px;border:1px solid #dc2626;background:#ffffff;color:#dc2626;font-size:11px;font-weight:700;cursor:pointer;">Remove</button>
+                        </div>
+                    `;
+                }).join("");
                 container.querySelectorAll("[data-remove-charge]").forEach((b) => {
                     b.addEventListener("click", () => {
                         const idx = parseInt(b.getAttribute("data-remove-charge"), 10);
@@ -2058,12 +2072,15 @@
 
             btn.addEventListener("click", () => {
                 const val = input.value.trim();
+                const fineVal = fineInput ? fineInput.value.trim() : "";
                 if (!val) return;
                 const div = document.createElement("div");
                 div.className = "charge-item";
                 div.dataset.charge = val;
+                div.dataset.fine = fineVal;
                 container.appendChild(div);
                 input.value = "";
+                if (fineInput) fineInput.value = "";
                 render();
             });
 
@@ -2073,12 +2090,26 @@
                     btn.click();
                 }
             });
+
+            if (fineInput) {
+                fineInput.addEventListener("keydown", (e) => {
+                    if (e.key === "Enter") {
+                        e.preventDefault();
+                        btn.click();
+                    }
+                });
+            }
         }
 
         function getCharges(containerId) {
             const container = document.getElementById(containerId);
             if (!container) return [];
-            return Array.from(container.querySelectorAll(".charge-item")).map((el) => el.dataset.charge || "").filter(Boolean);
+            return Array.from(container.querySelectorAll(".charge-item")).map((el) => {
+                const charge = el.dataset.charge || "";
+                const fine = el.dataset.fine || "";
+                if (!charge) return null;
+                return fine ? `${charge} ($${fine})` : charge;
+            }).filter(Boolean);
         }
 
         async function generateCitationPdf() {
@@ -2568,8 +2599,8 @@
 
         initSignatureCanvas("citationSignatureCanvas", "citationSignatureClear");
         initSignatureCanvas("arrestSignatureCanvas", "arrestSignatureClear");
-        addChargeInput("citationChargesList", "citationChargesInput", "addCitationChargeBtn");
-        addChargeInput("arrestChargesList", "arrestChargesInput", "addArrestChargeBtn");
+        addChargeInput("citationChargesList", "citationChargesInput", "addCitationChargeBtn", "citationFineInput");
+        addChargeInput("arrestChargesList", "arrestChargesInput", "addArrestChargeBtn", "arrestFineInput");
 
         (function updateMilitaryTime() {
             const el = document.getElementById("militaryTime");
