@@ -946,6 +946,7 @@
                 card.style.color = currentTheme.text || "";
                 card.style.borderColor = currentTheme.accent || "";
             }
+            if (document.body) document.body.style.background = currentTheme.bg || "";
             if (viewTitle) viewTitle.style.color = currentTheme.accent || "";
             if (viewContent) viewContent.style.color = currentTheme.text || "";
             if (editTitle) editTitle.style.color = currentTheme.accent || "";
