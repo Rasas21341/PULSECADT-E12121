@@ -979,6 +979,37 @@
             color: #f8fafc;
         }
 
+        .dashboard-hero {
+            display: grid;
+            grid-template-columns: 1.4fr 1fr;
+            gap: 14px;
+            margin-bottom: 18px;
+        }
+
+        .dashboard-hero-card {
+            padding: 18px;
+            border-radius: 20px;
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.24), rgba(14, 165, 233, 0.12));
+            border: 1px solid rgba(148, 163, 184, 0.18);
+        }
+
+        .dashboard-hero-card.secondary {
+            background: rgba(15, 23, 42, 0.72);
+        }
+
+        .dashboard-hero-title {
+            font-size: 14px;
+            font-weight: 800;
+            color: #ffffff;
+            margin-bottom: 10px;
+        }
+
+        .dashboard-hero-copy {
+            font-size: 13px;
+            color: #cbd5e1;
+            line-height: 1.6;
+        }
+
         .dashboard-actions {
             display: flex;
             gap: 10px;
@@ -1836,6 +1867,17 @@ enable-ga="false"
                         <button type="button" class="create-community-centered-btn" id="createCommunityCenteredBtn">Create Community</button>
                         <button type="button" class="join-community-centered-btn" id="joinCommunityCenteredBtn">Join Community</button>
                         <button type="button" class="join-community-centered-btn" id="staffDashboardBtn">Staff Dashboard</button>
+                    </div>
+                </div>
+
+                <div class="dashboard-hero">
+                    <div class="dashboard-hero-card">
+                        <div class="dashboard-hero-title">Overview</div>
+                        <div class="dashboard-hero-copy">Your PulseCAD workspace is now live. Use the actions to build, join, and manage communities from a single post-login dashboard.</div>
+                    </div>
+                    <div class="dashboard-hero-card secondary">
+                        <div class="dashboard-hero-title">Account status</div>
+                        <div class="dashboard-hero-copy">Secure session active with access to the communities you created or joined.</div>
                     </div>
                 </div>
 
@@ -2814,6 +2856,8 @@ enable-ga="false"
         const createCommunityCenteredBtn = document.getElementById("createCommunityCenteredBtn");
         const joinCommunityCenteredBtn = document.getElementById("joinCommunityCenteredBtn");
         const loggedInCommunities = document.getElementById("loggedInCommunities");
+        const dashboardCommunityCount = document.getElementById("dashboardCommunityCount");
+        const dashboardSidebarButtons = document.querySelectorAll(".dashboard-sidebar-btn");
 
         function loadCommunities() {
             if (!loggedInCommunities || !localSupabase) return;
@@ -2824,6 +2868,7 @@ enable-ga="false"
                 const userEmail = user?.email;
                 if (!userId) {
                     loggedInCommunities.innerHTML = "";
+                    if (dashboardCommunityCount) dashboardCommunityCount.textContent = "0";
                     return;
                 }
                 localSupabase
@@ -2835,15 +2880,17 @@ enable-ga="false"
                             alert("Failed to load communities: " + error.message);
                             return;
                         }
+                        let visibleCount = 0;
                         if (Array.isArray(data)) {
                             for (const row of data) {
                                 const isCreator = row.creator_email === userEmail;
                                 const joined = isCreator || await checkUserJoined(userId, row.id);
-                                // Only show communities the user created or has joined
                                 if (!isCreator && !joined) continue;
+                                visibleCount += 1;
                                 addCommunityCard(row.name, row.description || "Community", joined, row.id, isCreator, !!row.verification_requested, !!row.suspended, !!row.members_only);
                             }
                         }
+                        if (dashboardCommunityCount) dashboardCommunityCount.textContent = String(visibleCount);
                     })
                     .catch((err) => alert("Failed to load communities: " + (err.message || err)));
             }).catch((err) => {
@@ -3016,6 +3063,7 @@ enable-ga="false"
             const topbarLoginBtn = document.getElementById("topbarLoginBtn");
             const userDropdown = document.getElementById("userDropdown");
             const userEmailDisplay = document.getElementById("userEmailDisplay");
+            const sidebarUserEmail = document.getElementById("sidebarUserEmail");
             const container = document.querySelector(".container");
             const loggedInScreen = document.getElementById("loggedInScreen");
             const authModal = document.getElementById("authModal");
@@ -3024,6 +3072,7 @@ enable-ga="false"
             if (topbarLoginBtn) topbarLoginBtn.textContent = "Logout";
             if (userDropdown) userDropdown.style.display = "inline-flex";
             if (userEmailDisplay && email) userEmailDisplay.textContent = email;
+            if (sidebarUserEmail) sidebarUserEmail.textContent = email || "Signed in";
             if (container) container.style.display = "none";
             if (loggedInScreen) loggedInScreen.classList.add("open");
             if (authModal) authModal.classList.remove("open");
@@ -3067,6 +3116,21 @@ enable-ga="false"
                 console.error("Restore session failed:", err);
             }
         }
+
+        dashboardSidebarButtons.forEach((button) => {
+            button.addEventListener("click", () => {
+                dashboardSidebarButtons.forEach((btn) => btn.classList.remove("active"));
+                button.classList.add("active");
+                const action = button.getAttribute("data-action");
+                if (action === "create") {
+                    createCommunityCenteredBtn?.click();
+                } else if (action === "join") {
+                    joinCommunityCenteredBtn?.click();
+                } else if (action === "staff") {
+                    document.getElementById("staffDashboardBtn")?.click();
+                }
+            });
+        });
 
         if (localSupabase) {
             localSupabase.auth.onAuthStateChange((event, session) => {
