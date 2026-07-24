@@ -13,7 +13,7 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: #ffffff;
+            background: #0C0D10;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -25,7 +25,7 @@
             text-align: center;
             padding: 60px 32px;
             max-width: 560px;
-            background: #ffffff;
+            background: #0C0D10;
             border-radius: 12px;
             border: 1px solid #e2e8f0;
         }
@@ -98,7 +98,7 @@
             font-size: 14px;
             font-weight: 600;
             color: #0f172a;
-            background: #ffffff;
+            background: #0C0D10;
             border: 1px solid #e2e8f0;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
         }
@@ -116,7 +116,7 @@
             border-radius: 999px;
             font-size: 13px;
             font-weight: 600;
-            color: #2563eb;
+            color: #5865F2;
             background: #eff6ff;
             border: 1px solid #bfdbfe;
             text-decoration: none;
@@ -133,8 +133,8 @@
             border-radius: 999px;
             font-size: 13px;
             font-weight: 600;
-            color: #ffffff;
-            background: #2563eb;
+            color: #0C0D10;
+            background: #5865F2;
             border: none;
             cursor: pointer;
         }
@@ -199,8 +199,8 @@
             border-radius: 10px;
             font-size: 14px;
             font-weight: 700;
-            color: #ffffff;
-            background: #2563eb;
+            color: #0C0D10;
+            background: #5865F2;
             border: none;
             cursor: pointer;
             margin-bottom: 10px;
@@ -236,7 +236,7 @@
             font-size: 13px;
             font-weight: 600;
             color: #334155;
-            background: #ffffff;
+            background: #0C0D10;
             border: 1px solid #e2e8f0;
             padding: 8px 14px;
             border-radius: 999px;
@@ -256,7 +256,7 @@
             align-items: center;
             font-size: 13px;
             font-weight: 600;
-            color: #2563eb;
+            color: #5865F2;
             background: #eff6ff;
             border: 1px solid #bfdbfe;
             padding: 8px 14px;
@@ -276,7 +276,7 @@
             border-radius: 999px;
             font-size: 12px;
             font-weight: 700;
-            color: #ffffff;
+            color: #0C0D10;
             background: #7c3aed;
             border: 1px solid #7c3aed;
             cursor: pointer;
@@ -322,7 +322,7 @@
         .support-field input:focus,
         .support-field select:focus,
         .support-field textarea:focus {
-            border-color: #2563eb;
+            border-color: #5865F2;
             box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
         }
 
@@ -331,8 +331,8 @@
             padding: 12px 14px;
             border-radius: 12px;
             border: none;
-            background: #2563eb;
-            color: #ffffff;
+            background: #5865F2;
+            color: #0C0D10;
             font-size: 15px;
             font-weight: 700;
             cursor: pointer;
@@ -395,7 +395,7 @@
             padding: 9px 10px;
             border-radius: 999px;
             border: 1px solid #e2e8f0;
-            background: #ffffff;
+            background: #0C0D10;
             color: #475569;
             font-size: 13px;
             font-weight: 700;
@@ -404,7 +404,7 @@
 
         .support-tab-btn.active {
             background: #0f172a;
-            color: #ffffff;
+            color: #0C0D10;
             border-color: #0f172a;
         }
 
@@ -477,7 +477,7 @@
         .support-thread-back {
             background: transparent;
             border: none;
-            color: #2563eb;
+            color: #5865F2;
             font-size: 13px;
             font-weight: 600;
             cursor: pointer;
@@ -515,8 +515,8 @@
 
         .support-msg-user {
             align-self: flex-end;
-            background: #2563eb;
-            color: #ffffff;
+            background: #5865F2;
+            color: #0C0D10;
             border-bottom-right-radius: 4px;
         }
 
@@ -568,7 +568,7 @@
         }
 
         .support-reply-input:focus {
-            border-color: #2563eb;
+            border-color: #5865F2;
             box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
         }
 
@@ -593,7 +593,7 @@
             right: 0;
             top: 110%;
             min-width: 180px;
-            background: #ffffff;
+            background: #0C0D10;
             border: 1px solid #e2e8f0;
             border-radius: 12px;
             box-shadow: 0 10px 25px rgba(0,0,0,0.12);
@@ -632,12 +632,13 @@
         .modal-overlay {
             position: fixed;
             inset: 0;
-            background: rgba(15, 23, 42, 0.45);
+            background: rgba(0, 0, 0, 0.75);
             display: none;
             align-items: center;
             justify-content: center;
             z-index: 1000;
             padding: 16px;
+            backdrop-filter: blur(4px);
         }
 
         .modal-overlay.open {
@@ -645,13 +646,13 @@
         }
 
         .modal {
-            background: #ffffff;
+            background: #0C0D10;
             border-radius: 20px;
-            border: 1px solid #e2e8f0;
+            border: 1px solid #1E293B;
             padding: 22px;
             width: 100%;
             max-width: 420px;
-            box-shadow: 0 20px 50px rgba(15, 23, 42, 0.18);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
         }
 
         .modal-header {
@@ -664,13 +665,13 @@
         .modal-title {
             font-size: 18px;
             font-weight: 700;
-            color: #0f172a;
+            color: #ffffff;
         }
 
         .modal-close {
             border: none;
             background: transparent;
-            color: #64748b;
+            color: #94a3b8;
             font-size: 20px;
             cursor: pointer;
             line-height: 1;
@@ -679,8 +680,8 @@
         }
 
         .modal-close:hover {
-            background: #f1f5f9;
-            color: #0f172a;
+            background: #1E293B;
+            color: #ffffff;
         }
 
         .auth {
@@ -700,7 +701,7 @@
             padding: 10px;
             border-radius: 999px;
             border: 1px solid #e2e8f0;
-            background: #ffffff;
+            background: #0C0D10;
             color: #475569;
             font-size: 14px;
             font-weight: 600;
@@ -709,7 +710,7 @@
 
         .auth-tab.active {
             background: #0f172a;
-            color: #ffffff;
+            color: #0C0D10;
             border-color: #0f172a;
         }
 
@@ -719,7 +720,7 @@
         }
 
         .auth-form {
-            background: #ffffff;
+            background: #0C0D10;
             border: 1px solid #e2e8f0;
             border-radius: 16px;
             padding: 20px;
@@ -755,7 +756,7 @@
         }
 
         .auth-field input:focus {
-            border-color: #2563eb;
+            border-color: #5865F2;
             box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
         }
 
@@ -764,8 +765,8 @@
             padding: 12px 14px;
             border-radius: 12px;
             border: none;
-            background: #2563eb;
-            color: #ffffff;
+            background: #5865F2;
+            color: #0C0D10;
             font-size: 15px;
             font-weight: 700;
             cursor: pointer;
@@ -785,7 +786,7 @@
             border-radius: 999px;
             border: 1px solid #5865F2;
             background: #5865F2;
-            color: #ffffff;
+            color: #0C0D10;
             font-size: 13px;
             font-weight: 600;
             cursor: pointer;
@@ -819,7 +820,7 @@
         }
 
         .auth-account {
-            background: #ffffff;
+            background: #0C0D10;
             color: #334155;
             border-color: #e2e8f0;
         }
@@ -887,7 +888,7 @@
         .dashboard-brand-name {
             font-size: 18px;
             font-weight: 800;
-            color: #ffffff;
+            color: #0C0D10;
         }
 
         .dashboard-brand-subtitle {
@@ -919,7 +920,7 @@
         .dashboard-sidebar-btn.active {
             background: #1d4ed8;
             border-color: #1d4ed8;
-            color: #ffffff;
+            color: #0C0D10;
             box-shadow: none;
         }
 
@@ -996,7 +997,7 @@
         .dashboard-hero-title {
             font-size: 14px;
             font-weight: 800;
-            color: #ffffff;
+            color: #0C0D10;
             margin-bottom: 10px;
         }
 
@@ -1035,8 +1036,8 @@
             border-radius: 999px;
             font-size: 14px;
             font-weight: 700;
-            color: #ffffff;
-            background: #2563eb;
+            color: #0C0D10;
+            background: #5865F2;
             border: none;
             cursor: pointer;
             box-shadow: none;
@@ -1087,7 +1088,7 @@
         .dashboard-stat-value {
             font-size: 24px;
             font-weight: 800;
-            color: #ffffff;
+            color: #0C0D10;
         }
 
         .dashboard-list-panel {
@@ -1108,7 +1109,7 @@
         .dashboard-list-title {
             font-size: 18px;
             font-weight: 800;
-            color: #ffffff;
+            color: #0C0D10;
         }
 
         .dashboard-list-subtitle {
@@ -1149,7 +1150,7 @@
         .community-list-name {
             font-size: 15px;
             font-weight: 800;
-            color: #ffffff;
+            color: #0C0D10;
             margin-bottom: 4px;
             word-break: break-word;
         }
@@ -1165,8 +1166,8 @@
             border-radius: 10px;
             font-size: 12px;
             font-weight: 700;
-            color: #ffffff;
-            background: #2563eb;
+            color: #0C0D10;
+            background: #5865F2;
             border: none;
             cursor: pointer;
             white-space: nowrap;
@@ -1181,7 +1182,7 @@
             border-radius: 10px;
             font-size: 12px;
             font-weight: 700;
-            color: #ffffff;
+            color: #0C0D10;
             background: #dc2626;
             border: 1px solid #dc2626;
             cursor: pointer;
@@ -1234,9 +1235,9 @@
             border-radius: 8px;
             font-size: 12px;
             font-weight: 700;
-            color: #ffffff;
-            background: #2563eb;
-            border: 1px solid #2563eb;
+            color: #0C0D10;
+            background: #5865F2;
+            border: 1px solid #5865F2;
             white-space: nowrap;
         }
 
@@ -1245,7 +1246,7 @@
             border-radius: 8px;
             font-size: 12px;
             font-weight: 700;
-            color: #ffffff;
+            color: #0C0D10;
             background: #dc2626;
             border: 1px solid #dc2626;
             white-space: nowrap;
@@ -1284,7 +1285,7 @@
         .staff-dashboard-title {
             font-size: 18px;
             font-weight: 800;
-            color: #ffffff;
+            color: #0C0D10;
             margin-bottom: 12px;
         }
 
@@ -1364,7 +1365,7 @@
             display: none;
             position: fixed;
             inset: 0;
-            background: #ffffff;
+            background: #0C0D10;
             z-index: 500;
             padding: 80px 24px 24px 24px;
             overflow-y: auto;
@@ -1377,7 +1378,7 @@
         .settings-card {
             max-width: 540px;
             margin: 0 auto;
-            background: #ffffff;
+            background: #0C0D10;
             border: 1px solid #e2e8f0;
             border-radius: 20px;
             padding: 22px;
@@ -1483,7 +1484,7 @@
         }
 
         .lockdown-card {
-            background: #ffffff;
+            background: #0C0D10;
             border-radius: 20px;
             border: 1px solid #e2e8f0;
             padding: 28px;
@@ -1521,7 +1522,7 @@
             border-radius: 999px;
             font-size: 13px;
             font-weight: 600;
-            color: #2563eb;
+            color: #5865F2;
             background: #eff6ff;
             border: 1px solid #bfdbfe;
             text-decoration: none;
@@ -1569,7 +1570,7 @@
         }
 
         .wallet-input:focus {
-            border-color: #2563eb;
+            border-color: #5865F2;
             box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
         }
 
@@ -1578,7 +1579,7 @@
             border-radius: 12px;
             border: none;
             background: #16a34a;
-            color: #ffffff;
+            color: #0C0D10;
             font-size: 14px;
             font-weight: 700;
             cursor: pointer;
@@ -1670,7 +1671,7 @@
              padding: 10px 12px;
              border: 1px solid #e2e8f0;
              border-radius: 12px;
-             background: #ffffff;
+             background: #0C0D10;
          }
 
          .members-item-name {
@@ -1777,10 +1778,13 @@ enable-ga="false"
         </div>
     </div>
     <div class="modal-overlay" id="authModal">
-        <div class="modal">
-            <div class="modal-header">
-                <div class="modal-title">PulseCAD Account</div>
-                <button class="modal-close" id="modalClose" type="button" aria-label="Close">×</button>
+        <div class="modal" style="background:#0C0D10;border:1px solid #1E293B;box-shadow:0 20px 60px rgba(0,0,0,0.5);">
+            <div class="modal-header" style="border-bottom:1px solid #1E293B;margin-bottom:20px;">
+                <div style="display:flex;align-items:center;gap:12px;">
+                    <img src="https://cdn.discordapp.com/icons/1498000979101093999/c96c547fbd94e68254d8335dadb2e437.webp?size=1024" style="width:40px;height:40px;border-radius:12px;object-fit:cover;" alt="PulseCAD" />
+                     <div class="modal-title" style="color:#ffffff;font-size:20px;">PulseCAD</div>
+                </div>
+                <button class="modal-close" id="modalClose" type="button" aria-label="Close" style="color:#94a3b8;">×</button>
             </div>
             <div class="auth" id="auth">
                 <div class="auth-tabs">
@@ -1790,36 +1794,36 @@ enable-ga="false"
 
                 <form class="auth-form visible" id="loginForm" autocomplete="email">
                     <div class="auth-field">
-                        <label for="loginEmail">Email</label>
-                        <input type="email" id="loginEmail" placeholder="you@example.com" required />
+                        <label for="loginEmail" style="color:#94a3b8;">Email</label>
+                        <input type="email" id="loginEmail" placeholder="you@example.com" required style="background:#0C0D10;border:1px solid #1E293B;color:#f1f5f9;" />
                     </div>
                     <div class="auth-field">
-                        <label for="loginPassword">Password</label>
-                        <input type="password" id="loginPassword" placeholder="Your password" required minlength="6" />
+                        <label for="loginPassword" style="color:#94a3b8;">Password</label>
+                        <input type="password" id="loginPassword" placeholder="Your password" required minlength="6" style="background:#0C0D10;border:1px solid #1E293B;color:#f1f5f9;" />
                     </div>
-                     <button type="submit" class="auth-submit">Login</button>
-                     <div class="auth-error" id="loginError"></div>
-                    <div class="auth-success" id="loginSuccess"></div>
-                    <div class="auth-account" id="loginAccount"></div>
+                     <button type="submit" class="auth-submit" style="background:#5865F2;border-radius:8px;">Login</button>
+                     <div class="auth-error" id="loginError" style="display:none;"></div>
+                    <div class="auth-success" id="loginSuccess" style="display:none;"></div>
+                    <div class="auth-account" id="loginAccount" style="display:none;"></div>
                 </form>
 
                 <form class="auth-form" id="signupForm" autocomplete="email">
                     <div class="auth-field">
-                        <label for="signupEmail">Email</label>
-                        <input type="email" id="signupEmail" placeholder="you@example.com" required />
+                        <label for="signupEmail" style="color:#94a3b8;">Email</label>
+                        <input type="email" id="signupEmail" placeholder="you@example.com" required style="background:#0C0D10;border:1px solid #1E293B;color:#f1f5f9;" />
                     </div>
                     <div class="auth-field">
-                        <label for="signupPassword">Password</label>
-                        <input type="password" id="signupPassword" placeholder="Create a password" required minlength="6" />
+                        <label for="signupPassword" style="color:#94a3b8;">Password</label>
+                        <input type="password" id="signupPassword" placeholder="Create a password" required minlength="6" style="background:#0C0D10;border:1px solid #1E293B;color:#f1f5f9;" />
                     </div>
                     <div class="auth-field">
-                        <label for="signupConfirm">Confirm Password</label>
-                        <input type="password" id="signupConfirm" placeholder="Repeat your password" required minlength="6" />
+                        <label for="signupConfirm" style="color:#94a3b8;">Confirm Password</label>
+                        <input type="password" id="signupConfirm" placeholder="Repeat your password" required minlength="6" style="background:#0C0D10;border:1px solid #1E293B;color:#f1f5f9;" />
                     </div>
-                    <button type="submit" class="auth-submit">Create Account</button>
-                    <div class="auth-error" id="signupError"></div>
-                    <div class="auth-success" id="signupSuccess"></div>
-                    <div class="auth-account" id="signupAccount"></div>
+                    <button type="submit" class="auth-submit" style="background:#5865F2;border-radius:8px;">Create Account</button>
+                    <div class="auth-error" id="signupError" style="display:none;"></div>
+                    <div class="auth-success" id="signupSuccess" style="display:none;"></div>
+                    <div class="auth-account" id="signupAccount" style="display:none;"></div>
                 </form>
             </div>
         </div>
