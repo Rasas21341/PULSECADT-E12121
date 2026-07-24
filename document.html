@@ -988,9 +988,7 @@
                 applyTheme({ bg: "", text: "", accent: "" });
             }
             if (themeHint) {
-                themeHint.textContent = isOwner
-                    ? "As the owner, saving updates colors for everyone viewing this document."
-                    : "Colors are saved on this device only.";
+                themeHint.textContent = "Colors are saved for everyone viewing this document.";
             }
         }
 
@@ -1021,14 +1019,10 @@
             const t = readThemeInputs();
             applyTheme(t);
             saveThemeLocal(t);
-            if (isOwner) {
-                if (themeSaveBtn) { themeSaveBtn.disabled = true; themeSaveBtn.textContent = "Saving..."; }
-                const ok = await persistTheme();
-                if (themeSaveBtn) { themeSaveBtn.disabled = false; themeSaveBtn.textContent = "Save"; }
-                if (ok) showStatus("Colors saved.", "success");
-            } else {
-                showStatus("Colors saved on this device.", "success");
-            }
+            if (themeSaveBtn) { themeSaveBtn.disabled = true; themeSaveBtn.textContent = "Saving..."; }
+            const ok = await persistTheme();
+            if (themeSaveBtn) { themeSaveBtn.disabled = false; themeSaveBtn.textContent = "Save"; }
+            if (ok) showStatus("Colors saved.", "success");
         }
 
         function resetTheme() {
@@ -1036,11 +1030,7 @@
             setThemeInputs({ bg: "#ffffff", text: "#334155", accent: "#2563eb" });
             applyTheme(def);
             saveThemeLocal(def);
-            if (isOwner) {
-                persistTheme().then((ok) => { if (ok) showStatus("Colors reset.", "success"); });
-            } else {
-                showStatus("Colors reset on this device.", "success");
-            }
+            persistTheme().then((ok) => { if (ok) showStatus("Colors reset.", "success"); });
         }
 
         function openThemePanel() {
