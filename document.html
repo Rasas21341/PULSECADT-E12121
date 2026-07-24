@@ -415,12 +415,24 @@
 
         .doc-theme-actions .btn { flex: 1; }
 
-        .doc-theme-hint {
-            font-size: 11px;
-            color: #94a3b8;
-            margin-top: 10px;
-            line-height: 1.4;
-        }
+.doc-theme-hint {
+             font-size: 11px;
+             color: #94a3b8;
+             margin-top: 10px;
+             line-height: 1.4;
+         }
+
+         .doc-theme-section-label {
+             font-size: 11px;
+             font-weight: 700;
+             color: #94a3b8;
+             text-transform: uppercase;
+             letter-spacing: 0.5px;
+             margin-top: 14px;
+             margin-bottom: 4px;
+             padding-bottom: 4px;
+             border-bottom: 1px solid #f1f5f9;
+         }
 
         /* Copy protection + watermark */
         .doc-protected .doc-page-title,
@@ -549,12 +561,27 @@
             <label for="themeText">Text</label>
             <input type="color" id="themeText" value="#334155" />
         </div>
-        <div class="doc-theme-row">
-            <label for="themeAccent">Accent</label>
-            <input type="color" id="themeAccent" value="#2563eb" />
-        </div>
+<div class="doc-theme-row">
+             <label for="themeAccent">Accent</label>
+             <input type="color" id="themeAccent" value="#2563eb" />
+         </div>
 
-        <div class="doc-theme-field">
+         <div class="doc-theme-section-label">Sidebar</div>
+
+         <div class="doc-theme-row">
+             <label for="themeSidebarBg">Sidebar BG</label>
+             <input type="color" id="themeSidebarBg" value="#ffffff" />
+         </div>
+         <div class="doc-theme-row">
+             <label for="themeSidebarText">Sidebar Text</label>
+             <input type="color" id="themeSidebarText" value="#334155" />
+         </div>
+         <div class="doc-theme-row">
+             <label for="themeSidebarAccent">Sidebar Accent</label>
+             <input type="color" id="themeSidebarAccent" value="#2563eb" />
+         </div>
+
+         <div class="doc-theme-field">
             <label for="themeWatermark">Watermark text (blank = default)</label>
             <input type="text" id="themeWatermark" placeholder="e.g. CONFIDENTIAL" maxlength="40" />
         </div>
@@ -599,22 +626,25 @@
         const themePanel = document.getElementById("themePanel");
         const themeCloseBtn = document.getElementById("themeCloseBtn");
         const themePresets = document.getElementById("themePresets");
-        const themeBg = document.getElementById("themeBg");
-        const themeText = document.getElementById("themeText");
-        const themeAccent = document.getElementById("themeAccent");
-        const themeWatermark = document.getElementById("themeWatermark");
-        const themeSaveBtn = document.getElementById("themeSaveBtn");
-        const themeResetBtn = document.getElementById("themeResetBtn");
-        const themeHint = document.getElementById("themeHint");
+const themeBg = document.getElementById("themeBg");
+         const themeText = document.getElementById("themeText");
+         const themeAccent = document.getElementById("themeAccent");
+         const themeSidebarBg = document.getElementById("themeSidebarBg");
+         const themeSidebarText = document.getElementById("themeSidebarText");
+         const themeSidebarAccent = document.getElementById("themeSidebarAccent");
+         const themeWatermark = document.getElementById("themeWatermark");
+         const themeSaveBtn = document.getElementById("themeSaveBtn");
+         const themeResetBtn = document.getElementById("themeResetBtn");
+         const themeHint = document.getElementById("themeHint");
 
-        let localSupabase = null;
-        let currentDoc = null;
-        let pages = [];
-        let selectedId = null;
-        let isOwner = false;
-        let editing = false;
-        let currentCommunityName = "";
-        let currentTheme = { bg: "", text: "", accent: "" };
+         let localSupabase = null;
+         let currentDoc = null;
+         let pages = [];
+         let selectedId = null;
+         let isOwner = false;
+         let editing = false;
+         let currentCommunityName = "";
+         let currentTheme = { bg: "", text: "", accent: "", sidebarBg: "", sidebarText: "", sidebarAccent: "" };
 
         try {
             if (typeof window.supabase !== "undefined") {
