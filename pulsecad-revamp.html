@@ -632,13 +632,12 @@
         .modal-overlay {
             position: fixed;
             inset: 0;
-            background: rgba(0, 0, 0, 0.75);
+            background: rgba(15, 23, 42, 0.45);
             display: none;
             align-items: center;
             justify-content: center;
             z-index: 1000;
             padding: 16px;
-            backdrop-filter: blur(4px);
         }
 
         .modal-overlay.open {
@@ -648,11 +647,11 @@
         .modal {
             background: #0C0D10;
             border-radius: 20px;
-            border: 1px solid #1E293B;
+            border: 1px solid #e2e8f0;
             padding: 22px;
             width: 100%;
             max-width: 420px;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 20px 50px rgba(15, 23, 42, 0.18);
         }
 
         .modal-header {
@@ -665,13 +664,13 @@
         .modal-title {
             font-size: 18px;
             font-weight: 700;
-            color: #ffffff;
+            color: #0f172a;
         }
 
         .modal-close {
             border: none;
             background: transparent;
-            color: #94a3b8;
+            color: #64748b;
             font-size: 20px;
             cursor: pointer;
             line-height: 1;
@@ -680,8 +679,8 @@
         }
 
         .modal-close:hover {
-            background: #1E293B;
-            color: #ffffff;
+            background: #f1f5f9;
+            color: #0f172a;
         }
 
         .auth {
@@ -1782,7 +1781,7 @@ enable-ga="false"
             <div class="modal-header" style="border-bottom:1px solid #1E293B;margin-bottom:20px;">
                 <div style="display:flex;align-items:center;gap:12px;">
                     <img src="https://cdn.discordapp.com/icons/1498000979101093999/c96c547fbd94e68254d8335dadb2e437.webp?size=1024" style="width:40px;height:40px;border-radius:12px;object-fit:cover;" alt="PulseCAD" />
-                     <div class="modal-title" style="color:#ffffff;font-size:20px;">PulseCAD</div>
+                    <div class="modal-title" style="color:#0C0D10;font-size:20px;">PulseCAD</div>
                 </div>
                 <button class="modal-close" id="modalClose" type="button" aria-label="Close" style="color:#94a3b8;">×</button>
             </div>
