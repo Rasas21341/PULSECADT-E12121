@@ -837,10 +837,7 @@
             display: none;
             position: fixed;
             inset: 0;
-            background:
-                radial-gradient(circle at top left, rgba(37, 99, 235, 0.34), transparent 26%),
-                radial-gradient(circle at bottom right, rgba(14, 165, 233, 0.22), transparent 24%),
-                linear-gradient(135deg, #07111d 0%, #0b1322 48%, #0f172a 100%);
+            background: #0b1020;
             z-index: 500;
             overflow-y: auto;
             color: #f8fafc;
@@ -853,11 +850,10 @@
         .dashboard-shell {
             width: min(1340px, calc(100% - 32px));
             margin: 24px auto;
-            border: 1px solid rgba(148, 163, 184, 0.18);
-            background: rgba(9, 14, 28, 0.86);
-            backdrop-filter: blur(12px);
-            border-radius: 26px;
-            box-shadow: 0 24px 80px rgba(2, 6, 23, 0.38);
+            border: 1px solid #243042;
+            background: #0f172a;
+            border-radius: 24px;
+            box-shadow: 0 18px 54px rgba(2, 6, 23, 0.32);
             display: grid;
             grid-template-columns: 280px minmax(0, 1fr);
             overflow: hidden;
@@ -865,8 +861,8 @@
 
         .dashboard-sidebar {
             padding: 22px;
-            border-right: 1px solid rgba(148, 163, 184, 0.18);
-            background: rgba(15, 23, 42, 0.72);
+            border-right: 1px solid #243042;
+            background: #111827;
             display: flex;
             flex-direction: column;
             gap: 18px;
@@ -877,7 +873,7 @@
             align-items: center;
             gap: 12px;
             padding-bottom: 18px;
-            border-bottom: 1px solid rgba(148, 163, 184, 0.18);
+            border-bottom: 1px solid #243042;
         }
 
         .dashboard-brand-logo {
@@ -909,9 +905,9 @@
         .dashboard-sidebar-btn {
             width: 100%;
             padding: 12px 14px;
-            border-radius: 14px;
-            border: 1px solid rgba(148, 163, 184, 0.22);
-            background: rgba(15, 23, 42, 0.72);
+            border-radius: 12px;
+            border: 1px solid #334155;
+            background: #111827;
             color: #e2e8f0;
             font-size: 14px;
             font-weight: 700;
@@ -921,10 +917,10 @@
 
         .dashboard-sidebar-btn:hover,
         .dashboard-sidebar-btn.active {
-            background: linear-gradient(135deg, rgba(37, 99, 235, 0.92), rgba(14, 165, 233, 0.82));
-            border-color: transparent;
+            background: #1d4ed8;
+            border-color: #1d4ed8;
             color: #ffffff;
-            box-shadow: 0 10px 30px rgba(37, 99, 235, 0.32);
+            box-shadow: none;
         }
 
         .sidebar-user-card {
@@ -988,13 +984,13 @@
 
         .dashboard-hero-card {
             padding: 18px;
-            border-radius: 20px;
-            background: linear-gradient(135deg, rgba(37, 99, 235, 0.24), rgba(14, 165, 233, 0.12));
-            border: 1px solid rgba(148, 163, 184, 0.18);
+            border-radius: 18px;
+            background: #111827;
+            border: 1px solid #243042;
         }
 
         .dashboard-hero-card.secondary {
-            background: rgba(15, 23, 42, 0.72);
+            background: #0f172a;
         }
 
         .dashboard-hero-title {
@@ -1040,14 +1036,14 @@
             font-size: 14px;
             font-weight: 700;
             color: #ffffff;
-            background: linear-gradient(135deg, #2563eb, #0ea5e9);
+            background: #2563eb;
             border: none;
             cursor: pointer;
-            box-shadow: 0 10px 30px rgba(37, 99, 235, 0.28);
+            box-shadow: none;
         }
 
         .create-community-centered-btn:hover {
-            background: linear-gradient(135deg, #1d4ed8, #0284c7);
+            background: #1d4ed8;
         }
 
         .join-community-centered-btn {
@@ -1055,15 +1051,14 @@
             border-radius: 999px;
             font-size: 14px;
             font-weight: 700;
-            color: #ffffff;
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.18);
+            color: #dbe4f0;
+            background: #111827;
+            border: 1px solid #334155;
             cursor: pointer;
-            backdrop-filter: blur(10px);
         }
 
         .join-community-centered-btn:hover {
-            background: rgba(255, 255, 255, 0.14);
+            background: #1f2937;
         }
 
         .dashboard-stats {
@@ -1076,8 +1071,8 @@
         .dashboard-stat {
             padding: 16px;
             border-radius: 18px;
-            background: rgba(15, 23, 42, 0.72);
-            border: 1px solid rgba(148, 163, 184, 0.18);
+            background: #111827;
+            border: 1px solid #243042;
         }
 
         .dashboard-stat-label {
@@ -1098,8 +1093,8 @@
         .dashboard-list-panel {
             padding: 18px;
             border-radius: 22px;
-            background: rgba(15, 23, 42, 0.72);
-            border: 1px solid rgba(148, 163, 184, 0.18);
+            background: #111827;
+            border: 1px solid #243042;
         }
 
         .dashboard-list-title-row {
@@ -1136,11 +1131,11 @@
 
         .community-list-card {
             width: 100%;
-            background: rgba(10, 16, 30, 0.95);
-            border: 1px solid rgba(148, 163, 184, 0.18);
-            border-radius: 16px;
+            background: #0b1220;
+            border: 1px solid #243042;
+            border-radius: 14px;
             padding: 16px;
-            box-shadow: 0 12px 30px rgba(2, 6, 23, 0.24);
+            box-shadow: none;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -1171,14 +1166,14 @@
             font-size: 12px;
             font-weight: 700;
             color: #ffffff;
-            background: linear-gradient(135deg, #2563eb, #0ea5e9);
+            background: #2563eb;
             border: none;
             cursor: pointer;
             white-space: nowrap;
         }
 
         .community-list-join:hover {
-            background: linear-gradient(135deg, #1d4ed8, #0284c7);
+            background: #1d4ed8;
         }
 
         .community-list-leave {
@@ -1213,16 +1208,16 @@
             border-radius: 10px;
             font-size: 12px;
             font-weight: 700;
-            color: #ffffff;
-            background: rgba(148, 163, 184, 0.18);
-            border: 1px solid rgba(148, 163, 184, 0.22);
+            color: #dbe4f0;
+            background: #1f2937;
+            border: 1px solid #334155;
             cursor: pointer;
             white-space: nowrap;
             text-decoration: none;
         }
 
         .community-list-dashboard:hover {
-            background: rgba(148, 163, 184, 0.28);
+            background: #334155;
         }
 
         .community-lock-icon {
@@ -1274,11 +1269,11 @@
 
         .staff-dashboard-card {
             margin-top: 18px;
-            background: rgba(15, 23, 42, 0.72);
-            border: 1px solid rgba(148, 163, 184, 0.18);
-            border-radius: 20px;
+            background: #111827;
+            border: 1px solid #243042;
+            border-radius: 18px;
             padding: 18px;
-            box-shadow: 0 10px 30px rgba(2, 6, 23, 0.24);
+            box-shadow: none;
             display: none;
         }
 
