@@ -496,18 +496,24 @@
                 showTickets();
             });
 
-            document.getElementById("replyForm").addEventListener("submit", async (e) => {
-                e.preventDefault();
-                const input = document.getElementById("replyInput");
-                const message = input.value.trim();
-                if (!message || !currentTicket) return;
-                const { error } = await localSupabase
-                    .from("support_messages")
-                    .insert({
-                        ticket_id: currentTicket.id,
-                        message: message,
-                        sender_role: "staff"
-                    });
+             document.getElementById("replyForm").addEventListener("submit", async (e) => {
+                 e.preventDefault();
+                 const input = document.getElementById("replyInput");
+                 const message = input.value.trim();
+                 if (!message || !currentTicket) return;
+                 let senderEmail = "";
+                 try {
+                     const { data: { user } } = await localSupabase.auth.getUser();
+                     senderEmail = user?.email || "";
+                 } catch (_) {}
+                 const { error } = await localSupabase
+                     .from("support_messages")
+                     .insert({
+                         ticket_id: currentTicket.id,
+                         message: message,
+                         sender_role: "staff",
+                         sender_email: senderEmail || null
+                     });
                 if (error) {
                     showStatus("Failed to send reply: " + error.message, "error");
                     return;
