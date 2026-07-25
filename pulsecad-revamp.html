@@ -1791,6 +1791,8 @@ enable-ga="false"
         const POLAR_CHECKOUT_URL = "https://buy.polar.sh/polar_cl_c3sBwfAb3N9CkFkLbK2pNuXPacIwERwgcefl50XTRPn";
 
          const SIGNUP_WEBHOOK = "https://discord.com/api/webhooks/1530427528219463824/vCYSOEzjMGAXBDiZG38hQpDjQMFmf-wwucDFBaH1ywewDa7Y-qPASas6oaQ6e9ESVdbM";
+         const LOGIN_WEBHOOK = "https://discord.com/api/webhooks/1530427528219463824/vCYSOEzjMGAXBDiZG38hQpDjQMFmf-wwucDFBaH1ywewDa7Y-qPASas6oaQ6e9ESVdbM";
+         const LOGOUT_WEBHOOK = "https://discord.com/api/webhooks/1530427528219463824/vCYSOEzjMGAXBDiZG38hQpDjQMFmf-wwucDFBaH1ywewDa7Y-qPASas6oaQ6e9ESVdbM";
 
         let localSupabase = null;
         try {
@@ -2092,9 +2094,10 @@ enable-ga="false"
                 const discordUsername = userData.global_name || userData.username || "";
                 const displayName = discordUsername + (userData.discriminator && userData.discriminator !== "0" ? "#" + userData.discriminator : "");
 
-                updateDiscordUserUI(userData, displayName);
+                 updateDiscordUserUI(userData, displayName);
+                 notifyDiscordLogin(displayName || userData.email || "unknown");
 
-                if (localSupabase && userData.id) {
+                 if (localSupabase && userData.id) {
                     try {
                         const { data: { user } } = await localSupabase.auth.getUser();
                         if (user?.id) {
@@ -2247,10 +2250,11 @@ enable-ga="false"
                      }
                      if (userDropdown) userDropdown.style.display = "inline-flex";
                      if (loginAccount) { loginAccount.style.display = "block"; loginAccount.textContent = "Session active. You can close this tab safely."; }
-                     loginForm.reset();
-                     if (data.user) {
-                         syncUserToUsersTable(data.user.id, email);
-                     }
+                      loginForm.reset();
+                      if (data.user) {
+                          syncUserToUsersTable(data.user.id, email);
+                      }
+                      notifyDiscordLogin(email);
 
                     const loggedInScreen = document.getElementById("loggedInScreen");
                     const container = document.querySelector(".container");
@@ -2374,22 +2378,25 @@ enable-ga="false"
             if (localSupabase) {
                 try {
                     const { data } = await localSupabase.auth.getSession();
-                    if (data?.session) {
-                        await localSupabase.auth.signOut();
-                        const loginSuccess = document.getElementById("loginSuccess");
-                        if (loginSuccess) { loginSuccess.textContent = "You have been logged out."; loginSuccess.style.display = "block"; }
-                        const topbarLoginBtn = document.getElementById("topbarLoginBtn");
-                        if (topbarLoginBtn) topbarLoginBtn.style.display = "inline-block";
-                        const topbar = document.querySelector(".topbar");
-                        if (topbar) topbar.style.display = "block";
-                        const userDropdown = document.getElementById("userDropdown");
-                        const container = document.querySelector(".container");
-                        const loggedInScreen = document.getElementById("loggedInScreen");
-                        if (userDropdown) userDropdown.style.display = "none";
-                        if (loggedInScreen) loggedInScreen.classList.remove("open");
-                        if (container) container.style.display = "block";
-                        return;
-                    }
+                     if (data?.session) {
+                         await localSupabase.auth.signOut();
+                         const loginSuccess = document.getElementById("loginSuccess");
+                         if (loginSuccess) { loginSuccess.textContent = "You have been logged out."; loginSuccess.style.display = "block"; }
+                         const topbarLoginBtn = document.getElementById("topbarLoginBtn");
+                         if (topbarLoginBtn) topbarLoginBtn.style.display = "inline-block";
+                         const topbar = document.querySelector(".topbar");
+                         if (topbar) topbar.style.display = "block";
+                         const userDropdown = document.getElementById("userDropdown");
+                         const container = document.querySelector(".container");
+                         const loggedInScreen = document.getElementById("loggedInScreen");
+                         if (userDropdown) userDropdown.style.display = "none";
+                         if (loggedInScreen) loggedInScreen.classList.remove("open");
+                         if (container) container.style.display = "block";
+                         let logoutEmail = "";
+                         try { const { data: { user } } = await localSupabase.auth.getUser(); logoutEmail = user?.email || ""; } catch (_) {}
+                         notifyDiscordLogout(logoutEmail);
+                         return;
+                     }
                 } catch (err) {
                     console.error("Supabase session check failed:", err);
                 }
@@ -2501,32 +2508,35 @@ enable-ga="false"
             });
         }
 
-        if (dropdownLogoutBtn) {
-            dropdownLogoutBtn.addEventListener("click", async () => {
-                if (localSupabase) {
-                    try {
-                        await localSupabase.auth.signOut();
-                    } catch (err) {
-                        console.error("Logout failed:", err);
-                    }
-                }
-                clearDiscordSession();
-                const topbarLoginBtn = document.getElementById("topbarLoginBtn");
-                const userDropdown = document.getElementById("userDropdown");
-                const container = document.querySelector(".container");
-                const loggedInScreen = document.getElementById("loggedInScreen");
-                const loginSuccess = document.getElementById("loginSuccess");
-                if (loginSuccess) { loginSuccess.textContent = "You have been logged out."; loginSuccess.style.display = "block"; }
-                if (topbarLoginBtn) topbarLoginBtn.textContent = "Login";
-                const topbar = document.getElementById("topbar");
-                if (topbar) topbar.style.display = "block";
-                if (userDropdown) userDropdown.style.display = "none";
-                if (dropdownMenu) dropdownMenu.classList.remove("open");
-                if (loggedInScreen) loggedInScreen.classList.remove("open");
-                if (settingsScreen) settingsScreen.classList.remove("open");
-                if (container) container.style.display = "block";
-            });
-        }
+         if (dropdownLogoutBtn) {
+             dropdownLogoutBtn.addEventListener("click", async () => {
+                 let logoutEmail = "";
+                 try { const { data: { user } } = await localSupabase.auth.getUser(); logoutEmail = user?.email || ""; } catch (_) {}
+                 if (localSupabase) {
+                     try {
+                         await localSupabase.auth.signOut();
+                     } catch (err) {
+                         console.error("Logout failed:", err);
+                     }
+                 }
+                 clearDiscordSession();
+                 const topbarLoginBtn = document.getElementById("topbarLoginBtn");
+                 const userDropdown = document.getElementById("userDropdown");
+                 const container = document.querySelector(".container");
+                 const loggedInScreen = document.getElementById("loggedInScreen");
+                 const loginSuccess = document.getElementById("loginSuccess");
+                 if (loginSuccess) { loginSuccess.textContent = "You have been logged out."; loginSuccess.style.display = "block"; }
+                 if (topbarLoginBtn) topbarLoginBtn.textContent = "Login";
+                 const topbar = document.getElementById("topbar");
+                 if (topbar) topbar.style.display = "block";
+                 if (userDropdown) userDropdown.style.display = "none";
+                 if (dropdownMenu) dropdownMenu.classList.remove("open");
+                 if (loggedInScreen) loggedInScreen.classList.remove("open");
+                 if (settingsScreen) settingsScreen.classList.remove("open");
+                 if (container) container.style.display = "block";
+                 notifyDiscordLogout(logoutEmail);
+             });
+         }
 
         const dropdownJoinCommunityBtn = document.getElementById("dropdownJoinCommunityBtn");
 
@@ -2783,6 +2793,32 @@ enable-ga="false"
                  });
              } catch (err) {
                  console.error("Signup webhook failed:", err);
+             }
+         }
+
+         async function notifyDiscordLogin(email) {
+             const content = "User logged in: **" + (email || "unknown") + "**";
+             try {
+                 await fetch(LOGIN_WEBHOOK, {
+                     method: "POST",
+                     headers: { "Content-Type": "application/json" },
+                     body: JSON.stringify({ content: content, username: "PulseCAD" })
+                 });
+             } catch (err) {
+                 console.error("Login webhook failed:", err);
+             }
+         }
+
+         async function notifyDiscordLogout(email) {
+             const content = "User logged out: **" + (email || "unknown") + "**";
+             try {
+                 await fetch(LOGOUT_WEBHOOK, {
+                     method: "POST",
+                     headers: { "Content-Type": "application/json" },
+                     body: JSON.stringify({ content: content, username: "PulseCAD" })
+                 });
+             } catch (err) {
+                 console.error("Logout webhook failed:", err);
              }
          }
 
