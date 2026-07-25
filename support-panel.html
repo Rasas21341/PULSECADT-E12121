@@ -374,14 +374,23 @@
             }
         }
 
-        async function getStaffProfile() {
-            const { data } = await localSupabase
-                .from("staff")
-                .select("department, name")
-                .eq("user_id", currentUser.id)
-                .maybeSingle();
-            return data || {};
-        }
+         async function getStaffProfile() {
+             const { data: staffData } = await localSupabase
+                 .from("staff")
+                 .select("department, name")
+                 .eq("user_id", currentUser.id)
+                 .maybeSingle();
+             if (staffData && staffData.department) return staffData;
+             const { data: userData } = await localSupabase
+                 .from("users")
+                 .select("department, email")
+                 .eq("id", currentUser.id)
+                 .maybeSingle();
+             if (userData && userData.department) {
+                 return { department: userData.department, name: userData.email || "" };
+             }
+             return {};
+         }
 
         function statusBadge(status) {
             const s = (status || "open").toLowerCase().replace(/\s+/g, "-");
