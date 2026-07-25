@@ -267,26 +267,9 @@
             box-shadow: 0 1px 3px rgba(0,0,0,0.06);
         }
 
-        .support-ticket-btn:hover {
-            background: #dbeafe;
-        }
-
-        .mod-panel-btn {
-            padding: 6px 12px;
-            border-radius: 999px;
-            font-size: 12px;
-            font-weight: 700;
-            color: #ffffff;
-            background: #7c3aed;
-            border: 1px solid #7c3aed;
-            cursor: pointer;
-            white-space: nowrap;
-            text-decoration: none;
-        }
-
-        .mod-panel-btn:hover {
-            background: #6d28d9;
-        }
+         .support-ticket-btn:hover {
+             background: #dbeafe;
+         }
 
         .support-field {
             margin-bottom: 14px;
@@ -1009,24 +992,7 @@
             white-space: nowrap;
         }
 
-        .community-list-dashboard {
-            padding: 6px 12px;
-            border-radius: 8px;
-            font-size: 12px;
-            font-weight: 700;
-            color: #ffffff;
-            background: #0f172a;
-            border: 1px solid #0f172a;
-            cursor: pointer;
-            white-space: nowrap;
-            text-decoration: none;
-        }
-
-        .community-list-dashboard:hover {
-            background: #1e293b;
-        }
-
-        .community-lock-icon {
+         .community-lock-icon {
             display: inline-flex;
             align-items: center;
             font-size: 13px;
@@ -1069,6 +1035,75 @@
             align-items: center;
             gap: 12px;
             margin-left: auto;
+        }
+
+        .community-kebab {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            align-items: center;
+            justify-content: center;
+            transition: background .15s ease;
+        }
+
+        .community-kebab:hover {
+            background: #f1f5f9;
+        }
+
+        .community-kebab-dot {
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background: #64748b;
+            display: block;
+        }
+
+        .community-kebab-menu {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 100%;
+            margin-top: 4px;
+            min-width: 140px;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+            overflow: hidden;
+            z-index: 800;
+        }
+
+        .community-kebab-menu.open {
+            display: block;
+        }
+
+        .community-kebab-item {
+            width: 100%;
+            padding: 10px 14px;
+            border: none;
+            background: transparent;
+            color: #0f172a;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            text-align: left;
+        }
+
+        .community-kebab-item:hover {
+            background: #f8fafc;
+        }
+
+        .community-kebab-item.danger {
+            color: #dc2626;
+        }
+
+        .community-kebab-item.danger:hover {
+            background: #fef2f2;
         }
 
         .staff-dashboard-card {
@@ -2397,9 +2432,10 @@ enable-ga="false"
             });
         }
 
-        document.addEventListener("click", () => {
-            if (dropdownMenu) dropdownMenu.classList.remove("open");
-        });
+         document.addEventListener("click", () => {
+             if (dropdownMenu) dropdownMenu.classList.remove("open");
+             document.querySelectorAll(".community-kebab-menu.open").forEach((m) => m.classList.remove("open"));
+         });
 
         const dropdownLogoutBtn = document.getElementById("dropdownLogoutBtn");
         const dropdownSettingsBtn = document.getElementById("dropdownSettingsBtn");
@@ -2889,25 +2925,34 @@ enable-ga="false"
             if (isSuspended) badges.push('<span class="community-list-suspended">Suspended</span>');
             if (isJoined) badges.push('<span class="community-list-joined">Joined</span>');
             const badgesHtml = badges.length ? `<div class="community-list-badges">${badges.join("")}</div>` : "";
-            const lockIcon = isMembersOnly ? '<span class="community-lock-icon"> →</span>' : "";
-            const dashboardBtn = isCreator ? `<button type="button" class="community-list-dashboard" data-id="${id || ''}">Dashboard</button>` : "";
-            const modPanelBtn = isCreator ? `<button type="button" class="mod-panel-btn" data-id="${id || ''}">Mod Panel</button>` : "";
-            const leaveBtn = (isJoined && !isCreator) ? `<button type="button" class="community-list-leave" data-id="${id || ''}">Leave</button>` : "";
-            card.innerHTML = `<div class="community-list-info"${communityId}><div class="community-list-name">${escapedName}</div>${creatorText}${isSuspended ? '<div class="community-list-meta" style="color:#dc2626;font-weight:700;">This community has been suspended.</div>' : ''}<div class="community-list-meta"></div></div>${badgesHtml}${lockIcon}<div class="community-list-actions">${dashboardBtn}${modPanelBtn}${leaveBtn}${(!isJoined && !isCreator && !isSuspended) ? '<button type="button" class="community-list-join">Join</button>' : ""}</div>`;
+             const lockIcon = isMembersOnly ? '<span class="community-lock-icon"> →</span>' : "";
+             const kebabHtml = isCreator ? `<div class="community-kebab-wrapper" style="position:relative;">
+                 <button type="button" class="community-kebab" data-id="${id || ''}">
+                     <span class="community-kebab-dot"></span>
+                     <span class="community-kebab-dot"></span>
+                     <span class="community-kebab-dot"></span>
+                 </button>
+                 <div class="community-kebab-menu">
+                     <button type="button" class="community-kebab-item" data-action="dashboard" data-id="${id || ''}">Dashboard</button>
+                     <button type="button" class="community-kebab-item" data-action="modpanel" data-id="${id || ''}">Mod Panel</button>
+                 </div>
+             </div>` : "";
+             const leaveBtn = (isJoined && !isCreator) ? `<button type="button" class="community-list-leave" data-id="${id || ''}">Leave</button>` : "";
+             card.innerHTML = `<div class="community-list-info"${communityId}><div class="community-list-name">${escapedName}</div>${creatorText}${isSuspended ? '<div class="community-list-meta" style="color:#dc2626;font-weight:700;">This community has been suspended.</div>' : ''}<div class="community-list-meta"></div></div>${badgesHtml}${lockIcon}<div class="community-list-actions">${kebabHtml}${leaveBtn}${(!isJoined && !isCreator && !isSuspended) ? '<button type="button" class="community-list-join">Join</button>' : ""}</div>`;
             loggedInCommunities.appendChild(card);
 
-            card.style.cursor = isSuspended ? "default" : "pointer";
-            card.addEventListener("click", (e) => {
-                if (e.target.closest(".community-list-join")) return;
-                if (e.target.closest(".community-list-leave")) return;
-                if (e.target.closest(".community-list-dashboard")) return;
-                if (e.target.closest(".mod-panel-btn")) return;
-                if (isSuspended) return;
-                const rowId = card.querySelector(".community-list-info")?.getAttribute("data-id");
-                if (rowId) {
-                    window.open("community/" + encodeURIComponent(rowId), "_blank");
-                }
-            });
+             card.style.cursor = isSuspended ? "default" : "pointer";
+             card.addEventListener("click", (e) => {
+                 if (e.target.closest(".community-list-join")) return;
+                 if (e.target.closest(".community-list-leave")) return;
+                 if (e.target.closest(".community-kebab")) return;
+                 if (e.target.closest(".community-kebab-menu")) return;
+                 if (isSuspended) return;
+                 const rowId = card.querySelector(".community-list-info")?.getAttribute("data-id");
+                 if (rowId) {
+                     window.open("community/" + encodeURIComponent(rowId), "_blank");
+                 }
+             });
 
             if (!isJoined && !isCreator && !isSuspended) {
                 const joinBtn = card.querySelector(".community-list-join");
@@ -2947,29 +2992,35 @@ enable-ga="false"
                 }
             }
 
-            if (isCreator) {
-                const dashboardBtnEl = card.querySelector(".community-list-dashboard");
-                if (dashboardBtnEl) {
-                    dashboardBtnEl.addEventListener("click", (e) => {
-                        e.stopPropagation();
-                        const rowId = dashboardBtnEl.getAttribute("data-id");
-                        if (rowId) {
-                            window.open("community/" + encodeURIComponent(rowId) + "?dashboard=1", "_blank");
-                        }
-                    });
-                }
-
-                const modPanelBtnEl = card.querySelector(".mod-panel-btn");
-                if (modPanelBtnEl) {
-                    modPanelBtnEl.addEventListener("click", (e) => {
-                        e.stopPropagation();
-                        const rowId = modPanelBtnEl.getAttribute("data-id");
-                        if (rowId) {
-                            window.open("mpanel.html?id=" + encodeURIComponent(rowId), "_blank");
-                        }
-                    });
-                }
-            }
+             if (isCreator) {
+                 const kebabWrapper = card.querySelector(".community-kebab-wrapper");
+                 if (kebabWrapper) {
+                     const kebabBtn = kebabWrapper.querySelector(".community-kebab");
+                     const kebabMenu = kebabWrapper.querySelector(".community-kebab-menu");
+                     if (kebabBtn && kebabMenu) {
+                         kebabBtn.addEventListener("click", (e) => {
+                             e.stopPropagation();
+                             const isOpen = kebabMenu.classList.contains("open");
+                             document.querySelectorAll(".community-kebab-menu.open").forEach((m) => m.classList.remove("open"));
+                             if (!isOpen) kebabMenu.classList.add("open");
+                         });
+                     }
+                 }
+                 card.querySelectorAll(".community-kebab-item").forEach((item) => {
+                     item.addEventListener("click", (e) => {
+                         e.stopPropagation();
+                         const action = item.getAttribute("data-action");
+                         const rowId = item.getAttribute("data-id");
+                         if (!rowId) return;
+                         if (action === "dashboard") {
+                             window.open("community/" + encodeURIComponent(rowId) + "?dashboard=1", "_blank");
+                         } else if (action === "modpanel") {
+                             window.open("mpanel.html?id=" + encodeURIComponent(rowId), "_blank");
+                         }
+                         document.querySelectorAll(".community-kebab-menu.open").forEach((m) => m.classList.remove("open"));
+                     });
+                 });
+             }
         }
 
         async function consumeRedeemedKey() {
