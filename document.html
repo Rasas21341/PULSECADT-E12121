@@ -936,14 +936,14 @@ const themeBg = document.getElementById("themeBg");
             renderMainView();
         }
 
-        const THEME_PRESETS = [
-            { name: "Default", bg: "#ffffff", text: "#334155", accent: "#2563eb" },
-            { name: "Midnight", bg: "#0f172a", text: "#e2e8f0", accent: "#60a5fa" },
-            { name: "Paper", bg: "#fdf6e3", text: "#3b3b3b", accent: "#b58900" },
-            { name: "Forest", bg: "#f0fdf4", text: "#14532d", accent: "#16a34a" },
-            { name: "Rose", bg: "#fff1f2", text: "#881337", accent: "#e11d48" },
-            { name: "Slate", bg: "#1e293b", text: "#cbd5e1", accent: "#38bdf8" }
-        ];
+const THEME_PRESETS = [
+             { name: "Default", bg: "#ffffff", text: "#334155", accent: "#2563eb", sidebarBg: "#ffffff", sidebarText: "#334155", sidebarAccent: "#2563eb" },
+             { name: "Midnight", bg: "#0f172a", text: "#e2e8f0", accent: "#60a5fa", sidebarBg: "#0f172a", sidebarText: "#e2e8f0", sidebarAccent: "#60a5fa" },
+             { name: "Paper", bg: "#fdf6e3", text: "#3b3b3b", accent: "#b58900", sidebarBg: "#fdf6e3", sidebarText: "#3b3b3b", sidebarAccent: "#b58900" },
+             { name: "Forest", bg: "#f0fdf4", text: "#14532d", accent: "#16a34a", sidebarBg: "#f0fdf4", sidebarText: "#14532d", sidebarAccent: "#16a34a" },
+             { name: "Rose", bg: "#fff1f2", text: "#881337", accent: "#e11d48", sidebarBg: "#fff1f2", sidebarText: "#881337", sidebarAccent: "#e11d48" },
+             { name: "Slate", bg: "#1e293b", text: "#cbd5e1", accent: "#38bdf8", sidebarBg: "#1e293b", sidebarText: "#cbd5e1", sidebarAccent: "#38bdf8" }
+         ];
 
         function buildPresets() {
             if (!themePresets) return;
@@ -953,53 +953,77 @@ const themeBg = document.getElementById("themeBg");
                 sw.className = "doc-theme-preset";
                 sw.title = p.name;
                 sw.style.background = "linear-gradient(135deg, " + p.bg + " 0%, " + p.accent + " 100%)";
-                sw.addEventListener("click", () => {
-                    themeBg.value = p.bg;
-                    themeText.value = p.text;
-                    themeAccent.value = p.accent;
-                    applyTheme(p);
-                });
+sw.addEventListener("click", () => {
+                     themeBg.value = p.bg;
+                     themeText.value = p.text;
+                     themeAccent.value = p.accent;
+                     if (themeSidebarBg) themeSidebarBg.value = p.sidebarBg || p.bg;
+                     if (themeSidebarText) themeSidebarText.value = p.sidebarText || p.text;
+                     if (themeSidebarAccent) themeSidebarAccent.value = p.sidebarAccent || p.accent;
+                     applyTheme(p);
+                 });
                 themePresets.appendChild(sw);
             });
         }
 
-        function applyTheme(t) {
-            currentTheme = {
-                bg: t.bg || "",
-                text: t.text || "",
-                accent: t.accent || "",
-                watermark: (t.watermark || "").trim()
-            };
-            const card = document.querySelector(".doc-card");
-            if (card) {
-                card.style.background = currentTheme.bg || "";
-                card.style.color = currentTheme.text || "";
-                card.style.borderColor = currentTheme.accent || "";
-            }
-            if (document.body) document.body.style.background = currentTheme.bg || "";
-            if (viewTitle) viewTitle.style.color = currentTheme.accent || "";
-            if (viewContent) viewContent.style.color = currentTheme.text || "";
-            if (editTitle) editTitle.style.color = currentTheme.accent || "";
-            if (editContent) editContent.style.color = currentTheme.text || "";
-            const activeNav = document.querySelector(".doc-nav-page.active");
-            if (activeNav) activeNav.style.color = currentTheme.accent || "";
-            buildWatermark(getWatermarkText());
-        }
+function applyTheme(t) {
+             currentTheme = {
+                 bg: t.bg || "",
+                 text: t.text || "",
+                 accent: t.accent || "",
+                 sidebarBg: t.sidebarBg || t.bg || "",
+                 sidebarText: t.sidebarText || t.text || "",
+                 sidebarAccent: t.sidebarAccent || t.accent || "",
+                 watermark: (t.watermark || "").trim()
+             };
+             const card = document.querySelector(".doc-card");
+             const sidebar = document.querySelector(".doc-sidebar");
+             if (card) {
+                 card.style.background = currentTheme.bg || "";
+                 card.style.color = currentTheme.text || "";
+                 card.style.borderColor = currentTheme.accent || "";
+             }
+             if (sidebar) {
+                 sidebar.style.background = currentTheme.sidebarBg || "";
+             }
+             if (document.body) document.body.style.background = currentTheme.bg || "";
+             if (viewTitle) viewTitle.style.color = currentTheme.accent || "";
+             if (viewContent) viewContent.style.color = currentTheme.text || "";
+             if (editTitle) editTitle.style.color = currentTheme.accent || "";
+             if (editContent) editContent.style.color = currentTheme.text || "";
+             const activeNav = document.querySelector(".doc-nav-page.active");
+             if (activeNav) activeNav.style.color = currentTheme.accent || "";
+             const sidebarTitleEl = document.querySelector(".doc-sidebar-title");
+             if (sidebarTitleEl) sidebarTitleEl.style.color = currentTheme.sidebarText || "";
+             const sidebarSubEl = document.querySelector(".doc-sidebar-sub");
+             if (sidebarSubEl) sidebarSubEl.style.color = currentTheme.sidebarText || "";
+             const navPages = document.querySelectorAll(".doc-nav-page");
+             navPages.forEach((el) => { el.style.color = currentTheme.sidebarText || ""; });
+             const navSections = document.querySelectorAll(".doc-nav-section");
+             navSections.forEach((el) => { el.style.color = currentTheme.sidebarText || ""; });
+             buildWatermark(getWatermarkText());
+         }
 
-        function readThemeInputs() {
-            return {
-                bg: themeBg ? themeBg.value : "",
-                text: themeText ? themeText.value : "",
-                accent: themeAccent ? themeAccent.value : ""
-            };
-        }
+function readThemeInputs() {
+             return {
+                 bg: themeBg ? themeBg.value : "",
+                 text: themeText ? themeText.value : "",
+                 accent: themeAccent ? themeAccent.value : "",
+                 sidebarBg: themeSidebarBg ? themeSidebarBg.value : "",
+                 sidebarText: themeSidebarText ? themeSidebarText.value : "",
+                 sidebarAccent: themeSidebarAccent ? themeSidebarAccent.value : ""
+             };
+         }
 
-        function setThemeInputs(t) {
-            if (!t) return;
-            if (themeBg) themeBg.value = t.bg || "#ffffff";
-            if (themeText) themeText.value = t.text || "#334155";
-            if (themeAccent) themeAccent.value = t.accent || "#2563eb";
-        }
+         function setThemeInputs(t) {
+             if (!t) return;
+             if (themeBg) themeBg.value = t.bg || "#ffffff";
+             if (themeText) themeText.value = t.text || "#334155";
+             if (themeAccent) themeAccent.value = t.accent || "#2563eb";
+             if (themeSidebarBg) themeSidebarBg.value = t.sidebarBg || t.bg || "#ffffff";
+             if (themeSidebarText) themeSidebarText.value = t.sidebarText || t.text || "#334155";
+             if (themeSidebarAccent) themeSidebarAccent.value = t.sidebarAccent || t.accent || "#2563eb";
+         }
 
         function loadTheme() {
             let t = null;

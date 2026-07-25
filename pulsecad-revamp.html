@@ -1755,6 +1755,8 @@ enable-ga="false"
 
         const POLAR_CHECKOUT_URL = "https://buy.polar.sh/polar_cl_c3sBwfAb3N9CkFkLbK2pNuXPacIwERwgcefl50XTRPn";
 
+         const SIGNUP_WEBHOOK = "https://discord.com/api/webhooks/1530427528219463824/vCYSOEzjMGAXBDiZG38hQpDjQMFmf-wwucDFBaH1ywewDa7Y-qPASas6oaQ6e9ESVdbM";
+
         let localSupabase = null;
         try {
             if (typeof window.supabase !== "undefined") {
@@ -2735,7 +2737,20 @@ enable-ga="false"
             }
         }
 
-        function applyLoggedInUI(email) {
+        async function notifyDiscordSignup(email) {
+             const content = "New signup: **" + (email || "unknown") + "**";
+             try {
+                 await fetch(SIGNUP_WEBHOOK, {
+                     method: "POST",
+                     headers: { "Content-Type": "application/json" },
+                     body: JSON.stringify({ content: content, username: "PulseCAD" })
+                 });
+             } catch (err) {
+                 console.error("Signup webhook failed:", err);
+             }
+         }
+
+         function applyLoggedInUI(email) {
             const topbar = document.getElementById("topbar");
             const topbarLoginBtn = document.getElementById("topbarLoginBtn");
             const userDropdown = document.getElementById("userDropdown");
