@@ -123,12 +123,16 @@ const server = http.createServer(async (req, res) => {
             if (req.headers[h]) headers[h] = req.headers[h];
         });
         const options = { method: req.method, headers };
+        console.log(`[proxy] ${req.method} /api/erlc/${rest} -> ${target}`);
         const proxyReq = https.request(target, options, (proxyRes) => {
             res.setHeader("Access-Control-Allow-Origin", "*");
+            res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+            res.setHeader("Access-Control-Allow-Headers", "server-key, content-type, accept");
             res.writeHead(proxyRes.statusCode, proxyRes.headers);
             proxyRes.pipe(res);
         });
         proxyReq.on("error", (err) => {
+            console.error(`[proxy] error for /api/erlc/${rest}:`, err.message);
             res.writeHead(502, { "Content-Type": "application/json" });
             res.end(JSON.stringify({ error: "Proxy failed: " + err.message }));
         });
