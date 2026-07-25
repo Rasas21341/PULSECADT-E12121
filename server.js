@@ -115,30 +115,32 @@ const server = http.createServer(async (req, res) => {
         return;
     }
 
-    if (req.url.startsWith("/api/erlc/")) {
-        const rest = req.url.slice("/api/erlc/".length);
-        const target = ERLC_BASE + "/" + rest;
-        const headers = {};
-        ["server-key", "content-type", "accept"].forEach((h) => {
-            if (req.headers[h]) headers[h] = req.headers[h];
-        });
-        const options = { method: req.method, headers };
-        console.log(`[proxy] ${req.method} /api/erlc/${rest} -> ${target}`);
-        const proxyReq = https.request(target, options, (proxyRes) => {
-            res.setHeader("Access-Control-Allow-Origin", "*");
-            res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-            res.setHeader("Access-Control-Allow-Headers", "server-key, content-type, accept");
-            res.writeHead(proxyRes.statusCode, proxyRes.headers);
-            proxyRes.pipe(res);
-        });
-        proxyReq.on("error", (err) => {
-            console.error(`[proxy] error for /api/erlc/${rest}:`, err.message);
-            res.writeHead(502, { "Content-Type": "application/json" });
-            res.end(JSON.stringify({ error: "Proxy failed: " + err.message }));
-        });
-        req.pipe(proxyReq);
-        return;
-    }
+     if (req.url.startsWith("/api/erlc/")) {
+         const rest = req.url.slice("/api/erlc/".length);
+         const target = ERLC_BASE + "/" + rest;
+         const headers = {};
+         ["server-key", "content-type", "accept"].forEach((h) => {
+             if (req.headers[h]) headers[h] = req.headers[h];
+         });
+         const options = { method: req.method, headers };
+         console.log(`[proxy] ${req.method} /api/erlc/${rest} -> ${target}`);
+         const proxyReq = https.request(target, options, (proxyRes) => {
+             const proxyResHeaders = { ...proxyRes.headers };
+             delete proxyResHeaders["cross-origin-resource-policy"];
+             delete proxyResHeaders["cross-origin-opener-policy"];
+             delete proxyResHeaders["cross-origin-embedder-policy"];
+             proxyResHeaders["access-control-allow-origin"] = "*";
+             res.writeHead(proxyRes.statusCode, proxyResHeaders);
+             proxyRes.pipe(res);
+         });
+         proxyReq.on("error", (err) => {
+             console.error(`[proxy] error for /api/erlc/${rest}:`, err.message);
+             res.writeHead(502, { "Content-Type": "application/json" });
+             res.end(JSON.stringify({ error: "Proxy failed: " + err.message }));
+         });
+         req.pipe(proxyReq);
+         return;
+     }
 
     if (req.url.startsWith("/api/discord-webhook")) {
         if (req.method !== "POST") {
