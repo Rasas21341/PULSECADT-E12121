@@ -1687,6 +1687,43 @@
                             await loadMembersInto(memberList);
                         }
 
+                        if (membersViewList) {
+                            membersViewList.addEventListener("click", async (e) => {
+                                const kickBtn = e.target.closest(".kick-btn");
+                                const banBtn = e.target.closest(".ban-btn");
+                                if (kickBtn) {
+                                    const userId = kickBtn.getAttribute("data-user-id");
+                                    if (confirm("Kick this member?")) {
+                                        try {
+                                            await localSupabase
+                                                .from("user_communities")
+                                                .delete()
+                                                .eq("user_id", userId)
+                                                .eq("community_id", id);
+                                            loadMembersInto(membersViewList, { loadingText: "Loading members...", openDropdown: false });
+                                        } catch (err) {
+                                            alert("Failed to kick member.");
+                                        }
+                                    }
+                                }
+                                if (banBtn) {
+                                    const userId = banBtn.getAttribute("data-user-id");
+                                    if (confirm("Ban this member? They will not be able to rejoin.")) {
+                                        try {
+                                            await localSupabase
+                                                .from("user_communities")
+                                                .update({ banned: true })
+                                                .eq("user_id", userId)
+                                                .eq("community_id", id);
+                                            loadMembersInto(membersViewList, { loadingText: "Loading members...", openDropdown: false });
+                                        } catch (err) {
+                                            alert("Failed to ban member.");
+                                        }
+                                    }
+                                }
+                            });
+                        }
+
                         async function loadVehicles() {
                             if (!vehiclesViewList || !localSupabase) return;
                             vehiclesViewList.innerHTML = '<div class="empty">Loading vehicles...</div>';
