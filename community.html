@@ -842,6 +842,47 @@
             font-size: 13px;
             color: #334155;
             border-bottom: 1px solid #f1f5f9;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+        }
+
+        .member-item .member-email {
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .member-item .member-actions {
+            display: flex;
+            gap: 4px;
+            flex-shrink: 0;
+        }
+
+        .member-item .kick-btn,
+        .member-item .ban-btn {
+            padding: 3px 8px;
+            border-radius: 6px;
+            border: 1px solid #cbd5e1;
+            background: #ffffff;
+            color: #0f172a;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .member-item .kick-btn:hover {
+            background: #fef2f2;
+            border-color: #fecaca;
+            color: #991b1b;
+        }
+
+        .member-item .ban-btn:hover {
+            background: #fef2f2;
+            border-color: #fecaca;
+            color: #991b1b;
         }
 
         .discord-invite-link {
@@ -1619,10 +1660,17 @@
                                 if (community && community.creator_email) {
                                     html += `<button type="button" class="member-btn">${esc(community.creator_email)} (Owner)</button>`;
                                 }
+                                const isMembersView = targetEl === membersViewList;
                                 if (rows.length === 0) {
                                     if (!html) html = '<div class="empty">No members yet.</div>';
                                 } else {
-                                    html += rows.map((r) => `<button type="button" class="member-btn">${esc(emailById[r.user_id] || r.user_id)}</button>`).join('');
+                                    html += rows.map((r) => {
+                                        const email = esc(emailById[r.user_id] || r.user_id);
+                                        if (isMembersView && community && community.creator_email === currentEmail) {
+                                            return `<div class="member-item"><span class="member-email">${email}</span><div class="member-actions"><button type="button" class="kick-btn" data-user-id="${esc(r.user_id)}">Kick</button><button type="button" class="ban-btn" data-user-id="${esc(r.user_id)}">Ban</button></div></div>`;
+                                        }
+                                        return `<button type="button" class="member-btn">${email}</button>`;
+                                    }).join('');
                                 }
                                 targetEl.innerHTML = html;
                             } catch (err) {
