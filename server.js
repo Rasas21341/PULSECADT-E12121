@@ -6,6 +6,37 @@ const path = require("path");
 const PORT = process.env.PORT || 3000;
 const ROOT = __dirname;
 const ERLC_BASE = "https://api.erlc.gg";
+const SUPABASE_URL = process.env.SUPABASE_URL || "";
+const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
+
+function supabaseRequest(method, supabasePath, body) {
+    return new Promise((resolve, reject) => {
+        const url = new URL(supabasePath, SUPABASE_URL + "/rest/v1/");
+        const payload = body ? JSON.stringify(body) : null;
+        const options = {
+            method: method,
+            hostname: url.hostname,
+            path: url.pathname + url.search,
+            headers: {
+                "apikey": SUPABASE_SERVICE_ROLE_KEY,
+                "Authorization": "Bearer " + SUPABASE_SERVICE_ROLE_KEY,
+                "Content-Type": "application/json"
+            }
+        };
+        if (payload) options.headers["Content-Length"] = Buffer.byteLength(payload);
+        const req = https.request(options, (res) => {
+            let data = "";
+            res.on("data", (c) => { data += c; });
+            res.on("end", () => {
+                try { resolve({ status: res.statusCode, body: JSON.parse(data) }); }
+                catch (e) { resolve({ status: res.statusCode, body: data }); }
+            });
+        });
+        req.on("error", reject);
+        if (payload) req.write(payload);
+        req.end();
+    });
+}
 
 const MIME = {
     ".html": "text/html; charset=utf-8",
@@ -115,26 +146,32 @@ const server = http.createServer(async (req, res) => {
         return;
     }
 
-    if (req.url.startsWith("/api/erlc/")) {
-        const rest = req.url.slice("/api/erlc/".length);
-        const target = ERLC_BASE + "/" + rest;
-        const headers = {};
-        ["server-key", "content-type", "accept"].forEach((h) => {
-            if (req.headers[h]) headers[h] = req.headers[h];
-        });
-        const options = { method: req.method, headers };
-        const proxyReq = https.request(target, options, (proxyRes) => {
-            res.setHeader("Access-Control-Allow-Origin", "*");
-            res.writeHead(proxyRes.statusCode, proxyRes.headers);
-            proxyRes.pipe(res);
-        });
-        proxyReq.on("error", (err) => {
-            res.writeHead(502, { "Content-Type": "application/json" });
-            res.end(JSON.stringify({ error: "Proxy failed: " + err.message }));
-        });
-        req.pipe(proxyReq);
-        return;
-    }
+     if (req.url.startsWith("/api/erlc/")) {
+         const rest = req.url.slice("/api/erlc/".length);
+         const target = ERLC_BASE + "/" + rest;
+         const headers = {};
+         ["server-key", "content-type", "accept"].forEach((h) => {
+             if (req.headers[h]) headers[h] = req.headers[h];
+         });
+         const options = { method: req.method, headers };
+         console.log(`[proxy] ${req.method} /api/erlc/${rest} -> ${target}`);
+         const proxyReq = https.request(target, options, (proxyRes) => {
+             const proxyResHeaders = { ...proxyRes.headers };
+             delete proxyResHeaders["cross-origin-resource-policy"];
+             delete proxyResHeaders["cross-origin-opener-policy"];
+             delete proxyResHeaders["cross-origin-embedder-policy"];
+             proxyResHeaders["access-control-allow-origin"] = "*";
+             res.writeHead(proxyRes.statusCode, proxyResHeaders);
+             proxyRes.pipe(res);
+         });
+         proxyReq.on("error", (err) => {
+             console.error(`[proxy] error for /api/erlc/${rest}:`, err.message);
+             res.writeHead(502, { "Content-Type": "application/json" });
+             res.end(JSON.stringify({ error: "Proxy failed: " + err.message }));
+         });
+         req.pipe(proxyReq);
+         return;
+     }
 
     if (req.url.startsWith("/api/discord-webhook")) {
         if (req.method !== "POST") {
@@ -188,6 +225,70 @@ const server = http.createServer(async (req, res) => {
     if (req.url.startsWith("/api/discord-")) {
         const rest = req.url.slice("/api/discord-".length).split("?")[0];
         await handleDiscordApi(rest, req, res);
+        return;
+    }
+
+    if (req.url.startsWith("/api/kick") || req.url.startsWith("/api/ban")) {
+        if (req.method !== "POST") {
+            res.writeHead(405, { "Content-Type": "application/json" });
+            res.end(JSON.stringify({ error: "Method not allowed" }));
+            return;
+        }
+        try {
+            const payload = await readBody(req);
+            const communityId = payload.communityId || "";
+            const userId = payload.userId || "";
+            const action = payload.action || "";
+
+            if (!communityId || !userId || !action) {
+                res.writeHead(400, { "Content-Type": "application/json" });
+                res.end(JSON.stringify({ error: "communityId, userId, and action are required" }));
+                return;
+            }
+
+            if (!SUPABASE_SERVICE_ROLE_KEY) {
+                res.writeHead(500, { "Content-Type": "application/json" });
+                res.end(JSON.stringify({ error: "Server not configured" }));
+                return;
+            }
+
+            let result;
+            if (req.url.startsWith("/api/kick")) {
+                result = await supabaseRequest("DELETE", `user_communities?user_id=eq.${userId}&community_id=eq.${communityId}`);
+            } else if (req.url.startsWith("/api/ban")) {
+                result = await supabaseRequest("PATCH", `user_communities?user_id=eq.${userId}&community_id=eq.${communityId}`, { banned: true });
+            }
+
+            if (result.status < 200 || result.status >= 300) {
+                res.writeHead(result.status, { "Content-Type": "application/json" });
+                res.end(JSON.stringify({ error: "Supabase error", detail: result.body }));
+                return;
+            }
+
+            const webhook = payload.webhook || "";
+            const username = payload.username || "PulseCAD";
+            if (webhook && /^https:\/\/discord(app)?\.com\/api\/webhooks\//.test(webhook)) {
+                const actionText = action === "kick" ? "kicked" : "banned";
+                const content = `**A user** was **${actionText}** from the community.`;
+                const endpoints = ["/api/discord-webhook", "https://www.pulsecad.xyz/api/discord-webhook"];
+                for (const ep of endpoints) {
+                    try {
+                        await fetch(ep, {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ webhook, content, username })
+                        });
+                        break;
+                    } catch (e) {}
+                }
+            }
+
+            res.writeHead(200, { "Content-Type": "application/json" });
+            res.end(JSON.stringify({ ok: true }));
+        } catch (err) {
+            res.writeHead(500, { "Content-Type": "application/json" });
+            res.end(JSON.stringify({ error: "Server error: " + err.message }));
+        }
         return;
     }
 

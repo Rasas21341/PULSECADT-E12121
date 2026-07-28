@@ -1697,11 +1697,11 @@
                                     const userId = kickBtn.getAttribute("data-user-id");
                                     if (confirm("Kick this member?")) {
                                         try {
-                                            await localSupabase
-                                                .from("user_communities")
-                                                .delete()
-                                                .eq("user_id", userId)
-                                                .eq("community_id", id);
+                                            await fetch("/api/kick", {
+                                                method: "POST",
+                                                headers: { "Content-Type": "application/json" },
+                                                body: JSON.stringify({ communityId: id, userId, action: "kick", webhook: communityData && communityData.discord_webhook, username: "PulseCAD" })
+                                            });
                                             loadMembersInto(membersViewList, { loadingText: "Loading members...", openDropdown: false });
                                         } catch (err) {
                                             alert("Failed to kick member.");
@@ -1712,11 +1712,11 @@
                                     const userId = banBtn.getAttribute("data-user-id");
                                     if (confirm("Ban this member? They will not be able to rejoin.")) {
                                         try {
-                                            await localSupabase
-                                                .from("user_communities")
-                                                .update({ banned: true })
-                                                .eq("user_id", userId)
-                                                .eq("community_id", id);
+                                            await fetch("/api/ban", {
+                                                method: "POST",
+                                                headers: { "Content-Type": "application/json" },
+                                                body: JSON.stringify({ communityId: id, userId, action: "ban", webhook: communityData && communityData.discord_webhook, username: "PulseCAD" })
+                                            });
                                             loadMembersInto(membersViewList, { loadingText: "Loading members...", openDropdown: false });
                                         } catch (err) {
                                             alert("Failed to ban member.");
@@ -1734,11 +1734,11 @@
                                     const userId = kickBtn.getAttribute("data-user-id");
                                     if (confirm("Kick this member?")) {
                                         try {
-                                            await localSupabase
-                                                .from("user_communities")
-                                                .delete()
-                                                .eq("user_id", userId)
-                                                .eq("community_id", id);
+                                            await fetch("/api/kick", {
+                                                method: "POST",
+                                                headers: { "Content-Type": "application/json" },
+                                                body: JSON.stringify({ communityId: id, userId, action: "kick", webhook: communityData && communityData.discord_webhook, username: "PulseCAD" })
+                                            });
                                             loadMembersInto(memberList, { loadingText: "Loading members...", openDropdown: true });
                                         } catch (err) {
                                             alert("Failed to kick member.");
@@ -1749,11 +1749,11 @@
                                     const userId = banBtn.getAttribute("data-user-id");
                                     if (confirm("Ban this member? They will not be able to rejoin.")) {
                                         try {
-                                            await localSupabase
-                                                .from("user_communities")
-                                                .update({ banned: true })
-                                                .eq("user_id", userId)
-                                                .eq("community_id", id);
+                                            await fetch("/api/ban", {
+                                                method: "POST",
+                                                headers: { "Content-Type": "application/json" },
+                                                body: JSON.stringify({ communityId: id, userId, action: "ban", webhook: communityData && communityData.discord_webhook, username: "PulseCAD" })
+                                            });
                                             loadMembersInto(memberList, { loadingText: "Loading members...", openDropdown: true });
                                         } catch (err) {
                                             alert("Failed to ban member.");
