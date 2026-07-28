@@ -230,7 +230,9 @@ const server = http.createServer(async (req, res) => {
 
     if (req.url.startsWith("/api/kick") || req.url.startsWith("/api/ban")) {
         if (req.method !== "POST") {
-            res.writeHead(405, { "Content-Type": "application/json" });
+            res.setHeader("Access-Control-Allow-Origin", "*");
+            res.setHeader("Content-Type", "application/json");
+            res.writeHead(405);
             res.end(JSON.stringify({ error: "Method not allowed" }));
             return;
         }
@@ -241,13 +243,17 @@ const server = http.createServer(async (req, res) => {
             const action = payload.action || "";
 
             if (!communityId || !userId || !action) {
-                res.writeHead(400, { "Content-Type": "application/json" });
+                res.setHeader("Access-Control-Allow-Origin", "*");
+                res.setHeader("Content-Type", "application/json");
+                res.writeHead(400);
                 res.end(JSON.stringify({ error: "communityId, userId, and action are required" }));
                 return;
             }
 
             if (!SUPABASE_SERVICE_ROLE_KEY) {
-                res.writeHead(500, { "Content-Type": "application/json" });
+                res.setHeader("Access-Control-Allow-Origin", "*");
+                res.setHeader("Content-Type", "application/json");
+                res.writeHead(500);
                 res.end(JSON.stringify({ error: "Server not configured" }));
                 return;
             }
@@ -260,7 +266,9 @@ const server = http.createServer(async (req, res) => {
             }
 
             if (result.status < 200 || result.status >= 300) {
-                res.writeHead(result.status, { "Content-Type": "application/json" });
+                res.setHeader("Access-Control-Allow-Origin", "*");
+                res.setHeader("Content-Type", "application/json");
+                res.writeHead(result.status);
                 res.end(JSON.stringify({ error: "Supabase error", detail: result.body }));
                 return;
             }
@@ -283,10 +291,14 @@ const server = http.createServer(async (req, res) => {
                 }
             }
 
-            res.writeHead(200, { "Content-Type": "application/json" });
+            res.setHeader("Access-Control-Allow-Origin", "*");
+            res.setHeader("Content-Type", "application/json");
+            res.writeHead(200);
             res.end(JSON.stringify({ ok: true }));
         } catch (err) {
-            res.writeHead(500, { "Content-Type": "application/json" });
+            res.setHeader("Access-Control-Allow-Origin", "*");
+            res.setHeader("Content-Type", "application/json");
+            res.writeHead(500);
             res.end(JSON.stringify({ error: "Server error: " + err.message }));
         }
         return;
