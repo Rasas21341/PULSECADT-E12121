@@ -1657,16 +1657,24 @@
 
                                 const esc = (t) => (t || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
                                 let html = '';
-                                if (community && community.creator_email) {
-                                    html += `<button type="button" class="member-btn">${esc(community.creator_email)} (Owner)</button>`;
+                                const creatorEmail = community && community.creator_email ? community.creator_email : "";
+                                const creatorUserId = creatorEmail ? (() => {
+                                    const match = Object.entries(emailById).find(([uid, email]) => email === creatorEmail);
+                                    return match ? match[0] : null;
+                                })() : null;
+                                if (creatorEmail) {
+                                    html += `<button type="button" class="member-btn">${esc(creatorEmail)} (Owner)</button>`;
                                 }
                                 const isMembersView = targetEl === membersViewList;
                                 const isDropdown = targetEl === memberList;
-                                const showKickBan = (isMembersView || isDropdown) && community && community.creator_email === currentEmail;
+                                const showKickBan = (isMembersView || isDropdown) && creatorEmail === currentEmail;
                                 if (rows.length === 0) {
                                     if (!html) html = '<div class="empty">No members yet.</div>';
                                 } else {
                                     html += rows.map((r) => {
+                                        if (creatorUserId && r.user_id === creatorUserId) {
+                                            return "";
+                                        }
                                         const email = esc(emailById[r.user_id] || r.user_id);
                                         if (showKickBan) {
                                             return `<div class="member-item"><span class="member-email">${email}</span><div class="member-actions"><button type="button" class="kick-btn" data-user-id="${esc(r.user_id)}">Kick</button><button type="button" class="ban-btn" data-user-id="${esc(r.user_id)}">Ban</button></div></div>`;
@@ -1695,31 +1703,47 @@
                                 const banBtn = e.target.closest(".ban-btn");
                                 if (kickBtn) {
                                     const userId = kickBtn.getAttribute("data-user-id");
+                                    if (userId === currentEmail) {
+                                        alert("You cannot kick yourself.");
+                                        return;
+                                    }
                                     if (confirm("Kick this member?")) {
                                         try {
-                                            await fetch("/api/kick", {
+                                            const res = await fetch("/api/kick", {
                                                 method: "POST",
                                                 headers: { "Content-Type": "application/json" },
                                                 body: JSON.stringify({ communityId: id, userId, action: "kick", webhook: communityData && communityData.discord_webhook, username: "PulseCAD" })
                                             });
+                                            if (!res.ok) {
+                                                const data = await res.json().catch(() => ({}));
+                                                throw new Error(data && data.error ? data.error : "Kick failed");
+                                            }
                                             loadMembersInto(membersViewList, { loadingText: "Loading members...", openDropdown: false });
                                         } catch (err) {
-                                            alert("Failed to kick member.");
+                                            alert("Failed to kick member: " + (err.message || err));
                                         }
                                     }
                                 }
                                 if (banBtn) {
                                     const userId = banBtn.getAttribute("data-user-id");
+                                    if (userId === currentEmail) {
+                                        alert("You cannot ban yourself.");
+                                        return;
+                                    }
                                     if (confirm("Ban this member? They will not be able to rejoin.")) {
                                         try {
-                                            await fetch("/api/ban", {
+                                            const res = await fetch("/api/ban", {
                                                 method: "POST",
                                                 headers: { "Content-Type": "application/json" },
                                                 body: JSON.stringify({ communityId: id, userId, action: "ban", webhook: communityData && communityData.discord_webhook, username: "PulseCAD" })
                                             });
+                                            if (!res.ok) {
+                                                const data = await res.json().catch(() => ({}));
+                                                throw new Error(data && data.error ? data.error : "Ban failed");
+                                            }
                                             loadMembersInto(membersViewList, { loadingText: "Loading members...", openDropdown: false });
                                         } catch (err) {
-                                            alert("Failed to ban member.");
+                                            alert("Failed to ban member: " + (err.message || err));
                                         }
                                     }
                                 }
@@ -1732,31 +1756,47 @@
                                 const banBtn = e.target.closest(".ban-btn");
                                 if (kickBtn) {
                                     const userId = kickBtn.getAttribute("data-user-id");
+                                    if (userId === currentEmail) {
+                                        alert("You cannot kick yourself.");
+                                        return;
+                                    }
                                     if (confirm("Kick this member?")) {
                                         try {
-                                            await fetch("/api/kick", {
+                                            const res = await fetch("/api/kick", {
                                                 method: "POST",
                                                 headers: { "Content-Type": "application/json" },
                                                 body: JSON.stringify({ communityId: id, userId, action: "kick", webhook: communityData && communityData.discord_webhook, username: "PulseCAD" })
                                             });
+                                            if (!res.ok) {
+                                                const data = await res.json().catch(() => ({}));
+                                                throw new Error(data && data.error ? data.error : "Kick failed");
+                                            }
                                             loadMembersInto(memberList, { loadingText: "Loading members...", openDropdown: true });
                                         } catch (err) {
-                                            alert("Failed to kick member.");
+                                            alert("Failed to kick member: " + (err.message || err));
                                         }
                                     }
                                 }
                                 if (banBtn) {
                                     const userId = banBtn.getAttribute("data-user-id");
+                                    if (userId === currentEmail) {
+                                        alert("You cannot ban yourself.");
+                                        return;
+                                    }
                                     if (confirm("Ban this member? They will not be able to rejoin.")) {
                                         try {
-                                            await fetch("/api/ban", {
+                                            const res = await fetch("/api/ban", {
                                                 method: "POST",
                                                 headers: { "Content-Type": "application/json" },
                                                 body: JSON.stringify({ communityId: id, userId, action: "ban", webhook: communityData && communityData.discord_webhook, username: "PulseCAD" })
                                             });
+                                            if (!res.ok) {
+                                                const data = await res.json().catch(() => ({}));
+                                                throw new Error(data && data.error ? data.error : "Ban failed");
+                                            }
                                             loadMembersInto(memberList, { loadingText: "Loading members...", openDropdown: true });
                                         } catch (err) {
-                                            alert("Failed to ban member.");
+                                            alert("Failed to ban member: " + (err.message || err));
                                         }
                                     }
                                 }
