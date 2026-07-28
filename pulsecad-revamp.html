@@ -3048,8 +3048,8 @@ enable-ga="false"
                          const action = item.getAttribute("data-action");
                          const rowId = item.getAttribute("data-id");
                          if (!rowId) return;
-                         if (action === "dashboard") {
-                             window.open("community/" + encodeURIComponent(rowId) + "?dashboard=1", "_blank");
+if (action === "dashboard") {
+                              window.open("community.html?id=" + encodeURIComponent(rowId) + "&dashboard=1", "_blank");
                          } else if (action === "modpanel") {
                              window.open("mpanel.html?id=" + encodeURIComponent(rowId), "_blank");
                          }

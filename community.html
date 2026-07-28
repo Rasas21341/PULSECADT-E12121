@@ -1661,12 +1661,14 @@
                                     html += `<button type="button" class="member-btn">${esc(community.creator_email)} (Owner)</button>`;
                                 }
                                 const isMembersView = targetEl === membersViewList;
+                                const isDropdown = targetEl === memberList;
+                                const showKickBan = (isMembersView || isDropdown) && community && community.creator_email === currentEmail;
                                 if (rows.length === 0) {
                                     if (!html) html = '<div class="empty">No members yet.</div>';
                                 } else {
                                     html += rows.map((r) => {
                                         const email = esc(emailById[r.user_id] || r.user_id);
-                                        if (isMembersView && community && community.creator_email === currentEmail) {
+                                        if (showKickBan) {
                                             return `<div class="member-item"><span class="member-email">${email}</span><div class="member-actions"><button type="button" class="kick-btn" data-user-id="${esc(r.user_id)}">Kick</button><button type="button" class="ban-btn" data-user-id="${esc(r.user_id)}">Ban</button></div></div>`;
                                         }
                                         return `<button type="button" class="member-btn">${email}</button>`;
@@ -1716,6 +1718,43 @@
                                                 .eq("user_id", userId)
                                                 .eq("community_id", id);
                                             loadMembersInto(membersViewList, { loadingText: "Loading members...", openDropdown: false });
+                                        } catch (err) {
+                                            alert("Failed to ban member.");
+                                        }
+                                    }
+                                }
+                            });
+                        }
+
+                        if (memberList) {
+                            memberList.addEventListener("click", async (e) => {
+                                const kickBtn = e.target.closest(".kick-btn");
+                                const banBtn = e.target.closest(".ban-btn");
+                                if (kickBtn) {
+                                    const userId = kickBtn.getAttribute("data-user-id");
+                                    if (confirm("Kick this member?")) {
+                                        try {
+                                            await localSupabase
+                                                .from("user_communities")
+                                                .delete()
+                                                .eq("user_id", userId)
+                                                .eq("community_id", id);
+                                            loadMembersInto(memberList, { loadingText: "Loading members...", openDropdown: true });
+                                        } catch (err) {
+                                            alert("Failed to kick member.");
+                                        }
+                                    }
+                                }
+                                if (banBtn) {
+                                    const userId = banBtn.getAttribute("data-user-id");
+                                    if (confirm("Ban this member? They will not be able to rejoin.")) {
+                                        try {
+                                            await localSupabase
+                                                .from("user_communities")
+                                                .update({ banned: true })
+                                                .eq("user_id", userId)
+                                                .eq("community_id", id);
+                                            loadMembersInto(memberList, { loadingText: "Loading members...", openDropdown: true });
                                         } catch (err) {
                                             alert("Failed to ban member.");
                                         }
