@@ -1681,7 +1681,7 @@
                                 const isDropdown = targetEl === memberList;
                                 const showKickBan = (isMembersView || isDropdown) && creatorEmail === currentEmail;
                                 const currentUserDepartment = (currentUserDepartment || "").trim();
-                                const isSupport = currentUserDepartment === "Support Team" || currentUserDepartment === "Customer Support";
+                                const isSupport = currentUserDepartment === "Support Team";
                                 if (rows.length === 0) {
                                     if (!html) html = '<div class="empty">No members yet.</div>';
                                 } else {

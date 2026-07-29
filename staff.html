@@ -1196,7 +1196,7 @@
             const staff = await ensureStaff();
             if (!staff.allowed) return;
             const dept = (staff.department || "").toLowerCase();
-            if (dept !== "management" && dept !== "support team" && dept !== "customer support") {
+                if (dept !== "management" && dept !== "support team" && dept !== "support team lead") {
                 showStatus("Access denied. Management or Support only.", "error");
                 return;
             }
