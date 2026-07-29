@@ -797,7 +797,7 @@
                 contentEl.querySelectorAll(".department-select").forEach((select) => {
                     select.addEventListener("change", async () => {
                         const userDept = await getUserDepartment();
-                        const isSupport = userDept === "Support Team";
+                        const isSupport = userDept === "Support Team" || userDept === "Support Team Lead";
                         const currentDept = select.getAttribute("data-current-dept") || "";
                         if (isSupport && currentDept === "Management") {
                             alert("Access denied. Support cannot remove users from Management.");
@@ -819,7 +819,7 @@
                 contentEl.querySelectorAll(".give-key-btn").forEach((btn) => {
                     btn.addEventListener("click", async () => {
                         const dept = await getUserDepartment();
-                        if (dept !== "Management") {
+                        if (dept !== "Management" && dept !== "Support Team Lead") {
                             alert("Access denied. Management only.");
                             return;
                         }

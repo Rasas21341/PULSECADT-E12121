@@ -1823,7 +1823,7 @@ enable-ga="false"
             }
         }
 
-        const STAFF_ACCESS_DEPARTMENTS = ["Management"];
+        const STAFF_ACCESS_DEPARTMENTS = ["Management", "Support Team Lead"];
 
         async function updateStaffButtonVisibility() {
             const btn = document.getElementById("staffDashboardBtn");
@@ -3177,7 +3177,7 @@ if (action === "dashboard") {
                     .select("department")
                     .eq("email", user.email)
                     .maybeSingle();
-                if (error || !data || data.department !== "Management") {
+                if (error || !data || (data.department !== "Management" && data.department !== "Support Team Lead")) {
                     alert("Access denied. Staff only.");
                     return;
                 }
