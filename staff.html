@@ -572,7 +572,7 @@
                 }
                 const department = (data?.department || "").trim();
                 const normalized = department.toLowerCase().replace(/\s+/g, "");
-                const allowedDepts = ["management", "supportteam", "support"];
+                const allowedDepts = ["management", "supportteam", "supportteamlead", "support"];
                 if (allowedDepts.includes(normalized)) {
                     return { allowed: true, department };
                 }

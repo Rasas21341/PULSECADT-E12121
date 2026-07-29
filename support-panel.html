@@ -402,7 +402,7 @@
             if (ticketLive) { localSupabase.removeChannel(ticketLive); ticketLive = null; }
             currentTicket = null;
             showStatus("");
-            const allowedDepts = ["management", "supportteam", "support"];
+            const allowedDepts = ["management", "supportteam", "supportteamlead", "support"];
             let profile = {};
             try { profile = await getStaffProfile(); } catch (e) {}
             const deptLower = (profile.department || "").toLowerCase();

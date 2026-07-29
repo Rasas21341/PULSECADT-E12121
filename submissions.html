@@ -179,7 +179,7 @@
                     return { allowed: false };
                 }
                 const department = data?.department || "";
-                if (department === "Management" || department === "Support Team") {
+                if (department === "Management" || department === "Support Team" || department === "Support Team Lead") {
                     return { allowed: true, department };
                 }
                 contentEl.innerHTML = `<div class="empty">Access denied. Staff only.</div>`;
