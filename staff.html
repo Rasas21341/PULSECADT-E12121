@@ -763,15 +763,16 @@
                 }
 
                 const userDepartment = await getUserDepartment();
-                const isManagement = userDepartment === "Management" || userDepartment === "Support Team Lead";
+                const isManagement = userDepartment === "Management";
+                const isSupportLead = userDepartment === "Support Team Lead";
                 const isSupport = userDepartment === "Support Team";
-                let html = `<input type="text" class="search-box" id="userSearch" placeholder="Search users by email..." /><table><tr><th>Email</th><th>Created</th><th>Department</th>${isManagement ? "<th>IP</th>" : ""}<th>Actions</th></tr>`;
+                let html = `<input type="text" class="search-box" id="userSearch" placeholder="Search users by email..." /><table><tr><th>Email</th><th>Created</th><th>Department</th>${(isManagement || isSupportLead) ? "<th>IP</th>" : ""}<th>Actions</th></tr>`;
                 data.forEach((row) => {
                     const email = (row.email || "N/A").replace(/</g, "&lt;").replace(/>/g, "&gt;");
                     const created = row.created_at ? new Date(row.created_at).toLocaleString() : "";
                     const currentDept = row.department || "";
-                    const ipCell = isManagement ? `<td>${(row.ip || "N/A").replace(/</g, "&lt;").replace(/>/g, "&gt;")}</td>` : "";
-                    const giveKeyBtn = isManagement ? `<button type="button" class="give-key-btn" data-user-id="${row.id}" data-email="${email.replace(/"/g, '&quot;')}">Give Key</button>` : `<span style="color:#94a3b8;font-size:12px;font-weight:600;">No Permission</span>`;
+                    const ipCell = (isManagement || isSupportLead) ? `<td>${(row.ip || "N/A").replace(/</g, "&lt;").replace(/>/g, "&gt;")}</td>` : "";
+                    const giveKeyBtn = (isManagement || isSupportLead) ? `<button type="button" class="give-key-btn" data-user-id="${row.id}" data-email="${email.replace(/"/g, '&quot;')}">Give Key</button>` : `<span style="color:#94a3b8;font-size:12px;font-weight:600;">No Permission</span>`;
                     let deptDisabled = "";
                     if (!isManagement) {
                         deptDisabled = "disabled";
@@ -799,13 +800,20 @@
                         const userDept = await getUserDepartment();
                         const isSupport = userDept === "Support Team" || userDept === "Support Team Lead";
                         const currentDept = select.getAttribute("data-current-dept") || "";
-                        if (isSupport && currentDept === "Management") {
-                            alert("Access denied. Support cannot remove users from Management.");
-                            select.value = currentDept;
-                            return;
+                        const newDepartment = select.value;
+                        if (isSupport) {
+                            if (currentDept === "Management") {
+                                alert("Access denied. Support cannot remove users from Management.");
+                                select.value = currentDept;
+                                return;
+                            }
+                            if (newDepartment === "Management") {
+                                alert("Access denied. Support cannot assign users to Management.");
+                                select.value = currentDept;
+                                return;
+                            }
                         }
                         const userId = select.getAttribute("data-user-id");
-                        const newDepartment = select.value;
                         const { error } = await localSupabase
                             .from("users")
                             .update({ department: newDepartment })
