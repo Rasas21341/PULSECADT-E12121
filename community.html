@@ -1260,9 +1260,20 @@
                 if (dashboard === "1") {
                     try {
                         let currentEmail = "";
+                        let currentUserDepartment = "";
                         try {
                             const userData = await localSupabase.auth.getUser();
                             currentEmail = userData?.data?.user?.email || "";
+                            if (currentEmail) {
+                                try {
+                                    const { data: currentUserData } = await localSupabase
+                                        .from("users")
+                                        .select("department")
+                                        .eq("email", currentEmail)
+                                        .maybeSingle();
+                                    currentUserDepartment = (currentUserData && currentUserData.department) ? currentUserData.department : "";
+                                } catch (e) {}
+                            }
                         } catch (authErr) {
                             console.error("Auth check failed:", authErr);
                         }
@@ -1646,13 +1657,14 @@
                                 const rows = Array.isArray(memberRows) ? memberRows : [];
                                 const ids = rows.map((r) => r.user_id).filter(Boolean);
                                 let emailById = {};
+                                let deptById = {};
                                 if (ids.length > 0) {
                                     const { data: users, error: userError } = await localSupabase
                                         .from("users")
-                                        .select("id, email")
+                                        .select("id, email, department")
                                         .in("id", ids);
                                     if (userError) throw userError;
-                                    (users || []).forEach((u) => { emailById[u.id] = u.email; });
+                                    (users || []).forEach((u) => { emailById[u.id] = u.email; deptById[u.id] = u.department; });
                                 }
 
                                 const esc = (t) => (t || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -1668,6 +1680,8 @@
                                 const isMembersView = targetEl === membersViewList;
                                 const isDropdown = targetEl === memberList;
                                 const showKickBan = (isMembersView || isDropdown) && creatorEmail === currentEmail;
+                                const currentUserDepartment = (currentUserDepartment || "").trim();
+                                const isSupport = currentUserDepartment === "Support Team" || currentUserDepartment === "Customer Support";
                                 if (rows.length === 0) {
                                     if (!html) html = '<div class="empty">No members yet.</div>';
                                 } else {
@@ -1676,7 +1690,10 @@
                                             return "";
                                         }
                                         const email = esc(emailById[r.user_id] || r.user_id);
-                                        if (showKickBan) {
+                                        const memberDept = (deptById[r.user_id] || "").trim();
+                                        const isManagement = memberDept === "Management";
+                                        const canKickBan = showKickBan && !(isSupport && isManagement);
+                                        if (canKickBan) {
                                             return `<div class="member-item"><span class="member-email">${email}</span><div class="member-actions"><button type="button" class="kick-btn" data-user-id="${esc(r.user_id)}">Kick</button><button type="button" class="ban-btn" data-user-id="${esc(r.user_id)}">Ban</button></div></div>`;
                                         }
                                         return `<button type="button" class="member-btn">${email}</button>`;

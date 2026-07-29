@@ -764,15 +764,23 @@
 
                 const userDepartment = await getUserDepartment();
                 const isManagement = userDepartment === "Management";
+                const isSupport = userDepartment === "Support Team" || userDepartment === "Customer Support";
                 let html = `<input type="text" class="search-box" id="userSearch" placeholder="Search users by email..." /><table><tr><th>Email</th><th>Created</th><th>Department</th>${isManagement ? "<th>IP</th>" : ""}<th>Actions</th></tr>`;
                 data.forEach((row) => {
                     const email = (row.email || "N/A").replace(/</g, "&lt;").replace(/>/g, "&gt;");
                     const created = row.created_at ? new Date(row.created_at).toLocaleString() : "";
                     const currentDept = row.department || "";
                     const ipCell = isManagement ? `<td>${(row.ip || "N/A").replace(/</g, "&lt;").replace(/>/g, "&gt;")}</td>` : "";
-                    const giveKeyBtn = userDepartment === "Management" ? `<button type="button" class="give-key-btn" data-user-id="${row.id}" data-email="${email.replace(/"/g, '&quot;')}">Give Key</button>` : `<span style="color:#94a3b8;font-size:12px;font-weight:600;">No Permission</span>`;
-                    const deptDisabled = isManagement ? "" : "disabled";
-                    html += `<tr><td>${email}</td><td>${created}</td><td><select class="department-select" data-user-id="${row.id}" ${deptDisabled}><option value="">Unassigned</option><option value="Management" ${currentDept === 'Management' ? 'selected' : ''}>Management</option><option value="Support Team" ${currentDept === 'Support Team' ? 'selected' : ''}>Support Team</option><option value="Development Team" ${currentDept === 'Development Team' ? 'selected' : ''}>Development Team</option></select></td>${ipCell}<td>${giveKeyBtn}</td></tr>`;
+                    const giveKeyBtn = isManagement ? `<button type="button" class="give-key-btn" data-user-id="${row.id}" data-email="${email.replace(/"/g, '&quot;')}">Give Key</button>` : `<span style="color:#94a3b8;font-size:12px;font-weight:600;">No Permission</span>`;
+                    let deptDisabled = "";
+                    if (!isManagement) {
+                        if (isSupport && currentDept === "Management") {
+                            deptDisabled = "disabled";
+                        } else if (!isSupport) {
+                            deptDisabled = "disabled";
+                        }
+                    }
+                    html += `<tr><td>${email}</td><td>${created}</td><td><select class="department-select" data-user-id="${row.id}" data-current-dept="${escapeHtml(currentDept)}" ${deptDisabled}><option value="">Unassigned</option><option value="Management" ${currentDept === 'Management' ? 'selected' : ''}>Management</option><option value="Support Team" ${currentDept === 'Support Team' ? 'selected' : ''}>Support Team</option><option value="Development Team" ${currentDept === 'Development Team' ? 'selected' : ''}>Development Team</option></select></td>${ipCell}<td>${giveKeyBtn}</td></tr>`;
                 });
                 html += "</table>";
                 contentEl.innerHTML = html;
@@ -792,6 +800,14 @@
 
                 contentEl.querySelectorAll(".department-select").forEach((select) => {
                     select.addEventListener("change", async () => {
+                        const userDept = await getUserDepartment();
+                        const isSupport = userDept === "Support Team" || userDept === "Customer Support";
+                        const currentDept = select.getAttribute("data-current-dept") || "";
+                        if (isSupport && currentDept === "Management") {
+                            alert("Access denied. Support cannot remove users from Management.");
+                            select.value = currentDept;
+                            return;
+                        }
                         const userId = select.getAttribute("data-user-id");
                         const newDepartment = select.value;
                         const { error } = await localSupabase
