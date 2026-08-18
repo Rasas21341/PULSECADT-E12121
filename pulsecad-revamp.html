@@ -3000,7 +3000,7 @@ enable-ga="false"
                             return null;
                         }
                         if (Array.isArray(insertData) && insertData[0]) {
-                                addCommunityCard(name, insertData[0].description || "Community", false, insertData[0].id, true, !!insertData[0].verification_requested, !!insertData[0].suspended, !!insertData[0].members_only);
+                                addCommunityCard(name, insertData[0].description || "Community", false, insertData[0].id, true, !!insertData[0].verification_requested, !!insertData[0].suspended, !!insertData[0].members_only, insertData[0].banner);
                         }
                         return insertData ? insertData[0] : null;
                     })
@@ -3118,18 +3118,47 @@ enable-ga="false"
                          });
                      }
                  }
-                 card.querySelectorAll(".community-kebab-item").forEach((item) => {
-                     item.addEventListener("click", (e) => {
-                         e.stopPropagation();
-                         const action = item.getAttribute("data-action");
-                         const rowId = item.getAttribute("data-id");
-                         if (!rowId) return;
+                  card.querySelectorAll(".community-kebab-item").forEach((item) => {
+                      item.addEventListener("click", async (e) => {
+                          e.stopPropagation();
+                          const action = item.getAttribute("data-action");
+                          const rowId = item.getAttribute("data-id");
+                          if (!rowId) return;
 if (action === "dashboard") {
-                              window.open("community.html?id=" + encodeURIComponent(rowId) + "&dashboard=1", "_blank");
-                         } else if (action === "modpanel") {
-                             window.open("mpanel.html?id=" + encodeURIComponent(rowId), "_blank");
-                         }
-                         document.querySelectorAll(".community-kebab-menu.open").forEach((m) => m.classList.remove("open"));
+                               window.open("community.html?id=" + encodeURIComponent(rowId) + "&dashboard=1", "_blank");
+                          } else if (action === "modpanel") {
+                              window.open("mpanel.html?id=" + encodeURIComponent(rowId), "_blank");
+                          } else if (action === "setbanner") {
+                              e.stopPropagation();
+                              const fileInput = document.createElement("input");
+                              fileInput.type = "file";
+                              fileInput.accept = "image/*";
+                              fileInput.onchange = async (ev) => {
+                                  const file = ev.target.files[0];
+                                  if (!file) return;
+                                  if (!file.type.startsWith("image/")) {
+                                      alert("Please select an image file.");
+                                      return;
+                                  }
+                                  const reader = new FileReader();
+                                  reader.onload = async (evt) => {
+                                      const bannerDataUrl = evt.target.result;
+                                      try {
+                                          const { error } = await localSupabase
+                                              .from("communities")
+                                              .update({ banner: bannerDataUrl })
+                                              .eq("id", rowId);
+                                          if (error) throw error;
+                                          loadCommunities();
+                                      } catch (err) {
+                                          alert("Failed to save banner: " + (err.message || err));
+                                      }
+                                  };
+                                  reader.readAsDataURL(file);
+                              };
+                              fileInput.click();
+                          }
+                          document.querySelectorAll(".community-kebab-menu.open").forEach((m) => m.classList.remove("open"));
                       });
                   });
               }
