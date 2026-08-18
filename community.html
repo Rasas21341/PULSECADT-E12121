@@ -1569,30 +1569,45 @@
                             });
                         }
 
-                        const erlcApiKeyInput = document.getElementById("erlcApiKeyInput");
-                        if (erlcApiKeyInput) {
-                            erlcApiKeyInput.addEventListener("blur", async () => {
-                                const val = erlcApiKeyInput.value.trim();
-                                try {
-                                    const { error } = await localSupabase
-                                        .from("communities")
-                                        .update({ erlc_api_key: val || null })
-                                        .eq("id", id);
-                                    if (error) console.warn("DB save of ERLC API key failed:", error.message);
-                                    try {
-                                        if (val) localStorage.setItem("erlcApiKey_" + id, val);
-                                        else localStorage.removeItem("erlcApiKey_" + id);
-                                    } catch (e) {}
-                                } catch (err) {
-                                    try {
-                                        if (val) localStorage.setItem("erlcApiKey_" + id, val);
-                                        else localStorage.removeItem("erlcApiKey_" + id);
-                                    } catch (e) {}
-                                }
-                            });
-                        }
+                         const erlcApiKeyInput = document.getElementById("erlcApiKeyInput");
+                         if (erlcApiKeyInput) {
+                             erlcApiKeyInput.addEventListener("blur", async () => {
+                                 const val = erlcApiKeyInput.value.trim();
+                                 try {
+                                     const { error } = await localSupabase
+                                         .from("communities")
+                                         .update({ erlc_api_key: val || null })
+                                         .eq("id", id);
+                                     if (error) console.warn("DB save of ERLC API key failed:", error.message);
+                                     try {
+                                         if (val) localStorage.setItem("erlcApiKey_" + id, val);
+                                         else localStorage.removeItem("erlcApiKey_" + id);
+                                     } catch (e) {}
+                                 } catch (err) {
+                                     try {
+                                         if (val) localStorage.setItem("erlcApiKey_" + id, val);
+                                         else localStorage.removeItem("erlcApiKey_" + id);
+                                     } catch (e) {}
+                                 }
+                             });
+                         }
 
-                        const deleteServerBtn = document.getElementById("deleteServerBtn");
+                         if (supervisorInput) {
+                             supervisorInput.addEventListener("blur", async () => {
+                                 const val = supervisorInput.value.trim();
+                                 try {
+                                     const { error } = await localSupabase
+                                         .from("communities")
+                                         .update({ supervisor: val || null })
+                                         .eq("id", id);
+                                     if (error) console.warn("DB save of supervisor failed:", error.message);
+                                 } catch (err) {
+                                     console.error("Failed to save supervisor:", err);
+                                 }
+                             });
+                         }
+
+                         const deleteServerBtn = document.getElementById("deleteServerBtn");
                         const deleteServerMenu = document.getElementById("deleteServerMenu");
                         const confirmDeleteServerBtn = document.getElementById("confirmDeleteServerBtn");
 
