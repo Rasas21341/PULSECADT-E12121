@@ -657,13 +657,10 @@
                         ? `<button class="pro-server-btn" data-id="${row.id}" data-pro="${pro}" style="padding:4px 10px;border-radius:999px;font-size:11px;font-weight:700;cursor:pointer;border:1px solid #16a34a;background:#f0fdf4;color:#166534;">${pro ? "Remove Pro" : "Give Pro"}</button>`
                         : `<span style="color:#94a3b8;font-size:12px;font-weight:600;">No Permission</span>`;
                     const partner = !!row.partner;
-                    const partnerCell = partner
-                        ? `<span style="display:inline-flex;align-items:center;background:#f59e0b;color:#ffffff;border-radius:999px;padding:2px 9px;font-size:10px;font-weight:600;">Partner</span>`
-                        : `<span style="color:#94a3b8;font-size:11px;font-weight:600;">No</span>`;
                     const partnerToggleBtn = canPartner
                         ? `<button class="partner-server-btn" data-id="${row.id}" data-partner="${partner}" style="padding:4px 10px;border-radius:999px;font-size:11px;font-weight:700;cursor:pointer;border:1px solid #f59e0b;background:#fef3c7;color:#92400e;">${partner ? "Remove Partner" : "Give Partner"}</button>`
                         : `<span style="color:#94a3b8;font-size:12px;font-weight:600;">No Permission</span>`;
-                    html += `<tr><td>${name}</td><td>${owner}</td><td>${created}</td><td>${statusCell}</td><td>${membersOnlyCell}</td><td>${proCell}<br/>${proToggleBtn}</td><td>${partnerCell}<br/>${partnerToggleBtn}</td><td><div style="display:flex;gap:8px;flex-wrap:wrap;">${suspendBtn} ${deleteBtn}</div></td></tr>`;
+                    html += `<tr><td>${name}</td><td>${owner}</td><td>${created}</td><td>${statusCell}</td><td>${membersOnlyCell}</td><td>${proCell}<br/>${proToggleBtn}</td><td>${partnerToggleBtn}</td><td><div style="display:flex;gap:8px;flex-wrap:wrap;">${suspendBtn} ${deleteBtn}</div></td></tr>`;
                 });
                 html += "</table>";
                 contentEl.innerHTML = html;
