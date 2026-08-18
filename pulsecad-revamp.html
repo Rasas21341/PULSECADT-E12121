@@ -1005,6 +1005,39 @@
             background: #eff6ff;
         }
 
+        .panel-btn {
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            color: #2563eb;
+            background: #ffffff;
+            border: 1px solid #2563eb;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .panel-btn:hover {
+            background: #eff6ff;
+        }
+
+        .panel-manage-btn {
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            color: #0f172a;
+            background: #2563eb;
+            border: 1px solid #2563eb;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .panel-manage-btn:hover {
+            background: #1d4ed8;
+            color: #ffffff;
+        }
+
         .community-list-leave {
             padding: 6px 12px;
             border-radius: 8px;
@@ -3016,17 +3049,20 @@ enable-ga="false"
                      <button type="button" class="community-kebab-item" data-action="modpanel" data-id="${id || ''}">Mod Panel</button>
                  </div>
              </div>` : "";
-             const leaveBtn = (isJoined && !isCreator) ? `<button type="button" class="community-list-leave" data-id="${id || ''}">Leave</button>` : "";
-             card.innerHTML = `<div class="community-list-info"${communityId}><div class="community-list-name">${escapedName}</div>${creatorText}${isSuspended ? '<div class="community-list-meta" style="color:#dc2626;font-weight:700;">This community has been suspended.</div>' : ''}<div class="community-list-meta"></div></div>${badgesHtml}${lockIcon}<div class="community-list-actions">${kebabHtml}${leaveBtn}${(!isJoined && !isCreator && !isSuspended) ? '<button type="button" class="community-list-join">Join</button>' : ""}</div>`;
+              const leaveBtn = (isJoined && !isCreator) ? `<button type="button" class="community-list-leave" data-id="${id || ''}">Leave</button>` : "";
+              const panelButtons = !isSuspended ? `<button type="button" class="panel-btn panel-open-mdt" data-id="${id || ''}">Open MDT</button><button type="button" class="panel-manage-btn panel-manage" data-id="${id || ''}">Manage</button>` : "";
+              card.innerHTML = `<div class="community-list-info"${communityId}><div class="community-list-name">${escapedName}</div>${creatorText}${isSuspended ? '<div class="community-list-meta" style="color:#dc2626;font-weight:700;">This community has been suspended.</div>' : ''}<div class="community-list-meta"></div></div>${badgesHtml}${lockIcon}<div class="community-list-actions">${panelButtons}${kebabHtml}${leaveBtn}${(!isJoined && !isCreator && !isSuspended) ? '<button type="button" class="community-list-join">Join</button>' : ""}</div>`;
             loggedInCommunities.appendChild(card);
 
              card.style.cursor = isSuspended ? "default" : "pointer";
-             card.addEventListener("click", (e) => {
-                 if (e.target.closest(".community-list-join")) return;
-                 if (e.target.closest(".community-list-leave")) return;
-                 if (e.target.closest(".community-kebab")) return;
-                 if (e.target.closest(".community-kebab-menu")) return;
-                 if (isSuspended) return;
+              card.addEventListener("click", (e) => {
+                  if (e.target.closest(".community-list-join")) return;
+                  if (e.target.closest(".community-list-leave")) return;
+                  if (e.target.closest(".panel-btn")) return;
+                  if (e.target.closest(".panel-manage-btn")) return;
+                  if (e.target.closest(".community-kebab")) return;
+                  if (e.target.closest(".community-kebab-menu")) return;
+                  if (isSuspended) return;
                  const rowId = card.querySelector(".community-list-info")?.getAttribute("data-id");
                  if (rowId) {
                      window.open("community/" + encodeURIComponent(rowId), "_blank");
@@ -3097,10 +3133,30 @@ if (action === "dashboard") {
                              window.open("mpanel.html?id=" + encodeURIComponent(rowId), "_blank");
                          }
                          document.querySelectorAll(".community-kebab-menu.open").forEach((m) => m.classList.remove("open"));
-                     });
-                 });
-             }
-        }
+                      });
+                  });
+              }
+
+              const openMdtBtn = card.querySelector(".panel-open-mdt");
+              if (openMdtBtn) {
+                  openMdtBtn.addEventListener("click", (e) => {
+                      e.stopPropagation();
+                      const rowId = openMdtBtn.getAttribute("data-id");
+                      if (!rowId) return;
+                      window.open("community/" + encodeURIComponent(rowId), "_blank");
+                  });
+              }
+
+              const manageBtn = card.querySelector(".panel-manage");
+              if (manageBtn) {
+                  manageBtn.addEventListener("click", (e) => {
+                      e.stopPropagation();
+                      const rowId = manageBtn.getAttribute("data-id");
+                      if (!rowId) return;
+                      window.open("mpanel.html?id=" + encodeURIComponent(rowId), "_blank");
+                  });
+              }
+         }
 
         async function consumeRedeemedKey() {
             if (!localSupabase) return false;
