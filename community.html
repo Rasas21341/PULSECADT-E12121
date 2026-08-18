@@ -1691,7 +1691,8 @@
                                           .update({ banner: bannerUrl })
                                           .eq("id", id);
                                       if (error) throw error;
-                                      alert("Banner saved.");
+                                      alert("Banner saved. Refreshing...");
+                                      window.location.reload();
                                   } catch (err) {
                                       alert("Failed to save banner: " + (err.message || err));
                                   }
