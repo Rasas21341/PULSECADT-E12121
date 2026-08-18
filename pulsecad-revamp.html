@@ -892,20 +892,21 @@
             }
         }
 
-        .panels-manage-title {
-            position: fixed;
-            top: 24px;
-            left: 50%;
-            transform: translateX(-50%);
+        .panels-manage-header {
+            width: 100%;
+            background: #0C0D10;
+            border: 1px solid #1E293B;
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-bottom: 10px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
             font-size: 20px;
             font-weight: 700;
             color: #ffffff;
-            z-index: 510;
-            pointer-events: none;
             display: none;
         }
 
-        .panels-manage-title.visible {
+        .panels-manage-header.visible {
             display: block;
         }
 
@@ -2605,15 +2606,16 @@ enable-ga="false"
         const joinCommunityCenteredBtn = document.getElementById("joinCommunityCenteredBtn");
         const loggedInCommunities = document.getElementById("loggedInCommunities");
 
-        function loadCommunities() {
+         function loadCommunities() {
             if (!loggedInCommunities || !localSupabase) return;
-            loggedInCommunities.innerHTML = "";
+            const header = `<div class="panels-manage-header" id="panelsManageHeader">Panels you manage</div>`;
+            loggedInCommunities.innerHTML = header;
             localSupabase.auth.getUser().then(({ data: userData }) => {
                 const user = userData?.user;
                 const userId = user?.id;
                 const userEmail = user?.email;
                 if (!userId) {
-                    loggedInCommunities.innerHTML = "";
+                    loggedInCommunities.innerHTML = header;
                     return;
                 }
                 localSupabase
