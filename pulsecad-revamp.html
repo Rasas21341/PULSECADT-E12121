@@ -3014,7 +3014,7 @@ enable-ga="false"
             });
         }
 
-        function addCommunityCard(name, meta, joined, id, creator, verified, suspended, membersOnly) {
+        function addCommunityCard(name, meta, joined, id, creator, verified, suspended, membersOnly, banner) {
             if (!loggedInCommunities) return;
             if (id && loggedInCommunities.querySelector(`[data-id="${id}"]`)) {
                 return;
@@ -3035,6 +3035,7 @@ enable-ga="false"
             if (isSuspended) badges.push('<span class="community-list-suspended">Suspended</span>');
             const badgesHtml = badges.length ? `<div class="community-list-badges">${badges.join("")}</div>` : "";
               const lockIcon = "";
+              const bannerImg = banner ? `<img src="${banner}" class="community-card-banner" alt="${escapedName} banner" />` : "";
               const kebabHtml = isCreator ? `<div class="community-kebab-wrapper">
                   <button type="button" class="community-kebab" data-id="${id || ''}">
                       <span class="community-kebab-dot"></span>
@@ -3044,6 +3045,7 @@ enable-ga="false"
                   <div class="community-kebab-menu">
                       <button type="button" class="community-kebab-item" data-action="dashboard" data-id="${id || ''}">Dashboard</button>
                       <button type="button" class="community-kebab-item" data-action="modpanel" data-id="${id || ''}">Mod Panel</button>
+                      <button type="button" class="community-kebab-item" data-action="setbanner" data-id="${id || ''}">Set Banner</button>
                   </div>
               </div>` : "";
               const leaveBtn = (isJoined && !isCreator) ? `<button type="button" class="community-list-leave" data-id="${id || ''}">Leave</button>` : "";
