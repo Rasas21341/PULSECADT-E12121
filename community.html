@@ -76,6 +76,46 @@
             padding-top: 20px;
         }
 
+        .community-banner {
+            width: 100%;
+            max-height: 200px;
+            object-fit: cover;
+            border-radius: 12px;
+            margin-bottom: 16px;
+            display: block;
+            border: 1px solid #e2e8f0;
+            background: #f1f5f9;
+        }
+
+        .community-banner-upload-wrap {
+            margin-top: 16px;
+            border-top: 1px solid #e2e8f0;
+            padding-top: 14px;
+        }
+
+        .community-banner-upload-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: #334155;
+            margin-bottom: 6px;
+        }
+
+        .community-banner-upload-input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 10px;
+            font-size: 13px;
+            color: #64748b;
+            cursor: pointer;
+            background: #f8fafc;
+        }
+
+        .community-banner-upload-input:hover {
+            border-color: #2563eb;
+        }
+
         .community-screen {
             margin-top: 24px;
             min-height: 280px;
@@ -1372,9 +1412,15 @@
                                              <input type="text" id="erlcApiKeyInput" placeholder="ERLC API key" value="${initialErkKey.replace(/</g, '&lt;').replace(/>/g, '&gt;')}" />
                                          </div>
                                          <div class="field">
-                                             <label>Supervisor Password</label>
-                                             <input type="text" id="supervisorInput" placeholder="Supervisor password" value="${(communityData.supervisor || '').replace(/</g, '&lt;').replace(/>/g, '&gt;')}" />
-                                         </div>
+                                              <label>Supervisor Password</label>
+                                              <input type="text" id="supervisorInput" placeholder="Supervisor password" value="${(communityData.supervisor || '').replace(/</g, '&lt;').replace(/>/g, '&gt;')}" />
+                                          </div>
+                                          <div class="community-banner-upload-wrap">
+                                              <label class="community-banner-upload-label">Community Banner</label>
+                                              <input type="file" id="communityBannerInput" accept="image/*" class="community-banner-upload-input" />
+                                              <img id="communityBannerPreview" class="dept-banner-preview" style="max-height:160px; margin-top:8px;" />
+                                              <button type="button" class="submit-btn" id="saveCommunityBannerBtn" style="margin-top:12px; padding:8px 12px; font-size:13px;">Save Banner</button>
+                                          </div>
                                          <div class="dashboard-dropdown">
                                             <button type="button" class="dropdown-toggle" id="requestsDropdownToggle">Requests</button>
                                             <div class="dropdown-menu" id="requestsDropdownMenu">
