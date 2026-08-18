@@ -965,10 +965,12 @@
             border: 1px solid #1E293B;
             border-radius: 12px;
             padding: 14px;
+            padding-right: 40px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.04);
             display: flex;
             flex-direction: column;
             gap: 10px;
+            position: relative;
         }
 
         .community-list-info {
@@ -1103,6 +1105,16 @@
             align-items: center;
             gap: 10px;
             flex-wrap: wrap;
+        }
+
+        .community-kebab-wrapper {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .community-kebab {
@@ -3030,20 +3042,19 @@ enable-ga="false"
             const badges = [];
             if (isVerified) badges.push('<span class="community-list-verified">Verified</span>');
             if (isSuspended) badges.push('<span class="community-list-suspended">Suspended</span>');
-            if (isJoined) badges.push('<span class="community-list-joined">Joined</span>');
             const badgesHtml = badges.length ? `<div class="community-list-badges">${badges.join("")}</div>` : "";
              const lockIcon = isMembersOnly ? '<span class="community-lock-icon"> →</span>' : "";
-             const kebabHtml = isCreator ? `<div class="community-kebab-wrapper" style="position:relative;">
-                 <button type="button" class="community-kebab" data-id="${id || ''}">
-                     <span class="community-kebab-dot"></span>
-                     <span class="community-kebab-dot"></span>
-                     <span class="community-kebab-dot"></span>
-                 </button>
-                 <div class="community-kebab-menu">
-                     <button type="button" class="community-kebab-item" data-action="dashboard" data-id="${id || ''}">Dashboard</button>
-                     <button type="button" class="community-kebab-item" data-action="modpanel" data-id="${id || ''}">Mod Panel</button>
-                 </div>
-             </div>` : "";
+              const kebabHtml = isCreator ? `<div class="community-kebab-wrapper">
+                  <button type="button" class="community-kebab" data-id="${id || ''}">
+                      <span class="community-kebab-dot"></span>
+                      <span class="community-kebab-dot"></span>
+                      <span class="community-kebab-dot"></span>
+                  </button>
+                  <div class="community-kebab-menu">
+                      <button type="button" class="community-kebab-item" data-action="dashboard" data-id="${id || ''}">Dashboard</button>
+                      <button type="button" class="community-kebab-item" data-action="modpanel" data-id="${id || ''}">Mod Panel</button>
+                  </div>
+              </div>` : "";
               const leaveBtn = (isJoined && !isCreator) ? `<button type="button" class="community-list-leave" data-id="${id || ''}">Leave</button>` : "";
               const buildingIcon = '<svg class="panel-icon" viewBox="0 0 24 24" width="14" height="14"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-9 8v-4h4v4h-4zm0 6v-4H8v4h2zm6 0v-4h2v4h-2zm0-6v-4h2v4h-2z"/></svg>';
               const settingsIcon = '<svg class="panel-icon" viewBox="0 0 24 24" width="14" height="14"><path d="M19.14 12.94c.04-.1.06-.21.06-.33s-.02-.23-.06-.33l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.488.488 0 0 0-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 0 0-.48-.41h-3.84a.484.484 0 0 0-.48.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.04.1-.06.21-.06.33s.02.23.06.33l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.47.3.65.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.48-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zm-6.89 6.31c-.83 0-1.5-1.08-1.5-2.41s1.08-2.41 1.5-2.41 1.5 1.08 1.5 2.41-.67 2.41-1.5 2.41z"/></svg>';
@@ -3084,10 +3095,6 @@ enable-ga="false"
                             return;
                         }
                         await joinCommunity(rowId);
-                        const span = document.createElement("span");
-                        span.className = "community-list-joined";
-                        span.textContent = "Joined";
-                        joinBtn.replaceWith(span);
                     });
                 }
             }
