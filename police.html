@@ -526,6 +526,175 @@
             background: #eff6ff;
         }
 
+        .supervisor-panel-btn {
+            position: fixed;
+            right: 24px;
+            bottom: 70px;
+            padding: 12px 20px;
+            border-radius: 12px;
+            border: 1px solid #dc2626;
+            background: #ffffff;
+            color: #dc2626;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            z-index: 700;
+            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.15);
+        }
+
+        .supervisor-panel-btn:hover {
+            background: #fef2f2;
+        }
+
+        .supervisor-password-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.45);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1200;
+            padding: 16px;
+        }
+
+        .supervisor-password-overlay.open {
+            display: flex;
+        }
+
+        .supervisor-password-modal {
+            background: #ffffff;
+            border-radius: 20px;
+            border: 1px solid #e2e8f0;
+            padding: 22px;
+            width: 100%;
+            max-width: 420px;
+            box-shadow: 0 20px 50px rgba(15, 23, 42, 0.18);
+        }
+
+        .supervisor-panel-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.55);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1200;
+            padding: 16px;
+        }
+
+        .supervisor-panel-overlay.open {
+            display: flex;
+        }
+
+        .supervisor-panel-modal {
+            background: #ffffff;
+            border-radius: 20px;
+            border: 1px solid #e2e8f0;
+            padding: 22px;
+            width: 100%;
+            max-width: 520px;
+            box-shadow: 0 20px 50px rgba(15, 23, 42, 0.18);
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+
+        .supervisor-panel-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 14px;
+        }
+
+        .supervisor-panel-close {
+            border: none;
+            background: transparent;
+            color: #64748b;
+            font-size: 20px;
+            cursor: pointer;
+            line-height: 1;
+            padding: 4px;
+            border-radius: 999px;
+        }
+
+        .supervisor-panel-close:hover {
+            background: #f1f5f9;
+            color: #0f172a;
+        }
+
+        .supervisor-panel-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 14px;
+        }
+
+        .supervisor-field {
+            margin-bottom: 14px;
+        }
+
+        .supervisor-field label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: #334155;
+            margin-bottom: 6px;
+        }
+
+        .supervisor-field input {
+            width: 100%;
+            padding: 12px 14px;
+            border-radius: 12px;
+            border: 1px solid #cbd5e1;
+            font-size: 15px;
+            color: #0f172a;
+            outline: none;
+            transition: border-color .15s ease, box-shadow .15s ease;
+        }
+
+        .supervisor-field input:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+        }
+
+        .supervisor-submit {
+            width: 100%;
+            padding: 12px 14px;
+            border-radius: 12px;
+            border: none;
+            background: #2563eb;
+            color: #ffffff;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform .05s ease, background .15s ease;
+        }
+
+        .supervisor-submit:hover {
+            background: #1d4ed8;
+        }
+
+        .supervisor-error {
+            margin-top: 10px;
+            padding: 10px 12px;
+            border-radius: 10px;
+            background: #fef2f2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+            font-size: 14px;
+            display: none;
+        }
+
+        .supervisor-success {
+            margin-top: 10px;
+            padding: 10px 12px;
+            border-radius: 10px;
+            background: #f0fdf4;
+            color: #166534;
+            border: 1px solid #bbf7d0;
+            font-size: 14px;
+            display: none;
+        }
+
         .status-select {
             padding: 8px 12px;
             border-radius: 10px;
@@ -677,6 +846,32 @@
 
     <button type="button" class="plate-lookup-btn" id="plateLookupBtn">Plate Lookup</button>
     <button type="button" class="civilian-lookup-btn" id="civilianLookupBtn">Lookup Civilian</button>
+    <button type="button" class="supervisor-panel-btn" id="supervisorPanelBtn">Supervisor Panel</button>
+
+    <div class="supervisor-password-overlay" id="supervisorPasswordOverlay">
+        <div class="supervisor-password-modal">
+            <div class="supervisor-panel-header">
+                <div class="supervisor-panel-title">Supervisor Access</div>
+                <button class="supervisor-panel-close" id="supervisorPasswordClose" type="button" aria-label="Close">×</button>
+            </div>
+            <div class="supervisor-field">
+                <label for="supervisorPasswordInput">Supervisor Password</label>
+                <input type="password" id="supervisorPasswordInput" placeholder="Enter supervisor password" />
+            </div>
+            <button type="button" class="supervisor-submit" id="supervisorPasswordSubmit">Access Panel</button>
+            <div class="supervisor-error" id="supervisorPasswordError"></div>
+        </div>
+    </div>
+
+    <div class="supervisor-panel-overlay" id="supervisorPanelOverlay">
+        <div class="supervisor-panel-modal">
+            <div class="supervisor-panel-header">
+                <div class="supervisor-panel-title">Supervisor Panel</div>
+                <button class="supervisor-panel-close" id="supervisorPanelClose" type="button" aria-label="Close">×</button>
+            </div>
+            <div id="supervisorPanelContent"></div>
+        </div>
+    </div>
 
     <div class="modal-overlay" id="lookupModal">
         <div class="modal">
