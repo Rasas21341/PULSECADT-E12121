@@ -1650,12 +1650,56 @@
                                  } catch (err) {
                                      console.error("Failed to save supervisor:", err);
                                  }
-                             });
-                         }
+                              });
+                          }
 
-                         const deleteServerBtn = document.getElementById("deleteServerBtn");
-                        const deleteServerMenu = document.getElementById("deleteServerMenu");
-                        const confirmDeleteServerBtn = document.getElementById("confirmDeleteServerBtn");
+                          const communityBannerInput = document.getElementById("communityBannerInput");
+                          const communityBannerPreview = document.getElementById("communityBannerPreview");
+                          const saveCommunityBannerBtn = document.getElementById("saveCommunityBannerBtn");
+
+                          if (communityBannerPreview && communityData.banner) {
+                              communityBannerPreview.src = communityData.banner;
+                              communityBannerPreview.style.display = "block";
+                          }
+
+                          if (communityBannerInput) {
+                              communityBannerInput.addEventListener("change", (e) => {
+                                  const file = e.target.files[0];
+                                  if (!file) return;
+                                  if (!file.type.startsWith("image/")) {
+                                      alert("Please select an image file.");
+                                      return;
+                                  }
+                                  const reader = new FileReader();
+                                  reader.onload = (ev) => {
+                                      if (communityBannerPreview) {
+                                          communityBannerPreview.src = ev.target.result;
+                                          communityBannerPreview.style.display = "block";
+                                      }
+                                  };
+                                  reader.readAsDataURL(file);
+                              });
+                          }
+
+                          if (saveCommunityBannerBtn) {
+                              saveCommunityBannerBtn.addEventListener("click", async () => {
+                                  const bannerUrl = communityBannerPreview && communityBannerPreview.style.display !== "none" ? communityBannerPreview.src : null;
+                                  try {
+                                      const { error } = await localSupabase
+                                          .from("communities")
+                                          .update({ banner: bannerUrl })
+                                          .eq("id", id);
+                                      if (error) throw error;
+                                      alert("Banner saved.");
+                                  } catch (err) {
+                                      alert("Failed to save banner: " + (err.message || err));
+                                  }
+                              });
+                          }
+
+                          const deleteServerBtn = document.getElementById("deleteServerBtn");
+                         const deleteServerMenu = document.getElementById("deleteServerMenu");
+                         const confirmDeleteServerBtn = document.getElementById("confirmDeleteServerBtn");
 
                         if (deleteServerBtn && deleteServerMenu) {
                             deleteServerBtn.addEventListener("click", () => {
@@ -2939,6 +2983,7 @@
                 }
 
                 contentEl.innerHTML = `
+                    ${data.banner ? `<img src="${data.banner}" class="community-banner" alt="${name} banner" />` : ""}
                     <button type="button" class="role-btn" data-role="Civilian">Civilian</button>
                     <div id="communityDepartments"></div>
                 `;

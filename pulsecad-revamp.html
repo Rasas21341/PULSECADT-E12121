@@ -3143,14 +3143,14 @@ if (action === "dashboard") {
               }
 
               const manageBtn = card.querySelector(".panel-manage");
-              if (manageBtn) {
-                  manageBtn.addEventListener("click", (e) => {
-                      e.stopPropagation();
-                      const rowId = manageBtn.getAttribute("data-id");
-                      if (!rowId) return;
-                      window.open("mpanel.html?id=" + encodeURIComponent(rowId), "_blank");
-                  });
-              }
+               if (manageBtn) {
+                   manageBtn.addEventListener("click", (e) => {
+                       e.stopPropagation();
+                       const rowId = manageBtn.getAttribute("data-id");
+                       if (!rowId) return;
+                       window.open("community.html?id=" + encodeURIComponent(rowId) + "&dashboard=1", "_blank");
+                   });
+               }
          }
 
         async function consumeRedeemedKey() {
