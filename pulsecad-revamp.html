@@ -2130,15 +2130,18 @@ enable-ga="false"
             const width = 1200;
             const height = 800;
             for (let i = openPanels.length - 1; i >= 0; i--) {
-                if (openPanels[i].closed) {
+                if (openPanels[i].win.closed) {
                     openPanels.splice(i, 1);
                 }
             }
-            const left = openPanels.length > 0 ? Math.min(openPanels[openPanels.length - 1].screenX + 200, screen.availWidth - width) : 0;
-            const top = 0;
-            const win = window.open(url, "_blank", `width=${width},height=${height},left=${left},top=${top}`);
+            let left = 0;
+            if (openPanels.length > 0) {
+                const last = openPanels[openPanels.length - 1];
+                left = Math.min(last.left + width + 40, screen.availWidth - width);
+            }
+            const win = window.open(url, "_blank", `width=${width},height=${height},left=${left},top=0`);
             if (win) {
-                openPanels.push(win);
+                openPanels.push({ win, left });
             }
             return win;
         }
