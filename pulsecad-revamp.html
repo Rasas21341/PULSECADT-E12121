@@ -960,15 +960,15 @@
 
         .community-list-card {
             width: 100%;
+            max-width: 580px;
             background: #0C0D10;
             border: 1px solid #1E293B;
             border-radius: 12px;
-            padding: 16px;
+            padding: 14px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.04);
             display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 12px;
+            flex-direction: column;
+            gap: 10px;
         }
 
         .community-list-info {
@@ -1106,8 +1106,8 @@
         .community-list-actions {
             display: flex;
             align-items: center;
-            gap: 12px;
-            margin-left: auto;
+            gap: 10px;
+            flex-wrap: wrap;
         }
 
         .community-kebab {
