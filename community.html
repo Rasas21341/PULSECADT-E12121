@@ -1335,6 +1335,7 @@
 
                         contentEl.innerHTML = `
                             <div class="dashboard">
+                                ${communityData.banner ? `<img src="${communityData.banner}" class="community-banner" alt="${serverName} banner" style="max-height:120px; margin-bottom:12px;" />` : ""}
                                 <div class="dashboard-top-right">
                                     <div class="dashboard-top-right-badge">People & Property</div>
                                     <div class="btn-dropdown-wrap">
