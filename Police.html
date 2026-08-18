@@ -488,7 +488,7 @@
 
         .plate-lookup-btn {
             position: fixed;
-            right: 24px;
+            right: 492px;
             bottom: 24px;
             padding: 12px 20px;
             border-radius: 12px;
@@ -508,7 +508,7 @@
 
         .civilian-lookup-btn {
             position: fixed;
-            right: 180px;
+            right: 336px;
             bottom: 24px;
             padding: 12px 20px;
             border-radius: 12px;
@@ -528,22 +528,151 @@
 
         .supervisor-panel-btn {
             position: fixed;
-            right: 24px;
-            bottom: 70px;
+            right: 180px;
+            bottom: 24px;
             padding: 12px 20px;
             border-radius: 12px;
-            border: 1px solid #dc2626;
+            border: 1px solid #2563eb;
             background: #ffffff;
-            color: #dc2626;
+            color: #2563eb;
             font-size: 14px;
             font-weight: 700;
             cursor: pointer;
             z-index: 700;
-            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.15);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15);
         }
 
         .supervisor-panel-btn:hover {
-            background: #fef2f2;
+            background: #eff6ff;
+        }
+
+        .units-citations-btn {
+            position: fixed;
+            right: 24px;
+            bottom: 24px;
+            padding: 12px 20px;
+            border-radius: 12px;
+            border: 1px solid #2563eb;
+            background: #ffffff;
+            color: #2563eb;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            z-index: 700;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15);
+        }
+
+        .units-citations-btn:hover {
+            background: #eff6ff;
+        }
+
+        .units-citations-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.45);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1200;
+            padding: 16px;
+        }
+
+        .units-citations-overlay.open {
+            display: flex;
+        }
+
+        .units-citations-modal {
+            background: #ffffff;
+            border-radius: 20px;
+            border: 1px solid #e2e8f0;
+            padding: 22px;
+            width: 100%;
+            max-width: 520px;
+            box-shadow: 0 20px 50px rgba(15, 23, 42, 0.18);
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+
+        .units-citations-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 14px;
+        }
+
+        .units-citations-close {
+            border: none;
+            background: transparent;
+            color: #64748b;
+            font-size: 20px;
+            cursor: pointer;
+            line-height: 1;
+            padding: 4px;
+            border-radius: 999px;
+        }
+
+        .units-citations-close:hover {
+            background: #f1f5f9;
+            color: #0f172a;
+        }
+
+        .units-citations-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 14px;
+        }
+
+        .citation-record-item {
+            padding: 10px 12px;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+            background: #f8fafc;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 8px;
+        }
+
+        .citation-record-item strong {
+            display: block;
+            color: #0f172a;
+            margin-bottom: 4px;
+        }
+
+        .citation-record-item span {
+            color: #475569;
+            font-size: 13px;
+        }
+
+        .citation-record-text {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .citation-delete-btn {
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 6px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: #94a3b8;
+        }
+
+        .citation-delete-btn:hover {
+            background: #fee2e2;
+            color: #ef4444;
+        }
+
+        .units-citations-empty {
+            font-size: 13px;
+            color: #94a3b8;
+            text-align: center;
+            padding: 18px;
         }
 
         .supervisor-password-overlay {
@@ -847,6 +976,17 @@
     <button type="button" class="plate-lookup-btn" id="plateLookupBtn">Plate Lookup</button>
     <button type="button" class="civilian-lookup-btn" id="civilianLookupBtn">Lookup Civilian</button>
     <button type="button" class="supervisor-panel-btn" id="supervisorPanelBtn">Supervisor Panel</button>
+    <button type="button" class="units-citations-btn" id="unitsCitationsBtn">Units / Citations</button>
+
+    <div class="units-citations-overlay" id="unitsCitationsOverlay">
+        <div class="units-citations-modal">
+            <div class="units-citations-header">
+                <div class="units-citations-title">Units / Citations</div>
+                <button class="units-citations-close" id="unitsCitationsClose" type="button" aria-label="Close">×</button>
+            </div>
+            <div id="unitsCitationsList"></div>
+        </div>
+    </div>
 
     <div class="supervisor-password-overlay" id="supervisorPasswordOverlay">
         <div class="supervisor-password-modal">
@@ -2105,6 +2245,109 @@
                 }
             });
         }
+
+        const unitsCitationsBtn = document.getElementById("unitsCitationsBtn");
+        const unitsCitationsOverlay = document.getElementById("unitsCitationsOverlay");
+        const unitsCitationsClose = document.getElementById("unitsCitationsClose");
+        const unitsCitationsList = document.getElementById("unitsCitationsList");
+
+        if (unitsCitationsBtn) {
+            unitsCitationsBtn.addEventListener("click", async () => {
+                if (!localSupabase) {
+                    alert("Database unavailable.");
+                    return;
+                }
+                if (unitsCitationsList) unitsCitationsList.innerHTML = '<div class="units-citations-empty">Loading citations...</div>';
+                if (unitsCitationsOverlay) unitsCitationsOverlay.classList.add("open");
+                await loadUnitsCitations();
+            });
+        }
+
+        if (unitsCitationsClose) {
+            unitsCitationsClose.addEventListener("click", () => {
+                if (unitsCitationsOverlay) unitsCitationsOverlay.classList.remove("open");
+            });
+        }
+
+        if (unitsCitationsOverlay) {
+            unitsCitationsOverlay.addEventListener("click", (e) => {
+                if (e.target === unitsCitationsOverlay) {
+                    unitsCitationsOverlay.classList.remove("open");
+                }
+            });
+        }
+
+        async function loadUnitsCitations() {
+            if (!unitsCitationsList || !localSupabase) return;
+            try {
+                const currentOfficerId = localStorage.getItem("policeOfficerId") || "";
+                const query = localSupabase
+                    .from("citations")
+                    .select("*")
+                    .order("created_at", { ascending: false })
+                    .limit(50);
+
+                if (currentOfficerId) {
+                    query.eq("officer_id", currentOfficerId);
+                }
+
+                const { data, error } = await query;
+
+                if (error) throw error;
+
+                if (!Array.isArray(data) || data.length === 0) {
+                    unitsCitationsList.innerHTML = '<div class="units-citations-empty">No citations found.</div>';
+                    return;
+                }
+
+                const esc = (t) => (t || "").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+                unitsCitationsList.innerHTML = data.map((c) => {
+                    const date = c.created_at ? new Date(c.created_at).toLocaleString() : "";
+                    const details = [c.reason, c.location, c.notes].filter(Boolean).join(" | ");
+                    return `
+                        <div class="citation-record-item" data-citation-id="${c.id}">
+                            <div class="citation-record-text">
+                                <strong>${esc(c.civilian_name || "Unknown")}</strong>
+                                <span>${esc(details || "No details")}</span>
+                                <span style="display:block; margin-top:4px; color:#94a3b8; font-size:11px;">${esc(date)}</span>
+                            </div>
+                            <button type="button" class="citation-delete-btn" data-citation-id="${c.id}" title="Delete citation">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="3 6 5 6 21 6"></polyline>
+                                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    `;
+                }).join("");
+
+                unitsCitationsList.querySelectorAll(".citation-delete-btn").forEach((btn) => {
+                    btn.addEventListener("click", async (e) => {
+                        e.stopPropagation();
+                        const citationId = btn.getAttribute("data-citation-id");
+                        if (!citationId) return;
+                        if (!confirm("Delete this citation?")) return;
+                        try {
+                            const { error } = await localSupabase
+                                .from("citations")
+                                .delete()
+                                .eq("id", citationId);
+                            if (error) {
+                                alert("Failed to delete citation: " + error.message);
+                                return;
+                            }
+                            await loadUnitsCitations();
+                        } catch (err) {
+                            alert("Failed to delete citation.");
+                            console.error(err);
+                        }
+                    });
+                });
+            } catch (err) {
+                if (unitsCitationsList) unitsCitationsList.innerHTML = '<div class="units-citations-empty">Failed to load citations.</div>';
+                console.error(err);
+            }
+        }
     </script>
 </body>
-</html>s
+</html>

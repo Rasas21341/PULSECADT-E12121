@@ -892,6 +892,23 @@
             }
         }
 
+        .panels-manage-title {
+            position: fixed;
+            top: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 20px;
+            font-weight: 700;
+            color: #ffffff;
+            z-index: 510;
+            pointer-events: none;
+            display: none;
+        }
+
+        .panels-manage-title.visible {
+            display: block;
+        }
+
         .logged-in-actions {
             position: fixed;
             top: 50%;
@@ -1616,8 +1633,9 @@ enable-ga="false"
         <p>We are actively working on the PulseCAD Revamp. Updates are in progress.</p>
         <span class="status"><span class="status-dot"></span>In Progress</span>
     </div>
-    <div class="logged-in-screen" id="loggedInScreen">
-        <div class="logged-in-actions">
+     <div class="logged-in-screen" id="loggedInScreen">
+         <div class="panels-manage-title" id="panelsManageTitle">Panels you manage</div>
+         <div class="logged-in-actions">
             <button type="button" class="create-community-centered-btn" id="createCommunityCenteredBtn">Create Community</button>
             <button type="button" class="join-community-centered-btn" id="joinCommunityCenteredBtn">Join Community</button>
             <button type="button" class="join-community-centered-btn" id="staffDashboardBtn">Staff Dashboard</button>
@@ -2838,10 +2856,12 @@ enable-ga="false"
             if (container) container.style.display = "none";
             if (loggedInScreen) loggedInScreen.classList.add("open");
             if (authModal) authModal.classList.remove("open");
-            if (topLeftLogo) topLeftLogo.classList.add("visible");
-            const trustedFooter = document.getElementById("trustedFooter");
-            if (trustedFooter) trustedFooter.style.display = "none";
-            updateStaffButtonVisibility();
+             if (topLeftLogo) topLeftLogo.classList.add("visible");
+             const trustedFooter = document.getElementById("trustedFooter");
+             if (trustedFooter) trustedFooter.style.display = "none";
+             const panelsManageTitle = document.getElementById("panelsManageTitle");
+             if (panelsManageTitle) panelsManageTitle.classList.add("visible");
+             updateStaffButtonVisibility();
         }
 
         function applyLoggedOutUI() {
@@ -2858,9 +2878,11 @@ enable-ga="false"
             if (loggedInScreen) loggedInScreen.classList.remove("open");
             if (settingsScreen) settingsScreen.classList.remove("open");
             if (container) container.style.display = "block";
-            if (topLeftLogo) topLeftLogo.classList.remove("visible");
-            const trustedFooter = document.getElementById("trustedFooter");
-            if (trustedFooter) trustedFooter.style.display = "block";
+             if (topLeftLogo) topLeftLogo.classList.remove("visible");
+             const panelsManageTitle = document.getElementById("panelsManageTitle");
+             if (panelsManageTitle) panelsManageTitle.classList.remove("visible");
+             const trustedFooter = document.getElementById("trustedFooter");
+             if (trustedFooter) trustedFooter.style.display = "block";
         }
 
         async function restoreSession() {
