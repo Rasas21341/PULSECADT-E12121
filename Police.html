@@ -1993,6 +1993,118 @@
         if (arrestDownloadPdfBtn) {
             arrestDownloadPdfBtn.addEventListener("click", generateArrestPdf);
         }
+
+        const communityId = new URLSearchParams(window.location.search).get("community") || "";
+        const supervisorPanelBtn = document.getElementById("supervisorPanelBtn");
+        const supervisorPasswordOverlay = document.getElementById("supervisorPasswordOverlay");
+        const supervisorPasswordClose = document.getElementById("supervisorPasswordClose");
+        const supervisorPasswordInput = document.getElementById("supervisorPasswordInput");
+        const supervisorPasswordSubmit = document.getElementById("supervisorPasswordSubmit");
+        const supervisorPasswordError = document.getElementById("supervisorPasswordError");
+        const supervisorPanelOverlay = document.getElementById("supervisorPanelOverlay");
+        const supervisorPanelClose = document.getElementById("supervisorPanelClose");
+        const supervisorPanelContent = document.getElementById("supervisorPanelContent");
+
+        if (supervisorPanelBtn) {
+            supervisorPanelBtn.addEventListener("click", () => {
+                if (!communityId) {
+                    alert("Community ID missing. Cannot access supervisor panel.");
+                    return;
+                }
+                if (supervisorPasswordInput) supervisorPasswordInput.value = "";
+                if (supervisorPasswordError) { supervisorPasswordError.textContent = ""; supervisorPasswordError.style.display = "none"; }
+                if (supervisorPasswordOverlay) supervisorPasswordOverlay.classList.add("open");
+                if (supervisorPasswordInput) supervisorPasswordInput.focus();
+            });
+        }
+
+        if (supervisorPasswordClose) {
+            supervisorPasswordClose.addEventListener("click", () => {
+                if (supervisorPasswordOverlay) supervisorPasswordOverlay.classList.remove("open");
+            });
+        }
+
+        if (supervisorPasswordOverlay) {
+            supervisorPasswordOverlay.addEventListener("click", (e) => {
+                if (e.target === supervisorPasswordOverlay) {
+                    supervisorPasswordOverlay.classList.remove("open");
+                }
+            });
+        }
+
+        if (supervisorPasswordSubmit) {
+            supervisorPasswordSubmit.addEventListener("click", async () => {
+                const password = supervisorPasswordInput ? supervisorPasswordInput.value.trim() : "";
+                if (!password) {
+                    if (supervisorPasswordError) { supervisorPasswordError.textContent = "Enter the supervisor password."; supervisorPasswordError.style.display = "block"; }
+                    return;
+                }
+                if (!localSupabase || !communityId) {
+                    if (supervisorPasswordError) { supervisorPasswordError.textContent = "Unable to verify password."; supervisorPasswordError.style.display = "block"; }
+                    return;
+                }
+                if (supervisorPasswordError) { supervisorPasswordError.textContent = ""; supervisorPasswordError.style.display = "none"; }
+                if (supervisorPasswordSubmit) { supervisorPasswordSubmit.disabled = true; supervisorPasswordSubmit.textContent = "Verifying..."; }
+
+                try {
+                    const { data, error } = await localSupabase
+                        .from("communities")
+                        .select("name, supervisor")
+                        .eq("id", communityId)
+                        .maybeSingle();
+
+                    if (error || !data) {
+                        if (supervisorPasswordError) { supervisorPasswordError.textContent = "Failed to verify password."; supervisorPasswordError.style.display = "block"; }
+                        return;
+                    }
+
+                    if (data.supervisor !== password) {
+                        if (supervisorPasswordError) { supervisorPasswordError.textContent = "Incorrect supervisor password."; supervisorPasswordError.style.display = "block"; }
+                        return;
+                    }
+
+                    if (supervisorPasswordOverlay) supervisorPasswordOverlay.classList.remove("open");
+                    openSupervisorPanel(data.name);
+                } catch (err) {
+                    if (supervisorPasswordError) { supervisorPasswordError.textContent = "Verification failed."; supervisorPasswordError.style.display = "block"; }
+                } finally {
+                    if (supervisorPasswordSubmit) { supervisorPasswordSubmit.disabled = false; supervisorPasswordSubmit.textContent = "Access Panel"; }
+                }
+            });
+        }
+
+        if (supervisorPasswordInput) {
+            supervisorPasswordInput.addEventListener("keydown", (e) => {
+                if (e.key === "Enter") {
+                    if (supervisorPasswordSubmit) supervisorPasswordSubmit.click();
+                }
+            });
+        }
+
+        function openSupervisorPanel(communityName) {
+            if (!supervisorPanelOverlay || !supervisorPanelContent) return;
+            const esc = (t) => (t || "").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+            supervisorPanelContent.innerHTML = `
+                <div style="font-size:14px; color:#475569; margin-bottom:12px;">Community: <strong>${esc(communityName)}</strong></div>
+                <div style="font-size:14px; color:#166534; font-weight:700;">Supervisor access granted.</div>
+                <div style="font-size:13px; color:#64748b; margin-top:8px;">You can add supervisor-only controls here.</div>
+            `;
+            supervisorPanelOverlay.classList.add("open");
+        }
+
+        if (supervisorPanelClose) {
+            supervisorPanelClose.addEventListener("click", () => {
+                if (supervisorPanelOverlay) supervisorPanelOverlay.classList.remove("open");
+            });
+        }
+
+        if (supervisorPanelOverlay) {
+            supervisorPanelOverlay.addEventListener("click", (e) => {
+                if (e.target === supervisorPanelOverlay) {
+                    supervisorPanelOverlay.classList.remove("open");
+                }
+            });
+        }
     </script>
 </body>
 </html>s
