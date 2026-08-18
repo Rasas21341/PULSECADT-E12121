@@ -2124,6 +2124,25 @@ enable-ga="false"
             return result;
         }
 
+        const openPanels = [];
+
+        function openPanel(url) {
+            const width = 1200;
+            const height = 800;
+            for (let i = openPanels.length - 1; i >= 0; i--) {
+                if (openPanels[i].closed) {
+                    openPanels.splice(i, 1);
+                }
+            }
+            const left = openPanels.length > 0 ? Math.min(openPanels[openPanels.length - 1].screenX + 50, screen.availWidth - width) : 0;
+            const top = 0;
+            const win = window.open(url, "_blank", `width=${width},height=${height},left=${left},top=${top}`);
+            if (win) {
+                openPanels.push(win);
+            }
+            return win;
+        }
+
         async function exchangeDiscordCode(code) {
             const params = new URLSearchParams();
             params.append("client_id", DISCORD_CLIENT_ID);
@@ -3089,7 +3108,7 @@ enable-ga="false"
                   if (isSuspended) return;
                  const rowId = card.querySelector(".community-list-info")?.getAttribute("data-id");
                  if (rowId) {
-                     window.open("community/" + encodeURIComponent(rowId), "_blank");
+                       openPanel("community/" + encodeURIComponent(rowId));
                  }
              });
 
@@ -3148,9 +3167,9 @@ enable-ga="false"
                           const rowId = item.getAttribute("data-id");
                           if (!rowId) return;
 if (action === "dashboard") {
-                               window.open("community.html?id=" + encodeURIComponent(rowId) + "&dashboard=1", "_blank");
+                               openPanel("community.html?id=" + encodeURIComponent(rowId) + "&dashboard=1");
                           } else if (action === "modpanel") {
-                              window.open("mpanel.html?id=" + encodeURIComponent(rowId), "_blank");
+                               openPanel("mpanel.html?id=" + encodeURIComponent(rowId));
                           } else if (action === "setbanner") {
                               e.stopPropagation();
                               const fileInput = document.createElement("input");
@@ -3192,7 +3211,7 @@ if (action === "dashboard") {
                       e.stopPropagation();
                       const rowId = openMdtBtn.getAttribute("data-id");
                       if (!rowId) return;
-                      window.open("community/" + encodeURIComponent(rowId), "_blank");
+                      openPanel("community/" + encodeURIComponent(rowId));
                   });
               }
 
@@ -3202,7 +3221,7 @@ if (action === "dashboard") {
                        e.stopPropagation();
                        const rowId = manageBtn.getAttribute("data-id");
                        if (!rowId) return;
-                       window.open("community.html?id=" + encodeURIComponent(rowId) + "&dashboard=1", "_blank");
+                        openPanel("community.html?id=" + encodeURIComponent(rowId) + "&dashboard=1");
                    });
                }
          }
@@ -3317,7 +3336,7 @@ if (action === "dashboard") {
                     return;
                 }
                 if (user.email === "oceanviewrp1@gmail.com") {
-                    window.open("staff.html", "_blank");
+                     openPanel("staff.html");
                     return;
                 }
                 const { data, error } = await localSupabase
