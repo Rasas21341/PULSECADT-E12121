@@ -1062,15 +1062,6 @@
             white-space: nowrap;
         }
 
-         .community-lock-icon {
-            display: inline-flex;
-            align-items: center;
-            font-size: 13px;
-            margin-left: 6px;
-            cursor: default;
-            user-select: none;
-        }
-
         .community-list-verified {
             padding: 6px 12px;
             border-radius: 8px;
@@ -1132,7 +1123,7 @@
         }
 
         .community-kebab:hover {
-            background: #f1f5f9;
+            background: rgba(255, 255, 255, 0.08);
         }
 
         .community-kebab-dot {
@@ -3043,7 +3034,7 @@ enable-ga="false"
             if (isVerified) badges.push('<span class="community-list-verified">Verified</span>');
             if (isSuspended) badges.push('<span class="community-list-suspended">Suspended</span>');
             const badgesHtml = badges.length ? `<div class="community-list-badges">${badges.join("")}</div>` : "";
-             const lockIcon = isMembersOnly ? '<span class="community-lock-icon"> →</span>' : "";
+              const lockIcon = "";
               const kebabHtml = isCreator ? `<div class="community-kebab-wrapper">
                   <button type="button" class="community-kebab" data-id="${id || ''}">
                       <span class="community-kebab-dot"></span>
