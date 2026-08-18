@@ -877,6 +877,14 @@
             background: #eff6ff;
         }
 
+        .create-community-above-panels {
+            position: fixed;
+            top: 78px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 511;
+        }
+
         @media (max-width: 480px) {
             .create-community-centered-btn,
             .join-community-centered-btn {
@@ -910,7 +918,7 @@
 
         .panels-manage-card {
             position: fixed;
-            top: 122px;
+            top: 142px;
             left: 50%;
             transform: translateX(-50%);
             width: min(780px, calc(100% - 48px));
@@ -967,7 +975,7 @@
 
         @media (max-width: 560px) {
             .panels-manage-card {
-                top: 78px;
+                top: 100px;
                 width: calc(100% - 24px);
                 padding: 18px 14px 22px;
             }
@@ -1746,11 +1754,11 @@ enable-ga="false"
         <span class="status"><span class="status-dot"></span>In Progress</span>
     </div>
       <div class="logged-in-screen" id="loggedInScreen">
-         <div class="logged-in-actions">
-              <button type="button" class="create-community-centered-btn" id="createCommunityCenteredBtn">+ Create</button>
-             <button type="button" class="join-community-centered-btn" id="joinCommunityCenteredBtn">Join Community</button>
-             <button type="button" class="join-community-centered-btn" id="staffDashboardBtn">Staff Dashboard</button>
-         </div>
+          <button type="button" class="create-community-centered-btn create-community-above-panels" id="createCommunityCenteredBtn">+ Create</button>
+          <div class="logged-in-actions">
+              <button type="button" class="join-community-centered-btn" id="joinCommunityCenteredBtn">Join Community</button>
+              <button type="button" class="join-community-centered-btn" id="staffDashboardBtn">Staff Dashboard</button>
+          </div>
          <div class="panels-manage-card open" id="panelsManageCard">
              <div class="panels-manage-title">Panels you manage</div>
              <div class="logged-in-communities" id="loggedInCommunities"></div>
