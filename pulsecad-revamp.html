@@ -2134,7 +2134,7 @@ enable-ga="false"
                     openPanels.splice(i, 1);
                 }
             }
-            const left = openPanels.length > 0 ? Math.min(openPanels[openPanels.length - 1].screenX + 50, screen.availWidth - width) : 0;
+            const left = openPanels.length > 0 ? Math.min(openPanels[openPanels.length - 1].screenX + 200, screen.availWidth - width) : 0;
             const top = 0;
             const win = window.open(url, "_blank", `width=${width},height=${height},left=${left},top=${top}`);
             if (win) {
