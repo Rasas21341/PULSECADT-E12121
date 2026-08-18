@@ -822,7 +822,6 @@
             inset: 0;
             background: #0C0D10;
             z-index: 500;
-            overflow-y: auto;
         }
 
         .logged-in-screen.open {
@@ -831,11 +830,11 @@
 
         .top-left-logo {
             position: fixed;
-            top: 18px;
-            left: 20px;
-            width: 34px;
-            height: 34px;
-            border-radius: 8px;
+            top: 24px;
+            left: 24px;
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
             object-fit: cover;
             z-index: 800;
             display: none;
@@ -939,9 +938,9 @@
 
         .logged-in-actions {
             position: fixed;
-            top: 22px;
-            right: 24px;
-            transform: none;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
             display: flex;
             gap: 12px;
             z-index: 510;
@@ -967,17 +966,6 @@
         }
 
         @media (max-width: 560px) {
-            .logged-in-actions {
-                top: 16px;
-                right: 12px;
-                gap: 6px;
-            }
-
-            .logged-in-actions button {
-                padding: 8px 10px;
-                font-size: 12px;
-            }
-
             .panels-manage-card {
                 top: 78px;
                 width: calc(100% - 24px);
