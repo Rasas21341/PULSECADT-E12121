@@ -1367,11 +1367,15 @@
                                             <label>Community Passcode</label>
                                             <input type="text" id="communityPasscodeInput" placeholder="Leave blank for no passcode" value="${(communityData.passcode || '').replace(/</g, '&lt;').replace(/>/g, '&gt;')}" />
                                         </div>
-                                        <div class="field">
-                                            <label>ERLC API Key</label>
-                                            <input type="text" id="erlcApiKeyInput" placeholder="ERLC API key" value="${initialErkKey.replace(/</g, '&lt;').replace(/>/g, '&gt;')}" />
-                                        </div>
-                                        <div class="dashboard-dropdown">
+                                         <div class="field">
+                                             <label>ERLC API Key</label>
+                                             <input type="text" id="erlcApiKeyInput" placeholder="ERLC API key" value="${initialErkKey.replace(/</g, '&lt;').replace(/>/g, '&gt;')}" />
+                                         </div>
+                                         <div class="field">
+                                             <label>Supervisor</label>
+                                             <input type="text" id="supervisorInput" placeholder="Supervisor name" value="${(communityData.supervisor || '').replace(/</g, '&lt;').replace(/>/g, '&gt;')}" />
+                                         </div>
+                                         <div class="dashboard-dropdown">
                                             <button type="button" class="dropdown-toggle" id="requestsDropdownToggle">Requests</button>
                                             <div class="dropdown-menu" id="requestsDropdownMenu">
                                                 <div class="empty" id="requestsStatus">Requests turned off</div>
@@ -1489,32 +1493,33 @@
                                 </div>
                          `;
 
-                        const serverNameInput = document.getElementById("serverNameInput");
-                        const approvalBtns = document.getElementById("settingsView").querySelectorAll(".approval-btn");
-                        const membersBtn = document.getElementById("membersBtn");
-                        const memberList = document.getElementById("memberList");
-                        const vehiclesBtn = document.getElementById("vehiclesBtn");
-                        const vehiclesView = document.getElementById("vehiclesView");
-                        const vehiclesViewList = document.getElementById("vehiclesViewList");
-                        const vehiclesViewClose = document.getElementById("vehiclesViewClose");
-                        const licencesBtn = document.getElementById("licencesBtn");
-                        const licencesView = document.getElementById("licencesView");
-                        const licencesViewList = document.getElementById("licencesViewList");
-                        const licencesViewClose = document.getElementById("licencesViewClose");
-                        const requestsDropdownToggle = document.getElementById("requestsDropdownToggle");
-                        const requestsDropdownMenu = document.getElementById("requestsDropdownMenu");
-                        const requestsStatus = document.getElementById("requestsStatus");
-                        const requestsList = document.getElementById("requestsList");
-                        const settingsBtn = document.getElementById("settingsBtn");
-                        const settingsView = document.getElementById("settingsView");
-                        const settingsViewClose = document.getElementById("settingsViewClose");
-                        const membersView = document.getElementById("membersView");
-                        const membersViewList = document.getElementById("membersViewList");
-                        const membersViewClose = document.getElementById("membersViewClose");
-                        const applicationsBtn = document.getElementById("applicationsBtn");
-                        const applicationsView = document.getElementById("applicationsView");
-                        const applicationsViewClose = document.getElementById("applicationsViewClose");
-                        const applicationsList = document.getElementById("applicationsList");
+                         const serverNameInput = document.getElementById("serverNameInput");
+                         const approvalBtns = document.getElementById("settingsView").querySelectorAll(".approval-btn");
+                         const membersBtn = document.getElementById("membersBtn");
+                         const memberList = document.getElementById("memberList");
+                         const vehiclesBtn = document.getElementById("vehiclesBtn");
+                         const vehiclesView = document.getElementById("vehiclesView");
+                         const vehiclesViewList = document.getElementById("vehiclesViewList");
+                         const vehiclesViewClose = document.getElementById("vehiclesViewClose");
+                         const licencesBtn = document.getElementById("licencesBtn");
+                         const licencesView = document.getElementById("licencesView");
+                         const licencesViewList = document.getElementById("licencesViewList");
+                         const licencesViewClose = document.getElementById("licencesViewClose");
+                         const requestsDropdownToggle = document.getElementById("requestsDropdownToggle");
+                         const requestsDropdownMenu = document.getElementById("requestsDropdownMenu");
+                         const requestsStatus = document.getElementById("requestsStatus");
+                         const requestsList = document.getElementById("requestsList");
+                         const settingsBtn = document.getElementById("settingsBtn");
+                         const settingsView = document.getElementById("settingsView");
+                         const settingsViewClose = document.getElementById("settingsViewClose");
+                         const membersView = document.getElementById("membersView");
+                         const membersViewList = document.getElementById("membersViewList");
+                         const membersViewClose = document.getElementById("membersViewClose");
+                         const applicationsBtn = document.getElementById("applicationsBtn");
+                         const applicationsView = document.getElementById("applicationsView");
+                         const applicationsViewClose = document.getElementById("applicationsViewClose");
+                         const applicationsList = document.getElementById("applicationsList");
+                         const supervisorInput = document.getElementById("supervisorInput");
 
                         if (settingsBtn && settingsView) {
                             settingsBtn.addEventListener("click", (e) => {
