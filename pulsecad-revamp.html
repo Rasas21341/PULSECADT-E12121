@@ -1691,12 +1691,15 @@ enable-ga="false"
         <span class="status"><span class="status-dot"></span>In Progress</span>
     </div>
       <div class="logged-in-screen" id="loggedInScreen">
-          <div class="logged-in-actions">
-            <button type="button" class="create-community-centered-btn" id="createCommunityCenteredBtn">Create Community</button>
-            <button type="button" class="join-community-centered-btn" id="joinCommunityCenteredBtn">Join Community</button>
-            <button type="button" class="join-community-centered-btn" id="staffDashboardBtn">Staff Dashboard</button>
-        </div>
-        <div class="logged-in-communities" id="loggedInCommunities"></div>
+         <div class="logged-in-actions">
+             <button type="button" class="create-community-centered-btn" id="createCommunityCenteredBtn">Create Community</button>
+             <button type="button" class="join-community-centered-btn" id="joinCommunityCenteredBtn">Join Community</button>
+             <button type="button" class="join-community-centered-btn" id="staffDashboardBtn">Staff Dashboard</button>
+         </div>
+         <div class="panels-manage-card open" id="panelsManageCard">
+             <div class="panels-manage-title">Panels you manage</div>
+             <div class="logged-in-communities" id="loggedInCommunities"></div>
+         </div>
         <div class="staff-dashboard-card" id="staffDashboardCard">
             <div class="staff-dashboard-title">Staff Dashboard</div>
             <div id="staffDashboardContent"></div>
@@ -2661,16 +2664,15 @@ enable-ga="false"
         const joinCommunityCenteredBtn = document.getElementById("joinCommunityCenteredBtn");
         const loggedInCommunities = document.getElementById("loggedInCommunities");
 
-         function loadCommunities() {
+        function loadCommunities() {
             if (!loggedInCommunities || !localSupabase) return;
-            const header = `<div class="panels-manage-header" id="panelsManageHeader">Panels you manage</div>`;
-            loggedInCommunities.innerHTML = header;
+            loggedInCommunities.innerHTML = "";
             localSupabase.auth.getUser().then(({ data: userData }) => {
                 const user = userData?.user;
                 const userId = user?.id;
                 const userEmail = user?.email;
                 if (!userId) {
-                    loggedInCommunities.innerHTML = header;
+                    loggedInCommunities.innerHTML = "";
                     return;
                 }
                 localSupabase
