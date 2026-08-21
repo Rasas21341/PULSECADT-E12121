@@ -3258,15 +3258,15 @@ if (action === "dashboard") {
                    });
                }
 
-              const manageBtn = card.querySelector(".panel-manage");
-               if (manageBtn) {
-                   manageBtn.addEventListener("click", (e) => {
-                       e.stopPropagation();
-                       const rowId = manageBtn.getAttribute("data-id");
-                       if (!rowId) return;
-                        openPanel("community.html?id=" + encodeURIComponent(rowId) + "&dashboard=1");
-                   });
-               }
+               const manageBtn = card.querySelector(".panel-manage");
+                if (manageBtn) {
+                    manageBtn.addEventListener("click", (e) => {
+                        e.stopPropagation();
+                        const rowId = manageBtn.getAttribute("data-id");
+                        if (!rowId) return;
+                        window.location.href = "community.html?id=" + encodeURIComponent(rowId) + "&dashboard=1";
+                    });
+                }
          }
 
         async function consumeRedeemedKey() {
