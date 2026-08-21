@@ -3248,15 +3248,15 @@ if (action === "dashboard") {
                   });
               }
 
-              const openMdtBtn = card.querySelector(".panel-open-mdt");
-              if (openMdtBtn) {
-                  openMdtBtn.addEventListener("click", (e) => {
-                      e.stopPropagation();
-                      const rowId = openMdtBtn.getAttribute("data-id");
-                      if (!rowId) return;
-                      openPanel("community/" + encodeURIComponent(rowId));
-                  });
-              }
+               const openMdtBtn = card.querySelector(".panel-open-mdt");
+               if (openMdtBtn) {
+                   openMdtBtn.addEventListener("click", (e) => {
+                       e.stopPropagation();
+                       const rowId = openMdtBtn.getAttribute("data-id");
+                       if (!rowId) return;
+                       window.location.href = "community/" + encodeURIComponent(rowId);
+                   });
+               }
 
               const manageBtn = card.querySelector(".panel-manage");
                if (manageBtn) {
