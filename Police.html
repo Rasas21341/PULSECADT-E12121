@@ -1214,6 +1214,13 @@
 
         document.getElementById("backBtn").addEventListener("click", () => window.close());
 
+        const formsBtn = document.getElementById("formsBtn");
+        if (formsBtn) {
+            formsBtn.addEventListener("click", () => {
+                alert("Coming Soon");
+            });
+        }
+
         let officerId = "officer-" + Math.random().toString(36).slice(2, 10);
         try {
             const stored = localStorage.getItem("policeOfficerId");
