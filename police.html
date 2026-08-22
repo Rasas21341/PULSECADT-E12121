@@ -1670,12 +1670,6 @@
                     console.error("Could not read officer details:", err);
                 }
             }
-            try {
-                const savedCallsign = localStorage.getItem("policeOfficerCallsign");
-                if (savedCallsign) callsign = savedCallsign;
-            } catch (err) {
-                console.error("Could not read callsign:", err);
-            }
             if (officerInfo) {
                 const display = (officerRank ? officerRank + " " : "") + officerName;
                 officerInfo.innerHTML = display;
