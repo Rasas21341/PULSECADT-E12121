@@ -1373,6 +1373,48 @@
             console.error("Supabase init failed:", err);
         }
 
+        async function loadCallsBar() {
+            const tbody = document.getElementById("callsTableBody");
+            if (!tbody) return;
+            if (!localSupabase) {
+                tbody.innerHTML = '<tr><td colspan="7" class="calls-empty">Database unavailable</td></tr>';
+                return;
+            }
+            try {
+                const { data, error } = await localSupabase
+                    .from("calls")
+                    .select("*")
+                    .order("created_at", { ascending: false })
+                    .limit(20);
+
+                if (error) throw error;
+
+                if (!Array.isArray(data) || data.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="7" class="calls-empty">No active calls</td></tr>';
+                    return;
+                }
+
+                const esc = (t) => (t || "").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+                tbody.innerHTML = data.map((c) => {
+                    const statusClass = (c.status || "pending").toLowerCase();
+                    return `<tr>
+                        <td>${esc(String(c.id || "").slice(0, 8))}</td>
+                        <td>${esc(c.nature || "")}</td>
+                        <td>${esc(c.location || "")}</td>
+                        <td>${esc(c.postal || "")}</td>
+                        <td><span class="status-badge status-${statusClass}">${esc(c.status || "Pending")}</span></td>
+                        <td>${esc(c.units || "")}</td>
+                        <td>${esc(c.caller || "")}</td>
+                    </tr>`;
+                }).join("");
+            } catch (err) {
+                tbody.innerHTML = '<tr><td colspan="7" class="calls-empty">Failed to load calls</td></tr>';
+                console.error("Failed to load calls:", err);
+            }
+        }
+
+        loadCallsBar();
+
         document.getElementById("backBtn").addEventListener("click", () => window.close());
 
         const formsBtn = document.getElementById("formsBtn");
