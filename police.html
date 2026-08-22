@@ -1048,6 +1048,24 @@
             box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
         }
 
+        .callsign-input {
+            padding: 8px 12px;
+            border-radius: 10px;
+            border: 1px solid #cbd5e1;
+            background: #ffffff;
+            color: #0f172a;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            outline: none;
+            width: 140px;
+        }
+
+        .callsign-input:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+        }
+
         .id-picture-overlay {
             position: fixed;
             inset: 0;
@@ -1174,6 +1192,7 @@
                 <option value="unavailable">Unavailable</option>
                 <option value="busy">Busy</option>
             </select>
+            <input type="text" id="callsignInput" class="callsign-input" placeholder="Callsign" maxlength="20" />
         </div>
     </div>
 
