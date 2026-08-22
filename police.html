@@ -1101,6 +1101,26 @@
         </div>
     </div>
 
+    <div class="units-bar" id="unitsBar">
+        <table class="units-table">
+            <thead>
+                <tr>
+                    <th>Officer Unit</th>
+                    <th>Status</th>
+                    <th>Call #</th>
+                    <th>Agency</th>
+                    <th>Location</th>
+                    <th>Assignment</th>
+                    <th>Disposition</th>
+                </tr>
+            </thead>
+            <tbody id="unitsTableBody">
+                <tr>
+                    <td colspan="7" class="units-empty">Loading units...</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 
     <div class="calls-bar" id="callsBar">
         <table class="calls-table">
@@ -1356,27 +1376,6 @@
             </div>
             <div style="font-size:14px; color:#475569; text-align:center; padding: 10px 0;">Coming Soon</div>
         </div>
-    </div>
-
-    <div class="calls-bar" id="callsBar">
-        <table class="calls-table">
-            <thead>
-                <tr>
-                    <th>Call #</th>
-                    <th>Nature</th>
-                    <th>Location</th>
-                    <th>Postal</th>
-                    <th>Status</th>
-                    <th>Units</th>
-                    <th>Caller</th>
-                </tr>
-            </thead>
-            <tbody id="callsTableBody">
-                <tr>
-                    <td colspan="7" class="calls-empty">Loading calls...</td>
-                </tr>
-            </tbody>
-        </table>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
