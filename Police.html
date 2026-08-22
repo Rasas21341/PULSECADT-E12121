@@ -1733,7 +1733,7 @@
         const callsignInput = document.getElementById("callsignInput");
         if (callsignInput) {
             try {
-                callsign = localStorage.getItem("policeCallsign") || "";
+                callsign = localStorage.getItem("policeOfficerCallsign") || "";
                 callsignInput.value = callsign;
             } catch (err) {
                 console.error("Could not read callsign:", err);
@@ -1741,7 +1741,7 @@
             callsignInput.addEventListener("input", () => {
                 callsign = callsignInput.value.trim();
                 try {
-                    localStorage.setItem("policeCallsign", callsign);
+                    localStorage.setItem("policeOfficerCallsign", callsign);
                 } catch (err) {
                     console.error("Could not save callsign:", err);
                 }
