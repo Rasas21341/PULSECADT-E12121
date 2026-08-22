@@ -1469,6 +1469,46 @@
             console.error("Supabase init failed:", err);
         }
 
+        async function loadUnitsBar() {
+            const tbody = document.getElementById("unitsTableBody");
+            if (!tbody) return;
+            if (!localSupabase) {
+                tbody.innerHTML = '<tr><td colspan="7" class="units-empty">Database unavailable</td></tr>';
+                return;
+            }
+            try {
+                const { data, error } = await localSupabase
+                    .from("officers")
+                    .select("*")
+                    .order("created_at", { ascending: false })
+                    .limit(20);
+
+                if (error) throw error;
+
+                if (!Array.isArray(data) || data.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="7" class="units-empty">No active units</td></tr>';
+                    return;
+                }
+
+                const esc = (t) => (t || "").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+                tbody.innerHTML = data.map((o) => {
+                    const statusClass = (o.status || "available").toLowerCase();
+                    return `<tr>
+                        <td>${esc(o.unit || o.name || "")}</td>
+                        <td><span class="status-badge status-${statusClass}">${esc(o.status || "Available")}</span></td>
+                        <td>${esc(o.call_number || "")}</td>
+                        <td>${esc(o.agency || "")}</td>
+                        <td>${esc(o.location || "")}</td>
+                        <td>${esc(o.assignment || "")}</td>
+                        <td>${esc(o.disposition || "")}</td>
+                    </tr>`;
+                }).join("");
+            } catch (err) {
+                tbody.innerHTML = '<tr><td colspan="7" class="units-empty">Failed to load units</td></tr>';
+                console.error("Failed to load units:", err);
+            }
+        }
+
         async function loadCallsBar() {
             const tbody = document.getElementById("callsTableBody");
             if (!tbody) return;
