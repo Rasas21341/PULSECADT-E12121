@@ -1182,6 +1182,7 @@
             <thead>
                 <tr>
                     <th>Officer Unit</th>
+                    <th>Rank</th>
                     <th>Status</th>
                     <th>Call #</th>
                     <th>Agency</th>
@@ -1192,7 +1193,7 @@
             </thead>
             <tbody id="unitsTableBody">
                 <tr>
-                    <td colspan="7" class="units-empty">Loading units...</td>
+                    <td colspan="8" class="units-empty">Loading units...</td>
                 </tr>
             </tbody>
         </table>
@@ -1477,7 +1478,7 @@
             const displayName = (officerRank ? officerRank + " " : "") + officerName;
 
             if (!localSupabase) {
-                tbody.innerHTML = `<tr><td colspan="7" class="units-empty">Database unavailable</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="8" class="units-empty">Database unavailable</td></tr>`;
                 return;
             }
             try {
@@ -1492,6 +1493,7 @@
                 const currentStatusClass = (currentStatus || "available").toLowerCase();
                 const currentRow = `<tr>
                     <td><strong>${esc(displayName)}</strong></td>
+                    <td>${esc(officerRank || "")}</td>
                     <td><span class="status-badge status-${currentStatusClass}">${esc(STATUS_LABELS[currentStatus] || "Available")}</span></td>
                     <td></td>
                     <td></td>
@@ -1501,7 +1503,7 @@
                 </tr>`;
 
                 if (!Array.isArray(data) || data.length === 0) {
-                    tbody.innerHTML = currentRow + '<tr><td colspan="7" class="units-empty">No other active units</td></tr>';
+                    tbody.innerHTML = currentRow + '<tr><td colspan="8" class="units-empty">No other active units</td></tr>';
                     return;
                 }
 
@@ -1509,6 +1511,7 @@
                     const statusClass = (o.status || "available").toLowerCase();
                     return `<tr>
                         <td>${esc(o.unit || o.name || "")}</td>
+                        <td>${esc(o.rank || "")}</td>
                         <td><span class="status-badge status-${statusClass}">${esc(o.status || "Available")}</span></td>
                         <td>${esc(o.call_number || "")}</td>
                         <td>${esc(o.agency || "")}</td>
@@ -1520,7 +1523,7 @@
 
                 tbody.innerHTML = currentRow + otherRows;
             } catch (err) {
-                tbody.innerHTML = '<tr><td colspan="7" class="units-empty">Failed to load units</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="8" class="units-empty">Failed to load units</td></tr>';
                 console.error("Failed to load units:", err);
             }
         }
