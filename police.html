@@ -1565,9 +1565,6 @@
             }
         }
 
-        loadUnitsBar();
-        loadCallsBar();
-
         document.getElementById("backBtn").addEventListener("click", () => window.close());
 
         const formsBtn = document.getElementById("formsBtn");
@@ -2773,6 +2770,9 @@
                 console.error(err);
             }
         }
+
+        loadUnitsBar();
+        loadCallsBar();
     </script>
 </body>
 </html>
