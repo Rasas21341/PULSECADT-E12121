@@ -1651,12 +1651,14 @@
             const params = new URLSearchParams(window.location.search);
             const pName = params.get("name");
             const pRank = params.get("rank");
+            const pCallsign = params.get("callsign");
             if (pName) {
                 officerName = pName;
                 officerRank = pRank || "";
                 try {
                     localStorage.setItem("policeOfficerName", officerName);
                     localStorage.setItem("policeOfficerRank", officerRank);
+                    if (pCallsign) localStorage.setItem("policeOfficerCallsign", pCallsign);
                 } catch (err) {
                     console.error("Could not save officer details:", err);
                 }
@@ -1667,6 +1669,12 @@
                 } catch (err) {
                     console.error("Could not read officer details:", err);
                 }
+            }
+            try {
+                const savedCallsign = localStorage.getItem("policeOfficerCallsign");
+                if (savedCallsign) callsign = savedCallsign;
+            } catch (err) {
+                console.error("Could not read callsign:", err);
             }
             if (officerInfo) {
                 const display = (officerRank ? officerRank + " " : "") + officerName;
