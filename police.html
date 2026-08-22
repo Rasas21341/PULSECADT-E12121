@@ -1174,7 +1174,6 @@
                 <option value="unavailable">Unavailable</option>
                 <option value="busy">Busy</option>
             </select>
-            <input type="text" id="callsignInput" class="callsign-input" placeholder="Callsign" maxlength="20" />
         </div>
     </div>
 
@@ -1701,25 +1700,6 @@
             console.error("Could not read status:", err);
         }
         setStatus(savedStatus);
-
-        let callsign = "";
-        const callsignInput = document.getElementById("callsignInput");
-        if (callsignInput) {
-            try {
-                callsign = localStorage.getItem("policeOfficerCallsign") || "";
-                callsignInput.value = callsign;
-            } catch (err) {
-                console.error("Could not read callsign:", err);
-            }
-            callsignInput.addEventListener("input", () => {
-                callsign = callsignInput.value.trim();
-                try {
-                    localStorage.setItem("policeOfficerCallsign", callsign);
-                } catch (err) {
-                    console.error("Could not save callsign:", err);
-                }
-            });
-        }
 
         const lookupModal = document.getElementById("lookupModal");
         const lookupModalClose = document.getElementById("lookupModalClose");
