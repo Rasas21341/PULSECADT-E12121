@@ -1721,6 +1721,25 @@
         }
         setStatus(savedStatus);
 
+        let callsign = "";
+        const callsignInput = document.getElementById("callsignInput");
+        if (callsignInput) {
+            try {
+                callsign = localStorage.getItem("policeCallsign") || "";
+                callsignInput.value = callsign;
+            } catch (err) {
+                console.error("Could not read callsign:", err);
+            }
+            callsignInput.addEventListener("input", () => {
+                callsign = callsignInput.value.trim();
+                try {
+                    localStorage.setItem("policeCallsign", callsign);
+                } catch (err) {
+                    console.error("Could not save callsign:", err);
+                }
+            });
+        }
+
         const lookupModal = document.getElementById("lookupModal");
         const lookupModalClose = document.getElementById("lookupModalClose");
         const plateInput = document.getElementById("plateInput");
