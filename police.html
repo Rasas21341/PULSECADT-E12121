@@ -1472,8 +1472,12 @@
         async function loadUnitsBar() {
             const tbody = document.getElementById("unitsTableBody");
             if (!tbody) return;
+
+            const esc = (t) => (t || "").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+            const displayName = (officerRank ? officerRank + " " : "") + officerName;
+
             if (!localSupabase) {
-                tbody.innerHTML = '<tr><td colspan="7" class="units-empty">Database unavailable</td></tr>';
+                tbody.innerHTML = `<tr><td colspan="7" class="units-empty">Database unavailable</td></tr>`;
                 return;
             }
             try {
@@ -1485,13 +1489,23 @@
 
                 if (error) throw error;
 
+                const currentStatusClass = (currentStatus || "available").toLowerCase();
+                const currentRow = `<tr>
+                    <td><strong>${esc(displayName)}</strong></td>
+                    <td><span class="status-badge status-${currentStatusClass}">${esc(STATUS_LABELS[currentStatus] || "Available")}</span></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>`;
+
                 if (!Array.isArray(data) || data.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="7" class="units-empty">No active units</td></tr>';
+                    tbody.innerHTML = currentRow + '<tr><td colspan="7" class="units-empty">No other active units</td></tr>';
                     return;
                 }
 
-                const esc = (t) => (t || "").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-                tbody.innerHTML = data.map((o) => {
+                const otherRows = data.map((o) => {
                     const statusClass = (o.status || "available").toLowerCase();
                     return `<tr>
                         <td>${esc(o.unit || o.name || "")}</td>
@@ -1503,6 +1517,8 @@
                         <td>${esc(o.disposition || "")}</td>
                     </tr>`;
                 }).join("");
+
+                tbody.innerHTML = currentRow + otherRows;
             } catch (err) {
                 tbody.innerHTML = '<tr><td colspan="7" class="units-empty">Failed to load units</td></tr>';
                 console.error("Failed to load units:", err);
