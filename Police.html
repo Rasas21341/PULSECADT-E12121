@@ -1203,6 +1203,16 @@
         </div>
     </div>
 
+    <div class="modal-overlay" id="formsModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">Forms</div>
+                <button class="modal-close" id="formsModalClose" type="button" aria-label="Close">×</button>
+            </div>
+            <div style="font-size:14px; color:#475569; text-align:center; padding: 10px 0;">Coming Soon</div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script>
@@ -1221,9 +1231,23 @@
         document.getElementById("backBtn").addEventListener("click", () => window.close());
 
         const formsBtn = document.getElementById("formsBtn");
-        if (formsBtn) {
+        const formsModal = document.getElementById("formsModal");
+        const formsModalClose = document.getElementById("formsModalClose");
+        if (formsBtn && formsModal) {
             formsBtn.addEventListener("click", () => {
-                alert("Coming Soon");
+                formsModal.classList.add("open");
+            });
+        }
+        if (formsModalClose && formsModal) {
+            formsModalClose.addEventListener("click", () => {
+                formsModal.classList.remove("open");
+            });
+        }
+        if (formsModal) {
+            formsModal.addEventListener("click", (e) => {
+                if (e.target === formsModal) {
+                    formsModal.classList.remove("open");
+                }
             });
         }
 
