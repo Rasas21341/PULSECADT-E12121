@@ -1234,40 +1234,21 @@ function readThemeInputs() {
                     if (user) {
                         const userEmail = user.email;
 
-                        let ownerEmail = null;
+                        let communityPro = false;
                         try {
                             const { data: community } = await localSupabase
                                 .from("communities")
-                                .select("creator_email, name")
+                                .select("creator_email, name, pro")
                                 .eq("id", data.community_id)
                                 .maybeSingle();
                             isOwner = !!(community && community.creator_email === userEmail);
-                            ownerEmail = community ? community.creator_email : null;
+                            communityPro = !!(community && community.pro === true);
                             currentCommunityName = (community && community.name) || "";
                         } catch (err) {
                             console.error("Owner check failed:", err);
                         }
 
-                        let hasPremium = false;
-                        async function checkPremium(email) {
-                            if (!email) return;
-                            try {
-                                const { count, error } = await localSupabase
-                                    .from("premium_keys")
-                                    .select("*", { count: "exact", head: true })
-                                    .eq("used_by", email)
-                                    .eq("used", true);
-                                if (!error && count > 0) {
-                                    hasPremium = true;
-                                }
-                            } catch (err) {
-                                console.error("Premium check failed:", err);
-                            }
-                        }
-
-                        await checkPremium(userEmail);
-                        if (ownerEmail) await checkPremium(ownerEmail);
-                        if (docFooter) docFooter.style.display = hasPremium ? "none" : "block";
+                        if (docFooter) docFooter.style.display = communityPro ? "none" : "block";
                     }
                 } catch (err) {
                     console.error("User/auth check failed:", err);
