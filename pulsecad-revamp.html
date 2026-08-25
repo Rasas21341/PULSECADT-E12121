@@ -2034,7 +2034,11 @@ enable-ga="false"
             } catch (err) {
                 console.error("Failed to check staff access:", err);
             }
-            btn.style.display = allowed ? "inline-block" : "none";
+            if (allowed) {
+                btn.classList.add("visible");
+            } else {
+                btn.classList.remove("visible");
+            }
         }
 
         async function checkPremiumStatus() {
@@ -3060,6 +3064,8 @@ enable-ga="false"
             if (loggedInScreen) loggedInScreen.classList.add("open");
             if (authModal) authModal.classList.remove("open");
              if (topLeftLogo) topLeftLogo.classList.add("visible");
+             const moderationBtn = document.getElementById("staffDashboardBtn");
+             if (moderationBtn) moderationBtn.classList.add("visible");
              const trustedFooter = document.getElementById("trustedFooter");
              if (trustedFooter) trustedFooter.style.display = "none";
              updateStaffButtonVisibility();
@@ -3080,6 +3086,8 @@ enable-ga="false"
             if (settingsScreen) settingsScreen.classList.remove("open");
             if (container) container.style.display = "block";
              if (topLeftLogo) topLeftLogo.classList.remove("visible");
+             const moderationBtn = document.getElementById("staffDashboardBtn");
+             if (moderationBtn) moderationBtn.classList.remove("visible");
              const trustedFooter = document.getElementById("trustedFooter");
              if (trustedFooter) trustedFooter.style.display = "block";
         }
