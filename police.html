@@ -2425,6 +2425,130 @@
             }
         }
 
+        async function loadCivilianInsurance(civilianId) {
+            const listEl = document.getElementById("civilianInsuranceList");
+            if (!listEl || !localSupabase) return;
+            listEl.innerHTML = '<div class="empty">Loading insurance...</div>';
+            try {
+                const { data, error } = await localSupabase
+                    .from("insurance_cards")
+                    .select("*")
+                    .eq("civilian_id", civilianId)
+                    .order("created_at", { ascending: false });
+
+                if (error || !Array.isArray(data) || data.length === 0) {
+                    listEl.innerHTML = '<div class="empty">No insurance cards on record.</div>';
+                    return;
+                }
+
+                listEl.innerHTML = data.map((ins) => `
+                    <div class="insurance-item">
+                        <div class="insurance-item-info">
+                            <div class="insurance-item-title">${escapeHtml(ins.policy_type || "Insurance")} — ${escapeHtml(ins.provider || "Unknown provider")}</div>
+                            <div class="insurance-item-meta">${ins.policy_number ? "Policy #: " + escapeHtml(ins.policy_number) : "No policy number"}</div>
+                        </div>
+                        <button type="button" class="insurance-view-btn" data-id="${ins.id}">View</button>
+                    </div>
+                `).join("");
+
+                listEl.querySelectorAll(".insurance-view-btn").forEach((btn) => {
+                    btn.addEventListener("click", async (e) => {
+                        e.stopPropagation();
+                        const id = btn.getAttribute("data-id");
+                        try {
+                            const { data: row, error } = await localSupabase
+                                .from("insurance_cards")
+                                .select("*")
+                                .eq("id", id)
+                                .maybeSingle();
+                            if (!error && row) openInsuranceCard(row);
+                        } catch (err) {
+                            console.error("Failed to load insurance card:", err);
+                        }
+                    });
+                });
+            } catch (err) {
+                listEl.innerHTML = '<div class="empty">Failed to load insurance.</div>';
+                console.error("Failed to load insurance:", err);
+            }
+        }
+
+        const insuranceCard = document.getElementById("insuranceCard");
+        const icCloseBtn = document.getElementById("icCloseBtn");
+
+        function openInsuranceCard(ins) {
+            if (!insuranceCard) return;
+
+            const photo = selectedCivilian ? (selectedCivilian.photo_url || selectedCivilian.photo || "") : "";
+
+            if (document.getElementById("icTitle")) {
+                document.getElementById("icTitle").textContent = (ins.policy_type || "Insurance").toUpperCase();
+            }
+
+            const isExpired = ins.expiry_date && new Date(ins.expiry_date) < new Date();
+            const statusEl = document.getElementById("icStatus");
+            if (statusEl) {
+                statusEl.textContent = isExpired ? "Expired" : "Active";
+                statusEl.classList.toggle("expired", !!isExpired);
+            }
+
+            const barcodeNum = (ins.policy_number && ins.policy_number.replace(/[^A-Za-z0-9]/g, "").toUpperCase()) || "INS000000";
+            if (document.getElementById("icBarcode")) {
+                document.getElementById("icBarcode").textContent = barcodeNum;
+            }
+
+            const photoWrap = document.getElementById("icPhotoWrap");
+            if (photoWrap) {
+                if (photo) {
+                    photoWrap.innerHTML = `<img class="license-card-photo" src="${escapeHtml(photo)}" alt="Photo" />`;
+                } else {
+                    photoWrap.innerHTML = `<div class="license-card-photo-placeholder">NO<br>PHOTO</div>`;
+                }
+            }
+
+            if (document.getElementById("icName")) {
+                document.getElementById("icName").textContent = selectedCivilian && selectedCivilian.name ? selectedCivilian.name : "—";
+            }
+
+            const issueDate = new Date().toLocaleDateString();
+            if (document.getElementById("icBody")) {
+                document.getElementById("icBody").innerHTML = `
+                    <div class="license-card-row">
+                        <span class="license-card-label">Provider</span>
+                        <span class="license-card-value">${escapeHtml(ins.provider || "N/A")}</span>
+                    </div>
+                    <div class="license-card-row">
+                        <span class="license-card-label">Policy Type</span>
+                        <span class="license-card-value">${escapeHtml(ins.policy_type || "N/A")}</span>
+                    </div>
+                    <div class="license-card-row">
+                        <span class="license-card-label">Policy Number</span>
+                        <span class="license-card-value">${escapeHtml(ins.policy_number || "N/A")}</span>
+                    </div>
+                    <div class="license-card-row">
+                        <span class="license-card-label">Coverage</span>
+                        <span class="license-card-value">${escapeHtml(ins.coverage || "N/A")}</span>
+                    </div>
+                    <div class="license-card-row">
+                        <span class="license-card-label">Date Issued</span>
+                        <span class="license-card-value">${escapeHtml(ins.created_at ? new Date(ins.created_at).toLocaleDateString() : issueDate)}</span>
+                    </div>
+                    <div class="license-card-row">
+                        <span class="license-card-label">Date of Expiry</span>
+                        <span class="license-card-value">${ins.expiry_date ? escapeHtml(ins.expiry_date) : "N/A"}</span>
+                    </div>
+                `;
+            }
+
+            insuranceCard.classList.add("open");
+        }
+
+        if (icCloseBtn) {
+            icCloseBtn.addEventListener("click", () => {
+                if (insuranceCard) insuranceCard.classList.remove("open");
+            });
+        }
+
         const openTrafficStopBtn = document.getElementById("openTrafficStopBtn");
         const openCitationBtn = document.getElementById("openCitationBtn");
         const openArrestBtn = document.getElementById("openArrestBtn");
