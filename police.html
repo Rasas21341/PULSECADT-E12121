@@ -68,6 +68,48 @@
             background: #f1f5f9;
         }
 
+        .status-top-btn {
+            position: fixed;
+            top: 24px;
+            right: 110px;
+            padding: 8px 14px;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+            background: #ffffff;
+            color: #0f172a;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            z-index: 600;
+        }
+
+        .status-top-btn:hover {
+            background: #f1f5f9;
+        }
+
+        .status-top-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #94a3b8;
+            flex-shrink: 0;
+        }
+
+        .status-top-dot.available {
+            background: #22c55e;
+        }
+
+        .status-top-dot.unavailable {
+            background: #ef4444;
+        }
+
+        .status-top-dot.busy {
+            background: #f59e0b;
+        }
+
         .new-call-btn {
             position: fixed;
             top: 24px;
@@ -2012,6 +2054,10 @@
             <polyline points="10 9 9 9 8 9"></polyline>
         </svg>
         Forms
+    </button>
+    <button type="button" class="status-top-btn" id="statusTopBtn">
+        <span class="status-top-dot" id="statusTopDot"></span>
+        <span id="statusTopText">Available</span>
     </button>
     <button type="button" class="new-call-btn" id="newCallBtn">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
