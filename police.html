@@ -3802,66 +3802,7 @@
                 e.preventDefault();
                 toggleBodycam();
             }
-            if (e.key === "F8") {
-                e.preventDefault();
-                toggleRadio();
-            }
         });
-
-        const radioOverlay = document.getElementById("radioOverlay");
-        const radioPtt = document.getElementById("radioPtt");
-
-        function toggleRadio() {
-            if (!radioOverlay) return;
-            const channelInput = document.getElementById("radioChannelInput");
-            const talkgroupInput = document.getElementById("radioTalkgroupInput");
-            const channelMain = document.querySelector(".radio-channel-main");
-            const talkgroup = document.querySelector(".radio-talkgroup");
-
-            if (channelInput && channelMain) channelMain.textContent = channelInput.value || "Scen 1";
-            if (talkgroupInput && talkgroup) talkgroup.textContent = talkgroupInput.value || "FG 1";
-
-            const isOpen = radioOverlay.classList.contains("open");
-            if (isOpen) {
-                radioOverlay.classList.remove("open");
-            } else {
-                radioOverlay.classList.add("open");
-                speakRadioAnnouncement(channelInput ? channelInput.value : "Scen 1", talkgroupInput ? talkgroupInput.value : "FG 1");
-            }
-        }
-
-        function speakRadioAnnouncement(channel, talkgroup) {
-            const text = (channel || "Scen 1") + " " + (talkgroup || "FG 1");
-            const audio = new Audio("radio-voice.mp3");
-            audio.volume = 0.8;
-            audio.play().catch(() => {
-                try {
-                    if (!("speechSynthesis" in window)) return;
-                    const utterance = new SpeechSynthesisUtterance(text);
-                    utterance.rate = 0.85;
-                    utterance.pitch = 1.1;
-                    utterance.volume = 1;
-                    const voices = speechSynthesis.getVoices();
-                    const preferred = voices.find(v => /Google US English|Microsoft David|Samantha/i.test(v.name))
-                        || voices.find(v => v.lang === "en-US")
-                        || voices.find(v => v.lang.startsWith("en"))
-                        || voices[0];
-                    if (preferred) utterance.voice = preferred;
-                    window.speechSynthesis.cancel();
-                    window.speechSynthesis.speak(utterance);
-                } catch (e) {
-                    console.error("Radio speech failed:", e);
-                }
-            });
-        }
-
-        if (radioPtt) {
-            radioPtt.addEventListener("mousedown", () => radioPtt.classList.add("pressed"));
-            radioPtt.addEventListener("mouseup", () => radioPtt.classList.remove("pressed"));
-            radioPtt.addEventListener("mouseleave", () => radioPtt.classList.remove("pressed"));
-            radioPtt.addEventListener("touchstart", () => radioPtt.classList.add("pressed"));
-            radioPtt.addEventListener("touchend", () => radioPtt.classList.remove("pressed"));
-        }
     </script>
 </body>
 </html>
