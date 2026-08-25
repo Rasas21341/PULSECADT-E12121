@@ -1816,6 +1816,36 @@
             letter-spacing: 0.5px;
         }
 
+        .radio-input-row {
+            display: flex;
+            gap: 6px;
+            padding: 0 10px 8px;
+        }
+
+        .radio-input {
+            flex: 1;
+            background: #0a0f0a;
+            border: 2px solid #1f2937;
+            border-radius: 6px;
+            padding: 6px 8px;
+            color: #10b981;
+            font-size: 11px;
+            font-weight: 700;
+            font-family: 'Courier New', monospace;
+            outline: none;
+            text-transform: uppercase;
+        }
+
+        .radio-input:focus {
+            border-color: #10b981;
+            box-shadow: 0 0 6px rgba(16, 185, 129, 0.3);
+        }
+
+        .radio-input::placeholder {
+            color: #374151;
+            text-transform: none;
+        }
+
         .radio-ptt {
             position: absolute;
             left: 14px;
@@ -1907,6 +1937,10 @@
                 <div class="radio-knob-circle"></div>
                 <span class="radio-knob-label">Ch</span>
             </div>
+        </div>
+        <div class="radio-input-row">
+            <input type="text" class="radio-input" id="radioChannelInput" placeholder="Scene" value="Scen 1" maxlength="20" />
+            <input type="text" class="radio-input" id="radioTalkgroupInput" placeholder="FG" value="FG 1" maxlength="10" />
         </div>
         <button type="button" class="radio-ptt" id="radioPtt">PTT</button>
         <div class="radio-bottom-bar">P25 Phase II</div>
@@ -3779,22 +3813,31 @@
 
         function toggleRadio() {
             if (!radioOverlay) return;
+            const channelInput = document.getElementById("radioChannelInput");
+            const talkgroupInput = document.getElementById("radioTalkgroupInput");
+            const channelMain = document.querySelector(".radio-channel-main");
+            const talkgroup = document.querySelector(".radio-talkgroup");
+
+            if (channelInput && channelMain) channelMain.textContent = channelInput.value || "Scen 1";
+            if (talkgroupInput && talkgroup) talkgroup.textContent = talkgroupInput.value || "FG 1";
+
             const isOpen = radioOverlay.classList.contains("open");
             if (isOpen) {
                 radioOverlay.classList.remove("open");
             } else {
                 radioOverlay.classList.add("open");
-                speakRadioAnnouncement();
+                speakRadioAnnouncement(channelInput ? channelInput.value : "Scen 1", talkgroupInput ? talkgroupInput.value : "FG 1");
             }
         }
 
-        function speakRadioAnnouncement() {
+        function speakRadioAnnouncement(channel, talkgroup) {
+            const text = (channel || "Scen 1") + " " + (talkgroup || "FG 1");
             const audio = new Audio("radio-voice.mp3");
             audio.volume = 0.8;
             audio.play().catch(() => {
                 try {
                     if (!("speechSynthesis" in window)) return;
-                    const utterance = new SpeechSynthesisUtterance("Scen 1 FG 1");
+                    const utterance = new SpeechSynthesisUtterance(text);
                     utterance.rate = 0.85;
                     utterance.pitch = 1.1;
                     utterance.volume = 1;
