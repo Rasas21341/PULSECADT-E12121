@@ -1573,6 +1573,16 @@
                         return;
                     }
 
+                    const createdCard = {
+                        civilian_id: selectedCivilianFromModal,
+                        provider: provider || "",
+                        policy_type: policyType,
+                        policy_number: policyNumber || "",
+                        coverage: coverage || "",
+                        expiry_date: expiry || null,
+                        created_at: new Date().toISOString()
+                    };
+
                     if (insuranceSuccess) { insuranceSuccess.textContent = "Insurance card created successfully."; insuranceSuccess.style.display = "block"; }
 
                     document.getElementById("insuranceProvider").value = "";
@@ -1584,9 +1594,8 @@
                     const selectedId = document.getElementById("insuranceCivilian")?.value || "";
                     if (selectedId) loadInsuranceCards(selectedId);
 
-                    setTimeout(() => {
-                        if (insuranceModal) insuranceModal.classList.remove("open");
-                    }, 800);
+                    if (insuranceModal) insuranceModal.classList.remove("open");
+                    openInsuranceCard(createdCard);
                 } catch (err) {
                     if (insuranceError) { insuranceError.textContent = "Failed to create insurance card."; insuranceError.style.display = "block"; }
                     console.error(err);
