@@ -1815,7 +1815,7 @@ enable-ga="false"
                      </svg>
                      Join
                  </button>
-                 <button type="button" class="join-community-centered-btn" id="applicationBtn">Application</button>
+                  <a href="application.html" target="_blank" class="join-community-centered-btn" id="applicationBtn">Application</a>
             </div>
            <div class="logged-in-actions">
            </div>
@@ -3458,14 +3458,6 @@ if (action === "dashboard") {
                     return;
                 }
                 openPanel("staff.html");
-            });
-        }
-
-        // Application
-        const applicationBtn = document.getElementById("applicationBtn");
-        if (applicationBtn) {
-            applicationBtn.addEventListener("click", () => {
-                window.open("application.html", "_blank");
             });
         }
 
