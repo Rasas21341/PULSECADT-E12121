@@ -1273,6 +1273,16 @@
 
             const sectionEditBtn = document.getElementById("sectionEditBtn");
             const sectionLicenseBtn = document.getElementById("sectionLicenseBtn");
+            const sectionVehicleBtn = document.getElementById("sectionVehicleBtn");
+            const sectionInsuranceBtn = document.getElementById("sectionInsuranceBtn");
+            const sectionDeleteBtn = document.getElementById("sectionDeleteBtn");
+            if (sectionEditBtn) sectionEditBtn.disabled = false;
+            if (sectionLicenseBtn) sectionLicenseBtn.disabled = false;
+            if (sectionVehicleBtn) sectionVehicleBtn.disabled = false;
+            if (sectionInsuranceBtn) sectionInsuranceBtn.disabled = false;
+            if (sectionDeleteBtn) sectionDeleteBtn.disabled = false;
+        }
+
         async function loadInsuranceCards(civilianId) {
             const listEl = document.getElementById(`insuranceList-${civilianId}`);
             if (!listEl || !localSupabase) return;
@@ -1556,16 +1566,6 @@
                     console.error(err);
                 }
             });
-        }
-
-        const sectionVehicleBtn = document.getElementById("sectionVehicleBtn");
-            const sectionInsuranceBtn = document.getElementById("sectionInsuranceBtn");
-            const sectionDeleteBtn = document.getElementById("sectionDeleteBtn");
-            if (sectionEditBtn) sectionEditBtn.disabled = false;
-            if (sectionLicenseBtn) sectionLicenseBtn.disabled = false;
-            if (sectionVehicleBtn) sectionVehicleBtn.disabled = false;
-            if (sectionInsuranceBtn) sectionInsuranceBtn.disabled = false;
-            if (sectionDeleteBtn) sectionDeleteBtn.disabled = false;
         }
 
         async function loadLicenses(civilianId) {
