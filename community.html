@@ -945,6 +945,35 @@
             color: #991b1b;
         }
 
+        .member-badge.supervisor {
+            display: inline-block;
+            margin-left: 6px;
+            padding: 1px 6px;
+            border-radius: 999px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #ffffff;
+            background: #7c3aed;
+            vertical-align: middle;
+        }
+
+        .member-item .supervisor-btn {
+            padding: 3px 8px;
+            border-radius: 6px;
+            border: 1px solid #7c3aed;
+            background: #f5f3ff;
+            color: #6d28d9;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .member-item .supervisor-btn:hover {
+            background: #ede9fe;
+        }
+
         .discord-invite-link {
             display: inline-block;
             padding: 8px 12px;
@@ -1783,7 +1812,7 @@
 
                                 const { data: memberRows, error: memberError } = await localSupabase
                                     .from("user_communities")
-                                    .select("user_id")
+                                    .select("user_id, is_supervisor")
                                     .eq("community_id", id);
 
                                 if (memberError) throw memberError;
@@ -1826,11 +1855,14 @@
                                         const email = esc(emailById[r.user_id] || r.user_id);
                                         const memberDept = (deptById[r.user_id] || "").trim();
                                         const isManagement = memberDept === "Management";
+                                        const isSupervisor = !!r.is_supervisor;
                                         const canKickBan = showKickBan && !(isSupport && isManagement);
+                                        const supBadge = isSupervisor ? ' <span class="member-badge supervisor">Supervisor</span>' : '';
                                         if (canKickBan) {
-                                            return `<div class="member-item"><span class="member-email">${email}</span><div class="member-actions"><button type="button" class="kick-btn" data-user-id="${esc(r.user_id)}">Kick</button><button type="button" class="ban-btn" data-user-id="${esc(r.user_id)}">Ban</button></div></div>`;
+                                            const supBtn = `<button type="button" class="supervisor-btn" data-user-id="${esc(r.user_id)}">${isSupervisor ? "Remove Supervisor" : "Make Supervisor"}</button>`;
+                                            return `<div class="member-item"><span class="member-email">${email}${supBadge}</span><div class="member-actions"><button type="button" class="kick-btn" data-user-id="${esc(r.user_id)}">Kick</button><button type="button" class="ban-btn" data-user-id="${esc(r.user_id)}">Ban</button>${supBtn}</div></div>`;
                                         }
-                                        return `<button type="button" class="member-btn">${email}</button>`;
+                                        return `<button type="button" class="member-btn">${email}${supBadge}</button>`;
                                     }).join('');
                                 }
                                 targetEl.innerHTML = html;
@@ -1846,6 +1878,28 @@
 
                         async function loadMembers() {
                             await loadMembersInto(memberList);
+                        }
+
+                        async function toggleSupervisor(userId, targetEl, openDropdown) {
+                            try {
+                                const { data: existing, error: selErr } = await localSupabase
+                                    .from("user_communities")
+                                    .select("is_supervisor")
+                                    .eq("community_id", id)
+                                    .eq("user_id", userId)
+                                    .maybeSingle();
+                                if (selErr) throw selErr;
+                                const newVal = !(existing && existing.is_supervisor);
+                                const { error: updErr } = await localSupabase
+                                    .from("user_communities")
+                                    .update({ is_supervisor: newVal })
+                                    .eq("community_id", id)
+                                    .eq("user_id", userId);
+                                if (updErr) throw updErr;
+                                loadMembersInto(targetEl, { loadingText: "Loading members...", openDropdown });
+                            } catch (err) {
+                                alert("Failed to update supervisor status: " + (err.message || err));
+                            }
                         }
 
                         if (membersViewList) {
@@ -1905,6 +1959,11 @@
                                             alert("Failed to ban member: " + (err.message || err));
                                         }
                                     }
+                                }
+                                const supBtn = e.target.closest(".supervisor-btn");
+                                if (supBtn) {
+                                    const userId = supBtn.getAttribute("data-user-id");
+                                    await toggleSupervisor(userId, membersViewList, false);
                                 }
                             });
                         }
@@ -1994,6 +2053,11 @@
                                             alert("Failed to ban member: " + (err.message || err));
                                         }
                                     }
+                                }
+                                const supBtn = e.target.closest(".supervisor-btn");
+                                if (supBtn) {
+                                    const userId = supBtn.getAttribute("data-user-id");
+                                    await toggleSupervisor(userId, memberList, true);
                                 }
                             });
                         }
