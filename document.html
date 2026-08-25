@@ -1200,28 +1200,43 @@ function readThemeInputs() {
                 try {
                     const { data: { user } } = await localSupabase.auth.getUser();
                     if (user) {
-                        const { data: community } = await localSupabase
-                            .from("communities")
-                            .select("creator_email, name")
-                            .eq("id", data.community_id)
-                            .maybeSingle();
-                        isOwner = !!(community && community.creator_email === user.email);
-                        currentCommunityName = (community && community.name) || "";
+                        const userEmail = user.email;
 
+                        let ownerEmail = null;
                         try {
-                            const { data: premRow } = await localSupabase
-                                .from("users")
-                                .select("premium")
-                                .eq("email", user.email)
+                            const { data: community } = await localSupabase
+                                .from("communities")
+                                .select("creator_email, name")
+                                .eq("id", data.community_id)
                                 .maybeSingle();
-                            if (premRow && premRow.premium === true && docFooter) {
-                                docFooter.style.display = "none";
-                            }
+                            isOwner = !!(community && community.creator_email === userEmail);
+                            ownerEmail = community ? community.creator_email : null;
+                            currentCommunityName = (community && community.name) || "";
                         } catch (err) {
-                            console.error("Premium check failed:", err);
+                            console.error("Owner check failed:", err);
                         }
+
+                        async function checkPremiumHide(email) {
+                            if (!email || !docFooter) return;
+                            try {
+                                const { data: premRow } = await localSupabase
+                                    .from("users")
+                                    .select("premium")
+                                    .eq("email", email)
+                                    .maybeSingle();
+                                if (premRow && premRow.premium === true) {
+                                    docFooter.style.display = "none";
+                                }
+                            } catch (err) {
+                                console.error("Premium check failed:", err);
+                            }
+                        }
+
+                        await checkPremiumHide(userEmail);
+                        if (ownerEmail) await checkPremiumHide(ownerEmail);
+                    }
                 } catch (err) {
-                    console.error("Owner check failed:", err);
+                    console.error("User/auth check failed:", err);
                 }
 
                 normalizePages();
