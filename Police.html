@@ -3789,25 +3789,27 @@
         }
 
         function speakRadioAnnouncement() {
-            try {
-                if (!("speechSynthesis" in window)) return;
-                const utterance = new SpeechSynthesisUtterance("Scen 1 FG 1");
-                utterance.rate = 0.85;
-                utterance.pitch = 1.1;
-                utterance.volume = 1;
-
-                const voices = speechSynthesis.getVoices();
-                const preferred = voices.find(v => /Google US English|Microsoft David|Samantha/i.test(v.name))
-                    || voices.find(v => v.lang === "en-US")
-                    || voices.find(v => v.lang.startsWith("en"))
-                    || voices[0];
-                if (preferred) utterance.voice = preferred;
-
-                window.speechSynthesis.cancel();
-                window.speechSynthesis.speak(utterance);
-            } catch (e) {
-                console.error("Radio speech failed:", e);
-            }
+            const audio = new Audio("radio-voice.mp3");
+            audio.volume = 0.8;
+            audio.play().catch(() => {
+                try {
+                    if (!("speechSynthesis" in window)) return;
+                    const utterance = new SpeechSynthesisUtterance("Scen 1 FG 1");
+                    utterance.rate = 0.85;
+                    utterance.pitch = 1.1;
+                    utterance.volume = 1;
+                    const voices = speechSynthesis.getVoices();
+                    const preferred = voices.find(v => /Google US English|Microsoft David|Samantha/i.test(v.name))
+                        || voices.find(v => v.lang === "en-US")
+                        || voices.find(v => v.lang.startsWith("en"))
+                        || voices[0];
+                    if (preferred) utterance.voice = preferred;
+                    window.speechSynthesis.cancel();
+                    window.speechSynthesis.speak(utterance);
+                } catch (e) {
+                    console.error("Radio speech failed:", e);
+                }
+            });
         }
 
         if (radioPtt) {
