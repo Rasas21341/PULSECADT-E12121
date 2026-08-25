@@ -903,6 +903,7 @@
                         <button type="button" class="my-civilians-action-btn primary" id="sectionEditBtn" disabled>Edit Selected</button>
                         <button type="button" class="my-civilians-action-btn primary" id="sectionLicenseBtn" disabled>Create License</button>
                         <button type="button" class="my-civilians-action-btn primary" id="sectionVehicleBtn" disabled>Add Vehicle</button>
+                        <button type="button" class="my-civilians-action-btn primary" id="sectionInsuranceBtn" disabled>Insurance Card</button>
                         <button type="button" class="my-civilians-action-btn danger" id="sectionDeleteBtn" disabled>Delete Selected</button>
                     </div>
                 </div>
@@ -1186,10 +1187,12 @@
             const sectionEditBtn = document.getElementById("sectionEditBtn");
             const sectionLicenseBtn = document.getElementById("sectionLicenseBtn");
             const sectionVehicleBtn = document.getElementById("sectionVehicleBtn");
+            const sectionInsuranceBtn = document.getElementById("sectionInsuranceBtn");
             const sectionDeleteBtn = document.getElementById("sectionDeleteBtn");
             if (sectionEditBtn) sectionEditBtn.disabled = false;
             if (sectionLicenseBtn) sectionLicenseBtn.disabled = false;
             if (sectionVehicleBtn) sectionVehicleBtn.disabled = false;
+            if (sectionInsuranceBtn) sectionInsuranceBtn.disabled = false;
             if (sectionDeleteBtn) sectionDeleteBtn.disabled = false;
         }
 
@@ -1964,12 +1967,24 @@
                     if (sectionEditBtn) sectionEditBtn.disabled = true;
                     if (sectionLicenseBtn) sectionLicenseBtn.disabled = true;
                     if (sectionVehicleBtn) sectionVehicleBtn.disabled = true;
+                    if (sectionInsuranceBtn) sectionInsuranceBtn.disabled = true;
                     if (sectionDeleteBtn) sectionDeleteBtn.disabled = true;
                     loadMyCivilians();
                 } catch (err) {
                     console.error("Delete failed:", err);
                     alert("Failed to delete civilian.");
                 }
+            });
+        }
+
+        const sectionInsuranceBtn = document.getElementById("sectionInsuranceBtn");
+        if (sectionInsuranceBtn) {
+            sectionInsuranceBtn.addEventListener("click", () => {
+                if (!selectedCivilianId) {
+                    alert("Select a civilian first by clicking on their card.");
+                    return;
+                }
+                alert("Coming soon");
             });
         }
 
