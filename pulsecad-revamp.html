@@ -886,6 +886,21 @@
             gap: 8px;
         }
 
+        .top-actions {
+            position: fixed;
+            top: 88px;
+            right: max(24px, calc((100% - 780px) / 2));
+            z-index: 511;
+            display: flex;
+            gap: 8px;
+        }
+
+        .top-actions .create-community-centered-btn,
+        .top-actions .join-community-centered-btn {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
         @media (max-width: 480px) {
             .create-community-centered-btn,
             .join-community-centered-btn {
