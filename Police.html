@@ -3331,6 +3331,63 @@
 
         loadUnitsBar();
         loadCallsBar();
+
+        const bodycamOverlay = document.getElementById("bodycamOverlay");
+        const bodycamTime = document.getElementById("bodycamTime");
+        let bodycamInterval = null;
+
+        function playBodycamSound() {
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.type = "sine";
+                osc.frequency.setValueAtTime(1200, ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(600, ctx.currentTime + 0.15);
+                gain.gain.setValueAtTime(0.25, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.2);
+                osc.start(ctx.currentTime);
+                osc.stop(ctx.currentTime + 0.2);
+            } catch (e) {
+                console.error("Bodycam sound failed:", e);
+            }
+        }
+
+        function updateBodycamTime() {
+            if (!bodycamTime) return;
+            const now = new Date();
+            const y = now.getFullYear();
+            const m = String(now.getMonth() + 1).padStart(2, "0");
+            const d = String(now.getDate()).padStart(2, "0");
+            const hh = String(now.getHours()).padStart(2, "0");
+            const mm = String(now.getMinutes()).padStart(2, "0");
+            const ss = String(now.getSeconds()).padStart(2, "0");
+            bodycamTime.textContent = y + "-" + m + "-" + d + " " + hh + ":" + mm + ":" + ss;
+        }
+
+        function toggleBodycam() {
+            if (!bodycamOverlay) return;
+            const isOpen = bodycamOverlay.classList.contains("open");
+            if (isOpen) {
+                bodycamOverlay.classList.remove("open");
+                if (bodycamInterval) clearInterval(bodycamInterval);
+                bodycamInterval = null;
+            } else {
+                bodycamOverlay.classList.add("open");
+                updateBodycamTime();
+                bodycamInterval = setInterval(updateBodycamTime, 1000);
+                playBodycamSound();
+            }
+        }
+
+        document.addEventListener("keydown", (e) => {
+            if (e.key === "F11") {
+                e.preventDefault();
+                toggleBodycam();
+            }
+        });
     </script>
 </body>
 </html>
