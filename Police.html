@@ -1494,6 +1494,13 @@
             animation: bodycam-pulse 1.2s infinite;
         }
 
+        .bodycam-icon {
+            width: 18px;
+            height: 18px;
+            object-fit: contain;
+            filter: drop-shadow(0 0 2px rgba(239, 68, 68, 0.6));
+        }
+
         .bodycam-rec-label {
             font-size: 13px;
             font-weight: 700;
@@ -1517,6 +1524,7 @@
 </head>
 <body>
     <div class="bodycam-overlay" id="bodycamOverlay">
+        <img src="bodycam.png" class="bodycam-icon" alt="Bodycam" />
         <span class="bodycam-rec-dot"></span>
         <span class="bodycam-rec-label">REC</span>
         <span class="bodycam-time" id="bodycamTime"></span>
