@@ -1251,12 +1251,12 @@ function readThemeInputs() {
                         async function checkPremiumHide(email) {
                             if (!email || !docFooter) return;
                             try {
-                                const { data: premRow } = await localSupabase
-                                    .from("users")
-                                    .select("premium")
-                                    .eq("email", email)
-                                    .maybeSingle();
-                                if (premRow && premRow.premium === true) {
+                                const { count, error } = await localSupabase
+                                    .from("premium_keys")
+                                    .select("*", { count: "exact", head: true })
+                                    .eq("used_by", email)
+                                    .eq("used", true);
+                                if (!error && count > 0) {
                                     docFooter.style.display = "none";
                                 }
                             } catch (err) {
