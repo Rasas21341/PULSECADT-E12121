@@ -2387,14 +2387,34 @@
                 const lic = data[0];
                 const isSuspended = !!lic.suspended;
 
+                // Only Supervisors of this civilian's community can suspend/unsuspend
+                let isSupervisor = false;
+                try {
+                    const { data: authData } = await localSupabase.auth.getUser();
+                    const currentUserId = authData && authData.user ? authData.user.id : null;
+                    const civCommunityId = selectedCivilian ? selectedCivilian.community_id : null;
+                    if (currentUserId && civCommunityId) {
+                        const { data: supRow, error: supErr } = await localSupabase
+                            .from("user_communities")
+                            .select("user_id")
+                            .eq("community_id", civCommunityId)
+                            .eq("user_id", currentUserId)
+                            .eq("is_supervisor", true)
+                            .maybeSingle();
+                        isSupervisor = !supErr && !!supRow;
+                    }
+                } catch (supErr) {
+                    console.warn("Supervisor check failed:", supErr);
+                }
+
                 licenseStatusArea.innerHTML = `
                     <span style="font-size: 13px; color: #475569;">
                         License: ${escapeHtml(lic.license_type || 'N/A')} — ${escapeHtml(lic.license_number || 'N/A')}
                         <span class="license-status-badge ${isSuspended ? 'suspended' : 'active'}">${isSuspended ? 'SUSPENDED' : 'ACTIVE'}</span>
                     </span>
-                    <button type="button" class="${isSuspended ? 'unsuspend-license-btn' : 'suspend-license-btn'}" id="suspendLicenseBtn" data-license-id="${lic.id}">
+                    ${isSupervisor ? `<button type="button" class="${isSuspended ? 'unsuspend-license-btn' : 'suspend-license-btn'}" id="suspendLicenseBtn" data-license-id="${lic.id}">
                         ${isSuspended ? 'Unsuspend License' : 'Suspend License'}
-                    </button>
+                    </button>` : ''}
                 `;
 
                 const suspendBtn = document.getElementById("suspendLicenseBtn");
