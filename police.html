@@ -2556,6 +2556,30 @@
             });
         }
 
+        const statusTopBtn = document.getElementById("statusTopBtn");
+        const statusTopDot = document.getElementById("statusTopDot");
+        const statusTopText = document.getElementById("statusTopText");
+        const STATUS_CYCLE = ["available", "unavailable", "busy"];
+
+        function updateTopStatusButton(status) {
+            if (statusTopDot) {
+                statusTopDot.className = "status-top-dot " + status;
+            }
+            if (statusTopText) {
+                statusTopText.textContent = STATUS_LABELS[status] || "Available";
+            }
+        }
+
+        if (statusTopBtn) {
+            statusTopBtn.addEventListener("click", () => {
+                const current = getCurrentStatus();
+                const idx = STATUS_CYCLE.indexOf(current);
+                const next = STATUS_CYCLE[(idx + 1) % STATUS_CYCLE.length];
+                setStatus(next);
+                updateTopStatusButton(next);
+            });
+        }
+
         let savedStatus = "available";
         try {
             savedStatus = localStorage.getItem("policeStatus") || "available";
@@ -2563,6 +2587,7 @@
             console.error("Could not read status:", err);
         }
         setStatus(savedStatus);
+        updateTopStatusButton(savedStatus);
 
         const lookupModal = document.getElementById("lookupModal");
         const lookupModalClose = document.getElementById("lookupModalClose");
