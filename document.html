@@ -184,10 +184,16 @@
         }
 
         /* Sidebar collapse toggle */
+        .doc-sidebar-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 8px;
+            margin-bottom: 4px;
+        }
+
         .doc-sidebar-toggle {
-            position: absolute;
-            top: 16px;
-            right: 16px;
+            flex: 0 0 auto;
             width: 28px;
             height: 28px;
             border: 1px solid #e2e8f0;
@@ -200,7 +206,29 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            z-index: 5;
+        }
+
+        .doc-sidebar-toggle:hover {
+            background: #f1f5f9;
+            color: #0f172a;
+        }
+
+        .doc-sidebar.collapsed {
+            width: 52px;
+            flex: 0 0 52px;
+            padding: 16px 12px;
+        }
+
+        .doc-sidebar.collapsed .doc-sidebar-header {
+            justify-content: center;
+            margin-bottom: 0;
+        }
+
+        .doc-sidebar.collapsed .doc-sidebar-title,
+        .doc-sidebar.collapsed .doc-sidebar-sub,
+        .doc-sidebar.collapsed .doc-nav,
+        .doc-sidebar.collapsed .doc-add-btns {
+            display: none;
         }
 
         .doc-sidebar-toggle:hover {
@@ -572,9 +600,13 @@
 
     <div class="doc-layout" id="docLayout" style="display:none;">
         <div class="doc-sidebar" id="docSidebar">
-            <button type="button" class="doc-sidebar-toggle" id="sidebarToggle" title="Collapse sidebar" aria-label="Collapse sidebar">&#8249;</button>
-            <div class="doc-sidebar-title" id="sidebarTitle">Document</div>
-            <div class="doc-sidebar-sub" id="sidebarSub"></div>
+            <div class="doc-sidebar-header">
+                <div>
+                    <div class="doc-sidebar-title" id="sidebarTitle">Document</div>
+                    <div class="doc-sidebar-sub" id="sidebarSub"></div>
+                </div>
+                <button type="button" class="doc-sidebar-toggle" id="sidebarToggle" title="Collapse sidebar" aria-label="Collapse sidebar">&#8249;</button>
+            </div>
             <div class="doc-nav" id="docNav"></div>
             <div class="doc-add-btns" id="addBtns" style="display:none;">
                 <button type="button" class="doc-add-btn" id="addPageBtn">+ Page</button>
