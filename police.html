@@ -2387,7 +2387,7 @@
                 const lic = data[0];
                 const isSuspended = !!lic.suspended;
 
-                // Only Supervisors (or the community creator) of this civilian's community can suspend/unsuspend
+                // Supervisors (per community) or any community creator (owner) can suspend/unsuspend
                 let isSupervisor = false;
                 try {
                     const { data: authData } = await localSupabase.auth.getUser();
@@ -2395,22 +2395,22 @@
                     const currentUserEmail = authData && authData.user ? authData.user.email : null;
                     const civCommunityId = selectedCivilian ? selectedCivilian.community_id : null;
                     if (currentUserId && civCommunityId) {
-                        const { data: supRow, error: supErr } = await localSupabase
+                        const { data: supRow } = await localSupabase
                             .from("user_communities")
                             .select("user_id")
                             .eq("community_id", civCommunityId)
                             .eq("user_id", currentUserId)
                             .eq("is_supervisor", true)
                             .maybeSingle();
-                        isSupervisor = !supErr && !!supRow;
+                        isSupervisor = !!supRow;
                     }
-                    if (!isSupervisor && currentUserEmail && civCommunityId) {
-                        const { data: comm, error: commErr } = await localSupabase
+                    if (!isSupervisor && currentUserEmail) {
+                        const { data: anyComm } = await localSupabase
                             .from("communities")
-                            .select("creator_email")
-                            .eq("id", civCommunityId)
-                            .maybeSingle();
-                        if (!commErr && comm && comm.creator_email === currentUserEmail) {
+                            .select("id")
+                            .eq("creator_email", currentUserEmail)
+                            .limit(1);
+                        if (Array.isArray(anyComm) && anyComm.length > 0) {
                             isSupervisor = true;
                         }
                     }

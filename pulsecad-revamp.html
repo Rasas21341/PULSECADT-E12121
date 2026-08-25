@@ -877,14 +877,13 @@
             background: #eff6ff;
         }
 
-        .create-community-above-panels {
+        .top-actions {
             position: fixed;
             top: 88px;
             right: max(24px, calc((100% - 780px) / 2));
             z-index: 511;
-            padding: 6px 12px;
-            font-size: 12px;
-            border-radius: 999px;
+            display: flex;
+            gap: 8px;
         }
 
         @media (max-width: 480px) {
@@ -1756,11 +1755,13 @@ enable-ga="false"
         <span class="status"><span class="status-dot"></span>In Progress</span>
     </div>
       <div class="logged-in-screen" id="loggedInScreen">
-          <button type="button" class="create-community-centered-btn create-community-above-panels" id="createCommunityCenteredBtn">+ Create</button>
-          <div class="logged-in-actions">
-              <button type="button" class="join-community-centered-btn" id="joinCommunityCenteredBtn">Join Community</button>
-              <button type="button" class="join-community-centered-btn" id="staffDashboardBtn">Staff Dashboard</button>
-          </div>
+           <div class="top-actions">
+               <button type="button" class="create-community-centered-btn" id="createCommunityCenteredBtn">+ Create</button>
+               <button type="button" class="join-community-centered-btn" id="joinCommunityCenteredBtn">Join Community</button>
+           </div>
+           <div class="logged-in-actions">
+               <button type="button" class="join-community-centered-btn" id="staffDashboardBtn">Staff Dashboard</button>
+           </div>
          <div class="panels-manage-card open" id="panelsManageCard">
              <div class="panels-manage-title">Panels you manage</div>
              <div class="logged-in-communities" id="loggedInCommunities"></div>
