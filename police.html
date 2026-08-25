@@ -1766,6 +1766,37 @@
         </div>
     </div>
 
+       <div class="license-card" id="insuranceCard">
+           <div class="license-card-inner" id="insuranceCardInner">
+               <div class="license-card-holo"></div>
+               <div class="license-card-header">
+                   <div class="license-card-left-title">
+                       <span class="license-card-dept">PulseCAD Insurance</span>
+                       <span class="license-card-title" id="icTitle">INSURANCE</span>
+                   </div>
+                   <div class="license-card-emblem">PC</div>
+               </div>
+               <div class="license-card-main">
+                   <div id="icPhotoWrap"></div>
+                   <div class="license-card-info" id="icBody"></div>
+               </div>
+               <div class="license-card-barcode">
+                   <div class="license-card-barcode-bars"></div>
+                   <div class="license-card-barcode-num" id="icBarcode">INS-000000</div>
+               </div>
+               <div class="license-card-footer">
+                   <div class="license-card-signature">
+                       <div class="license-card-sign-thin" id="icName">—</div>
+                       <div class="license-card-sign-label">Insured Member</div>
+                   </div>
+                   <span class="license-card-badge" id="icStatus">Active</span>
+               </div>
+           </div>
+           <div class="license-card-actions" style="padding: 0 20px 18px; margin-top: 16px;">
+               <button type="button" class="license-card-btn secondary" id="icCloseBtn">Close</button>
+           </div>
+        </div>
+
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script>
@@ -2236,6 +2267,7 @@
             }
             loadCivilianLicenseStatus(civilian.id);
             loadCivilianRecords(civilian.id);
+            loadCivilianInsurance(civilian.id);
             switchTab(document.querySelector('.tab-btn.active'));
         }
 
