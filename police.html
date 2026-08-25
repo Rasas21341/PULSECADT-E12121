@@ -2387,11 +2387,12 @@
                 const lic = data[0];
                 const isSuspended = !!lic.suspended;
 
-                // Only Supervisors of this civilian's community can suspend/unsuspend
+                // Only Supervisors (or the community creator) of this civilian's community can suspend/unsuspend
                 let isSupervisor = false;
                 try {
                     const { data: authData } = await localSupabase.auth.getUser();
                     const currentUserId = authData && authData.user ? authData.user.id : null;
+                    const currentUserEmail = authData && authData.user ? authData.user.email : null;
                     const civCommunityId = selectedCivilian ? selectedCivilian.community_id : null;
                     if (currentUserId && civCommunityId) {
                         const { data: supRow, error: supErr } = await localSupabase
@@ -2402,6 +2403,16 @@
                             .eq("is_supervisor", true)
                             .maybeSingle();
                         isSupervisor = !supErr && !!supRow;
+                    }
+                    if (!isSupervisor && currentUserEmail && civCommunityId) {
+                        const { data: comm, error: commErr } = await localSupabase
+                            .from("communities")
+                            .select("creator_email")
+                            .eq("id", civCommunityId)
+                            .maybeSingle();
+                        if (!commErr && comm && comm.creator_email === currentUserEmail) {
+                            isSupervisor = true;
+                        }
                     }
                 } catch (supErr) {
                     console.warn("Supervisor check failed:", supErr);
