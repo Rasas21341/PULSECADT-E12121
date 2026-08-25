@@ -3511,7 +3511,32 @@
                 e.preventDefault();
                 toggleBodycam();
             }
+            if (e.key === "F8") {
+                e.preventDefault();
+                toggleRadio();
+            }
         });
+
+        const radioOverlay = document.getElementById("radioOverlay");
+        const radioPtt = document.getElementById("radioPtt");
+
+        function toggleRadio() {
+            if (!radioOverlay) return;
+            const isOpen = radioOverlay.classList.contains("open");
+            if (isOpen) {
+                radioOverlay.classList.remove("open");
+            } else {
+                radioOverlay.classList.add("open");
+            }
+        }
+
+        if (radioPtt) {
+            radioPtt.addEventListener("mousedown", () => radioPtt.classList.add("pressed"));
+            radioPtt.addEventListener("mouseup", () => radioPtt.classList.remove("pressed"));
+            radioPtt.addEventListener("mouseleave", () => radioPtt.classList.remove("pressed"));
+            radioPtt.addEventListener("touchstart", () => radioPtt.classList.add("pressed"));
+            radioPtt.addEventListener("touchend", () => radioPtt.classList.remove("pressed"));
+        }
     </script>
 </body>
 </html>
