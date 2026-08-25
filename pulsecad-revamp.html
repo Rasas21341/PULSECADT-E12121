@@ -886,6 +886,32 @@
             gap: 8px;
         }
 
+        .moderation-btn {
+            position: fixed;
+            top: 32px;
+            left: 80px;
+            z-index: 800;
+            padding: 6px 14px;
+            border-radius: 999px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #d7d9dc;
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            cursor: pointer;
+            display: none;
+        }
+
+        .moderation-btn.visible {
+            display: inline-block;
+        }
+
+        .moderation-btn:hover {
+            color: #ffffff;
+            border-color: rgba(255, 255, 255, 0.35);
+            background: rgba(255, 255, 255, 0.06);
+        }
+
         .top-actions .create-community-centered-btn,
         .top-actions .join-community-centered-btn {
             padding: 6px 12px;
@@ -1703,6 +1729,7 @@ enable-ga="false"
 <script defer src="https://downloads-global.3cx.com/downloads/livechatandtalk/v1/callus.js" id="tcx-callus-js" charset="utf-8"></script>
 <body>
     <img class="top-left-logo" id="topLeftLogo" src="https://cdn.discordapp.com/icons/1498000979101093999/c96c547fbd94e68254d8335dadb2e437.webp?size=1024" alt="Logo" />
+    <button type="button" class="moderation-btn" id="staffDashboardBtn">Moderation</button>
     <div class="topbar" id="topbar">
         <span class="pill">
             <a href="/changelogs" class="changelogs-btn">Changelogs</a>
@@ -1790,7 +1817,6 @@ enable-ga="false"
                 </button>
            </div>
            <div class="logged-in-actions">
-               <button type="button" class="join-community-centered-btn" id="staffDashboardBtn">Staff Dashboard</button>
            </div>
          <div class="panels-manage-card open" id="panelsManageCard">
              <div class="panels-manage-title">Panels you manage</div>
