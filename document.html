@@ -257,21 +257,41 @@
         /* Powered by footer */
         .doc-footer {
             position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            text-align: center;
-            padding: 8px 12px;
-            font-size: 12px;
+            bottom: 10px;
+            left: 12px;
+            padding: 2px 6px;
+            font-size: 11px;
             color: #94a3b8;
-            background: rgba(248, 250, 252, 0.92);
-            border-top: 1px solid #e2e8f0;
+            background: transparent;
             z-index: 500;
+            pointer-events: none;
         }
 
         .doc-footer strong {
             color: #475569;
             font-weight: 700;
+        }
+
+        /* Sidebar search */
+        .doc-search {
+            width: 100%;
+            padding: 8px 10px;
+            border: 1px solid #cbd5e1;
+            border-radius: 10px;
+            font-size: 13px;
+            color: #0f172a;
+            outline: none;
+            font-family: inherit;
+            margin-bottom: 12px;
+        }
+
+        .doc-search:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+        }
+
+        .doc-sidebar.collapsed .doc-search {
+            display: none;
         }
 
         /* Main */
@@ -607,6 +627,7 @@
                 </div>
                 <button type="button" class="doc-sidebar-toggle" id="sidebarToggle" title="Collapse sidebar" aria-label="Collapse sidebar">&#8249;</button>
             </div>
+            <input type="text" class="doc-search" id="docSearch" placeholder="Search pages..." aria-label="Search pages" />
             <div class="doc-nav" id="docNav"></div>
             <div class="doc-add-btns" id="addBtns" style="display:none;">
                 <button type="button" class="doc-add-btn" id="addPageBtn">+ Page</button>
@@ -707,6 +728,7 @@
         const docNav = document.getElementById("docNav");
         const docSidebar = document.getElementById("docSidebar");
         const sidebarToggle = document.getElementById("sidebarToggle");
+        const docSearch = document.getElementById("docSearch");
         const docFooter = document.getElementById("docFooter");
         const addBtns = document.getElementById("addBtns");
         const addPageBtn = document.getElementById("addPageBtn");
@@ -746,6 +768,7 @@ const themeBg = document.getElementById("themeBg");
          let editing = false;
          let currentCommunityName = "";
          let currentTheme = { bg: "", text: "", accent: "", sidebarBg: "", sidebarText: "", sidebarAccent: "" };
+         let searchTerm = "";
 
         try {
             if (typeof window.supabase !== "undefined") {
@@ -769,6 +792,13 @@ const themeBg = document.getElementById("themeBg");
         }
 
         if (sidebarToggle) sidebarToggle.addEventListener("click", toggleSidebar);
+
+        if (docSearch) {
+            docSearch.addEventListener("input", (e) => {
+                searchTerm = e.target.value || "";
+                renderSidebar();
+            });
+        }
 
         function showStatus(message, type) {
             if (!statusEl) return;
@@ -823,11 +853,19 @@ const themeBg = document.getElementById("themeBg");
         function renderSidebar() {
             if (!docNav) return;
             docNav.innerHTML = "";
+            const term = (searchTerm || "").trim().toLowerCase();
+            const filtered = term
+                ? pages.filter((e) => (e.title || "").toLowerCase().includes(term))
+                : pages;
             if (pages.length === 0) {
                 docNav.innerHTML = `<div class="doc-empty-state" style="padding:20px 8px; font-size:13px;">No pages yet.</div>`;
                 return;
             }
-            pages.forEach((entry) => {
+            if (filtered.length === 0) {
+                docNav.innerHTML = `<div class="doc-empty-state" style="padding:20px 8px; font-size:13px;">No matches.</div>`;
+                return;
+            }
+            filtered.forEach((entry) => {
                 if (entry.type === "section") {
                     const sec = document.createElement("div");
                     sec.className = "doc-nav-section";
