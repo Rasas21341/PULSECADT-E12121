@@ -1468,6 +1468,32 @@
             });
         }
 
+        const insuranceTypeSelect = document.getElementById("insuranceType");
+        const insuranceNumberInput = document.getElementById("insuranceNumber");
+
+        function generateInsuranceNumber(type) {
+            const prefixMap = {
+                "Auto": "AUT",
+                "Home": "HOM",
+                "Health": "HLT",
+                "Life": "LIF",
+                "Other": "INS"
+            };
+            const prefix = prefixMap[type] || "INS";
+            const random = Math.floor(100000 + Math.random() * 900000);
+            return `${prefix}-${random}`;
+        }
+
+        if (insuranceTypeSelect && insuranceNumberInput) {
+            insuranceTypeSelect.addEventListener("change", () => {
+                if (insuranceTypeSelect.value) {
+                    insuranceNumberInput.value = generateInsuranceNumber(insuranceTypeSelect.value);
+                } else {
+                    insuranceNumberInput.value = "";
+                }
+            });
+        }
+
         function openInsuranceModal() {
             if (!insuranceModal) return;
             if (insuranceError) { insuranceError.textContent = ""; insuranceError.style.display = "none"; }
