@@ -2441,15 +2441,19 @@
                     return;
                 }
 
-                listEl.innerHTML = data.map((ins) => `
+                listEl.innerHTML = data.map((ins) => {
+                    const isExpired = ins.expiry_date && new Date(ins.expiry_date) < new Date();
+                    return `
                     <div class="insurance-item">
                         <div class="insurance-item-info">
                             <div class="insurance-item-title">${escapeHtml(ins.policy_type || "Insurance")} — ${escapeHtml(ins.provider || "Unknown provider")}</div>
                             <div class="insurance-item-meta">${ins.policy_number ? "Policy #: " + escapeHtml(ins.policy_number) : "No policy number"}</div>
                         </div>
+                        <span class="license-card-badge ${isExpired ? "expired" : ""}" style="flex-shrink:0;">${isExpired ? "Expired" : "Active"}</span>
                         <button type="button" class="insurance-view-btn" data-id="${ins.id}">View</button>
                     </div>
-                `).join("");
+                `;
+                }).join("");
 
                 listEl.querySelectorAll(".insurance-view-btn").forEach((btn) => {
                     btn.addEventListener("click", async (e) => {
