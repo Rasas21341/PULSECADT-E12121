@@ -183,11 +183,74 @@
             color: #0f172a;
         }
 
+        /* Sidebar collapse toggle */
+        .doc-sidebar-toggle {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            width: 28px;
+            height: 28px;
+            border: 1px solid #e2e8f0;
+            background: #ffffff;
+            border-radius: 8px;
+            cursor: pointer;
+            color: #475569;
+            font-size: 16px;
+            line-height: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 5;
+        }
+
+        .doc-sidebar-toggle:hover {
+            background: #f1f5f9;
+            color: #0f172a;
+        }
+
+        .doc-sidebar.collapsed {
+            width: 52px;
+            flex: 0 0 52px;
+            padding: 16px 12px;
+        }
+
+        .doc-sidebar.collapsed .doc-sidebar-title,
+        .doc-sidebar.collapsed .doc-sidebar-sub,
+        .doc-sidebar.collapsed .doc-nav,
+        .doc-sidebar.collapsed .doc-add-btns {
+            display: none;
+        }
+
+        .doc-sidebar.collapsed .doc-sidebar-toggle {
+            position: static;
+            margin: 0 auto;
+        }
+
+        /* Powered by footer */
+        .doc-footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            text-align: center;
+            padding: 8px 12px;
+            font-size: 12px;
+            color: #94a3b8;
+            background: rgba(248, 250, 252, 0.92);
+            border-top: 1px solid #e2e8f0;
+            z-index: 500;
+        }
+
+        .doc-footer strong {
+            color: #475569;
+            font-weight: 700;
+        }
+
         /* Main */
         .doc-main {
             flex: 1;
             min-width: 0;
-            padding: 30px 40px 60px;
+            padding: 30px 40px 64px;
         }
 
         .doc-toolbar {
@@ -508,7 +571,8 @@
     <div id="fullscreenMsg" class="doc-fullscreen-msg" style="display:none;"></div>
 
     <div class="doc-layout" id="docLayout" style="display:none;">
-        <div class="doc-sidebar">
+        <div class="doc-sidebar" id="docSidebar">
+            <button type="button" class="doc-sidebar-toggle" id="sidebarToggle" title="Collapse sidebar" aria-label="Collapse sidebar">&#8249;</button>
             <div class="doc-sidebar-title" id="sidebarTitle">Document</div>
             <div class="doc-sidebar-sub" id="sidebarSub"></div>
             <div class="doc-nav" id="docNav"></div>
@@ -544,6 +608,8 @@
             </div>
         </div>
     </div>
+
+    <div class="doc-footer" id="docFooter">Powered by <strong>PulseCAD</strong></div>
 
     <div class="doc-theme-panel" id="themePanel">
         <div class="doc-theme-head">
@@ -607,6 +673,9 @@
         const sidebarTitle = document.getElementById("sidebarTitle");
         const sidebarSub = document.getElementById("sidebarSub");
         const docNav = document.getElementById("docNav");
+        const docSidebar = document.getElementById("docSidebar");
+        const sidebarToggle = document.getElementById("sidebarToggle");
+        const docFooter = document.getElementById("docFooter");
         const addBtns = document.getElementById("addBtns");
         const addPageBtn = document.getElementById("addPageBtn");
         const addSectionBtn = document.getElementById("addSectionBtn");
@@ -658,6 +727,16 @@ const themeBg = document.getElementById("themeBg");
             if (window.history.length > 1) window.history.back();
             else window.close();
         });
+
+        function toggleSidebar() {
+            if (!docSidebar || !sidebarToggle) return;
+            const collapsed = docSidebar.classList.toggle("collapsed");
+            sidebarToggle.innerHTML = collapsed ? "&#8250;" : "&#8249;";
+            sidebarToggle.title = collapsed ? "Expand sidebar" : "Collapse sidebar";
+            sidebarToggle.setAttribute("aria-label", collapsed ? "Expand sidebar" : "Collapse sidebar");
+        }
+
+        if (sidebarToggle) sidebarToggle.addEventListener("click", toggleSidebar);
 
         function showStatus(message, type) {
             if (!statusEl) return;
@@ -1127,7 +1206,19 @@ function readThemeInputs() {
                             .maybeSingle();
                         isOwner = !!(community && community.creator_email === user.email);
                         currentCommunityName = (community && community.name) || "";
-                    }
+
+                        try {
+                            const { data: premRow } = await localSupabase
+                                .from("users")
+                                .select("premium")
+                                .eq("email", user.email)
+                                .maybeSingle();
+                            if (premRow && premRow.premium === true && docFooter) {
+                                docFooter.style.display = "none";
+                            }
+                        } catch (err) {
+                            console.error("Premium check failed:", err);
+                        }
                 } catch (err) {
                     console.error("Owner check failed:", err);
                 }
