@@ -1522,18 +1522,44 @@
 
         .radio-overlay {
             position: fixed;
-            bottom: 24px;
-            right: 24px;
+            bottom: 8px;
+            left: 28px;
             z-index: 900;
             display: none;
-            width: 240px;
-            background: #1c1c1e;
-            border-radius: 18px 18px 24px 24px;
-            border: 3px solid #2d2d2d;
-            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255,255,255,0.05);
-            padding: 0;
-            overflow: hidden;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            width: 190px;
+            height: 570px;
+            background: linear-gradient(100deg, #696c6d 0%, #a0a2a1 14%, #777a7a 64%, #4e5152 100%);
+            border-radius: 18px 18px 22px 22px;
+            border: 3px solid #3e4142;
+            box-shadow: 8px 12px 22px rgba(0, 0, 0, 0.42), inset 3px 0 0 rgba(255,255,255,0.16), inset -4px 0 0 rgba(0,0,0,0.18);
+            padding: 10px 10px 8px;
+            overflow: visible;
+            font-family: 'Courier New', monospace;
+        }
+
+        .radio-overlay::before {
+            content: "";
+            position: absolute;
+            top: -25px;
+            left: 18px;
+            width: 9px;
+            height: 31px;
+            border-radius: 6px 6px 2px 2px;
+            background: linear-gradient(90deg, #303333, #777b79 45%, #292c2c);
+            border: 2px solid #292c2c;
+            box-shadow: 2px 0 2px rgba(0,0,0,0.3);
+        }
+
+        .radio-overlay::after {
+            content: "";
+            position: absolute;
+            top: 17px;
+            right: 20px;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #e14635;
+            box-shadow: -13px 0 0 #e9a52f, -26px 0 0 #35484a, 0 1px 3px rgba(0,0,0,0.55);
         }
 
         .radio-overlay.open {
@@ -1541,35 +1567,69 @@
         }
 
         .radio-top-bar {
-            background: #111113;
-            padding: 6px 10px;
+            position: relative;
+            background: #4b4e4f;
+            height: 200px;
+            padding: 8px 7px 7px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            border-bottom: 1px solid #2d2d2d;
+            border: 1px solid #303333;
+            border-radius: 9px 9px 3px 3px;
+            box-shadow: inset 0 1px 2px rgba(255,255,255,0.14), 0 2px 2px rgba(0,0,0,0.22);
+        }
+
+        .radio-top-bar::before {
+            content: "";
+            position: absolute;
+            top: 4px;
+            left: 25px;
+            width: 9px;
+            height: 104px;
+            border-radius: 6px 6px 3px 3px;
+            background: linear-gradient(90deg, #292c2c, #777b79 48%, #292c2c);
+            border: 2px solid #252828;
+            box-shadow: 2px 2px 3px rgba(0,0,0,0.28);
+        }
+
+        .radio-top-bar::after {
+            content: "";
+            position: absolute;
+            top: 109px;
+            left: 19px;
+            width: 23px;
+            height: 27px;
+            border-radius: 5px;
+            background: #343838;
+            border: 2px solid #292c2c;
+            box-shadow: 0 0 0 5px rgba(73, 76, 76, 0.6), 34px 18px 0 -4px #d58628, 50px 18px 0 -4px #35484a;
         }
 
         .radio-brand-text {
-            font-size: 9px;
+            font-size: 8px;
             font-weight: 800;
-            color: #6b7280;
-            letter-spacing: 1.5px;
+            color: #202323;
+            letter-spacing: 1px;
         }
 
         .radio-model {
             font-size: 8px;
             font-weight: 600;
-            color: #4b5563;
+            color: #252828;
         }
 
         .radio-screen {
-            margin: 10px;
-            height: 110px;
-            background: #0a0f0a;
-            border-radius: 8px;
-            border: 2px solid #1f2937;
-            box-shadow: inset 0 0 20px rgba(16, 185, 129, 0.08);
-            padding: 10px;
+            position: absolute;
+            top: 210px;
+            left: 14px;
+            width: 156px;
+            height: 270px;
+            margin: 0;
+            background: linear-gradient(to bottom, #111315 0%, #090b0c 75%, #12351d 100%);
+            border-radius: 4px;
+            border: 3px solid #292c2c;
+            box-shadow: inset 0 0 14px rgba(0, 0, 0, 0.9), 0 1px 1px rgba(255,255,255,0.13);
+            padding: 11px 9px;
             display: flex;
             flex-direction: column;
             position: relative;
@@ -1595,13 +1655,13 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 6px;
+            margin-bottom: 5px;
         }
 
         .radio-zone-label {
             font-size: 9px;
             font-weight: 700;
-            color: #4b5563;
+            color: #7d8582;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
@@ -1615,7 +1675,7 @@
 
         .radio-signal-bar {
             width: 2px;
-            background: #10b981;
+            background: #b7d7c0;
             border-radius: 1px;
         }
 
@@ -1625,10 +1685,10 @@
         .radio-signal-bar:nth-child(4) { height: 10px; }
 
         .radio-channel-main {
-            font-size: 20px;
+            font-size: 22px;
             font-weight: 800;
-            color: #10b981;
-            text-shadow: 0 0 8px rgba(16, 185, 129, 0.4);
+            color: #d6e3d9;
+            text-shadow: 0 0 7px rgba(151, 206, 165, 0.5);
             font-family: 'Courier New', monospace;
             margin-bottom: 2px;
         }
@@ -1648,13 +1708,13 @@
             align-items: center;
             margin-top: auto;
             padding-top: 6px;
-            border-top: 1px solid #1a2e1a;
+            border-top: 1px solid #263c2c;
         }
 
         .radio-tx-status {
             font-size: 9px;
             font-weight: 800;
-            color: #ef4444;
+            color: #e44a40;
             letter-spacing: 0.5px;
             display: flex;
             align-items: center;
@@ -1676,38 +1736,46 @@
         }
 
         .radio-side-controls {
+            position: absolute;
+            top: 482px;
+            left: 14px;
+            width: 156px;
             display: flex;
-            gap: 6px;
-            padding: 0 10px 8px;
+            gap: 5px;
+            padding: 0 4px 6px;
             justify-content: center;
         }
 
         .radio-side-btn {
             flex: 1;
-            height: 28px;
-            border-radius: 6px;
-            background: #111113;
-            border: 2px solid #2d2d2d;
+            height: 27px;
+            border-radius: 4px;
+            background: #3b3e3e;
+            border: 2px solid #292c2c;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 8px;
             font-weight: 700;
-            color: #6b7280;
+            color: #c0c4c2;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
 
-        .radio-emergency {
+        .radio-side-btn.emergency {
             background: #7f1d1d;
             border-color: #991b1b;
             color: #fca5a5;
         }
 
         .radio-knobs {
+            position: absolute;
+            top: 145px;
+            left: 25px;
+            width: 134px;
             display: flex;
-            gap: 8px;
-            padding: 0 10px 8px;
+            gap: 18px;
+            padding: 0 4px 6px;
             justify-content: center;
         }
 
@@ -1719,11 +1787,11 @@
         }
 
         .radio-knob-circle {
-            width: 32px;
-            height: 32px;
+            width: 34px;
+            height: 34px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #374151, #1f2937);
-            border: 2px solid #4b5563;
+            background: linear-gradient(135deg, #687070, #292d2e);
+            border: 2px solid #252828;
             box-shadow: 0 2px 4px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.1);
             position: relative;
         }
@@ -1743,42 +1811,50 @@
         .radio-knob-label {
             font-size: 7px;
             font-weight: 700;
-            color: #4b5563;
+            color: #303434;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
 
         .radio-ptt {
-            margin: 0 10px 10px;
-            padding: 14px;
-            border-radius: 12px;
-            border: none;
-            background: linear-gradient(to bottom, #374151, #1f2937);
-            color: #d1d5db;
-            font-size: 13px;
+            position: absolute;
+            left: 14px;
+            bottom: 29px;
+            margin: 0;
+            padding: 8px 10px;
+            width: calc(100% - 8px);
+            border-radius: 5px;
+            border: 2px solid #2a2d2d;
+            background: linear-gradient(to bottom, #555a59, #343838);
+            color: #d8ddda;
+            font-size: 12px;
             font-weight: 800;
             cursor: pointer;
             text-transform: uppercase;
             letter-spacing: 2px;
-            box-shadow: 0 4px 0 #111113, inset 0 1px 0 rgba(255,255,255,0.1);
+            box-shadow: 0 3px 0 #242727, inset 0 1px 0 rgba(255,255,255,0.16);
             transition: all 0.05s ease;
         }
 
         .radio-ptt:active, .radio-ptt.pressed {
             transform: translateY(3px);
             box-shadow: 0 1px 0 #111113, inset 0 1px 0 rgba(255,255,255,0.1);
-            background: linear-gradient(to bottom, #2563eb, #1d4ed8);
+            background: linear-gradient(to bottom, #2868d8, #17418f);
             color: #ffffff;
         }
 
         .radio-bottom-bar {
-            background: #111113;
-            padding: 6px 10px;
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(to bottom, #0d2714, #07150b);
+            padding: 7px 6px;
             text-align: center;
-            border-top: 1px solid #2d2d2d;
+            border-top: 2px solid #303333;
             font-size: 8px;
             font-weight: 700;
-            color: #4b5563;
+            color: #9bc0a1;
             letter-spacing: 1px;
             text-transform: uppercase;
         }
@@ -1807,8 +1883,8 @@
                     <span class="radio-signal-bar"></span>
                 </div>
             </div>
-            <div class="radio-channel-main">CH-01</div>
-            <div class="radio-talkgroup">TAC 1</div>
+            <div class="radio-channel-main">Scen 1</div>
+            <div class="radio-talkgroup">FG 1</div>
             <div class="radio-status-bar">
                 <div class="radio-tx-status">
                     <span class="radio-tx-dot"></span>
@@ -3708,6 +3784,21 @@
                 radioOverlay.classList.remove("open");
             } else {
                 radioOverlay.classList.add("open");
+                speakRadioAnnouncement();
+            }
+        }
+
+        function speakRadioAnnouncement() {
+            try {
+                if (!("speechSynthesis" in window)) return;
+                const utterance = new SpeechSynthesisUtterance("Scen 1 FG 1");
+                utterance.rate = 0.9;
+                utterance.pitch = 1;
+                utterance.volume = 1;
+                window.speechSynthesis.cancel();
+                window.speechSynthesis.speak(utterance);
+            } catch (e) {
+                console.error("Radio speech failed:", e);
             }
         }
 
