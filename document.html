@@ -880,6 +880,25 @@ const themeBg = document.getElementById("themeBg");
                         if (e.target.closest("[data-del]")) return;
                         selectPage(entry.id);
                     });
+                    btn.addEventListener("contextmenu", (e) => {
+                        if (!isOwner) return;
+                        e.preventDefault();
+                        const newName = prompt("Rename page:", entry.title || "");
+                        if (newName === null) return;
+                        const trimmed = newName.trim();
+                        if (!trimmed) {
+                            showStatus("Page name cannot be empty.", "error");
+                            return;
+                        }
+                        entry.title = trimmed;
+                        persistPages().then((ok) => {
+                            if (ok) {
+                                renderSidebar();
+                                if (selectedId === entry.id) renderMainView();
+                                showStatus("Renamed.", "success");
+                            }
+                        });
+                    });
                     docNav.appendChild(btn);
                 }
             });
