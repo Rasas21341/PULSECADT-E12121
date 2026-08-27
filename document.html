@@ -639,7 +639,6 @@
             <div class="doc-toolbar">
                 <button type="button" class="btn" id="backBtn">← Back</button>
                 <div class="doc-toolbar-actions">
-                    <button type="button" class="btn" id="themeBtn" title="Customize page colors">Colors</button>
                     <button type="button" class="btn" id="copyLinkBtn">Copy Link</button>
                     <button type="button" class="btn primary" id="editBtn" style="display:none;">Edit</button>
                     <button type="button" class="btn success" id="saveBtn" style="display:none;">Save</button>
@@ -745,7 +744,6 @@
         const saveBtn = document.getElementById("saveBtn");
         const cancelBtn = document.getElementById("cancelBtn");
         const copyLinkBtn = document.getElementById("copyLinkBtn");
-        const themeBtn = document.getElementById("themeBtn");
         const themePanel = document.getElementById("themePanel");
         const themeCloseBtn = document.getElementById("themeCloseBtn");
         const themePresets = document.getElementById("themePresets");
@@ -1296,7 +1294,7 @@ function readThemeInputs() {
                 selectedId = firstPageId();
 
                 document.title = (currentDoc.title || "Document") + " - PulseCAD";
-                if (sidebarTitle) sidebarTitle.textContent = currentDoc.title || "Document";
+                if (sidebarTitle) sidebarTitle.textContent = currentCommunityName || currentDoc.title || "Document";
                 if (sidebarSub) {
                     const depts = Array.isArray(currentDoc.departments) ? currentDoc.departments : [];
                     sidebarSub.textContent = depts.length ? depts.join(", ") : "";
@@ -1333,10 +1331,6 @@ function readThemeInputs() {
             });
         }
 
-        if (themeBtn) themeBtn.addEventListener("click", () => {
-            if (themePanel && themePanel.classList.contains("open")) closeThemePanel();
-            else openThemePanel();
-        });
         if (themeCloseBtn) themeCloseBtn.addEventListener("click", closeThemePanel);
         if (themeBg) themeBg.addEventListener("input", () => applyTheme(readThemeInputs()));
         if (themeText) themeText.addEventListener("input", () => applyTheme(readThemeInputs()));
@@ -1345,7 +1339,7 @@ function readThemeInputs() {
         if (themeResetBtn) themeResetBtn.addEventListener("click", resetTheme);
         document.addEventListener("click", (e) => {
             if (themePanel && themePanel.classList.contains("open")
-                && !themePanel.contains(e.target) && e.target !== themeBtn && !themeBtn.contains(e.target)) {
+                && !themePanel.contains(e.target)) {
                 closeThemePanel();
             }
         });
