@@ -183,11 +183,122 @@
             color: #0f172a;
         }
 
+        /* Sidebar collapse toggle */
+        .doc-sidebar-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 8px;
+            margin-bottom: 4px;
+        }
+
+        .doc-sidebar-toggle {
+            flex: 0 0 auto;
+            width: 28px;
+            height: 28px;
+            border: 1px solid #e2e8f0;
+            background: #ffffff;
+            border-radius: 8px;
+            cursor: pointer;
+            color: #475569;
+            font-size: 16px;
+            line-height: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .doc-sidebar-toggle:hover {
+            background: #f1f5f9;
+            color: #0f172a;
+        }
+
+        .doc-sidebar.collapsed {
+            width: 52px;
+            flex: 0 0 52px;
+            padding: 16px 12px;
+        }
+
+        .doc-sidebar.collapsed .doc-sidebar-header {
+            justify-content: center;
+            margin-bottom: 0;
+        }
+
+        .doc-sidebar.collapsed .doc-sidebar-title,
+        .doc-sidebar.collapsed .doc-sidebar-sub,
+        .doc-sidebar.collapsed .doc-nav,
+        .doc-sidebar.collapsed .doc-add-btns {
+            display: none;
+        }
+
+        .doc-sidebar-toggle:hover {
+            background: #f1f5f9;
+            color: #0f172a;
+        }
+
+        .doc-sidebar.collapsed {
+            width: 52px;
+            flex: 0 0 52px;
+            padding: 16px 12px;
+        }
+
+        .doc-sidebar.collapsed .doc-sidebar-title,
+        .doc-sidebar.collapsed .doc-sidebar-sub,
+        .doc-sidebar.collapsed .doc-nav,
+        .doc-sidebar.collapsed .doc-add-btns {
+            display: none;
+        }
+
+        .doc-sidebar.collapsed .doc-sidebar-toggle {
+            position: static;
+            margin: 0 auto;
+        }
+
+        /* Powered by footer */
+        .doc-footer {
+            position: fixed;
+            bottom: 10px;
+            left: 12px;
+            padding: 2px 6px;
+            font-size: 11px;
+            color: #94a3b8;
+            background: transparent;
+            z-index: 500;
+            pointer-events: none;
+        }
+
+        .doc-footer strong {
+            color: #475569;
+            font-weight: 700;
+        }
+
+        /* Sidebar search */
+        .doc-search {
+            width: 100%;
+            padding: 8px 10px;
+            border: 1px solid #cbd5e1;
+            border-radius: 10px;
+            font-size: 13px;
+            color: #0f172a;
+            outline: none;
+            font-family: inherit;
+            margin-bottom: 12px;
+        }
+
+        .doc-search:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+        }
+
+        .doc-sidebar.collapsed .doc-search {
+            display: none;
+        }
+
         /* Main */
         .doc-main {
             flex: 1;
             min-width: 0;
-            padding: 30px 40px 60px;
+            padding: 30px 40px 64px;
         }
 
         .doc-toolbar {
@@ -508,9 +619,15 @@
     <div id="fullscreenMsg" class="doc-fullscreen-msg" style="display:none;"></div>
 
     <div class="doc-layout" id="docLayout" style="display:none;">
-        <div class="doc-sidebar">
-            <div class="doc-sidebar-title" id="sidebarTitle">Document</div>
-            <div class="doc-sidebar-sub" id="sidebarSub"></div>
+        <div class="doc-sidebar" id="docSidebar">
+            <div class="doc-sidebar-header">
+                <div>
+                    <div class="doc-sidebar-title" id="sidebarTitle">Document</div>
+                    <div class="doc-sidebar-sub" id="sidebarSub"></div>
+                </div>
+                <button type="button" class="doc-sidebar-toggle" id="sidebarToggle" title="Collapse sidebar" aria-label="Collapse sidebar">&#8249;</button>
+            </div>
+            <input type="text" class="doc-search" id="docSearch" placeholder="Search pages..." aria-label="Search pages" />
             <div class="doc-nav" id="docNav"></div>
             <div class="doc-add-btns" id="addBtns" style="display:none;">
                 <button type="button" class="doc-add-btn" id="addPageBtn">+ Page</button>
@@ -522,7 +639,6 @@
             <div class="doc-toolbar">
                 <button type="button" class="btn" id="backBtn">← Back</button>
                 <div class="doc-toolbar-actions">
-                    <button type="button" class="btn" id="themeBtn" title="Customize page colors">Colors</button>
                     <button type="button" class="btn" id="copyLinkBtn">Copy Link</button>
                     <button type="button" class="btn primary" id="editBtn" style="display:none;">Edit</button>
                     <button type="button" class="btn success" id="saveBtn" style="display:none;">Save</button>
@@ -544,6 +660,8 @@
             </div>
         </div>
     </div>
+
+    <div class="doc-footer" id="docFooter">Powered by <strong>PulseCAD</strong></div>
 
     <div class="doc-theme-panel" id="themePanel">
         <div class="doc-theme-head">
@@ -607,6 +725,10 @@
         const sidebarTitle = document.getElementById("sidebarTitle");
         const sidebarSub = document.getElementById("sidebarSub");
         const docNav = document.getElementById("docNav");
+        const docSidebar = document.getElementById("docSidebar");
+        const sidebarToggle = document.getElementById("sidebarToggle");
+        const docSearch = document.getElementById("docSearch");
+        const docFooter = document.getElementById("docFooter");
         const addBtns = document.getElementById("addBtns");
         const addPageBtn = document.getElementById("addPageBtn");
         const addSectionBtn = document.getElementById("addSectionBtn");
@@ -622,7 +744,6 @@
         const saveBtn = document.getElementById("saveBtn");
         const cancelBtn = document.getElementById("cancelBtn");
         const copyLinkBtn = document.getElementById("copyLinkBtn");
-        const themeBtn = document.getElementById("themeBtn");
         const themePanel = document.getElementById("themePanel");
         const themeCloseBtn = document.getElementById("themeCloseBtn");
         const themePresets = document.getElementById("themePresets");
@@ -645,6 +766,7 @@ const themeBg = document.getElementById("themeBg");
          let editing = false;
          let currentCommunityName = "";
          let currentTheme = { bg: "", text: "", accent: "", sidebarBg: "", sidebarText: "", sidebarAccent: "" };
+         let searchTerm = "";
 
         try {
             if (typeof window.supabase !== "undefined") {
@@ -658,6 +780,23 @@ const themeBg = document.getElementById("themeBg");
             if (window.history.length > 1) window.history.back();
             else window.close();
         });
+
+        function toggleSidebar() {
+            if (!docSidebar || !sidebarToggle) return;
+            const collapsed = docSidebar.classList.toggle("collapsed");
+            sidebarToggle.innerHTML = collapsed ? "&#8250;" : "&#8249;";
+            sidebarToggle.title = collapsed ? "Expand sidebar" : "Collapse sidebar";
+            sidebarToggle.setAttribute("aria-label", collapsed ? "Expand sidebar" : "Collapse sidebar");
+        }
+
+        if (sidebarToggle) sidebarToggle.addEventListener("click", toggleSidebar);
+
+        if (docSearch) {
+            docSearch.addEventListener("input", (e) => {
+                searchTerm = e.target.value || "";
+                renderSidebar();
+            });
+        }
 
         function showStatus(message, type) {
             if (!statusEl) return;
@@ -673,6 +812,7 @@ const themeBg = document.getElementById("themeBg");
                 fullscreenMsg.textContent = message;
                 fullscreenMsg.style.display = "block";
             }
+            if (docFooter) docFooter.style.display = "none";
         }
 
         function escapeHtml(text) {
@@ -711,11 +851,19 @@ const themeBg = document.getElementById("themeBg");
         function renderSidebar() {
             if (!docNav) return;
             docNav.innerHTML = "";
+            const term = (searchTerm || "").trim().toLowerCase();
+            const filtered = term
+                ? pages.filter((e) => (e.title || "").toLowerCase().includes(term))
+                : pages;
             if (pages.length === 0) {
                 docNav.innerHTML = `<div class="doc-empty-state" style="padding:20px 8px; font-size:13px;">No pages yet.</div>`;
                 return;
             }
-            pages.forEach((entry) => {
+            if (filtered.length === 0) {
+                docNav.innerHTML = `<div class="doc-empty-state" style="padding:20px 8px; font-size:13px;">No matches.</div>`;
+                return;
+            }
+            filtered.forEach((entry) => {
                 if (entry.type === "section") {
                     const sec = document.createElement("div");
                     sec.className = "doc-nav-section";
@@ -731,6 +879,25 @@ const themeBg = document.getElementById("themeBg");
                     btn.addEventListener("click", (e) => {
                         if (e.target.closest("[data-del]")) return;
                         selectPage(entry.id);
+                    });
+                    btn.addEventListener("contextmenu", (e) => {
+                        if (!isOwner) return;
+                        e.preventDefault();
+                        const newName = prompt("Rename page:", entry.title || "");
+                        if (newName === null) return;
+                        const trimmed = newName.trim();
+                        if (!trimmed) {
+                            showStatus("Page name cannot be empty.", "error");
+                            return;
+                        }
+                        entry.title = trimmed;
+                        persistPages().then((ok) => {
+                            if (ok) {
+                                renderSidebar();
+                                if (selectedId === entry.id) renderMainView();
+                                showStatus("Renamed.", "success");
+                            }
+                        });
                     });
                     docNav.appendChild(btn);
                 }
@@ -1120,23 +1287,33 @@ function readThemeInputs() {
                 try {
                     const { data: { user } } = await localSupabase.auth.getUser();
                     if (user) {
-                        const { data: community } = await localSupabase
-                            .from("communities")
-                            .select("creator_email, name")
-                            .eq("id", data.community_id)
-                            .maybeSingle();
-                        isOwner = !!(community && community.creator_email === user.email);
-                        currentCommunityName = (community && community.name) || "";
+                        const userEmail = user.email;
+
+                        let communityPro = false;
+                        try {
+                            const { data: community } = await localSupabase
+                                .from("communities")
+                                .select("creator_email, name, pro")
+                                .eq("id", data.community_id)
+                                .maybeSingle();
+                            isOwner = !!(community && community.creator_email === userEmail);
+                            communityPro = !!(community && community.pro === true);
+                            currentCommunityName = (community && community.name) || "";
+                        } catch (err) {
+                            console.error("Owner check failed:", err);
+                        }
+
+                        if (docFooter) docFooter.style.display = communityPro ? "none" : "block";
                     }
                 } catch (err) {
-                    console.error("Owner check failed:", err);
+                    console.error("User/auth check failed:", err);
                 }
 
                 normalizePages();
                 selectedId = firstPageId();
 
                 document.title = (currentDoc.title || "Document") + " - PulseCAD";
-                if (sidebarTitle) sidebarTitle.textContent = currentDoc.title || "Document";
+                if (sidebarTitle) sidebarTitle.textContent = currentCommunityName || currentDoc.title || "Document";
                 if (sidebarSub) {
                     const depts = Array.isArray(currentDoc.departments) ? currentDoc.departments : [];
                     sidebarSub.textContent = depts.length ? depts.join(", ") : "";
@@ -1173,10 +1350,6 @@ function readThemeInputs() {
             });
         }
 
-        if (themeBtn) themeBtn.addEventListener("click", () => {
-            if (themePanel && themePanel.classList.contains("open")) closeThemePanel();
-            else openThemePanel();
-        });
         if (themeCloseBtn) themeCloseBtn.addEventListener("click", closeThemePanel);
         if (themeBg) themeBg.addEventListener("input", () => applyTheme(readThemeInputs()));
         if (themeText) themeText.addEventListener("input", () => applyTheme(readThemeInputs()));
@@ -1185,7 +1358,7 @@ function readThemeInputs() {
         if (themeResetBtn) themeResetBtn.addEventListener("click", resetTheme);
         document.addEventListener("click", (e) => {
             if (themePanel && themePanel.classList.contains("open")
-                && !themePanel.contains(e.target) && e.target !== themeBtn && !themeBtn.contains(e.target)) {
+                && !themePanel.contains(e.target)) {
                 closeThemePanel();
             }
         });

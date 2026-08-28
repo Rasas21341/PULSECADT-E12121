@@ -903,6 +903,7 @@
                         <button type="button" class="my-civilians-action-btn primary" id="sectionEditBtn" disabled>Edit Selected</button>
                         <button type="button" class="my-civilians-action-btn primary" id="sectionLicenseBtn" disabled>Create License</button>
                         <button type="button" class="my-civilians-action-btn primary" id="sectionVehicleBtn" disabled>Add Vehicle</button>
+                        <button type="button" class="my-civilians-action-btn primary" id="sectionInsuranceBtn" disabled>Insurance Card</button>
                         <button type="button" class="my-civilians-action-btn danger" id="sectionDeleteBtn" disabled>Delete Selected</button>
                     </div>
                 </div>
@@ -1043,13 +1044,90 @@
                   <label for="vehiclePlate">Plate</label>
                   <input type="text" id="vehiclePlate" placeholder="e.g. ABC 123" required />
               </div>
-              <button type="button" class="submit-btn" id="vehicleSubmitBtn">Add Vehicle</button>
-              <div class="form-error" id="vehicleError"></div>
-              <div class="form-success" id="vehicleSuccess"></div>
-           </div>
-       </div>
+               <button type="button" class="submit-btn" id="vehicleSubmitBtn">Add Vehicle</button>
+               <div class="form-error" id="vehicleError"></div>
+               <div class="form-success" id="vehicleSuccess"></div>
+            </div>
+        </div>
 
-      <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+       <div class="modal-overlay" id="insuranceModal">
+           <div class="modal">
+               <div class="modal-header">
+                   <div class="modal-title">Create Insurance Card</div>
+                   <button class="modal-close" id="insuranceModalClose" type="button" aria-label="Close">×</button>
+               </div>
+               <div class="form-field">
+                   <label for="insuranceCivilian">Civilian</label>
+                   <select id="insuranceCivilian">
+                       <option value="">Select a civilian</option>
+                   </select>
+               </div>
+               <div class="form-field">
+                   <label for="insuranceProvider">Provider</label>
+                   <input type="text" id="insuranceProvider" placeholder="e.g. StateFarm" />
+               </div>
+               <div class="form-field">
+                   <label for="insuranceType">Policy Type</label>
+                   <select id="insuranceType">
+                       <option value="">Select</option>
+                       <option value="Auto">Auto</option>
+                       <option value="Home">Home</option>
+                       <option value="Health">Health</option>
+                       <option value="Life">Life</option>
+                       <option value="Other">Other</option>
+                   </select>
+               </div>
+               <div class="form-field">
+                   <label for="insuranceNumber">Policy Number</label>
+                   <input type="text" id="insuranceNumber" placeholder="e.g. POL-123456" />
+               </div>
+               <div class="form-field">
+                   <label for="insuranceCoverage">Coverage</label>
+                   <input type="text" id="insuranceCoverage" placeholder="e.g. $50,000" />
+               </div>
+               <div class="form-field">
+                   <label for="insuranceExpiry">Expiry Date</label>
+                   <input type="date" id="insuranceExpiry" />
+               </div>
+               <button type="button" class="submit-btn" id="insuranceSubmitBtn">Create Insurance Card</button>
+               <div class="form-error" id="insuranceError"></div>
+               <div class="form-success" id="insuranceSuccess"></div>
+            </div>
+        </div>
+
+       <div class="license-card" id="insuranceCard">
+           <div class="license-card-inner" id="insuranceCardInner">
+               <div class="license-card-holo"></div>
+               <div class="license-card-header">
+                   <div class="license-card-left-title">
+                       <span class="license-card-dept">PulseCAD Insurance</span>
+                       <span class="license-card-title" id="icTitle">INSURANCE</span>
+                   </div>
+                   <div class="license-card-emblem">PC</div>
+               </div>
+               <div class="license-card-main">
+                   <div id="icPhotoWrap"></div>
+                   <div class="license-card-info" id="icBody"></div>
+               </div>
+               <div class="license-card-barcode">
+                   <div class="license-card-barcode-bars"></div>
+                   <div class="license-card-barcode-num" id="icBarcode">INS-000000</div>
+               </div>
+               <div class="license-card-footer">
+                   <div class="license-card-signature">
+                       <div class="license-card-sign-thin" id="icName">—</div>
+                       <div class="license-card-sign-label">Insured Member</div>
+                   </div>
+                   <span class="license-card-badge" id="icStatus">Active</span>
+               </div>
+           </div>
+           <div class="license-card-actions" style="padding: 0 20px 18px; margin-top: 16px;">
+               <button type="button" class="license-card-btn primary" id="icDownloadBtn">Download PNG</button>
+               <button type="button" class="license-card-btn secondary" id="icCloseBtn">Close</button>
+           </div>
+        </div>
+
+       <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
      <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
     <script>
         const SUPABASE_URL = "https://zwdogalwbczdtvxvhrfd.supabase.co";
@@ -1143,14 +1221,17 @@
                         <div class="civilian-card-actions">
                             <button type="button" class="civilian-action-btn primary" data-view-license="${civilian.id}">View License</button>
                             <button type="button" class="civilian-action-btn primary" data-add-vehicle="${civilian.id}">Add Vehicle</button>
+                            <button type="button" class="civilian-action-btn primary" data-add-insurance="${civilian.id}">Insurance</button>
                         </div>
                         <div class="license-list" id="licenseList-${civilian.id}"></div>
                         <div class="vehicle-list" id="vehicleList-${civilian.id}"></div>
+                        <div class="insurance-list" id="insuranceList-${civilian.id}"></div>
                     `;
 
                     card.addEventListener("click", (e) => {
                         if (e.target.closest("[data-view-license]")) return;
                         if (e.target.closest("[data-add-vehicle]")) return;
+                        if (e.target.closest("[data-add-insurance]")) return;
                         selectCivilianCard(civilian.id, card);
                     });
 
@@ -1167,8 +1248,15 @@
                         openVehicleModal();
                     });
 
+                    card.querySelector("[data-add-insurance]")?.addEventListener("click", (e) => {
+                        e.stopPropagation();
+                        currentCivilianId = civilian.id;
+                        openInsuranceModal();
+                    });
+
                     loadLicenses(civilian.id);
                     loadVehicles(civilian.id);
+                    loadInsuranceCards(civilian.id);
                 }
             } catch (err) {
                 console.error("Failed to load civilians:", err);
@@ -1186,11 +1274,333 @@
             const sectionEditBtn = document.getElementById("sectionEditBtn");
             const sectionLicenseBtn = document.getElementById("sectionLicenseBtn");
             const sectionVehicleBtn = document.getElementById("sectionVehicleBtn");
+            const sectionInsuranceBtn = document.getElementById("sectionInsuranceBtn");
             const sectionDeleteBtn = document.getElementById("sectionDeleteBtn");
             if (sectionEditBtn) sectionEditBtn.disabled = false;
             if (sectionLicenseBtn) sectionLicenseBtn.disabled = false;
             if (sectionVehicleBtn) sectionVehicleBtn.disabled = false;
+            if (sectionInsuranceBtn) sectionInsuranceBtn.disabled = false;
             if (sectionDeleteBtn) sectionDeleteBtn.disabled = false;
+        }
+
+        async function loadInsuranceCards(civilianId) {
+            const listEl = document.getElementById(`insuranceList-${civilianId}`);
+            if (!listEl || !localSupabase) return;
+
+            try {
+                const { data, error } = await localSupabase
+                    .from("insurance_cards")
+                    .select("*")
+                    .eq("civilian_id", civilianId)
+                    .order("created_at", { ascending: false });
+
+                if (error || !Array.isArray(data) || data.length === 0) {
+                    listEl.innerHTML = "";
+                    return;
+                }
+
+                listEl.innerHTML = data.map((ins) => `
+                    <div class="license-item">
+                        <strong>${escapeHtml(ins.policy_type || "Insurance")}</strong> — ${escapeHtml(ins.provider || "Unknown provider")}
+                        ${ins.policy_number ? `<br>Policy #: ${escapeHtml(ins.policy_number)}` : ""}
+                        <button type="button" class="license-download-btn" data-id="${ins.id}">View Card</button>
+                        <button type="button" class="vehicle-delete-btn" data-insurance-id="${ins.id}">Remove</button>
+                    </div>
+                `).join("");
+
+                listEl.querySelectorAll(".license-download-btn").forEach((btn) => {
+                    btn.addEventListener("click", async (e) => {
+                        e.stopPropagation();
+                        const id = btn.getAttribute("data-id");
+                        try {
+                            const { data: row, error } = await localSupabase
+                                .from("insurance_cards")
+                                .select("*")
+                                .eq("id", id)
+                                .maybeSingle();
+                            if (!error && row) openInsuranceCard(row);
+                        } catch (err) {
+                            console.error("Failed to load insurance card:", err);
+                        }
+                    });
+                });
+
+                listEl.querySelectorAll(".vehicle-delete-btn[data-insurance-id]").forEach((btn) => {
+                    btn.addEventListener("click", async (e) => {
+                        e.stopPropagation();
+                        if (!confirm("Remove this insurance card?")) return;
+                        try {
+                            await localSupabase.from("insurance_cards").delete().eq("id", btn.getAttribute("data-insurance-id"));
+                            loadInsuranceCards(civilianId);
+                        } catch (err) {
+                            console.error("Failed to delete insurance card:", err);
+                        }
+                    });
+                });
+            } catch (err) {
+                console.error("Failed to load insurance cards:", err);
+            }
+        }
+
+        const insuranceCard = document.getElementById("insuranceCard");
+        const icCloseBtn = document.getElementById("icCloseBtn");
+        const icDownloadBtn = document.getElementById("icDownloadBtn");
+
+        function openInsuranceCard(ins) {
+            if (!insuranceCard) return;
+            const name = (typeof loadedCivilians !== "undefined" && Array.isArray(loadedCivilians))
+                ? (loadedCivilians.find((c) => c.id === ins.civilian_id)?.name || "")
+                : "";
+            const photo = (typeof loadedCivilians !== "undefined" && Array.isArray(loadedCivilians))
+                ? (loadedCivilians.find((c) => c.id === ins.civilian_id)?.photo_url
+                    || loadedCivilians.find((c) => c.id === ins.civilian_id)?.photo || "")
+                : "";
+
+            if (document.getElementById("icTitle")) {
+                document.getElementById("icTitle").textContent = (ins.policy_type || "Insurance").toUpperCase();
+            }
+
+            const isExpired = ins.expiry_date && new Date(ins.expiry_date) < new Date();
+            const statusEl = document.getElementById("icStatus");
+            if (statusEl) {
+                statusEl.textContent = isExpired ? "Expired" : "Active";
+                statusEl.classList.toggle("expired", !!isExpired);
+            }
+
+            const barcodeNum = (ins.policy_number && ins.policy_number.replace(/[^A-Za-z0-9]/g, "").toUpperCase()) || "INS000000";
+            if (document.getElementById("icBarcode")) {
+                document.getElementById("icBarcode").textContent = barcodeNum;
+            }
+
+            const photoWrap = document.getElementById("icPhotoWrap");
+            if (photoWrap) {
+                if (photo) {
+                    photoWrap.innerHTML = `<img class="license-card-photo" src="${escapeHtml(photo)}" alt="Photo" />`;
+                } else {
+                    photoWrap.innerHTML = `<div class="license-card-photo-placeholder">NO<br>PHOTO</div>`;
+                }
+            }
+
+            if (document.getElementById("icName")) document.getElementById("icName").textContent = name || "—";
+
+            const issueDate = new Date().toLocaleDateString();
+            if (document.getElementById("icBody")) {
+                document.getElementById("icBody").innerHTML = `
+                    <div class="license-card-row">
+                        <span class="license-card-label">Provider</span>
+                        <span class="license-card-value">${escapeHtml(ins.provider || "N/A")}</span>
+                    </div>
+                    <div class="license-card-row">
+                        <span class="license-card-label">Policy Type</span>
+                        <span class="license-card-value">${escapeHtml(ins.policy_type || "N/A")}</span>
+                    </div>
+                    <div class="license-card-row">
+                        <span class="license-card-label">Policy Number</span>
+                        <span class="license-card-value">${escapeHtml(ins.policy_number || "N/A")}</span>
+                    </div>
+                    <div class="license-card-row">
+                        <span class="license-card-label">Coverage</span>
+                        <span class="license-card-value">${escapeHtml(ins.coverage || "N/A")}</span>
+                    </div>
+                    <div class="license-card-row">
+                        <span class="license-card-label">Date Issued</span>
+                        <span class="license-card-value">${escapeHtml(ins.created_at ? new Date(ins.created_at).toLocaleDateString() : issueDate)}</span>
+                    </div>
+                    <div class="license-card-row">
+                        <span class="license-card-label">Date of Expiry</span>
+                        <span class="license-card-value">${ins.expiry_date ? escapeHtml(ins.expiry_date) : "N/A"}</span>
+                    </div>
+                `;
+            }
+
+            insuranceCard.classList.add("open");
+        }
+
+        if (icCloseBtn) {
+            icCloseBtn.addEventListener("click", () => {
+                if (insuranceCard) insuranceCard.classList.remove("open");
+            });
+        }
+
+        if (icDownloadBtn) {
+            icDownloadBtn.addEventListener("click", () => {
+                const inner = document.getElementById("insuranceCardInner");
+                if (!inner || typeof window.html2canvas === "undefined") {
+                    window.print();
+                    return;
+                }
+                const originalText = icDownloadBtn.textContent;
+                icDownloadBtn.textContent = "Generating...";
+                icDownloadBtn.disabled = true;
+                html2canvas(inner, { backgroundColor: null, scale: 2 }).then((canvas) => {
+                    const link = document.createElement("a");
+                    link.download = `insurance-${(document.getElementById("icBarcode")?.textContent || "export").trim()}.png`;
+                    link.href = canvas.toDataURL("image/png");
+                    link.click();
+                    icDownloadBtn.textContent = originalText;
+                    icDownloadBtn.disabled = false;
+                }).catch((err) => {
+                    console.error("PNG export failed:", err);
+                    icDownloadBtn.textContent = originalText;
+                    icDownloadBtn.disabled = false;
+                    window.print();
+                });
+            });
+        }
+
+        const insuranceModal = document.getElementById("insuranceModal");
+        const insuranceModalClose = document.getElementById("insuranceModalClose");
+        const insuranceSubmitBtn = document.getElementById("insuranceSubmitBtn");
+        const insuranceError = document.getElementById("insuranceError");
+        const insuranceSuccess = document.getElementById("insuranceSuccess");
+
+        if (insuranceModalClose) {
+            insuranceModalClose.addEventListener("click", () => {
+                if (insuranceModal) insuranceModal.classList.remove("open");
+            });
+        }
+
+        if (insuranceModal) {
+            insuranceModal.addEventListener("click", (e) => {
+                if (e.target === insuranceModal) {
+                    insuranceModal.classList.remove("open");
+                }
+            });
+        }
+
+        const insuranceTypeSelect = document.getElementById("insuranceType");
+        const insuranceNumberInput = document.getElementById("insuranceNumber");
+
+        function generateInsuranceNumber(type) {
+            const prefixMap = {
+                "Auto": "AUT",
+                "Home": "HOM",
+                "Health": "HLT",
+                "Life": "LIF",
+                "Other": "INS"
+            };
+            const prefix = prefixMap[type] || "INS";
+            const random = Math.floor(100000 + Math.random() * 900000);
+            return `${prefix}-${random}`;
+        }
+
+        if (insuranceTypeSelect && insuranceNumberInput) {
+            insuranceTypeSelect.addEventListener("change", () => {
+                if (insuranceTypeSelect.value) {
+                    insuranceNumberInput.value = generateInsuranceNumber(insuranceTypeSelect.value);
+                } else {
+                    insuranceNumberInput.value = "";
+                }
+            });
+        }
+
+        function openInsuranceModal() {
+            if (!insuranceModal) return;
+            if (insuranceError) { insuranceError.textContent = ""; insuranceError.style.display = "none"; }
+            if (insuranceSuccess) { insuranceSuccess.textContent = ""; insuranceSuccess.style.display = "none"; }
+
+            const civilianSelect = document.getElementById("insuranceCivilian");
+            if (civilianSelect) {
+                civilianSelect.innerHTML = '<option value="">Select a civilian</option>';
+                if (Array.isArray(loadedCivilians)) {
+                    loadedCivilians.forEach(c => {
+                        const option = document.createElement("option");
+                        option.value = c.id;
+                        option.textContent = c.name || "Unnamed Civilian";
+                        civilianSelect.appendChild(option);
+                    });
+                }
+                if (currentCivilianId) {
+                    civilianSelect.value = currentCivilianId;
+                }
+            }
+
+            insuranceModal.classList.add("open");
+        }
+
+        if (insuranceSubmitBtn) {
+            insuranceSubmitBtn.addEventListener("click", async () => {
+                const civilianSelect = document.getElementById("insuranceCivilian");
+                const selectedCivilianFromModal = civilianSelect ? civilianSelect.value : "";
+                if (!selectedCivilianFromModal) {
+                    if (insuranceError) { insuranceError.textContent = "Select a civilian."; insuranceError.style.display = "block"; }
+                    return;
+                }
+
+                const user = await getCurrentUser();
+                if (!user) {
+                    if (insuranceError) { insuranceError.textContent = "You must be logged in."; insuranceError.style.display = "block"; }
+                    return;
+                }
+
+                const provider = document.getElementById("insuranceProvider")?.value.trim() || "";
+                const policyType = document.getElementById("insuranceType")?.value || "";
+                const policyNumber = document.getElementById("insuranceNumber")?.value.trim() || "";
+                const coverage = document.getElementById("insuranceCoverage")?.value.trim() || "";
+                const expiry = document.getElementById("insuranceExpiry")?.value || "";
+
+                if (!policyType) {
+                    if (insuranceError) { insuranceError.textContent = "Select a policy type."; insuranceError.style.display = "block"; }
+                    return;
+                }
+
+                if (!localSupabase) {
+                    if (insuranceError) { insuranceError.textContent = "Database unavailable."; insuranceError.style.display = "block"; }
+                    return;
+                }
+
+                if (insuranceError) { insuranceError.textContent = ""; insuranceError.style.display = "none"; }
+                if (insuranceSuccess) { insuranceSuccess.textContent = ""; insuranceSuccess.style.display = "none"; }
+
+                try {
+                    const { error } = await localSupabase
+                        .from("insurance_cards")
+                        .insert([{
+                            civilian_id: selectedCivilianFromModal,
+                            user_id: user.id,
+                            community_id: currentCommunityId || null,
+                            provider: provider || null,
+                            policy_type: policyType,
+                            policy_number: policyNumber || null,
+                            coverage: coverage || null,
+                            expiry_date: expiry || null,
+                            created_at: new Date().toISOString()
+                        }]);
+
+                    if (error) {
+                        if (insuranceError) { insuranceError.textContent = error.message || "Failed to create insurance card."; insuranceError.style.display = "block"; }
+                        console.error("Insurance insert failed:", error);
+                        return;
+                    }
+
+                    const createdCard = {
+                        civilian_id: selectedCivilianFromModal,
+                        provider: provider || "",
+                        policy_type: policyType,
+                        policy_number: policyNumber || "",
+                        coverage: coverage || "",
+                        expiry_date: expiry || null,
+                        created_at: new Date().toISOString()
+                    };
+
+                    if (insuranceSuccess) { insuranceSuccess.textContent = "Insurance card created successfully."; insuranceSuccess.style.display = "block"; }
+
+                    document.getElementById("insuranceProvider").value = "";
+                    document.getElementById("insuranceType").value = "";
+                    document.getElementById("insuranceNumber").value = "";
+                    document.getElementById("insuranceCoverage").value = "";
+                    document.getElementById("insuranceExpiry").value = "";
+
+                    const selectedId = document.getElementById("insuranceCivilian")?.value || "";
+                    if (selectedId) loadInsuranceCards(selectedId);
+
+                    if (insuranceModal) insuranceModal.classList.remove("open");
+                    openInsuranceCard(createdCard);
+                } catch (err) {
+                    if (insuranceError) { insuranceError.textContent = "Failed to create insurance card."; insuranceError.style.display = "block"; }
+                    console.error(err);
+                }
+            });
         }
 
         async function loadLicenses(civilianId) {
@@ -1964,12 +2374,25 @@
                     if (sectionEditBtn) sectionEditBtn.disabled = true;
                     if (sectionLicenseBtn) sectionLicenseBtn.disabled = true;
                     if (sectionVehicleBtn) sectionVehicleBtn.disabled = true;
+                    if (sectionInsuranceBtn) sectionInsuranceBtn.disabled = true;
                     if (sectionDeleteBtn) sectionDeleteBtn.disabled = true;
                     loadMyCivilians();
                 } catch (err) {
                     console.error("Delete failed:", err);
                     alert("Failed to delete civilian.");
                 }
+            });
+        }
+
+        const sectionInsuranceBtn = document.getElementById("sectionInsuranceBtn");
+        if (sectionInsuranceBtn) {
+            sectionInsuranceBtn.addEventListener("click", () => {
+                if (!selectedCivilianId) {
+                    alert("Select a civilian first by clicking on their card.");
+                    return;
+                }
+                currentCivilianId = selectedCivilianId;
+                openInsuranceModal();
             });
         }
 

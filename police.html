@@ -46,10 +46,10 @@
             background: #f1f5f9;
         }
 
-        .forms-btn {
+        .status-top-btn {
             position: fixed;
             top: 24px;
-            right: 160px;
+            right: 140px;
             padding: 8px 14px;
             border-radius: 10px;
             border: 1px solid #e2e8f0;
@@ -64,14 +64,20 @@
             z-index: 600;
         }
 
-        .forms-btn:hover {
+        .status-top-btn:hover {
             background: #f1f5f9;
+        }
+
+        .notes-icon {
+            width: 16px;
+            height: 16px;
+            flex-shrink: 0;
         }
 
         .new-call-btn {
             position: fixed;
             top: 24px;
-            right: 24px;
+            right: 30px;
             padding: 8px 14px;
             border-radius: 10px;
             border: 1px solid #e2e8f0;
@@ -87,10 +93,6 @@
         }
 
         .new-call-btn:hover {
-            background: #f1f5f9;
-        }
-
-        .forms-btn:hover {
             background: #f1f5f9;
         }
 
@@ -1160,9 +1162,791 @@
             color: #1d4ed8;
         }
 
+        .insurance-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 10px 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            margin-bottom: 8px;
+            background: #ffffff;
+        }
+
+        .insurance-item-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .insurance-item-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .insurance-item-meta {
+            font-size: 12px;
+            color: #475569;
+        }
+
+        .insurance-view-btn {
+            padding: 6px 12px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            color: #ffffff;
+            background: #2563eb;
+            border: 1px solid #2563eb;
+            flex-shrink: 0;
+        }
+
+        .insurance-view-btn:hover {
+            background: #1d4ed8;
+        }
+
+        .license-card {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: #ffffff;
+            z-index: 2000;
+            padding: 40px;
+            overflow-y: auto;
+        }
+
+        .license-card.open {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+        }
+
+        .license-card-inner {
+            background: linear-gradient(135deg, #f8fafc 0%, #eef2ff 100%);
+            border: 1px solid #1e293b;
+            border-radius: 14px;
+            max-width: 520px;
+            width: 100%;
+            box-shadow: 0 20px 50px rgba(15, 23, 42, 0.25);
+            position: relative;
+            overflow: hidden;
+            padding: 0;
+        }
+
+        .license-card-inner::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 6px;
+            background: linear-gradient(90deg, #1d4ed8, #7c3aed, #1d4ed8);
+        }
+
+        .license-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px 12px;
+            background: linear-gradient(90deg, #0f172a, #1e293b);
+            color: #ffffff;
+        }
+
+        .license-card-left-title {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .license-card-dept {
+            font-size: 11px;
+            letter-spacing: 3px;
+            font-weight: 700;
+            opacity: 0.85;
+            text-transform: uppercase;
+        }
+
+        .license-card-title {
+            font-size: 18px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-top: 2px;
+        }
+
+        .license-card-emblem {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            border: 2px solid rgba(255,255,255,0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            font-weight: 800;
+            background: rgba(255,255,255,0.1);
+        }
+
+        .license-card-main {
+            display: flex;
+            gap: 16px;
+            padding: 18px 20px;
+        }
+
+        .license-card-photo {
+            width: 110px;
+            height: 130px;
+            border: 2px solid #1e293b;
+            border-radius: 8px;
+            object-fit: cover;
+            background: #e2e8f0;
+            flex-shrink: 0;
+        }
+
+        .license-card-photo-placeholder {
+            width: 110px;
+            height: 130px;
+            border: 2px dashed #94a3b8;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #64748b;
+            font-size: 11px;
+            text-align: center;
+            flex-shrink: 0;
+            background: #f1f5f9;
+        }
+
+        .license-card-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .license-card-row {
+            display: flex;
+            flex-direction: column;
+            padding: 5px 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .license-card-row:last-child {
+            border-bottom: none;
+        }
+
+        .license-card-label {
+            font-size: 9px;
+            font-weight: 700;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .license-card-value {
+            font-size: 14px;
+            font-weight: 700;
+            color: #0f172a;
+            margin-top: 1px;
+            word-break: break-word;
+        }
+
+        .license-card-barcode {
+            padding: 0 20px 8px;
+            text-align: center;
+        }
+
+        .license-card-barcode-bars {
+            height: 34px;
+            background: repeating-linear-gradient(
+                to right,
+                #0f172a 0, #0f172a 2px,
+                transparent 2px, transparent 4px,
+                #0f172a 4px, #0f172a 5px,
+                transparent 5px, transparent 9px,
+                #0f172a 9px, #0f172a 12px,
+                transparent 12px, transparent 14px
+            );
+            border-radius: 2px;
+        }
+
+        .license-card-barcode-num {
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            letter-spacing: 3px;
+            color: #0f172a;
+            margin-top: 4px;
+            font-weight: 700;
+        }
+
+        .license-card-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 20px 16px;
+            border-top: 2px solid #1e293b;
+            background: rgba(255,255,255,0.6);
+        }
+
+        .license-card-signature {
+            flex: 1;
+            margin-right: 16px;
+        }
+
+        .license-card-sign-thin {
+            border-bottom: 1px solid #0f172a;
+            height: 28px;
+            font-family: 'Brush Script MT', cursive, serif;
+            font-size: 22px;
+            color: #1d4ed8;
+            padding-left: 4px;
+            line-height: 28px;
+        }
+
+        .license-card-sign-label {
+            font-size: 9px;
+            font-weight: 700;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 2px;
+        }
+
+        .license-card-badge {
+            flex-shrink: 0;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            background: #16a34a;
+            color: #ffffff;
+            border: 1px solid #15803d;
+            box-shadow: 0 2px 6px rgba(22,163,74,0.3);
+        }
+
+        .license-card-badge.expired {
+            background: #dc2626;
+            border-color: #b91c1c;
+            box-shadow: 0 2px 6px rgba(220,38,38,0.3);
+        }
+
+        .license-card-holo {
+            position: absolute;
+            top: 60px;
+            right: 18px;
+            width: 46px;
+            height: 46px;
+            border-radius: 50%;
+            background: conic-gradient(from 0deg, #60a5fa, #c084fc, #34d399, #fbbf24, #60a5fa);
+            opacity: 0.35;
+            filter: blur(0.5px);
+            pointer-events: none;
+        }
+
+        .license-card-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .license-card-btn {
+            padding: 10px 20px;
+            border-radius: 999px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            border: 1px solid;
+        }
+
+        .license-card-btn.secondary {
+            color: #334155;
+            background: #ffffff;
+            border-color: #e2e8f0;
+        }
+
+        .license-card-btn.secondary:hover {
+            background: #f8fafc;
+        }
+
+        .bodycam-overlay {
+            position: fixed;
+            bottom: 24px;
+            left: 24px;
+            z-index: 900;
+            display: none;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 16px;
+            background: rgba(0, 0, 0, 0.85);
+            border-radius: 12px;
+            border: 1px solid rgba(239, 68, 68, 0.4);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+        }
+
+        .bodycam-overlay.open {
+            display: inline-flex;
+        }
+
+        .bodycam-rec-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #ef4444;
+            animation: bodycam-pulse 1.2s infinite;
+        }
+
+        .bodycam-icon {
+            width: 18px;
+            height: 18px;
+            object-fit: contain;
+            filter: drop-shadow(0 0 2px rgba(239, 68, 68, 0.6));
+        }
+
+        .bodycam-rec-label {
+            font-size: 13px;
+            font-weight: 700;
+            color: #ef4444;
+            letter-spacing: 0.5px;
+        }
+
+        .bodycam-time {
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            font-weight: 700;
+            color: #ffffff;
+        }
+
+        @keyframes bodycam-pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.25; }
+        }
+
+        .radio-overlay {
+            position: fixed;
+            bottom: 8px;
+            left: 28px;
+            z-index: 900;
+            display: none;
+            width: 190px;
+            height: 570px;
+            background: linear-gradient(100deg, #696c6d 0%, #a0a2a1 14%, #777a7a 64%, #4e5152 100%);
+            border-radius: 18px 18px 22px 22px;
+            border: 3px solid #3e4142;
+            box-shadow: 8px 12px 22px rgba(0, 0, 0, 0.42), inset 3px 0 0 rgba(255,255,255,0.16), inset -4px 0 0 rgba(0,0,0,0.18);
+            padding: 10px 10px 8px;
+            overflow: visible;
+            font-family: 'Courier New', monospace;
+        }
+
+        .radio-overlay::before {
+            content: "";
+            position: absolute;
+            top: -25px;
+            left: 18px;
+            width: 9px;
+            height: 31px;
+            border-radius: 6px 6px 2px 2px;
+            background: linear-gradient(90deg, #303333, #777b79 45%, #292c2c);
+            border: 2px solid #292c2c;
+            box-shadow: 2px 0 2px rgba(0,0,0,0.3);
+        }
+
+        .radio-overlay::after {
+            content: "";
+            position: absolute;
+            top: 17px;
+            right: 20px;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #e14635;
+            box-shadow: -13px 0 0 #e9a52f, -26px 0 0 #35484a, 0 1px 3px rgba(0,0,0,0.55);
+        }
+
+        .radio-overlay.open {
+            display: block;
+        }
+
+        .radio-top-bar {
+            position: relative;
+            background: #4b4e4f;
+            height: 200px;
+            padding: 8px 7px 7px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border: 1px solid #303333;
+            border-radius: 9px 9px 3px 3px;
+            box-shadow: inset 0 1px 2px rgba(255,255,255,0.14), 0 2px 2px rgba(0,0,0,0.22);
+        }
+
+        .radio-top-bar::before {
+            content: "";
+            position: absolute;
+            top: 4px;
+            left: 25px;
+            width: 9px;
+            height: 104px;
+            border-radius: 6px 6px 3px 3px;
+            background: linear-gradient(90deg, #292c2c, #777b79 48%, #292c2c);
+            border: 2px solid #252828;
+            box-shadow: 2px 2px 3px rgba(0,0,0,0.28);
+        }
+
+        .radio-top-bar::after {
+            content: "";
+            position: absolute;
+            top: 109px;
+            left: 19px;
+            width: 23px;
+            height: 27px;
+            border-radius: 5px;
+            background: #343838;
+            border: 2px solid #292c2c;
+            box-shadow: 0 0 0 5px rgba(73, 76, 76, 0.6), 34px 18px 0 -4px #d58628, 50px 18px 0 -4px #35484a;
+        }
+
+        .radio-brand-text {
+            font-size: 8px;
+            font-weight: 800;
+            color: #202323;
+            letter-spacing: 1px;
+        }
+
+        .radio-model {
+            font-size: 8px;
+            font-weight: 600;
+            color: #252828;
+        }
+
+        .radio-screen {
+            position: absolute;
+            top: 210px;
+            left: 14px;
+            width: 156px;
+            height: 270px;
+            margin: 0;
+            background: linear-gradient(to bottom, #111315 0%, #090b0c 75%, #12351d 100%);
+            border-radius: 4px;
+            border: 3px solid #292c2c;
+            box-shadow: inset 0 0 14px rgba(0, 0, 0, 0.9), 0 1px 1px rgba(255,255,255,0.13);
+            padding: 11px 9px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .radio-screen::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0,0,0,0.2) 0px,
+                rgba(0,0,0,0.2) 1px,
+                transparent 1px,
+                transparent 3px
+            );
+            pointer-events: none;
+            border-radius: 6px;
+        }
+
+        .radio-screen-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+
+        .radio-zone-label {
+            font-size: 9px;
+            font-weight: 700;
+            color: #7d8582;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .radio-signal {
+            display: flex;
+            gap: 1px;
+            align-items: flex-end;
+            height: 10px;
+        }
+
+        .radio-signal-bar {
+            width: 2px;
+            background: #b7d7c0;
+            border-radius: 1px;
+        }
+
+        .radio-signal-bar:nth-child(1) { height: 3px; }
+        .radio-signal-bar:nth-child(2) { height: 5px; }
+        .radio-signal-bar:nth-child(3) { height: 7px; }
+        .radio-signal-bar:nth-child(4) { height: 10px; }
+
+        .radio-channel-main {
+            font-size: 22px;
+            font-weight: 800;
+            color: #d6e3d9;
+            text-shadow: 0 0 7px rgba(151, 206, 165, 0.5);
+            font-family: 'Courier New', monospace;
+            margin-bottom: 2px;
+        }
+
+        .radio-talkgroup {
+            font-size: 10px;
+            font-weight: 600;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+
+        .radio-status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: auto;
+            padding-top: 6px;
+            border-top: 1px solid #263c2c;
+        }
+
+        .radio-tx-status {
+            font-size: 9px;
+            font-weight: 800;
+            color: #e44a40;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .radio-tx-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #ef4444;
+            animation: radio-blink 1s infinite;
+        }
+
+        .radio-battery {
+            font-size: 8px;
+            font-weight: 700;
+            color: #10b981;
+        }
+
+        .radio-side-controls {
+            position: absolute;
+            top: 482px;
+            left: 14px;
+            width: 156px;
+            display: flex;
+            gap: 5px;
+            padding: 0 4px 6px;
+            justify-content: center;
+        }
+
+        .radio-side-btn {
+            flex: 1;
+            height: 27px;
+            border-radius: 4px;
+            background: #3b3e3e;
+            border: 2px solid #292c2c;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 8px;
+            font-weight: 700;
+            color: #c0c4c2;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .radio-side-btn.emergency {
+            background: #7f1d1d;
+            border-color: #991b1b;
+            color: #fca5a5;
+        }
+
+        .radio-knobs {
+            position: absolute;
+            top: 145px;
+            left: 25px;
+            width: 134px;
+            display: flex;
+            gap: 18px;
+            padding: 0 4px 6px;
+            justify-content: center;
+        }
+
+        .radio-knob {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .radio-knob-circle {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #687070, #292d2e);
+            border: 2px solid #252828;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.1);
+            position: relative;
+        }
+
+        .radio-knob-circle::after {
+            content: "";
+            position: absolute;
+            top: 4px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 2px;
+            height: 8px;
+            background: #9ca3af;
+            border-radius: 1px;
+        }
+
+        .radio-knob-label {
+            font-size: 7px;
+            font-weight: 700;
+            color: #303434;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .radio-input-row {
+            display: flex;
+            gap: 6px;
+            padding: 0 10px 8px;
+        }
+
+        .radio-input {
+            flex: 1;
+            background: #0a0f0a;
+            border: 2px solid #1f2937;
+            border-radius: 6px;
+            padding: 6px 8px;
+            color: #10b981;
+            font-size: 11px;
+            font-weight: 700;
+            font-family: 'Courier New', monospace;
+            outline: none;
+            text-transform: uppercase;
+        }
+
+        .radio-input:focus {
+            border-color: #10b981;
+            box-shadow: 0 0 6px rgba(16, 185, 129, 0.3);
+        }
+
+        .radio-input::placeholder {
+            color: #374151;
+            text-transform: none;
+        }
+
+        .radio-ptt {
+            position: absolute;
+            left: 14px;
+            bottom: 29px;
+            margin: 0;
+            padding: 8px 10px;
+            width: calc(100% - 8px);
+            border-radius: 5px;
+            border: 2px solid #2a2d2d;
+            background: linear-gradient(to bottom, #555a59, #343838);
+            color: #d8ddda;
+            font-size: 12px;
+            font-weight: 800;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            box-shadow: 0 3px 0 #242727, inset 0 1px 0 rgba(255,255,255,0.16);
+            transition: all 0.05s ease;
+        }
+
+        .radio-ptt:active, .radio-ptt.pressed {
+            transform: translateY(3px);
+            box-shadow: 0 1px 0 #111113, inset 0 1px 0 rgba(255,255,255,0.1);
+            background: linear-gradient(to bottom, #2868d8, #17418f);
+            color: #ffffff;
+        }
+
+        .radio-bottom-bar {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(to bottom, #0d2714, #07150b);
+            padding: 7px 6px;
+            text-align: center;
+            border-top: 2px solid #303333;
+            font-size: 8px;
+            font-weight: 700;
+            color: #9bc0a1;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
     </style>
 </head>
 <body>
+    <div class="bodycam-overlay" id="bodycamOverlay">
+        <img src="bodycam.png" class="bodycam-icon" alt="Bodycam" />
+        <span class="bodycam-rec-dot"></span>
+        <span class="bodycam-rec-label">REC</span>
+        <span class="bodycam-time" id="bodycamTime"></span>
+    </div>
+    <div class="radio-overlay" id="radioOverlay">
+        <div class="radio-top-bar">
+            <span class="radio-brand-text">MOTOROLA</span>
+            <span class="radio-model">APX P25</span>
+        </div>
+        <div class="radio-screen">
+            <div class="radio-screen-header">
+                <span class="radio-zone-label">Zone A</span>
+                <div class="radio-signal">
+                    <span class="radio-signal-bar"></span>
+                    <span class="radio-signal-bar"></span>
+                    <span class="radio-signal-bar"></span>
+                    <span class="radio-signal-bar"></span>
+                </div>
+            </div>
+            <div class="radio-channel-main">Scen 1</div>
+            <div class="radio-talkgroup">FG 1</div>
+            <div class="radio-status-bar">
+                <div class="radio-tx-status">
+                    <span class="radio-tx-dot"></span>
+                    <span>TX</span>
+                </div>
+                <div class="radio-battery">BAT 75%</div>
+            </div>
+        </div>
+        <div class="radio-side-controls">
+            <div class="radio-side-btn">1</div>
+            <div class="radio-side-btn">2</div>
+            <div class="radio-side-btn emergency">E</div>
+        </div>
+        <div class="radio-knobs">
+            <div class="radio-knob">
+                <div class="radio-knob-circle"></div>
+                <span class="radio-knob-label">Vol</span>
+            </div>
+            <div class="radio-knob">
+                <div class="radio-knob-circle"></div>
+                <span class="radio-knob-label">Ch</span>
+            </div>
+        </div>
+        <div class="radio-input-row">
+            <input type="text" class="radio-input" id="radioChannelInput" placeholder="Scene" value="Scen 1" maxlength="20" />
+            <input type="text" class="radio-input" id="radioTalkgroupInput" placeholder="FG" value="FG 1" maxlength="10" />
+        </div>
+        <button type="button" class="radio-ptt" id="radioPtt">PTT</button>
+        <div class="radio-bottom-bar">P25 Phase II</div>
+    </div>
     <div class="status-bar">
         <div class="status-current">
             <span class="status-dot" id="statusDot"></span>
@@ -1221,15 +2005,15 @@
     </div>
 
     <button class="back-btn" id="backBtn">← Back</button>
-    <button type="button" class="forms-btn" id="formsBtn">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <button type="button" class="status-top-btn" id="notesBtn">
+        <svg class="notes-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
             <polyline points="14 2 14 8 20 8"></polyline>
             <line x1="16" y1="13" x2="8" y2="13"></line>
             <line x1="16" y1="17" x2="8" y2="17"></line>
             <polyline points="10 9 9 9 8 9"></polyline>
         </svg>
-        Forms
+        Notes
     </button>
     <button type="button" class="new-call-btn" id="newCallBtn">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -1309,6 +2093,7 @@
                     <div class="tabs">
                         <button type="button" class="tab-btn active" data-tab="details" data-target="civilianDetailsPanel">Details</button>
                         <button type="button" class="tab-btn" data-tab="records" data-target="civilianRecordsPanel">Records</button>
+                        <button type="button" class="tab-btn" data-tab="insurance" data-target="civilianInsurancePanel">Insurance</button>
                     </div>
                     <div class="tab-panel active" id="civilianDetailsPanel">
                         <div class="record-item" id="selectedCivilianInfo"></div>
@@ -1320,6 +2105,9 @@
                     </div>
                     <div class="tab-panel" id="civilianRecordsPanel">
                         <div id="civilianRecordsList"><div class="empty">Loading records...</div></div>
+                    </div>
+                    <div class="tab-panel" id="civilianInsurancePanel">
+                        <div id="civilianInsuranceList"><div class="empty">Loading insurance...</div></div>
                     </div>
                 </div>
             </div>
@@ -1435,16 +2223,6 @@
         </div>
     </div>
 
-    <div class="modal-overlay" id="formsModal">
-        <div class="modal">
-            <div class="modal-header">
-                <div class="modal-title">Forms</div>
-                <button class="modal-close" id="formsModalClose" type="button" aria-label="Close">×</button>
-            </div>
-            <div style="font-size:14px; color:#475569; text-align:center; padding: 10px 0;">Coming Soon</div>
-        </div>
-    </div>
-
     <div class="modal-overlay" id="newCallModal">
         <div class="modal">
             <div class="modal-header">
@@ -1454,6 +2232,37 @@
             <div style="font-size:14px; color:#475569; text-align:center; padding: 10px 0;">Coming Soon</div>
         </div>
     </div>
+
+       <div class="license-card" id="insuranceCard">
+           <div class="license-card-inner" id="insuranceCardInner">
+               <div class="license-card-holo"></div>
+               <div class="license-card-header">
+                   <div class="license-card-left-title">
+                       <span class="license-card-dept">PulseCAD Insurance</span>
+                       <span class="license-card-title" id="icTitle">INSURANCE</span>
+                   </div>
+                   <div class="license-card-emblem">PC</div>
+               </div>
+               <div class="license-card-main">
+                   <div id="icPhotoWrap"></div>
+                   <div class="license-card-info" id="icBody"></div>
+               </div>
+               <div class="license-card-barcode">
+                   <div class="license-card-barcode-bars"></div>
+                   <div class="license-card-barcode-num" id="icBarcode">INS-000000</div>
+               </div>
+               <div class="license-card-footer">
+                   <div class="license-card-signature">
+                       <div class="license-card-sign-thin" id="icName">—</div>
+                       <div class="license-card-sign-label">Insured Member</div>
+                   </div>
+                   <span class="license-card-badge" id="icStatus">Active</span>
+               </div>
+           </div>
+           <div class="license-card-actions" style="padding: 0 20px 18px; margin-top: 16px;">
+               <button type="button" class="license-card-btn secondary" id="icCloseBtn">Close</button>
+           </div>
+        </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1569,27 +2378,6 @@
         }
 
         document.getElementById("backBtn").addEventListener("click", () => window.close());
-
-        const formsBtn = document.getElementById("formsBtn");
-        const formsModal = document.getElementById("formsModal");
-        const formsModalClose = document.getElementById("formsModalClose");
-        if (formsBtn && formsModal) {
-            formsBtn.addEventListener("click", () => {
-                formsModal.classList.add("open");
-            });
-        }
-        if (formsModalClose && formsModal) {
-            formsModalClose.addEventListener("click", () => {
-                formsModal.classList.remove("open");
-            });
-        }
-        if (formsModal) {
-            formsModal.addEventListener("click", (e) => {
-                if (e.target === formsModal) {
-                    formsModal.classList.remove("open");
-                }
-            });
-        }
 
         const newCallBtn = document.getElementById("newCallBtn");
         const newCallModal = document.getElementById("newCallModal");
@@ -1925,6 +2713,7 @@
             }
             loadCivilianLicenseStatus(civilian.id);
             loadCivilianRecords(civilian.id);
+            loadCivilianInsurance(civilian.id);
             switchTab(document.querySelector('.tab-btn.active'));
         }
 
@@ -2044,14 +2833,45 @@
                 const lic = data[0];
                 const isSuspended = !!lic.suspended;
 
+                // Supervisors (per community) or any community creator (owner) can suspend/unsuspend
+                let isSupervisor = false;
+                try {
+                    const { data: authData } = await localSupabase.auth.getUser();
+                    const currentUserId = authData && authData.user ? authData.user.id : null;
+                    const currentUserEmail = authData && authData.user ? authData.user.email : null;
+                    const civCommunityId = selectedCivilian ? selectedCivilian.community_id : null;
+                    if (currentUserId && civCommunityId) {
+                        const { data: supRow } = await localSupabase
+                            .from("user_communities")
+                            .select("user_id")
+                            .eq("community_id", civCommunityId)
+                            .eq("user_id", currentUserId)
+                            .eq("is_supervisor", true)
+                            .maybeSingle();
+                        isSupervisor = !!supRow;
+                    }
+                    if (!isSupervisor && currentUserEmail) {
+                        const { data: anyComm } = await localSupabase
+                            .from("communities")
+                            .select("id")
+                            .eq("creator_email", currentUserEmail)
+                            .limit(1);
+                        if (Array.isArray(anyComm) && anyComm.length > 0) {
+                            isSupervisor = true;
+                        }
+                    }
+                } catch (supErr) {
+                    console.warn("Supervisor check failed:", supErr);
+                }
+
                 licenseStatusArea.innerHTML = `
                     <span style="font-size: 13px; color: #475569;">
                         License: ${escapeHtml(lic.license_type || 'N/A')} — ${escapeHtml(lic.license_number || 'N/A')}
                         <span class="license-status-badge ${isSuspended ? 'suspended' : 'active'}">${isSuspended ? 'SUSPENDED' : 'ACTIVE'}</span>
                     </span>
-                    <button type="button" class="${isSuspended ? 'unsuspend-license-btn' : 'suspend-license-btn'}" id="suspendLicenseBtn" data-license-id="${lic.id}">
+                    ${isSupervisor ? `<button type="button" class="${isSuspended ? 'unsuspend-license-btn' : 'suspend-license-btn'}" id="suspendLicenseBtn" data-license-id="${lic.id}">
                         ${isSuspended ? 'Unsuspend License' : 'Suspend License'}
-                    </button>
+                    </button>` : ''}
                 `;
 
                 const suspendBtn = document.getElementById("suspendLicenseBtn");
@@ -2080,6 +2900,134 @@
             } catch (err) {
                 console.error("Failed to load license status:", err);
             }
+        }
+
+        async function loadCivilianInsurance(civilianId) {
+            const listEl = document.getElementById("civilianInsuranceList");
+            if (!listEl || !localSupabase) return;
+            listEl.innerHTML = '<div class="empty">Loading insurance...</div>';
+            try {
+                const { data, error } = await localSupabase
+                    .from("insurance_cards")
+                    .select("*")
+                    .eq("civilian_id", civilianId)
+                    .order("created_at", { ascending: false });
+
+                if (error || !Array.isArray(data) || data.length === 0) {
+                    listEl.innerHTML = '<div class="empty">No insurance cards on record.</div>';
+                    return;
+                }
+
+                listEl.innerHTML = data.map((ins) => {
+                    const isExpired = ins.expiry_date && new Date(ins.expiry_date) < new Date();
+                    return `
+                    <div class="insurance-item">
+                        <div class="insurance-item-info">
+                            <div class="insurance-item-title">${escapeHtml(ins.policy_type || "Insurance")} — ${escapeHtml(ins.provider || "Unknown provider")}</div>
+                            <div class="insurance-item-meta">${ins.policy_number ? "Policy #: " + escapeHtml(ins.policy_number) : "No policy number"}</div>
+                        </div>
+                        <span class="license-card-badge ${isExpired ? "expired" : ""}" style="flex-shrink:0;">${isExpired ? "Expired" : "Active"}</span>
+                        <button type="button" class="insurance-view-btn" data-id="${ins.id}">View</button>
+                    </div>
+                `;
+                }).join("");
+
+                listEl.querySelectorAll(".insurance-view-btn").forEach((btn) => {
+                    btn.addEventListener("click", async (e) => {
+                        e.stopPropagation();
+                        const id = btn.getAttribute("data-id");
+                        try {
+                            const { data: row, error } = await localSupabase
+                                .from("insurance_cards")
+                                .select("*")
+                                .eq("id", id)
+                                .maybeSingle();
+                            if (!error && row) openInsuranceCard(row);
+                        } catch (err) {
+                            console.error("Failed to load insurance card:", err);
+                        }
+                    });
+                });
+            } catch (err) {
+                listEl.innerHTML = '<div class="empty">Failed to load insurance.</div>';
+                console.error("Failed to load insurance:", err);
+            }
+        }
+
+        const insuranceCard = document.getElementById("insuranceCard");
+        const icCloseBtn = document.getElementById("icCloseBtn");
+
+        function openInsuranceCard(ins) {
+            if (!insuranceCard) return;
+
+            const photo = selectedCivilian ? (selectedCivilian.photo_url || selectedCivilian.photo || "") : "";
+
+            if (document.getElementById("icTitle")) {
+                document.getElementById("icTitle").textContent = (ins.policy_type || "Insurance").toUpperCase();
+            }
+
+            const isExpired = ins.expiry_date && new Date(ins.expiry_date) < new Date();
+            const statusEl = document.getElementById("icStatus");
+            if (statusEl) {
+                statusEl.textContent = isExpired ? "Expired" : "Active";
+                statusEl.classList.toggle("expired", !!isExpired);
+            }
+
+            const barcodeNum = (ins.policy_number && ins.policy_number.replace(/[^A-Za-z0-9]/g, "").toUpperCase()) || "INS000000";
+            if (document.getElementById("icBarcode")) {
+                document.getElementById("icBarcode").textContent = barcodeNum;
+            }
+
+            const photoWrap = document.getElementById("icPhotoWrap");
+            if (photoWrap) {
+                if (photo) {
+                    photoWrap.innerHTML = `<img class="license-card-photo" src="${escapeHtml(photo)}" alt="Photo" />`;
+                } else {
+                    photoWrap.innerHTML = `<div class="license-card-photo-placeholder">NO<br>PHOTO</div>`;
+                }
+            }
+
+            if (document.getElementById("icName")) {
+                document.getElementById("icName").textContent = selectedCivilian && selectedCivilian.name ? selectedCivilian.name : "—";
+            }
+
+            const issueDate = new Date().toLocaleDateString();
+            if (document.getElementById("icBody")) {
+                document.getElementById("icBody").innerHTML = `
+                    <div class="license-card-row">
+                        <span class="license-card-label">Provider</span>
+                        <span class="license-card-value">${escapeHtml(ins.provider || "N/A")}</span>
+                    </div>
+                    <div class="license-card-row">
+                        <span class="license-card-label">Policy Type</span>
+                        <span class="license-card-value">${escapeHtml(ins.policy_type || "N/A")}</span>
+                    </div>
+                    <div class="license-card-row">
+                        <span class="license-card-label">Policy Number</span>
+                        <span class="license-card-value">${escapeHtml(ins.policy_number || "N/A")}</span>
+                    </div>
+                    <div class="license-card-row">
+                        <span class="license-card-label">Coverage</span>
+                        <span class="license-card-value">${escapeHtml(ins.coverage || "N/A")}</span>
+                    </div>
+                    <div class="license-card-row">
+                        <span class="license-card-label">Date Issued</span>
+                        <span class="license-card-value">${escapeHtml(ins.created_at ? new Date(ins.created_at).toLocaleDateString() : issueDate)}</span>
+                    </div>
+                    <div class="license-card-row">
+                        <span class="license-card-label">Date of Expiry</span>
+                        <span class="license-card-value">${ins.expiry_date ? escapeHtml(ins.expiry_date) : "N/A"}</span>
+                    </div>
+                `;
+            }
+
+            insuranceCard.classList.add("open");
+        }
+
+        if (icCloseBtn) {
+            icCloseBtn.addEventListener("click", () => {
+                if (insuranceCard) insuranceCard.classList.remove("open");
+            });
         }
 
         const openTrafficStopBtn = document.getElementById("openTrafficStopBtn");
@@ -2778,6 +3726,54 @@
 
         loadUnitsBar();
         loadCallsBar();
+
+        const bodycamOverlay = document.getElementById("bodycamOverlay");
+        const bodycamTime = document.getElementById("bodycamTime");
+        let bodycamInterval = null;
+
+        function playBodycamSound() {
+            try {
+                const audio = new Audio("bodycam.mp3");
+                audio.volume = 0.5;
+                audio.play().catch((e) => console.error("Bodycam sound failed:", e));
+            } catch (e) {
+                console.error("Bodycam sound failed:", e);
+            }
+        }
+
+        function updateBodycamTime() {
+            if (!bodycamTime) return;
+            const now = new Date();
+            const y = now.getFullYear();
+            const m = String(now.getMonth() + 1).padStart(2, "0");
+            const d = String(now.getDate()).padStart(2, "0");
+            const hh = String(now.getHours()).padStart(2, "0");
+            const mm = String(now.getMinutes()).padStart(2, "0");
+            const ss = String(now.getSeconds()).padStart(2, "0");
+            bodycamTime.textContent = y + "-" + m + "-" + d + " " + hh + ":" + mm + ":" + ss;
+        }
+
+        function toggleBodycam() {
+            if (!bodycamOverlay) return;
+            const isOpen = bodycamOverlay.classList.contains("open");
+            if (isOpen) {
+                bodycamOverlay.classList.remove("open");
+                if (bodycamInterval) clearInterval(bodycamInterval);
+                bodycamInterval = null;
+            } else {
+                bodycamOverlay.classList.add("open");
+                updateBodycamTime();
+                bodycamInterval = setInterval(updateBodycamTime, 1000);
+                playBodycamSound();
+            }
+        }
+
+        document.addEventListener("keydown", (e) => {
+            if (e.key === "F11") {
+                e.preventDefault();
+                toggleBodycam();
+            }
+        });
     </script>
 </body>
 </html>
