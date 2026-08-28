@@ -1876,10 +1876,7 @@
 </head>
 <body>
     <div class="bodycam-overlay" id="bodycamOverlay">
-        <img src="bodycam.png" class="bodycam-icon" alt="Bodycam" />
-        <span class="bodycam-rec-dot"></span>
-        <span class="bodycam-rec-label">REC</span>
-        <span class="bodycam-time" id="bodycamTime"></span>
+        <img src="pdr.png" class="bodycam-icon" alt="PDR" />
     </div>
     <div class="radio-overlay" id="radioOverlay">
         <div class="radio-top-bar">
@@ -3709,48 +3706,14 @@
         loadCallsBar();
 
         const bodycamOverlay = document.getElementById("bodycamOverlay");
-        const bodycamTime = document.getElementById("bodycamTime");
-        let bodycamInterval = null;
-
-        function playBodycamSound() {
-            try {
-                const audio = new Audio("bodycam.mp3");
-                audio.volume = 0.5;
-                audio.play().catch((e) => console.error("Bodycam sound failed:", e));
-            } catch (e) {
-                console.error("Bodycam sound failed:", e);
-            }
-        }
-
-        function updateBodycamTime() {
-            if (!bodycamTime) return;
-            const now = new Date();
-            const y = now.getFullYear();
-            const m = String(now.getMonth() + 1).padStart(2, "0");
-            const d = String(now.getDate()).padStart(2, "0");
-            const hh = String(now.getHours()).padStart(2, "0");
-            const mm = String(now.getMinutes()).padStart(2, "0");
-            const ss = String(now.getSeconds()).padStart(2, "0");
-            bodycamTime.textContent = y + "-" + m + "-" + d + " " + hh + ":" + mm + ":" + ss;
-        }
 
         function toggleBodycam() {
             if (!bodycamOverlay) return;
-            const isOpen = bodycamOverlay.classList.contains("open");
-            if (isOpen) {
-                bodycamOverlay.classList.remove("open");
-                if (bodycamInterval) clearInterval(bodycamInterval);
-                bodycamInterval = null;
-            } else {
-                bodycamOverlay.classList.add("open");
-                updateBodycamTime();
-                bodycamInterval = setInterval(updateBodycamTime, 1000);
-                playBodycamSound();
-            }
+            bodycamOverlay.classList.toggle("open");
         }
 
         document.addEventListener("keydown", (e) => {
-            if (e.key === "F8") {
+            if (e.key === "m" || e.key === "M") {
                 e.preventDefault();
                 toggleBodycam();
             }
