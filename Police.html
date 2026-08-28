@@ -1893,8 +1893,8 @@
                     <span class="radio-signal-bar"></span>
                 </div>
             </div>
-            <div class="radio-channel-main">Scen 1</div>
-            <div class="radio-talkgroup">FG 1</div>
+            <div class="radio-channel-main">Dispatch</div>
+            <div class="radio-talkgroup">FG1</div>
             <div class="radio-status-bar">
                 <div class="radio-tx-status">
                     <span class="radio-tx-dot"></span>
@@ -1919,8 +1919,8 @@
             </div>
         </div>
         <div class="radio-input-row">
-            <input type="text" class="radio-input" id="radioChannelInput" placeholder="Scene" value="Scen 1" maxlength="20" />
-            <input type="text" class="radio-input" id="radioTalkgroupInput" placeholder="FG" value="FG 1" maxlength="10" />
+            <input type="text" class="radio-input" id="radioChannelInput" placeholder="Dispatch" value="Dispatch" maxlength="20" />
+            <input type="text" class="radio-input" id="radioTalkgroupInput" placeholder="FG" value="FG1" maxlength="10" />
         </div>
         <button type="button" class="radio-ptt" id="radioPtt">PTT</button>
         <div class="radio-bottom-bar">P25 Phase II</div>
@@ -3711,6 +3711,20 @@
             if (!bodycamOverlay) return;
             bodycamOverlay.classList.toggle("open");
         }
+
+        const radioChannelMain = document.querySelector(".radio-channel-main");
+        const radioTalkgroup = document.querySelector(".radio-talkgroup");
+        const radioChannelInput = document.getElementById("radioChannelInput");
+        const radioTalkgroupInput = document.getElementById("radioTalkgroupInput");
+
+        function setRadioDisplay(channelText = "Dispatch", talkgroupText = "FG1") {
+            if (radioChannelMain) radioChannelMain.textContent = channelText;
+            if (radioTalkgroup) radioTalkgroup.textContent = talkgroupText;
+            if (radioChannelInput) radioChannelInput.value = channelText;
+            if (radioTalkgroupInput) radioTalkgroupInput.value = talkgroupText;
+        }
+
+        setRadioDisplay();
 
         document.addEventListener("keydown", (e) => {
             if (e.key === "m" || e.key === "M") {
