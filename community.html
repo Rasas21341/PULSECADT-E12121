@@ -1179,25 +1179,31 @@
         <div id="content"><div class="empty">Loading community...</div></div>
     </div>
 
-    <div class="modal-overlay" id="policeModal">
-        <div class="modal">
-            <div class="modal-title">Officer Details</div>
-            <div class="field">
-                <label for="poName">Name</label>
-                <input type="text" id="poName" placeholder="Officer name" />
-            </div>
-            <div class="field">
-                <label for="poRank">Rank</label>
-                <input type="text" id="poRank" placeholder="e.g. Sergeant" />
-            </div>
-            <div class="field">
-                <label for="poCallsign">Callsign</label>
-                <input type="text" id="poCallsign" placeholder="e.g. 1A-12" />
-            </div>
-            <button type="button" class="submit-btn" id="poSubmit">Enter MDT</button>
-            <div class="modal-error" id="poError"></div>
-        </div>
-    </div>
+     <div class="modal-overlay" id="policeModal">
+         <div class="modal">
+             <div class="modal-title">Officer Details</div>
+             <div class="field">
+                 <label for="poName">Name</label>
+                 <input type="text" id="poName" placeholder="Officer name" />
+             </div>
+             <div class="field">
+                 <label for="poRank">Rank</label>
+                 <input type="text" id="poRank" placeholder="e.g. Sergeant" />
+             </div>
+             <div class="field">
+                 <label for="poCallsign">Callsign</label>
+                 <input type="text" id="poCallsign" placeholder="e.g. 1A-12" />
+             </div>
+             <div class="field">
+                 <label for="poDepartment">Department</label>
+                 <select id="poDepartment">
+                     <option value="">Loading departments...</option>
+                 </select>
+             </div>
+             <button type="button" class="submit-btn" id="poSubmit">Enter MDT</button>
+             <div class="modal-error" id="poError"></div>
+         </div>
+     </div>
 
     <div class="modal-overlay" id="departmentPasscodeModal">
         <div class="modal">
@@ -3179,13 +3185,43 @@
         const poName = document.getElementById("poName");
         const poRank = document.getElementById("poRank");
         const poCallsign = document.getElementById("poCallsign");
+        const poDepartment = document.getElementById("poDepartment");
         const poError = document.getElementById("poError");
+
+        async function loadPoliceDepartments() {
+            if (!poDepartment || !localSupabase || !currentCommunityId) return;
+            try {
+                const { data, error } = await localSupabase
+                    .from("departments")
+                    .select("*")
+                    .eq("community_id", currentCommunityId)
+                    .order("created_at", { ascending: true });
+
+                if (error || !Array.isArray(data) || data.length === 0) {
+                    poDepartment.innerHTML = '<option value="">No departments available</option>';
+                    return;
+                }
+
+                poDepartment.innerHTML = '<option value="">Select department</option>' + data.map((d) => {
+                    const escapedName = (d.name || "").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+                    return `<option value="${d.id}">${escapedName}</option>`;
+                }).join("");
+
+                if (pendingDepartment && pendingDepartment.id) {
+                    poDepartment.value = pendingDepartment.id;
+                }
+            } catch (err) {
+                console.error("Failed to load departments:", err);
+                poDepartment.innerHTML = '<option value="">Failed to load departments</option>';
+            }
+        }
 
         function openPoliceModal() {
             if (policeModal) {
                 policeModal.classList.add("open");
                 policeModal.style.display = "flex";
             }
+            loadPoliceDepartments();
             if (poName) {
                 setTimeout(() => poName.focus(), 50);
             }
@@ -3203,8 +3239,13 @@
                 const name = poName ? poName.value.trim() : "";
                 const rank = poRank ? poRank.value.trim() : "";
                 const callsign = poCallsign ? poCallsign.value.trim() : "";
+                const departmentId = poDepartment ? poDepartment.value : "";
                 if (!name) {
                     if (poError) { poError.textContent = "Please enter a name."; poError.style.display = "block"; }
+                    return;
+                }
+                if (!departmentId) {
+                    if (poError) { poError.textContent = "Please select a department."; poError.style.display = "block"; }
                     return;
                 }
                 if (poError) { poError.textContent = ""; poError.style.display = "none"; }
@@ -3213,7 +3254,7 @@
                 const params = new URLSearchParams({ name, rank, callsign });
                 params.set("community", currentCommunityId || "");
                 if (erlcKey) params.set("erlckey", erlcKey);
-                if (pendingDepartment) params.set("department", pendingDepartment.id);
+                params.set("department", departmentId);
                 try {
                     localStorage.setItem("policeErkKey", erlcKey);
                     localStorage.setItem("policeOfficerName", name);
