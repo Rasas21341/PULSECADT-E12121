@@ -1512,7 +1512,7 @@
             top: 44%;
             transform: translate(-50%, -50%);
             color: #000000;
-            font-size: clamp(18px, 2.4vw, 42px);
+            font-size: clamp(12px, 1.5vw, 28px);
             font-weight: 800;
             letter-spacing: 0.08em;
             text-transform: uppercase;
@@ -1770,9 +1770,16 @@
         }
 
         .radio-side-btn.emergency {
-            background: #7f1d1d;
-            border-color: #991b1b;
-            color: #fca5a5;
+            background: #f97316;
+            border-color: #c2410c;
+            color: #fff7ed;
+            box-shadow: inset 0 0 0 1px rgba(255,255,255,0.18);
+        }
+
+        .radio-side-btn.emergency.active {
+            background: #ef4444;
+            border-color: #b91c1c;
+            box-shadow: 0 0 12px rgba(239, 68, 68, 0.8), inset 0 0 0 1px rgba(255,255,255,0.22);
         }
 
         .radio-knobs {
@@ -1933,7 +1940,7 @@
         <div class="radio-side-controls">
             <div class="radio-side-btn">1</div>
             <div class="radio-side-btn">2</div>
-            <div class="radio-side-btn emergency">E</div>
+            <button type="button" class="radio-side-btn emergency" id="panicButton" aria-label="Panic button">E</button>
         </div>
         <div class="radio-knobs">
             <div class="radio-knob">
@@ -3737,6 +3744,20 @@
         function toggleBodycam() {
             if (!bodycamOverlay) return;
             bodycamOverlay.classList.toggle("open");
+        }
+
+        const panicButton = document.getElementById("panicButton");
+        let panicActive = false;
+
+        if (panicButton) {
+            panicButton.addEventListener("click", () => {
+                panicActive = !panicActive;
+                panicButton.classList.toggle("active", panicActive);
+                panicButton.textContent = panicActive ? "PANIC" : "E";
+                if (panicActive) {
+                    bodycamOverlay?.classList.add("open");
+                }
+            });
         }
 
         const radioChannelMain = document.querySelector(".radio-channel-main");
