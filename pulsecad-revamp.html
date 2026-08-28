@@ -3445,9 +3445,9 @@ if (action === "dashboard") {
                     return;
                 }
                 if (user.email === "oceanviewrp1@gmail.com") {
-                     openPanel("staff.html");
-                    return;
-                }
+                     window.location.href = "staff.html";
+                     return;
+                 }
                 const { data, error } = await localSupabase
                     .from("users")
                     .select("department")
@@ -3457,7 +3457,7 @@ if (action === "dashboard") {
                     alert("Access denied. Staff only.");
                     return;
                 }
-                openPanel("staff.html");
+                window.location.href = "staff.html";
             });
         }
 
