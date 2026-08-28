@@ -3211,9 +3211,9 @@ enable-ga="false"
                           if (!rowId) return;
 if (action === "dashboard") {
                                openPanel("community.html?id=" + encodeURIComponent(rowId) + "&dashboard=1");
-                          } else if (action === "modpanel") {
-                               openPanel("mpanel.html?id=" + encodeURIComponent(rowId));
-                          } else if (action === "setbanner") {
+                           } else if (action === "modpanel") {
+                                window.location.href = "mpanel.html?id=" + encodeURIComponent(rowId);
+                           } else if (action === "setbanner") {
                               e.stopPropagation();
                               const fileInput = document.createElement("input");
                               fileInput.type = "file";
