@@ -1273,6 +1273,45 @@
         </div>
     </div>
 
+    <div class="modal-overlay" id="newApplicationModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">New Application</div>
+                <button class="modal-close" id="newAppModalClose" type="button" aria-label="Close">×</button>
+            </div>
+            <div class="field">
+                <label for="newAppName">Name</label>
+                <input type="text" id="newAppName" placeholder="Full name" />
+            </div>
+            <div class="field">
+                <label for="newAppEmail">Email</label>
+                <input type="email" id="newAppEmail" placeholder="you@example.com" />
+            </div>
+            <div class="field">
+                <label for="newAppDiscord">Discord Username and ID</label>
+                <input type="text" id="newAppDiscord" placeholder="username#0000" />
+            </div>
+            <div class="field">
+                <label for="newAppAge">Age</label>
+                <input type="text" id="newAppAge" placeholder="Age" />
+            </div>
+            <div class="field">
+                <label for="newAppTimezone">Time Zone</label>
+                <input type="text" id="newAppTimezone" placeholder="Time zone" />
+            </div>
+            <div class="field">
+                <label for="newAppActive">How active can you be each week?</label>
+                <input type="text" id="newAppActive" placeholder="e.g. 10-15 hours" />
+            </div>
+            <div class="field">
+                <label for="newAppMember">Have you been a member before? If so, for how long?</label>
+                <input type="text" id="newAppMember" placeholder="Prior membership details" />
+            </div>
+            <button type="button" class="submit-btn" id="newAppSubmitBtn">Create Application</button>
+            <div class="modal-error" id="newAppError"></div>
+        </div>
+    </div>
+
      <div class="modal-overlay" id="editDepartmentModal">
          <div class="modal">
              <div class="modal-header">
@@ -2289,6 +2328,7 @@
                                 } else {
                                     closeAllPages();
                                     applicationsView.classList.add("open");
+                                    loadApplications();
                                 }
                             });
                         }
@@ -2976,6 +3016,125 @@
                                 closeNewDocumentModal();
                                 await addDocument(title, selected);
                             };
+                        }
+
+                        const openAddApplicationBtn = document.getElementById("openAddApplicationBtn");
+                        const newApplicationModal = document.getElementById("newApplicationModal");
+                        const newAppName = document.getElementById("newAppName");
+                        const newAppEmail = document.getElementById("newAppEmail");
+                        const newAppDiscord = document.getElementById("newAppDiscord");
+                        const newAppAge = document.getElementById("newAppAge");
+                        const newAppTimezone = document.getElementById("newAppTimezone");
+                        const newAppActive = document.getElementById("newAppActive");
+                        const newAppMember = document.getElementById("newAppMember");
+                        const newAppSubmitBtn = document.getElementById("newAppSubmitBtn");
+                        const newAppModalClose = document.getElementById("newAppModalClose");
+                        const newAppError = document.getElementById("newAppError");
+
+                        function openNewApplicationModal() {
+                            if (!newApplicationModal) return;
+                            if (newAppName) newAppName.value = "";
+                            if (newAppEmail) newAppEmail.value = "";
+                            if (newAppDiscord) newAppDiscord.value = "";
+                            if (newAppAge) newAppAge.value = "";
+                            if (newAppTimezone) newAppTimezone.value = "";
+                            if (newAppActive) newAppActive.value = "";
+                            if (newAppMember) newAppMember.value = "";
+                            if (newAppError) { newAppError.textContent = ""; newAppError.style.display = "none"; }
+                            newApplicationModal.classList.add("open");
+                        }
+
+                        function closeNewApplicationModal() {
+                            if (newApplicationModal) newApplicationModal.classList.remove("open");
+                        }
+
+                        if (openAddApplicationBtn) {
+                            openAddApplicationBtn.addEventListener("click", openNewApplicationModal);
+                        }
+                        if (newAppModalClose) {
+                            newAppModalClose.addEventListener("click", closeNewApplicationModal);
+                        }
+                        if (newApplicationModal) {
+                            newApplicationModal.addEventListener("click", (e) => {
+                                if (e.target === newApplicationModal) closeNewApplicationModal();
+                            });
+                        }
+                        if (newAppSubmitBtn) {
+                            newAppSubmitBtn.onclick = async () => {
+                                const name = newAppName ? newAppName.value.trim() : "";
+                                const email = newAppEmail ? newAppEmail.value.trim() : "";
+                                const discord = newAppDiscord ? newAppDiscord.value.trim() : "";
+                                const age = newAppAge ? newAppAge.value.trim() : "";
+                                const timezone = newAppTimezone ? newAppTimezone.value.trim() : "";
+                                const active = newAppActive ? newAppActive.value.trim() : "";
+                                const member = newAppMember ? newAppMember.value.trim() : "";
+                                if (!name) {
+                                    if (newAppError) { newAppError.textContent = "Name is required."; newAppError.style.display = "block"; }
+                                    return;
+                                }
+                                closeNewApplicationModal();
+                                await addApplication({ name, email, discord, age, timezone, active, member });
+                            };
+                        }
+
+                        async function addApplication({ name, email, discord, age, timezone, active, member }) {
+                            if (!localSupabase) return;
+                            try {
+                                const payload = {
+                                    email: email || "",
+                                    discord: discord || "",
+                                    age: age || "",
+                                    timezone: timezone || "",
+                                    active: active || "",
+                                    member: member || "",
+                                    community_id: currentCommunityId || null
+                                };
+                                const { error } = await localSupabase
+                                    .from("application_submissions")
+                                    .insert([payload]);
+                                if (error) {
+                                    alert("Failed to create application: " + error.message);
+                                    return;
+                                }
+                                loadApplications();
+                            } catch (err) {
+                                alert("Failed to create application.");
+                                console.error(err);
+                            }
+                        }
+
+                        async function loadApplications() {
+                            if (!applicationsList || !localSupabase || !currentCommunityId) return;
+                            try {
+                                const { data, error } = await localSupabase
+                                    .from("application_submissions")
+                                    .select("*")
+                                    .eq("community_id", currentCommunityId)
+                                    .order("created_at", { ascending: false });
+                                if (error) {
+                                    applicationsList.innerHTML = '<div class="empty">Failed to load applications.</div>';
+                                    return;
+                                }
+                                if (!Array.isArray(data) || data.length === 0) {
+                                    applicationsList.innerHTML = '<div class="empty">No applications yet.</div>';
+                                    return;
+                                }
+                                let html = '<div class="members-view-list">';
+                                data.forEach((row) => {
+                                    const esc = (v) => (v == null ? "" : String(v).replace(/</g, "&lt;").replace(/>/g, "&gt;"));
+                                    const created = row.created_at ? new Date(row.created_at).toLocaleString() : "";
+                                    html += `<div class="members-item">
+                                        <div class="members-item-name">${esc(row.name || "Unnamed")}</div>
+                                        <div class="members-item-role">${esc(row.email || "")}</div>
+                                        <div style="font-size:12px; color:#64748b; margin-top:2px;">${esc(created)}</div>
+                                    </div>`;
+                                });
+                                html += '</div>';
+                                applicationsList.innerHTML = html;
+                            } catch (err) {
+                                applicationsList.innerHTML = '<div class="empty">An unexpected error occurred.</div>';
+                                console.error(err);
+                            }
                         }
 
                         const openAddDepartmentBtn = document.getElementById("openAddDepartmentBtn");

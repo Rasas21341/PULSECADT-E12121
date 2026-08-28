@@ -1471,50 +1471,63 @@
 
         .bodycam-overlay {
             position: fixed;
-            bottom: 24px;
-            left: 24px;
-            z-index: 900;
+            inset: 0;
+            z-index: 9999;
             display: none;
             align-items: center;
-            gap: 10px;
-            padding: 10px 16px;
-            background: rgba(0, 0, 0, 0.85);
-            border-radius: 12px;
-            border: 1px solid rgba(239, 68, 68, 0.4);
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+            justify-content: center;
+            background: rgba(2, 6, 23, 0.72);
+            backdrop-filter: blur(2px);
         }
 
         .bodycam-overlay.open {
-            display: inline-flex;
+            display: flex;
         }
 
         .bodycam-rec-dot {
-            width: 12px;
-            height: 12px;
+            position: absolute;
+            top: 28px;
+            right: 28px;
+            width: 16px;
+            height: 16px;
             border-radius: 50%;
             background: #ef4444;
             animation: bodycam-pulse 1.2s infinite;
+            box-shadow: 0 0 14px rgba(239, 68, 68, 0.7);
         }
 
         .bodycam-icon {
-            width: 18px;
-            height: 18px;
+            width: min(80vw, 700px);
+            max-height: 70vh;
             object-fit: contain;
-            filter: drop-shadow(0 0 2px rgba(239, 68, 68, 0.6));
+            filter: drop-shadow(0 0 18px rgba(239, 68, 68, 0.5));
+            border-radius: 18px;
+            background: rgba(15, 23, 42, 0.25);
+            padding: 10px;
         }
 
         .bodycam-rec-label {
-            font-size: 13px;
-            font-weight: 700;
+            position: absolute;
+            top: 28px;
+            left: 28px;
+            font-size: 18px;
+            font-weight: 800;
             color: #ef4444;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.8px;
         }
 
         .bodycam-time {
+            position: absolute;
+            bottom: 28px;
+            left: 50%;
+            transform: translateX(-50%);
             font-family: 'Courier New', monospace;
-            font-size: 13px;
+            font-size: 14px;
             font-weight: 700;
             color: #ffffff;
+            background: rgba(15, 23, 42, 0.7);
+            padding: 8px 12px;
+            border-radius: 999px;
         }
 
         @keyframes bodycam-pulse {
@@ -3769,7 +3782,7 @@
         }
 
         document.addEventListener("keydown", (e) => {
-            if (e.key === "F11") {
+            if (e.key === "F8") {
                 e.preventDefault();
                 toggleBodycam();
             }
