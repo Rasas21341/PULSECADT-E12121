@@ -890,6 +890,12 @@ const themeBg = document.getElementById("themeBg");
                             showStatus("Page name cannot be empty.", "error");
                             return;
                         }
+                        const badWords = ["nigger", "nigga", "bitch", "fuck you"];
+                        const lower = trimmed.toLowerCase();
+                        if (badWords.some((w) => lower.includes(w))) {
+                            showStatus("That name contains blocked words.", "error");
+                            return;
+                        }
                         entry.title = trimmed;
                         persistPages().then((ok) => {
                             if (ok) {
