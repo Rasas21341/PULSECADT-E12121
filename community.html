@@ -1179,25 +1179,31 @@
         <div id="content"><div class="empty">Loading community...</div></div>
     </div>
 
-    <div class="modal-overlay" id="policeModal">
-        <div class="modal">
-            <div class="modal-title">Officer Details</div>
-            <div class="field">
-                <label for="poName">Name</label>
-                <input type="text" id="poName" placeholder="Officer name" />
-            </div>
-            <div class="field">
-                <label for="poRank">Rank</label>
-                <input type="text" id="poRank" placeholder="e.g. Sergeant" />
-            </div>
-            <div class="field">
-                <label for="poCallsign">Callsign</label>
-                <input type="text" id="poCallsign" placeholder="e.g. 1A-12" />
-            </div>
-            <button type="button" class="submit-btn" id="poSubmit">Enter MDT</button>
-            <div class="modal-error" id="poError"></div>
-        </div>
-    </div>
+     <div class="modal-overlay" id="policeModal">
+         <div class="modal">
+             <div class="modal-title">Officer Details</div>
+             <div class="field">
+                 <label for="poName">Name</label>
+                 <input type="text" id="poName" placeholder="Officer name" />
+             </div>
+             <div class="field">
+                 <label for="poRank">Rank</label>
+                 <input type="text" id="poRank" placeholder="e.g. Sergeant" />
+             </div>
+             <div class="field">
+                 <label for="poCallsign">Callsign</label>
+                 <input type="text" id="poCallsign" placeholder="e.g. 1A-12" />
+             </div>
+             <div class="field">
+                 <label for="poDepartment">Department</label>
+                 <select id="poDepartment">
+                     <option value="">Loading departments...</option>
+                 </select>
+             </div>
+             <button type="button" class="submit-btn" id="poSubmit">Enter MDT</button>
+             <div class="modal-error" id="poError"></div>
+         </div>
+     </div>
 
     <div class="modal-overlay" id="departmentPasscodeModal">
         <div class="modal">
@@ -1214,29 +1220,39 @@
         </div>
     </div>
 
-    <div class="modal-overlay" id="newDepartmentModal">
-        <div class="modal">
-            <div class="modal-header">
-                <div class="modal-title">New Department</div>
-                <button class="modal-close" id="newDeptModalClose" type="button" aria-label="Close">×</button>
-            </div>
-            <div class="field">
-                <label for="newDeptName">Department Name</label>
-                <input type="text" id="newDeptName" placeholder="Department name" />
-            </div>
-            <div class="field">
-                <label for="newDeptPasscode">Passcode (optional)</label>
-                <input type="text" id="newDeptPasscode" placeholder="Passcode" />
-            </div>
-            <div class="field">
-                <label>Banner Image</label>
-                <input type="file" id="newDeptBanner" accept="image/*" />
-                <img id="newDeptBannerPreview" class="dept-banner-preview" />
-            </div>
-            <button type="button" class="submit-btn" id="newDeptSubmitBtn">Create Department</button>
-            <div class="modal-error" id="newDeptError"></div>
-        </div>
-    </div>
+     <div class="modal-overlay" id="newDepartmentModal">
+         <div class="modal">
+             <div class="modal-header">
+                 <div class="modal-title">New Department</div>
+                 <button class="modal-close" id="newDeptModalClose" type="button" aria-label="Close">×</button>
+             </div>
+             <div class="field">
+                 <label for="newDeptName">Department Name</label>
+                 <input type="text" id="newDeptName" placeholder="Department name" />
+             </div>
+             <div class="field">
+                 <label for="newDeptType">Department Type</label>
+                 <select id="newDeptType">
+                     <option value="Police">Police</option>
+                     <option value="Dispatch">Dispatch</option>
+                     <option value="Fire">Fire</option>
+                     <option value="EMS">EMS</option>
+                     <option value="Other">Other</option>
+                 </select>
+             </div>
+             <div class="field">
+                 <label for="newDeptPasscode">Passcode (optional)</label>
+                 <input type="text" id="newDeptPasscode" placeholder="Passcode" />
+             </div>
+             <div class="field">
+                 <label>Banner Image</label>
+                 <input type="file" id="newDeptBanner" accept="image/*" />
+                 <img id="newDeptBannerPreview" class="dept-banner-preview" />
+             </div>
+             <button type="button" class="submit-btn" id="newDeptSubmitBtn">Create Department</button>
+             <div class="modal-error" id="newDeptError"></div>
+         </div>
+     </div>
 
     <div class="modal-overlay" id="newDocumentModal">
         <div class="modal">
@@ -1257,29 +1273,78 @@
         </div>
     </div>
 
-    <div class="modal-overlay" id="editDepartmentModal">
+    <div class="modal-overlay" id="newApplicationModal">
         <div class="modal">
             <div class="modal-header">
-                <div class="modal-title">Edit Department</div>
-                <button class="modal-close" id="editDeptModalClose" type="button" aria-label="Close">×</button>
+                <div class="modal-title">New Application</div>
+                <button class="modal-close" id="newAppModalClose" type="button" aria-label="Close">×</button>
             </div>
             <div class="field">
-                <label for="editDeptName">Department Name</label>
-                <input type="text" id="editDeptName" placeholder="Department name" />
+                <label for="newAppName">Name</label>
+                <input type="text" id="newAppName" placeholder="Full name" />
             </div>
             <div class="field">
-                <label for="editDeptPasscode">Passcode (leave blank to remove)</label>
-                <input type="text" id="editDeptPasscode" placeholder="Passcode" />
+                <label for="newAppEmail">Email</label>
+                <input type="email" id="newAppEmail" placeholder="you@example.com" />
             </div>
             <div class="field">
-                <label>Banner Image</label>
-                <input type="file" id="editDeptBanner" accept="image/*" />
-                <img id="editDeptBannerPreview" class="dept-banner-preview" />
+                <label for="newAppDiscord">Discord Username and ID</label>
+                <input type="text" id="newAppDiscord" placeholder="username#0000" />
             </div>
-            <button type="button" class="submit-btn" id="editDeptSubmitBtn">Save Changes</button>
-            <div class="modal-error" id="editDeptError"></div>
+            <div class="field">
+                <label for="newAppAge">Age</label>
+                <input type="text" id="newAppAge" placeholder="Age" />
+            </div>
+            <div class="field">
+                <label for="newAppTimezone">Time Zone</label>
+                <input type="text" id="newAppTimezone" placeholder="Time zone" />
+            </div>
+            <div class="field">
+                <label for="newAppActive">How active can you be each week?</label>
+                <input type="text" id="newAppActive" placeholder="e.g. 10-15 hours" />
+            </div>
+            <div class="field">
+                <label for="newAppMember">Have you been a member before? If so, for how long?</label>
+                <input type="text" id="newAppMember" placeholder="Prior membership details" />
+            </div>
+            <button type="button" class="submit-btn" id="newAppSubmitBtn">Create Application</button>
+            <div class="modal-error" id="newAppError"></div>
         </div>
     </div>
+
+     <div class="modal-overlay" id="editDepartmentModal">
+         <div class="modal">
+             <div class="modal-header">
+                 <div class="modal-title">Edit Department</div>
+                 <button class="modal-close" id="editDeptModalClose" type="button" aria-label="Close">×</button>
+             </div>
+             <div class="field">
+                 <label for="editDeptName">Department Name</label>
+                 <input type="text" id="editDeptName" placeholder="Department name" />
+             </div>
+             <div class="field">
+                 <label for="editDeptType">Department Type</label>
+                 <select id="editDeptType">
+                     <option value="Police">Police</option>
+                     <option value="Dispatch">Dispatch</option>
+                     <option value="Fire">Fire</option>
+                     <option value="EMS">EMS</option>
+                     <option value="Other">Other</option>
+                 </select>
+             </div>
+             <div class="field">
+                 <label for="editDeptPasscode">Passcode (leave blank to remove)</label>
+                 <input type="text" id="editDeptPasscode" placeholder="Passcode" />
+             </div>
+             <div class="field">
+                 <label>Banner Image</label>
+                 <input type="file" id="editDeptBanner" accept="image/*" />
+                 <img id="editDeptBannerPreview" class="dept-banner-preview" />
+             </div>
+             <button type="button" class="submit-btn" id="editDeptSubmitBtn">Save Changes</button>
+             <div class="modal-error" id="editDeptError"></div>
+         </div>
+     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
@@ -2263,6 +2328,7 @@
                                 } else {
                                     closeAllPages();
                                     applicationsView.classList.add("open");
+                                    loadApplications();
                                 }
                             });
                         }
@@ -2394,57 +2460,59 @@
                             }
                         }
 
-                        async function addDepartment(name, passcode, banner) {
-                            if (!name || !localSupabase) return;
-                            try {
-                                const { count, error: countError } = await localSupabase
-                                    .from("departments")
-                                    .select("*", { count: "exact", head: true })
-                                    .eq("community_id", id);
-                                if (!countError && typeof count === "number" && count >= 5) {
-                                    alert("This community already has the maximum of 5 departments.");
-                                    return;
-                                }
-                                const payload = { community_id: id, name: name.trim() };
-                                if (passcode && passcode.trim()) payload.passcode = passcode.trim();
-                                if (banner) payload.banner = banner;
-                                await localSupabase
-                                    .from("departments")
-                                    .insert([payload]);
-                                loadDepartments();
-                            } catch (err) {
-                                alert("Failed to add department.");
-                            }
-                        }
+                         async function addDepartment(name, passcode, banner, type) {
+                             if (!name || !localSupabase) return;
+                             try {
+                                 const { count, error: countError } = await localSupabase
+                                     .from("departments")
+                                     .select("*", { count: "exact", head: true })
+                                     .eq("community_id", id);
+                                 if (!countError && typeof count === "number" && count >= 5) {
+                                     alert("This community already has the maximum of 5 departments.");
+                                     return;
+                                 }
+                                 const payload = { community_id: id, name: name.trim(), type: type || "Other" };
+                                 if (passcode && passcode.trim()) payload.passcode = passcode.trim();
+                                 if (banner) payload.banner = banner;
+                                 await localSupabase
+                                     .from("departments")
+                                     .insert([payload]);
+                                 loadDepartments();
+                             } catch (err) {
+                                 alert("Failed to add department.");
+                             }
+                         }
 
-                        async function editDepartment(department) {
-                            if (!department || !localSupabase) return;
-                            const editModal = document.getElementById("editDepartmentModal");
-                            const editDeptName = document.getElementById("editDeptName");
-                            const editDeptPasscode = document.getElementById("editDeptPasscode");
-                            const editDeptBanner = document.getElementById("editDeptBanner");
-                            const editDeptBannerPreview = document.getElementById("editDeptBannerPreview");
-                            const editDeptSubmitBtn = document.getElementById("editDeptSubmitBtn");
-                            const editDeptError = document.getElementById("editDeptError");
-                            const editDeptModalClose = document.getElementById("editDeptModalClose");
-                            
-                            if (!editModal) return;
-                            
-                            let currentBanner = department.banner || null;
-                            
-                            if (editDeptName) editDeptName.value = department.name || "";
-                            if (editDeptPasscode) editDeptPasscode.value = department.passcode || "";
-                            if (editDeptBannerPreview) {
-                                if (currentBanner) {
-                                    editDeptBannerPreview.src = currentBanner;
-                                    editDeptBannerPreview.style.display = "block";
-                                } else {
-                                    editDeptBannerPreview.style.display = "none";
-                                }
-                            }
-                            if (editDeptError) { editDeptError.textContent = ""; editDeptError.style.display = "none"; }
-                            
-                            editModal.classList.add("open");
+                         async function editDepartment(department) {
+                             if (!department || !localSupabase) return;
+                             const editModal = document.getElementById("editDepartmentModal");
+                             const editDeptName = document.getElementById("editDeptName");
+                             const editDeptType = document.getElementById("editDeptType");
+                             const editDeptPasscode = document.getElementById("editDeptPasscode");
+                             const editDeptBanner = document.getElementById("editDeptBanner");
+                             const editDeptBannerPreview = document.getElementById("editDeptBannerPreview");
+                             const editDeptSubmitBtn = document.getElementById("editDeptSubmitBtn");
+                             const editDeptError = document.getElementById("editDeptError");
+                             const editDeptModalClose = document.getElementById("editDeptModalClose");
+                             
+                             if (!editModal) return;
+                             
+                             let currentBanner = department.banner || null;
+                             
+                             if (editDeptName) editDeptName.value = department.name || "";
+                             if (editDeptType) editDeptType.value = department.type || "Police";
+                             if (editDeptPasscode) editDeptPasscode.value = department.passcode || "";
+                             if (editDeptBannerPreview) {
+                                 if (currentBanner) {
+                                     editDeptBannerPreview.src = currentBanner;
+                                     editDeptBannerPreview.style.display = "block";
+                                 } else {
+                                     editDeptBannerPreview.style.display = "none";
+                                 }
+                             }
+                             if (editDeptError) { editDeptError.textContent = ""; editDeptError.style.display = "none"; }
+                             
+                             editModal.classList.add("open");
                             
                             const handleEditDeptBannerChange = (e) => {
                                 const file = e.target.files[0];
@@ -2468,37 +2536,38 @@
                                 editDeptBanner.onchange = handleEditDeptBannerChange;
                             }
                             
-                            const handleEditDeptSubmit = async () => {
-                                const newName = editDeptName ? editDeptName.value.trim() : "";
-                                const newPasscode = editDeptPasscode ? editDeptPasscode.value.trim() : "";
-                                
-                                if (!newName) {
-                                    if (editDeptError) { editDeptError.textContent = "Department name is required."; editDeptError.style.display = "block"; }
-                                    return;
-                                }
-                                
-                                try {
-                                    const payload = { name: newName };
-                                    if (newPasscode) payload.passcode = newPasscode;
-                                    else payload.passcode = null;
-                                    if (currentBanner !== null) payload.banner = currentBanner;
-                                    
-                                    console.log("Saving department:", payload);
-                                    
-                                    const { data: updated, error } = await localSupabase
-                                        .from("departments")
-                                        .update(payload)
-                                        .eq("id", department.id)
-                                        .select();
-                                    if (error) throw error;
-                                    if (!updated || updated.length === 0) {
-                                        throw new Error("Update saved 0 rows. This is a database permissions (RLS) issue on the departments table \u2014 enable UPDATE for authenticated users.");
-                                    }
-                                    
-                                    editModal.classList.remove("open");
-                                    loadDepartments();
-                                } catch (err) {
-                                    console.error("Failed to update department:", err);
+                             const handleEditDeptSubmit = async () => {
+                                 const newName = editDeptName ? editDeptName.value.trim() : "";
+                                 const newType = editDeptType ? editDeptType.value : "Other";
+                                 const newPasscode = editDeptPasscode ? editDeptPasscode.value.trim() : "";
+                                 
+                                 if (!newName) {
+                                     if (editDeptError) { editDeptError.textContent = "Department name is required."; editDeptError.style.display = "block"; }
+                                     return;
+                                 }
+                                 
+                                 try {
+                                     const payload = { name: newName, type: newType };
+                                     if (newPasscode) payload.passcode = newPasscode;
+                                     else payload.passcode = null;
+                                     if (currentBanner !== null) payload.banner = currentBanner;
+                                     
+                                     console.log("Saving department:", payload);
+                                     
+                                     const { data: updated, error } = await localSupabase
+                                         .from("departments")
+                                         .update(payload)
+                                         .eq("id", department.id)
+                                         .select();
+                                     if (error) throw error;
+                                     if (!updated || updated.length === 0) {
+                                         throw new Error("Update saved 0 rows. This is a database permissions (RLS) issue on the departments table \u2014 enable UPDATE for authenticated users.");
+                                     }
+                                     
+                                     editModal.classList.remove("open");
+                                     loadDepartments();
+                                 } catch (err) {
+                                     console.error("Failed to update department:", err);
                                     if (editDeptError) { editDeptError.textContent = "Failed to save: " + (err.message || err); editDeptError.style.display = "block"; }
                                 }
                             };
@@ -2949,6 +3018,125 @@
                             };
                         }
 
+                        const openAddApplicationBtn = document.getElementById("openAddApplicationBtn");
+                        const newApplicationModal = document.getElementById("newApplicationModal");
+                        const newAppName = document.getElementById("newAppName");
+                        const newAppEmail = document.getElementById("newAppEmail");
+                        const newAppDiscord = document.getElementById("newAppDiscord");
+                        const newAppAge = document.getElementById("newAppAge");
+                        const newAppTimezone = document.getElementById("newAppTimezone");
+                        const newAppActive = document.getElementById("newAppActive");
+                        const newAppMember = document.getElementById("newAppMember");
+                        const newAppSubmitBtn = document.getElementById("newAppSubmitBtn");
+                        const newAppModalClose = document.getElementById("newAppModalClose");
+                        const newAppError = document.getElementById("newAppError");
+
+                        function openNewApplicationModal() {
+                            if (!newApplicationModal) return;
+                            if (newAppName) newAppName.value = "";
+                            if (newAppEmail) newAppEmail.value = "";
+                            if (newAppDiscord) newAppDiscord.value = "";
+                            if (newAppAge) newAppAge.value = "";
+                            if (newAppTimezone) newAppTimezone.value = "";
+                            if (newAppActive) newAppActive.value = "";
+                            if (newAppMember) newAppMember.value = "";
+                            if (newAppError) { newAppError.textContent = ""; newAppError.style.display = "none"; }
+                            newApplicationModal.classList.add("open");
+                        }
+
+                        function closeNewApplicationModal() {
+                            if (newApplicationModal) newApplicationModal.classList.remove("open");
+                        }
+
+                        if (openAddApplicationBtn) {
+                            openAddApplicationBtn.addEventListener("click", openNewApplicationModal);
+                        }
+                        if (newAppModalClose) {
+                            newAppModalClose.addEventListener("click", closeNewApplicationModal);
+                        }
+                        if (newApplicationModal) {
+                            newApplicationModal.addEventListener("click", (e) => {
+                                if (e.target === newApplicationModal) closeNewApplicationModal();
+                            });
+                        }
+                        if (newAppSubmitBtn) {
+                            newAppSubmitBtn.onclick = async () => {
+                                const name = newAppName ? newAppName.value.trim() : "";
+                                const email = newAppEmail ? newAppEmail.value.trim() : "";
+                                const discord = newAppDiscord ? newAppDiscord.value.trim() : "";
+                                const age = newAppAge ? newAppAge.value.trim() : "";
+                                const timezone = newAppTimezone ? newAppTimezone.value.trim() : "";
+                                const active = newAppActive ? newAppActive.value.trim() : "";
+                                const member = newAppMember ? newAppMember.value.trim() : "";
+                                if (!name) {
+                                    if (newAppError) { newAppError.textContent = "Name is required."; newAppError.style.display = "block"; }
+                                    return;
+                                }
+                                closeNewApplicationModal();
+                                await addApplication({ name, email, discord, age, timezone, active, member });
+                            };
+                        }
+
+                        async function addApplication({ name, email, discord, age, timezone, active, member }) {
+                            if (!localSupabase) return;
+                            try {
+                                const payload = {
+                                    email: email || "",
+                                    discord: discord || "",
+                                    age: age || "",
+                                    timezone: timezone || "",
+                                    active: active || "",
+                                    member: member || "",
+                                    community_id: currentCommunityId || null
+                                };
+                                const { error } = await localSupabase
+                                    .from("application_submissions")
+                                    .insert([payload]);
+                                if (error) {
+                                    alert("Failed to create application: " + error.message);
+                                    return;
+                                }
+                                loadApplications();
+                            } catch (err) {
+                                alert("Failed to create application.");
+                                console.error(err);
+                            }
+                        }
+
+                        async function loadApplications() {
+                            if (!applicationsList || !localSupabase || !currentCommunityId) return;
+                            try {
+                                const { data, error } = await localSupabase
+                                    .from("application_submissions")
+                                    .select("*")
+                                    .eq("community_id", currentCommunityId)
+                                    .order("created_at", { ascending: false });
+                                if (error) {
+                                    applicationsList.innerHTML = '<div class="empty">Failed to load applications.</div>';
+                                    return;
+                                }
+                                if (!Array.isArray(data) || data.length === 0) {
+                                    applicationsList.innerHTML = '<div class="empty">No applications yet.</div>';
+                                    return;
+                                }
+                                let html = '<div class="members-view-list">';
+                                data.forEach((row) => {
+                                    const esc = (v) => (v == null ? "" : String(v).replace(/</g, "&lt;").replace(/>/g, "&gt;"));
+                                    const created = row.created_at ? new Date(row.created_at).toLocaleString() : "";
+                                    html += `<div class="members-item">
+                                        <div class="members-item-name">${esc(row.name || "Unnamed")}</div>
+                                        <div class="members-item-role">${esc(row.email || "")}</div>
+                                        <div style="font-size:12px; color:#64748b; margin-top:2px;">${esc(created)}</div>
+                                    </div>`;
+                                });
+                                html += '</div>';
+                                applicationsList.innerHTML = html;
+                            } catch (err) {
+                                applicationsList.innerHTML = '<div class="empty">An unexpected error occurred.</div>';
+                                console.error(err);
+                            }
+                        }
+
                         const openAddDepartmentBtn = document.getElementById("openAddDepartmentBtn");
                         const newDepartmentModal = document.getElementById("newDepartmentModal");
                         const newDeptName = document.getElementById("newDeptName");
@@ -3009,10 +3197,11 @@
                                     if (newDeptError) { newDeptError.textContent = "Department name is required."; newDeptError.style.display = "block"; }
                                     return;
                                 }
+                                const type = newDeptType ? newDeptType.value : "Other";
                                 const passcode = newDeptPasscode ? newDeptPasscode.value.trim() : "";
                                 const banner = (newDeptBannerPreview && newDeptBannerPreview.style.display !== "none") ? newDeptBannerPreview.src : null;
                                 closeNewDepartmentModal();
-                                await addDepartment(name, passcode, banner);
+                                await addDepartment(name, passcode, banner, type);
                             };
                         }
 
@@ -3179,13 +3368,43 @@
         const poName = document.getElementById("poName");
         const poRank = document.getElementById("poRank");
         const poCallsign = document.getElementById("poCallsign");
+        const poDepartment = document.getElementById("poDepartment");
         const poError = document.getElementById("poError");
+
+        async function loadPoliceDepartments() {
+            if (!poDepartment || !localSupabase || !currentCommunityId) return;
+            try {
+                const { data, error } = await localSupabase
+                    .from("departments")
+                    .select("*")
+                    .eq("community_id", currentCommunityId)
+                    .order("created_at", { ascending: true });
+
+                if (error || !Array.isArray(data) || data.length === 0) {
+                    poDepartment.innerHTML = '<option value="">No departments available</option>';
+                    return;
+                }
+
+                poDepartment.innerHTML = '<option value="">Select department</option>' + data.map((d) => {
+                    const escapedName = (d.name || "").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+                    return `<option value="${d.id}">${escapedName}</option>`;
+                }).join("");
+
+                if (pendingDepartment && pendingDepartment.id) {
+                    poDepartment.value = pendingDepartment.id;
+                }
+            } catch (err) {
+                console.error("Failed to load departments:", err);
+                poDepartment.innerHTML = '<option value="">Failed to load departments</option>';
+            }
+        }
 
         function openPoliceModal() {
             if (policeModal) {
                 policeModal.classList.add("open");
                 policeModal.style.display = "flex";
             }
+            loadPoliceDepartments();
             if (poName) {
                 setTimeout(() => poName.focus(), 50);
             }
@@ -3203,8 +3422,13 @@
                 const name = poName ? poName.value.trim() : "";
                 const rank = poRank ? poRank.value.trim() : "";
                 const callsign = poCallsign ? poCallsign.value.trim() : "";
+                const departmentId = poDepartment ? poDepartment.value : "";
                 if (!name) {
                     if (poError) { poError.textContent = "Please enter a name."; poError.style.display = "block"; }
+                    return;
+                }
+                if (!departmentId) {
+                    if (poError) { poError.textContent = "Please select a department."; poError.style.display = "block"; }
                     return;
                 }
                 if (poError) { poError.textContent = ""; poError.style.display = "none"; }
@@ -3213,7 +3437,7 @@
                 const params = new URLSearchParams({ name, rank, callsign });
                 params.set("community", currentCommunityId || "");
                 if (erlcKey) params.set("erlckey", erlcKey);
-                if (pendingDepartment) params.set("department", pendingDepartment.id);
+                params.set("department", departmentId);
                 try {
                     localStorage.setItem("policeErkKey", erlcKey);
                     localStorage.setItem("policeOfficerName", name);

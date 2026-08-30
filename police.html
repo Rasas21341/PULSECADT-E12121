@@ -1471,50 +1471,55 @@
 
         .bodycam-overlay {
             position: fixed;
-            bottom: 24px;
-            left: 24px;
-            z-index: 900;
+            inset: 0;
+            z-index: 9999;
             display: none;
             align-items: center;
-            gap: 10px;
-            padding: 10px 16px;
-            background: rgba(0, 0, 0, 0.85);
-            border-radius: 12px;
-            border: 1px solid rgba(239, 68, 68, 0.4);
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+            justify-content: center;
+            background: transparent;
+            pointer-events: none;
         }
 
         .bodycam-overlay.open {
-            display: inline-flex;
+            display: flex;
         }
 
-        .bodycam-rec-dot {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background: #ef4444;
-            animation: bodycam-pulse 1.2s infinite;
+        .bodycam-rec-dot,
+        .bodycam-rec-label,
+        .bodycam-time {
+            display: none !important;
+        }
+
+        .bodycam-image-wrap {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .bodycam-icon {
-            width: 18px;
-            height: 18px;
+            width: min(72vw, 820px);
+            max-height: 85vh;
             object-fit: contain;
-            filter: drop-shadow(0 0 2px rgba(239, 68, 68, 0.6));
+            display: block;
+            margin: auto;
+            filter: none;
         }
 
-        .bodycam-rec-label {
-            font-size: 13px;
-            font-weight: 700;
-            color: #ef4444;
-            letter-spacing: 0.5px;
-        }
-
-        .bodycam-time {
-            font-family: 'Courier New', monospace;
-            font-size: 13px;
-            font-weight: 700;
-            color: #ffffff;
+        .bodycam-label {
+            position: absolute;
+            left: 50%;
+            top: 44%;
+            transform: translate(-50%, -50%);
+            color: #000000;
+            font-size: clamp(12px, 1.5vw, 28px);
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            text-align: center;
+            pointer-events: none;
+            white-space: nowrap;
+            text-shadow: none;
         }
 
         @keyframes bodycam-pulse {
@@ -1608,14 +1613,14 @@
         }
 
         .radio-brand-text {
-            font-size: 8px;
+            font-size: 7px;
             font-weight: 800;
             color: #202323;
             letter-spacing: 1px;
         }
 
         .radio-model {
-            font-size: 8px;
+            font-size: 7px;
             font-weight: 600;
             color: #252828;
         }
@@ -1661,7 +1666,7 @@
         }
 
         .radio-zone-label {
-            font-size: 9px;
+            font-size: 8px;
             font-weight: 700;
             color: #7d8582;
             text-transform: uppercase;
@@ -1687,7 +1692,7 @@
         .radio-signal-bar:nth-child(4) { height: 10px; }
 
         .radio-channel-main {
-            font-size: 22px;
+            font-size: 18px;
             font-weight: 800;
             color: #d6e3d9;
             text-shadow: 0 0 7px rgba(151, 206, 165, 0.5);
@@ -1696,7 +1701,7 @@
         }
 
         .radio-talkgroup {
-            font-size: 10px;
+            font-size: 8px;
             font-weight: 600;
             color: #6b7280;
             text-transform: uppercase;
@@ -1714,7 +1719,7 @@
         }
 
         .radio-tx-status {
-            font-size: 9px;
+            font-size: 8px;
             font-weight: 800;
             color: #e44a40;
             letter-spacing: 0.5px;
@@ -1732,7 +1737,7 @@
         }
 
         .radio-battery {
-            font-size: 8px;
+            font-size: 7px;
             font-weight: 700;
             color: #10b981;
         }
@@ -1765,9 +1770,16 @@
         }
 
         .radio-side-btn.emergency {
-            background: #7f1d1d;
-            border-color: #991b1b;
-            color: #fca5a5;
+            background: #f97316;
+            border-color: #c2410c;
+            color: #fff7ed;
+            box-shadow: inset 0 0 0 1px rgba(255,255,255,0.18);
+        }
+
+        .radio-side-btn.emergency.active {
+            background: #ef4444;
+            border-color: #b91c1c;
+            box-shadow: 0 0 12px rgba(239, 68, 68, 0.8), inset 0 0 0 1px rgba(255,255,255,0.22);
         }
 
         .radio-knobs {
@@ -1895,10 +1907,10 @@
 </head>
 <body>
     <div class="bodycam-overlay" id="bodycamOverlay">
-        <img src="bodycam.png" class="bodycam-icon" alt="Bodycam" />
-        <span class="bodycam-rec-dot"></span>
-        <span class="bodycam-rec-label">REC</span>
-        <span class="bodycam-time" id="bodycamTime"></span>
+        <div class="bodycam-image-wrap">
+            <img src="pdr.png" class="bodycam-icon" alt="PDR" />
+            <div class="bodycam-label">Dispatch FG 1</div>
+        </div>
     </div>
     <div class="radio-overlay" id="radioOverlay">
         <div class="radio-top-bar">
@@ -1915,8 +1927,8 @@
                     <span class="radio-signal-bar"></span>
                 </div>
             </div>
-            <div class="radio-channel-main">Scen 1</div>
-            <div class="radio-talkgroup">FG 1</div>
+            <div class="radio-channel-main">Dispatch</div>
+            <div class="radio-talkgroup">FG1</div>
             <div class="radio-status-bar">
                 <div class="radio-tx-status">
                     <span class="radio-tx-dot"></span>
@@ -1928,7 +1940,7 @@
         <div class="radio-side-controls">
             <div class="radio-side-btn">1</div>
             <div class="radio-side-btn">2</div>
-            <div class="radio-side-btn emergency">E</div>
+            <button type="button" class="radio-side-btn emergency" id="panicButton" aria-label="Panic button">E</button>
         </div>
         <div class="radio-knobs">
             <div class="radio-knob">
@@ -1941,8 +1953,8 @@
             </div>
         </div>
         <div class="radio-input-row">
-            <input type="text" class="radio-input" id="radioChannelInput" placeholder="Scene" value="Scen 1" maxlength="20" />
-            <input type="text" class="radio-input" id="radioTalkgroupInput" placeholder="FG" value="FG 1" maxlength="10" />
+            <input type="text" class="radio-input" id="radioChannelInput" placeholder="Dispatch" value="Dispatch" maxlength="20" />
+            <input type="text" class="radio-input" id="radioTalkgroupInput" placeholder="FG" value="FG1" maxlength="10" />
         </div>
         <button type="button" class="radio-ptt" id="radioPtt">PTT</button>
         <div class="radio-bottom-bar">P25 Phase II</div>
@@ -3728,48 +3740,42 @@
         loadCallsBar();
 
         const bodycamOverlay = document.getElementById("bodycamOverlay");
-        const bodycamTime = document.getElementById("bodycamTime");
-        let bodycamInterval = null;
-
-        function playBodycamSound() {
-            try {
-                const audio = new Audio("bodycam.mp3");
-                audio.volume = 0.5;
-                audio.play().catch((e) => console.error("Bodycam sound failed:", e));
-            } catch (e) {
-                console.error("Bodycam sound failed:", e);
-            }
-        }
-
-        function updateBodycamTime() {
-            if (!bodycamTime) return;
-            const now = new Date();
-            const y = now.getFullYear();
-            const m = String(now.getMonth() + 1).padStart(2, "0");
-            const d = String(now.getDate()).padStart(2, "0");
-            const hh = String(now.getHours()).padStart(2, "0");
-            const mm = String(now.getMinutes()).padStart(2, "0");
-            const ss = String(now.getSeconds()).padStart(2, "0");
-            bodycamTime.textContent = y + "-" + m + "-" + d + " " + hh + ":" + mm + ":" + ss;
-        }
 
         function toggleBodycam() {
             if (!bodycamOverlay) return;
-            const isOpen = bodycamOverlay.classList.contains("open");
-            if (isOpen) {
-                bodycamOverlay.classList.remove("open");
-                if (bodycamInterval) clearInterval(bodycamInterval);
-                bodycamInterval = null;
-            } else {
-                bodycamOverlay.classList.add("open");
-                updateBodycamTime();
-                bodycamInterval = setInterval(updateBodycamTime, 1000);
-                playBodycamSound();
-            }
+            bodycamOverlay.classList.toggle("open");
         }
 
+        const panicButton = document.getElementById("panicButton");
+        let panicActive = false;
+
+        if (panicButton) {
+            panicButton.addEventListener("click", () => {
+                panicActive = !panicActive;
+                panicButton.classList.toggle("active", panicActive);
+                panicButton.textContent = panicActive ? "PANIC" : "E";
+                if (panicActive) {
+                    bodycamOverlay?.classList.add("open");
+                }
+            });
+        }
+
+        const radioChannelMain = document.querySelector(".radio-channel-main");
+        const radioTalkgroup = document.querySelector(".radio-talkgroup");
+        const radioChannelInput = document.getElementById("radioChannelInput");
+        const radioTalkgroupInput = document.getElementById("radioTalkgroupInput");
+
+        function setRadioDisplay(channelText = "Dispatch", talkgroupText = "FG1") {
+            if (radioChannelMain) radioChannelMain.textContent = channelText;
+            if (radioTalkgroup) radioTalkgroup.textContent = talkgroupText;
+            if (radioChannelInput) radioChannelInput.value = channelText;
+            if (radioTalkgroupInput) radioTalkgroupInput.value = talkgroupText;
+        }
+
+        setRadioDisplay();
+
         document.addEventListener("keydown", (e) => {
-            if (e.key === "F11") {
+            if (e.key === "m" || e.key === "M") {
                 e.preventDefault();
                 toggleBodycam();
             }
