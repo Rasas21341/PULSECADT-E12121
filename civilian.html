@@ -2480,10 +2480,14 @@
         const bankingBtn = document.getElementById("bankingBtn");
         const bankingSection = document.getElementById("bankingSection");
         const createCivilianForm = document.getElementById("createCivilianForm");
+        const pageTitle = document.querySelector(".page-title");
+        const myCiviliansSection = document.getElementById("myCiviliansSection");
 
         if (bankingBtn && bankingSection && createCivilianForm) {
             bankingBtn.addEventListener("click", () => {
                 createCivilianForm.style.display = "none";
+                if (pageTitle) pageTitle.style.display = "none";
+                if (myCiviliansSection) myCiviliansSection.style.display = "none";
                 bankingSection.style.display = "block";
             });
         }
@@ -2493,6 +2497,8 @@
             backBtn.addEventListener("click", () => {
                 bankingSection.style.display = "none";
                 createCivilianForm.style.display = "block";
+                if (pageTitle) pageTitle.style.display = "block";
+                if (myCiviliansSection) myCiviliansSection.style.display = "block";
             });
         }
 
