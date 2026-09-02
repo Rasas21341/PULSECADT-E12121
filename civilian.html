@@ -143,6 +143,16 @@
             cursor: not-allowed;
         }
 
+        .banking-account-box.checking {
+            max-width: 220px;
+        }
+
+        .banking-account-box.checking input[type="text"] {
+            background: #f8fafc;
+            color: #64748b;
+            cursor: not-allowed;
+        }
+
         .page-title {
             font-size: 24px;
             font-weight: 700;
@@ -1003,9 +1013,9 @@
 
            <div class="banking-section" id="bankingSection">
                <div class="page-title">Personal</div>
-               <div class="banking-account-box">
+               <div class="banking-account-box checking">
                    <label for="checkingBalance">Checking</label>
-                   <input type="text" id="checkingBalance" placeholder="$0.00" />
+                   <input type="text" id="checkingBalance" placeholder="$0.00" readonly />
                </div>
                <div class="banking-account-box savings">
                    <label for="savingsBalance">Savings</label>
