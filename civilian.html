@@ -1060,7 +1060,7 @@
                 <div class="page-title">Personal</div>
                 <div class="banking-id-box">
                     <label for="bankingId">Banking ID</label>
-                    <input type="text" id="bankingId" value="LC-00000" readonly />
+                    <input type="text" id="bankingId" placeholder="LC-00000" readonly />
                 </div>
                 <div class="banking-account-box checking">
                    <label for="checkingBalance">Checking</label>
@@ -1409,7 +1409,7 @@
                         if (e.target.closest("[data-view-license]")) return;
                         if (e.target.closest("[data-add-vehicle]")) return;
                         if (e.target.closest("[data-add-insurance]")) return;
-                        selectCivilianCard(civilian.id, card);
+                        selectCivilianCard(civilian, card);
                     });
 
                     listEl.appendChild(card);
@@ -1441,9 +1441,14 @@
             }
         }
 
-        function selectCivilianCard(civilianId, cardElement) {
-            selectedCivilianId = civilianId;
-            currentCivilianId = civilianId;
+        function selectCivilianCard(civilian, cardElement) {
+            selectedCivilianId = civilian.id;
+            currentCivilianId = civilian.id;
+
+            const bankingIdInput = document.getElementById("bankingId");
+            if (bankingIdInput) {
+                bankingIdInput.value = civilian.banking_id || "LC-00000";
+            }
 
             document.querySelectorAll(".civilian-card").forEach((c) => c.classList.remove("selected"));
             if (cardElement) cardElement.classList.add("selected");
