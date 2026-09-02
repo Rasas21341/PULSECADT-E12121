@@ -326,19 +326,20 @@
              margin-bottom: 4px;
          }
 
-         .civilian-card-meta {
-             font-size: 13px;
-             color: #475569;
-             margin-bottom: 8px;
-         }
+          .civilian-card-meta {
+              font-size: 13px;
+              color: #475569;
+              margin-bottom: 8px;
+          }
 
-         .civilian-card-actions {
-             display: flex;
-             gap: 8px;
-             flex-wrap: wrap;
-         }
+          .banking-id-display {
+              font-size: 12px;
+              color: #2563eb;
+              font-weight: 600;
+              margin-top: 4px;
+          }
 
-         .civilian-action-btn {
+          .civilian-action-btn {
              padding: 6px 12px;
              border-radius: 999px;
              font-size: 12px;
@@ -1351,6 +1352,106 @@
                 if (listEl) listEl.innerHTML = '<div class="empty-state">Database not loaded. Check console for errors.</div>';
                 return;
             }
+
+            try {
+                const user = await getCurrentUser();
+                if (!user) {
+                    listEl.innerHTML = '<div class="empty-state">Please log in to view your civilians.</div>';
+                    return;
+                }
+
+                let query = localSupabase
+                    .from("civilians")
+                    .select("*")
+                    .eq("user_id", user.id)
+                    .order("created_at", { ascending: false });
+
+                if (currentCommunityId) {
+                    query = query.eq("community_id", currentCommunityId);
+                }
+
+                const { data, error } = await query;
+
+                loadedCivilians = Array.isArray(data) ? data : [];
+
+                if (error) {
+                    listEl.innerHTML = `<div class="empty-state">Error loading civilians: ${escapeHtml(error.message)}</div>`;
+                    return;
+                }
+
+                if (!Array.isArray(data) || data.length === 0) {
+                    listEl.innerHTML = '<div class="empty-state">No civilians created yet.</div>';
+                    return;
+                }
+
+                const civilianIds = data.map(c => c.id);
+                const { data: existingBanking, error: bankingError } = await localSupabase
+                    .from("civilians")
+                    .select("id, banking_id")
+                    .in("id", civilianIds);
+
+                const bankingMap = new Map((existingBanking || []).map(b => [b.id, b.banking_id]));
+
+                listEl.innerHTML = "";
+                for (const civilian of data) {
+                    const card = document.createElement("div");
+                    card.className = "civilian-card";
+                    card.setAttribute("data-id", civilian.id);
+
+                    const meta = [civilian.age, civilian.gender, civilian.address].filter(Boolean).join(" | ") || "No additional details";
+
+                    const displayBankingId = bankingMap.get(civilian.id) || civilian.banking_id || "LC-00000";
+
+                    card.innerHTML = `
+                        <div class="civilian-card-name">${escapeHtml(civilian.name)}</div>
+                        <div class="civilian-card-meta">${escapeHtml(meta)}</div>
+                        ${civilian.photo_url ? `<img src="${escapeHtml(civilian.photo_url)}" style="max-width: 80px; max-height: 80px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 8px; display: block;" />` : ""}
+                        <div class="civilian-card-actions">
+                            <button type="button" class="civilian-action-btn primary" data-view-license="${civilian.id}">View License</button>
+                            <button type="button" class="civilian-action-btn primary" data-add-vehicle="${civilian.id}">Add Vehicle</button>
+                            <button type="button" class="civilian-action-btn primary" data-add-insurance="${civilian.id}">Insurance</button>
+                        </div>
+                        <div class="license-list" id="licenseList-${civilian.id}"></div>
+                        <div class="vehicle-list" id="vehicleList-${civilian.id}"></div>
+                        <div class="insurance-list" id="insuranceList-${civilian.id}"></div>
+                        <div class="banking-id-display">Banking ID: ${escapeHtml(displayBankingId)}</div>
+                    `;
+
+                    card.addEventListener("click", (e) => {
+                        if (e.target.closest("[data-view-license]")) return;
+                        if (e.target.closest("[data-add-vehicle]")) return;
+                        if (e.target.closest("[data-add-insurance]")) return;
+                        selectCivilianCard(civilian, card);
+                    });
+
+                    listEl.appendChild(card);
+
+                    card.querySelector("[data-view-license]")?.addEventListener("click", (e) => {
+                        e.stopPropagation();
+                        openLicenseFromCivilian(civilian);
+                    });
+
+                    card.querySelector("[data-add-vehicle]")?.addEventListener("click", (e) => {
+                        e.stopPropagation();
+                        currentCivilianId = civilian.id;
+                        openVehicleModal();
+                    });
+
+                    card.querySelector("[data-add-insurance]")?.addEventListener("click", (e) => {
+                        e.stopPropagation();
+                        currentCivilianId = civilian.id;
+                        openInsuranceModal();
+                    });
+
+                    loadLicenses(civilian.id);
+                    loadVehicles(civilian.id);
+                    loadInsuranceCards(civilian.id);
+                }
+            } catch (err) {
+                console.error("Failed to load civilians:", err);
+                listEl.innerHTML = '<div class="empty-state">Failed to load civilians.</div>';
+            }
+        }
 
             try {
                 const user = await getCurrentUser();
