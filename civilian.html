@@ -181,6 +181,22 @@
             cursor: not-allowed;
         }
 
+        .generate-id-btn {
+            padding: 6px 12px;
+            border-radius: 8px;
+            border: none;
+            background: #22c55e;
+            color: #ffffff;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background .15s ease;
+        }
+
+        .generate-id-btn:hover {
+            background: #16a34a;
+        }
+
         .page-title {
             font-size: 24px;
             font-weight: 700;
@@ -1062,6 +1078,7 @@
                 <div class="banking-id-box">
                     <label for="bankingId">Banking ID</label>
                     <input type="text" id="bankingId" placeholder="LC-00000" readonly />
+                    <button type="button" class="generate-id-btn" id="generateBankingIdBtn">Generate</button>
                 </div>
                 <div class="banking-account-box checking">
                    <label for="checkingBalance">Checking</label>
@@ -2484,26 +2501,11 @@
                 try {
                     const user = await getCurrentUser();
 
-                    let nextBankingId = "LC-00001";
-                    try {
-                        const { data: maxData } = await localSupabase
-                            .from("civilians")
-                            .select("banking_id")
-                            .order("created_at", { ascending: false })
-                            .limit(1);
-                        const currentMax = (maxData && maxData[0] && maxData[0].banking_id) ? maxData[0].banking_id : null;
-                        if (currentMax && currentMax.startsWith("LC-")) {
-                            const numPart = parseInt(currentMax.replace("LC-", ""), 10);
-                            const nextNum = isNaN(numPart) ? 1 : numPart + 1;
-                            nextBankingId = "LC-" + String(nextNum).padStart(5, "0");
-                        }
-                    } catch (bankingErr) {
-                        console.warn("Banking ID generation fallback:", bankingErr);
-                    }
+                    const bankingIdValue = bankingIdInput ? bankingIdInput.value.trim() : "";
 
                     const payload = {
                         name,
-                        banking_id: nextBankingId,
+                        banking_id: bankingIdValue || null,
                         age: age ? parseInt(age, 10) : null,
                         gender: gender || null,
                         address: address || null,
@@ -2630,6 +2632,29 @@
                 createCivilianForm.style.display = "block";
                 if (pageTitle) pageTitle.style.display = "block";
                 if (myCiviliansSection) myCiviliansSection.style.display = "block";
+            });
+        }
+
+        const generateBankingIdBtn = document.getElementById("generateBankingIdBtn");
+        const bankingIdInput = document.getElementById("bankingId");
+        if (generateBankingIdBtn && bankingIdInput) {
+            generateBankingIdBtn.addEventListener("click", async () => {
+                let nextNum = 1;
+                try {
+                    const { data: maxData } = await localSupabase
+                        .from("civilians")
+                        .select("banking_id")
+                        .order("created_at", { ascending: false })
+                        .limit(1);
+                    const currentMax = (maxData && maxData[0] && maxData[0].banking_id) ? maxData[0].banking_id : null;
+                    if (currentMax && currentMax.startsWith("LC-")) {
+                        const numPart = parseInt(currentMax.replace("LC-", ""), 10);
+                        nextNum = isNaN(numPart) ? 1 : numPart + 1;
+                    }
+                } catch (err) {
+                    console.warn("Banking ID generation fallback:", err);
+                }
+                bankingIdInput.value = "LC-" + String(nextNum).padStart(5, "0");
             });
         }
 
