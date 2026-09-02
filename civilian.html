@@ -1453,95 +1453,6 @@
             }
         }
 
-            try {
-                const user = await getCurrentUser();
-                if (!user) {
-                    listEl.innerHTML = '<div class="empty-state">Please log in to view your civilians.</div>';
-                    return;
-                }
-
-                let query = localSupabase
-                    .from("civilians")
-                    .select("*")
-                    .eq("user_id", user.id)
-                    .order("created_at", { ascending: false });
-
-                if (currentCommunityId) {
-                    query = query.eq("community_id", currentCommunityId);
-                }
-
-                const { data, error } = await query;
-
-                loadedCivilians = Array.isArray(data) ? data : [];
-
-                if (error) {
-                    listEl.innerHTML = `<div class="empty-state">Error loading civilians: ${escapeHtml(error.message)}</div>`;
-                    return;
-                }
-
-                if (!Array.isArray(data) || data.length === 0) {
-                    listEl.innerHTML = '<div class="empty-state">No civilians created yet.</div>';
-                    return;
-                }
-
-                listEl.innerHTML = "";
-                for (const civilian of data) {
-                    const card = document.createElement("div");
-                    card.className = "civilian-card";
-                    card.setAttribute("data-id", civilian.id);
-
-                    const meta = [civilian.age, civilian.gender, civilian.address].filter(Boolean).join(" | ") || "No additional details";
-
-                    card.innerHTML = `
-                        <div class="civilian-card-name">${escapeHtml(civilian.name)}</div>
-                        <div class="civilian-card-meta">${escapeHtml(meta)}</div>
-                        ${civilian.photo_url ? `<img src="${escapeHtml(civilian.photo_url)}" style="max-width: 80px; max-height: 80px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 8px; display: block;" />` : ""}
-                        <div class="civilian-card-actions">
-                            <button type="button" class="civilian-action-btn primary" data-view-license="${civilian.id}">View License</button>
-                            <button type="button" class="civilian-action-btn primary" data-add-vehicle="${civilian.id}">Add Vehicle</button>
-                            <button type="button" class="civilian-action-btn primary" data-add-insurance="${civilian.id}">Insurance</button>
-                        </div>
-                        <div class="license-list" id="licenseList-${civilian.id}"></div>
-                        <div class="vehicle-list" id="vehicleList-${civilian.id}"></div>
-                        <div class="insurance-list" id="insuranceList-${civilian.id}"></div>
-                    `;
-
-                    card.addEventListener("click", (e) => {
-                        if (e.target.closest("[data-view-license]")) return;
-                        if (e.target.closest("[data-add-vehicle]")) return;
-                        if (e.target.closest("[data-add-insurance]")) return;
-                        selectCivilianCard(civilian, card);
-                    });
-
-                    listEl.appendChild(card);
-
-                    card.querySelector("[data-view-license]")?.addEventListener("click", (e) => {
-                        e.stopPropagation();
-                        openLicenseFromCivilian(civilian);
-                    });
-
-                    card.querySelector("[data-add-vehicle]")?.addEventListener("click", (e) => {
-                        e.stopPropagation();
-                        currentCivilianId = civilian.id;
-                        openVehicleModal();
-                    });
-
-                    card.querySelector("[data-add-insurance]")?.addEventListener("click", (e) => {
-                        e.stopPropagation();
-                        currentCivilianId = civilian.id;
-                        openInsuranceModal();
-                    });
-
-                    loadLicenses(civilian.id);
-                    loadVehicles(civilian.id);
-                    loadInsuranceCards(civilian.id);
-                }
-            } catch (err) {
-                console.error("Failed to load civilians:", err);
-                if (listEl) listEl.innerHTML = '<div class="empty-state">Failed to load civilians.</div>';
-            }
-        }
-
         function selectCivilianCard(civilian, cardElement) {
             selectedCivilianId = civilian.id;
             currentCivilianId = civilian.id;
@@ -2572,8 +2483,27 @@
 
                 try {
                     const user = await getCurrentUser();
+
+                    let nextBankingId = "LC-00001";
+                    try {
+                        const { data: maxData } = await localSupabase
+                            .from("civilians")
+                            .select("banking_id")
+                            .order("created_at", { ascending: false })
+                            .limit(1);
+                        const currentMax = (maxData && maxData[0] && maxData[0].banking_id) ? maxData[0].banking_id : null;
+                        if (currentMax && currentMax.startsWith("LC-")) {
+                            const numPart = parseInt(currentMax.replace("LC-", ""), 10);
+                            const nextNum = isNaN(numPart) ? 1 : numPart + 1;
+                            nextBankingId = "LC-" + String(nextNum).padStart(5, "0");
+                        }
+                    } catch (bankingErr) {
+                        console.warn("Banking ID generation fallback:", bankingErr);
+                    }
+
                     const payload = {
                         name,
+                        banking_id: nextBankingId,
                         age: age ? parseInt(age, 10) : null,
                         gender: gender || null,
                         address: address || null,
