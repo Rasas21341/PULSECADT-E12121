@@ -106,6 +106,33 @@
             cursor: pointer;
         }
 
+        .banking-account-box {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 18px;
+            margin-bottom: 14px;
+        }
+
+        .banking-account-box label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #334155;
+            margin-bottom: 6px;
+        }
+
+        .banking-account-box input[type="text"] {
+            width: 100%;
+            padding: 12px 14px;
+            border-radius: 12px;
+            border: 1px solid #cbd5e1;
+            font-size: 15px;
+            color: #0f172a;
+            outline: none;
+            font-family: inherit;
+        }
+
         .page-title {
             font-size: 24px;
             font-weight: 700;
@@ -964,19 +991,17 @@
              <div class="form-success" id="formSuccess"></div>
           </form>
 
-          <div class="banking-section" id="bankingSection">
-              <div class="page-title">Personal</div>
-              <div class="form-field">
-                  <div class="checkbox-field">
-                      <input type="checkbox" id="checkingCheckbox">
-                      <label for="checkingCheckbox">Checking</label>
-                  </div>
-              </div>
-              <div class="form-field">
-                  <label for="bankingBalance">Balance</label>
-                  <input type="text" id="bankingBalance" placeholder="$0.00" />
-              </div>
-          </div>
+           <div class="banking-section" id="bankingSection">
+               <div class="page-title">Personal</div>
+               <div class="banking-account-box">
+                   <label for="checkingBalance">Checking</label>
+                   <input type="text" id="checkingBalance" placeholder="$0.00" />
+               </div>
+               <div class="banking-account-box">
+                   <label for="savingsBalance">Savings</label>
+                   <input type="text" id="savingsBalance" placeholder="$0.00" />
+               </div>
+           </div>
 
              <div class="my-civilians-section" id="myCiviliansSection">
                 <div class="my-civilians-header">
