@@ -1925,26 +1925,6 @@
 
                     setTimeout(() => {
                         if (editModal) editModal.classList.remove("open");
-        const bankingBtn = document.getElementById("bankingBtn");
-        const bankingSection = document.getElementById("bankingSection");
-        const createCivilianForm = document.getElementById("createCivilianForm");
-
-        if (bankingBtn && bankingSection && createCivilianForm) {
-            bankingBtn.addEventListener("click", () => {
-                createCivilianForm.style.display = "none";
-                bankingSection.style.display = "block";
-            });
-        }
-
-        const backBtn = document.getElementById("backBtn");
-        if (backBtn && bankingSection && createCivilianForm) {
-            backBtn.addEventListener("click", () => {
-                bankingSection.style.display = "none";
-                createCivilianForm.style.display = "block";
-            });
-        }
-
-        loadMyCivilians();
                     }, 600);
                 } catch (err) {
                     if (editError) { editError.textContent = "Failed to update civilian."; editError.style.display = "block"; }
@@ -2494,6 +2474,25 @@
                 }
                 currentCivilianId = selectedCivilianId;
                 openInsuranceModal();
+            });
+        }
+
+        const bankingBtn = document.getElementById("bankingBtn");
+        const bankingSection = document.getElementById("bankingSection");
+        const createCivilianForm = document.getElementById("createCivilianForm");
+
+        if (bankingBtn && bankingSection && createCivilianForm) {
+            bankingBtn.addEventListener("click", () => {
+                createCivilianForm.style.display = "none";
+                bankingSection.style.display = "block";
+            });
+        }
+
+        const backBtn = document.getElementById("backBtn");
+        if (backBtn && bankingSection && createCivilianForm) {
+            backBtn.addEventListener("click", () => {
+                bankingSection.style.display = "none";
+                createCivilianForm.style.display = "block";
             });
         }
 
