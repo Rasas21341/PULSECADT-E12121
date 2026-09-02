@@ -227,6 +227,23 @@
             transform: translateY(1px);
         }
 
+        .send-money-btn {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 8px;
+            border: none;
+            background: #22c55e;
+            color: #ffffff;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background .15s ease;
+        }
+
+        .send-money-btn:hover {
+            background: #16a34a;
+        }
+
         .form-error {
             margin-top: 10px;
             padding: 10px 12px;
@@ -1021,7 +1038,7 @@
                     <label for="savingsBalance">Savings</label>
                     <input type="text" id="savingsBalance" placeholder="$0.00" readonly />
                 </div>
-                <button type="button" class="submit-btn">Send Money</button>
+                <button type="button" class="send-money-btn">Send Money</button>
             </div>
 
              <div class="my-civilians-section" id="myCiviliansSection">
