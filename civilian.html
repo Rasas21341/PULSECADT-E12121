@@ -133,6 +133,16 @@
             font-family: inherit;
         }
 
+        .banking-account-box.savings {
+            max-width: 220px;
+        }
+
+        .banking-account-box.savings input[type="text"] {
+            background: #f8fafc;
+            color: #64748b;
+            cursor: not-allowed;
+        }
+
         .page-title {
             font-size: 24px;
             font-weight: 700;
@@ -997,9 +1007,9 @@
                    <label for="checkingBalance">Checking</label>
                    <input type="text" id="checkingBalance" placeholder="$0.00" />
                </div>
-               <div class="banking-account-box">
+               <div class="banking-account-box savings">
                    <label for="savingsBalance">Savings</label>
-                   <input type="text" id="savingsBalance" placeholder="$0.00" />
+                   <input type="text" id="savingsBalance" placeholder="$0.00" readonly />
                </div>
            </div>
 
