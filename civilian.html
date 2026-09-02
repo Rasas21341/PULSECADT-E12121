@@ -153,6 +153,32 @@
             cursor: not-allowed;
         }
 
+        .banking-id-box {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .banking-id-box label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #334155;
+            white-space: nowrap;
+        }
+
+        .banking-id-box input[type="text"] {
+            width: 140px;
+            padding: 8px 10px;
+            border-radius: 8px;
+            border: 1px solid #cbd5e1;
+            font-size: 14px;
+            color: #0f172a;
+            outline: none;
+            font-family: inherit;
+            background: #ffffff;
+        }
+
         .page-title {
             font-size: 24px;
             font-weight: 700;
@@ -1028,9 +1054,13 @@
              <div class="form-success" id="formSuccess"></div>
           </form>
 
-           <div class="banking-section" id="bankingSection">
-               <div class="page-title">Personal</div>
-               <div class="banking-account-box checking">
+            <div class="banking-section" id="bankingSection">
+                <div class="page-title">Personal</div>
+                <div class="banking-id-box">
+                    <label for="bankingId">Banking ID</label>
+                    <input type="text" id="bankingId" placeholder="BANK-000" />
+                </div>
+                <div class="banking-account-box checking">
                    <label for="checkingBalance">Checking</label>
                    <input type="text" id="checkingBalance" placeholder="$0.00" readonly />
                </div>
