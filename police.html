@@ -1527,135 +1527,59 @@
             50% { opacity: 0.25; }
         }
 
-        .radio-overlay {
+        .panic-floating-button {
             position: fixed;
-            bottom: 8px;
-            left: 28px;
-            z-index: 900;
-            display: none;
-            width: 190px;
-            height: 570px;
-            background: linear-gradient(100deg, #696c6d 0%, #a0a2a1 14%, #777a7a 64%, #4e5152 100%);
-            border-radius: 18px 18px 22px 22px;
-            border: 3px solid #3e4142;
-            box-shadow: 8px 12px 22px rgba(0, 0, 0, 0.42), inset 3px 0 0 rgba(255,255,255,0.16), inset -4px 0 0 rgba(0,0,0,0.18);
-            padding: 10px 10px 8px;
-            overflow: visible;
-            font-family: 'Courier New', monospace;
+            left: 24px;
+            bottom: 24px;
+            z-index: 10000;
+            border: none;
+            border-radius: 999px;
+            background: linear-gradient(135deg, #f59e0b, #f97316);
+            color: #fff7ed;
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            padding: 12px 16px;
+            box-shadow: 0 8px 20px rgba(249, 115, 22, 0.45);
+            cursor: pointer;
         }
 
-        .radio-overlay::before {
-            content: "";
-            position: absolute;
-            top: -25px;
-            left: 18px;
-            width: 9px;
-            height: 31px;
-            border-radius: 6px 6px 2px 2px;
-            background: linear-gradient(90deg, #303333, #777b79 45%, #292c2c);
-            border: 2px solid #292c2c;
-            box-shadow: 2px 0 2px rgba(0,0,0,0.3);
+        .panic-floating-button.active {
+            background: linear-gradient(135deg, #ef4444, #b91c1c);
+            box-shadow: 0 0 18px rgba(239, 68, 68, 0.8);
         }
 
-        .radio-overlay::after {
-            content: "";
-            position: absolute;
-            top: 17px;
-            right: 20px;
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: #e14635;
-            box-shadow: -13px 0 0 #e9a52f, -26px 0 0 #35484a, 0 1px 3px rgba(0,0,0,0.55);
-        }
-
-        .radio-overlay.open {
-            display: block;
+        .radio-overlay {
+            display: none !important;
         }
 
         .radio-top-bar {
-            position: relative;
-            background: #4b4e4f;
-            height: 200px;
-            padding: 8px 7px 7px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            border: 1px solid #303333;
-            border-radius: 9px 9px 3px 3px;
-            box-shadow: inset 0 1px 2px rgba(255,255,255,0.14), 0 2px 2px rgba(0,0,0,0.22);
-        }
-
-        .radio-top-bar::before {
-            content: "";
-            position: absolute;
-            top: 4px;
-            left: 25px;
-            width: 9px;
-            height: 104px;
-            border-radius: 6px 6px 3px 3px;
-            background: linear-gradient(90deg, #292c2c, #777b79 48%, #292c2c);
-            border: 2px solid #252828;
-            box-shadow: 2px 2px 3px rgba(0,0,0,0.28);
-        }
-
-        .radio-top-bar::after {
-            content: "";
-            position: absolute;
-            top: 109px;
-            left: 19px;
-            width: 23px;
-            height: 27px;
-            border-radius: 5px;
-            background: #343838;
-            border: 2px solid #292c2c;
-            box-shadow: 0 0 0 5px rgba(73, 76, 76, 0.6), 34px 18px 0 -4px #d58628, 50px 18px 0 -4px #35484a;
-        }
-
-        .radio-brand-text {
-            font-size: 7px;
-            font-weight: 800;
-            color: #202323;
-            letter-spacing: 1px;
-        }
-
-        .radio-model {
-            font-size: 7px;
-            font-weight: 600;
-            color: #252828;
+            display: none !important;
         }
 
         .radio-screen {
-            position: absolute;
-            top: 210px;
-            left: 14px;
-            width: 156px;
-            height: 270px;
-            margin: 0;
-            background: linear-gradient(to bottom, #111315 0%, #090b0c 75%, #12351d 100%);
-            border-radius: 4px;
-            border: 3px solid #292c2c;
-            box-shadow: inset 0 0 14px rgba(0, 0, 0, 0.9), 0 1px 1px rgba(255,255,255,0.13);
-            padding: 11px 9px;
-            display: flex;
-            flex-direction: column;
-            position: relative;
-            overflow: hidden;
+            display: none !important;
         }
 
-        .radio-screen::before {
-            content: "";
-            position: absolute;
-            inset: 0;
-            background: repeating-linear-gradient(
-                0deg,
-                rgba(0,0,0,0.2) 0px,
-                rgba(0,0,0,0.2) 1px,
-                transparent 1px,
-                transparent 3px
-            );
-            pointer-events: none;
-            border-radius: 6px;
+        .radio-side-controls {
+            display: none !important;
+        }
+
+        .radio-knobs {
+            display: none !important;
+        }
+
+        .radio-input-row {
+            display: none !important;
+        }
+
+        .radio-ptt {
+            display: none !important;
+        }
+
+        .radio-bottom-bar {
+            display: none !important;
         }
 
         .radio-screen-header {
@@ -1912,53 +1836,7 @@
             <div class="bodycam-label">Dispatch FG 1</div>
         </div>
     </div>
-    <div class="radio-overlay" id="radioOverlay">
-        <div class="radio-top-bar">
-            <span class="radio-brand-text">MOTOROLA</span>
-            <span class="radio-model">APX P25</span>
-        </div>
-        <div class="radio-screen">
-            <div class="radio-screen-header">
-                <span class="radio-zone-label">Zone A</span>
-                <div class="radio-signal">
-                    <span class="radio-signal-bar"></span>
-                    <span class="radio-signal-bar"></span>
-                    <span class="radio-signal-bar"></span>
-                    <span class="radio-signal-bar"></span>
-                </div>
-            </div>
-            <div class="radio-channel-main">Dispatch</div>
-            <div class="radio-talkgroup">FG1</div>
-            <div class="radio-status-bar">
-                <div class="radio-tx-status">
-                    <span class="radio-tx-dot"></span>
-                    <span>TX</span>
-                </div>
-                <div class="radio-battery">BAT 75%</div>
-            </div>
-        </div>
-        <div class="radio-side-controls">
-            <div class="radio-side-btn">1</div>
-            <div class="radio-side-btn">2</div>
-            <button type="button" class="radio-side-btn emergency" id="panicButton" aria-label="Panic button">E</button>
-        </div>
-        <div class="radio-knobs">
-            <div class="radio-knob">
-                <div class="radio-knob-circle"></div>
-                <span class="radio-knob-label">Vol</span>
-            </div>
-            <div class="radio-knob">
-                <div class="radio-knob-circle"></div>
-                <span class="radio-knob-label">Ch</span>
-            </div>
-        </div>
-        <div class="radio-input-row">
-            <input type="text" class="radio-input" id="radioChannelInput" placeholder="Dispatch" value="Dispatch" maxlength="20" />
-            <input type="text" class="radio-input" id="radioTalkgroupInput" placeholder="FG" value="FG1" maxlength="10" />
-        </div>
-        <button type="button" class="radio-ptt" id="radioPtt">PTT</button>
-        <div class="radio-bottom-bar">P25 Phase II</div>
-    </div>
+    <button type="button" class="panic-floating-button" id="panicButton" aria-label="Panic button">PANIC</button>
     <div class="status-bar">
         <div class="status-current">
             <span class="status-dot" id="statusDot"></span>
@@ -3753,26 +3631,14 @@
             panicButton.addEventListener("click", () => {
                 panicActive = !panicActive;
                 panicButton.classList.toggle("active", panicActive);
-                panicButton.textContent = panicActive ? "PANIC" : "E";
+                panicButton.textContent = panicActive ? "PANIC ON" : "PANIC";
                 if (panicActive) {
                     bodycamOverlay?.classList.add("open");
+                } else {
+                    bodycamOverlay?.classList.remove("open");
                 }
             });
         }
-
-        const radioChannelMain = document.querySelector(".radio-channel-main");
-        const radioTalkgroup = document.querySelector(".radio-talkgroup");
-        const radioChannelInput = document.getElementById("radioChannelInput");
-        const radioTalkgroupInput = document.getElementById("radioTalkgroupInput");
-
-        function setRadioDisplay(channelText = "Dispatch", talkgroupText = "FG1") {
-            if (radioChannelMain) radioChannelMain.textContent = channelText;
-            if (radioTalkgroup) radioTalkgroup.textContent = talkgroupText;
-            if (radioChannelInput) radioChannelInput.value = channelText;
-            if (radioTalkgroupInput) radioTalkgroupInput.value = talkgroupText;
-        }
-
-        setRadioDisplay();
 
         document.addEventListener("keydown", (e) => {
             if (e.key === "m" || e.key === "M") {
