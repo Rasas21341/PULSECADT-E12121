@@ -2640,22 +2640,38 @@
         const bankingIdInput = document.getElementById("bankingId");
         if (generateBankingIdBtn && bankingIdInput) {
             generateBankingIdBtn.addEventListener("click", async () => {
-                let nextNum = 1;
-                try {
-                    const { data: maxData } = await localSupabase
-                        .from("civilians")
-                        .select("banking_id")
-                        .order("created_at", { ascending: false })
-                        .limit(1);
-                    const currentMax = (maxData && maxData[0] && maxData[0].banking_id) ? maxData[0].banking_id : null;
-                    if (currentMax && currentMax.startsWith("LC-")) {
-                        const numPart = parseInt(currentMax.replace("LC-", ""), 10);
-                        nextNum = isNaN(numPart) ? 1 : numPart + 1;
+                let newId = null;
+                for (let attempt = 0; attempt < 20; attempt++) {
+                    const num = Math.floor(10000 + Math.random() * 90000);
+                    const candidate = "LC-" + num;
+                    try {
+                        const { data: existing } = await localSupabase
+                            .from("civilians")
+                            .select("id")
+                            .eq("banking_id", candidate)
+                            .maybeSingle();
+                        if (!existing) {
+                            newId = candidate;
+                            break;
+                        }
+                    } catch (err) {
+                        console.warn("Banking ID uniqueness check failed:", err);
                     }
-                } catch (err) {
-                    console.warn("Banking ID generation fallback:", err);
                 }
-                bankingIdInput.value = "LC-" + String(nextNum).padStart(5, "0");
+                if (!newId) {
+                    newId = "LC-" + Date.now().toString().slice(-5);
+                }
+                bankingIdInput.value = newId;
+                if (currentCivilianId && localSupabase) {
+                    try {
+                        await localSupabase
+                            .from("civilians")
+                            .update({ banking_id: newId })
+                            .eq("id", currentCivilianId);
+                    } catch (err) {
+                        console.error("Failed to save banking ID to civilian:", err);
+                    }
+                }
             });
         }
 
