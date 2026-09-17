@@ -887,10 +887,7 @@
         }
 
         .moderation-btn {
-            position: fixed;
-            top: 32px;
-            left: 80px;
-            z-index: 800;
+            display: inline-block;
             padding: 6px 14px;
             border-radius: 999px;
             font-size: 13px;
@@ -1729,7 +1726,6 @@ enable-ga="false"
 <script defer src="https://downloads-global.3cx.com/downloads/livechatandtalk/v1/callus.js" id="tcx-callus-js" charset="utf-8"></script>
 <body>
     <img class="top-left-logo" id="topLeftLogo" src="https://cdn.discordapp.com/icons/1498000979101093999/c96c547fbd94e68254d8335dadb2e437.webp?size=1024" alt="Logo" />
-    <button type="button" class="moderation-btn" id="staffDashboardBtn">Moderation</button>
     <div class="topbar" id="topbar">
         <span class="pill">
             <a href="/changelogs" class="changelogs-btn">Changelogs</a>
@@ -1805,6 +1801,7 @@ enable-ga="false"
     </div>
       <div class="logged-in-screen" id="loggedInScreen">
             <div class="top-actions">
+                <button type="button" class="moderation-btn" id="staffDashboardBtn">Moderation</button>
                 <button type="button" class="create-community-centered-btn" id="createCommunityCenteredBtn">+ Create</button>
                  <button type="button" class="join-community-centered-btn" id="joinCommunityCenteredBtn">
                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px; vertical-align:middle;">
