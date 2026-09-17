@@ -1334,6 +1334,7 @@
         let selectedCivilianId = null;
         let loadedCivilians = [];
         let currentCommunityId = null;
+        let pendingBankingId = null;
 
         try {
             if (typeof window.supabase !== "undefined") {
@@ -1349,6 +1350,10 @@
         } catch (e) {
             currentCommunityId = null;
         }
+
+        try {
+            pendingBankingId = localStorage.getItem("pendingBankingId") || null;
+        } catch (e) {}
 
         async function getCurrentUser() {
             if (!localSupabase) return null;
@@ -2505,7 +2510,7 @@
 
                     const payload = {
                         name,
-                        banking_id: bankingIdValue || null,
+                        banking_id: bankingIdValue || pendingBankingId || null,
                         age: age ? parseInt(age, 10) : null,
                         gender: gender || null,
                         address: address || null,
@@ -2541,6 +2546,7 @@
                     }
                     form.reset();
                     createPhotoBase64 = null;
+                    pendingBankingId = null;
                     if (civilianPhotoPreview) civilianPhotoPreview.style.display = "none";
                     if (bankingIdInput) bankingIdInput.value = "";
                     loadMyCivilians();
@@ -2638,6 +2644,9 @@
 
         const generateBankingIdBtn = document.getElementById("generateBankingIdBtn");
         const bankingIdInput = document.getElementById("bankingId");
+        if (bankingIdInput && pendingBankingId) {
+            bankingIdInput.value = pendingBankingId;
+        }
         if (generateBankingIdBtn && bankingIdInput) {
             generateBankingIdBtn.addEventListener("click", async () => {
                 let newId = null;
@@ -2671,6 +2680,9 @@
                     } catch (err) {
                         console.error("Failed to save banking ID to civilian:", err);
                     }
+                } else {
+                    pendingBankingId = newId;
+                    try { localStorage.setItem("pendingBankingId", newId); } catch (e) {}
                 }
             });
         }
