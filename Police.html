@@ -1555,11 +1555,6 @@
             color: #991b1b;
         }
 
-        .panic-unit {
-            font-weight: 700;
-            margin-left: 4px;
-        }
-
         .radio-overlay {
             display: none !important;
         }
@@ -1915,8 +1910,7 @@
         Notes
     </button>
     <button type="button" class="panic-floating-button" id="panicButton" aria-label="Panic button">
-        <span class="panic-label">Panic</span>
-        <span class="panic-unit" id="panicUnit"></span>
+        <span class="panic-label">PANIC</span>
     </button>
     <button type="button" class="new-call-btn" id="newCallBtn">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -3643,12 +3637,7 @@
         }
 
         const panicButton = document.getElementById("panicButton");
-        const panicUnit = document.getElementById("panicUnit");
         let panicActive = false;
-
-        if (panicUnit) {
-            panicUnit.textContent = officerCallsign ? `Callsign: ${officerCallsign}` : "";
-        }
 
         if (panicButton) {
             panicButton.addEventListener("click", () => {
