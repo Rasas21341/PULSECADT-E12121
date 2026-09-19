@@ -2581,6 +2581,140 @@
                                 console.error(err);
                             }
                         }
+
+                        let currentEditingRosterId = null;
+
+                        function openRosterEditor(rosterId, rosterName) {
+                            currentEditingRosterId = rosterId;
+                            const editorTitle = document.getElementById("rosterEditorTitle");
+                            const editorName = document.getElementById("rosterEditorName");
+                            const editorMembers = document.getElementById("rosterEditorMembers");
+                            const editorView = document.getElementById("rosterEditorView");
+
+                            if (editorTitle) editorTitle.textContent = "Edit Roster: " + rosterName;
+                            if (editorName) editorName.value = rosterName;
+                            if (editorMembers) editorMembers.innerHTML = '<div class="empty">Loading members...</div>';
+                            if (editorView) {
+                                closeAllPages();
+                                editorView.classList.add("open");
+                            }
+
+                            loadRosterMembers(rosterId);
+                        }
+
+                        async function loadRosterMembers(rosterId) {
+                            const membersEl = document.getElementById("rosterEditorMembers");
+                            if (!membersEl) return;
+                            try {
+                                // Fetch members from the community
+                                const { data: membersData } = await localSupabase
+                                    .from("members")
+                                    .select("*")
+                                    .eq("community_id", id)
+                                    .order("email");
+
+                                // Fetch current roster members
+                                const { data: rosterMembersData } = await localSupabase
+                                    .from("roster_members")
+                                    .select("member_id")
+                                    .eq("roster_id", rosterId);
+
+                                const rosterMemberIds = new Set((rosterMembersData || []).map(r => r.member_id));
+                                const members = Array.isArray(membersData) ? membersData : [];
+
+                                if (members.length === 0) {
+                                    membersEl.innerHTML = '<div class="empty">No members in this community.</div>';
+                                    return;
+                                }
+
+                                membersEl.innerHTML = members.map((m) => {
+                                    const email = (m.email || "Unknown").replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                                    const isSelected = rosterMemberIds.has(m.id);
+                                    return `<div class="member-item" style="padding:8px 10px; border-radius:6px; font-size:13px; color:#334155; border-bottom:1px solid #f1f5f9; display:flex; align-items:center; justify-content:space-between; gap:8px;">
+                                        <span class="member-email" style="flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${email}</span>
+                                        <input type="checkbox" class="roster-member-checkbox" data-member-id="${m.id}" ${isSelected ? 'checked' : ''} style="cursor:pointer;" />
+                                    </div>`;
+                                }).join('');
+                            } catch (err) {
+                                membersEl.innerHTML = '<div class="empty">Failed to load members.</div>';
+                                console.error(err);
+                            }
+                        }
+
+                        const rosterEditorClose = document.getElementById("rosterEditorClose");
+                        const rosterEditorSaveBtn = document.getElementById("rosterEditorSaveBtn");
+
+                        if (rosterEditorClose) {
+                            rosterEditorClose.addEventListener("click", () => {
+                                const editorView = document.getElementById("rosterEditorView");
+                                if (editorView) editorView.classList.remove("open");
+                                currentEditingRosterId = null;
+                            });
+                        }
+
+                        if (rosterEditorSaveBtn) {
+                            rosterEditorSaveBtn.addEventListener("click", async () => {
+                                if (!currentEditingRosterId || !localSupabase) return;
+                                const editorName = document.getElementById("rosterEditorName");
+                                const newName = editorName ? editorName.value.trim() : "";
+                                if (!newName) {
+                                    alert("Please enter a roster name.");
+                                    return;
+                                }
+                                try {
+                                    // Update roster name
+                                    const { error: nameError } = await localSupabase
+                                        .from("rosters")
+                                        .update({ name: newName, updated_at: new Date().toISOString() })
+                                        .eq("id", currentEditingRosterId);
+                                    if (nameError) {
+                                        alert("Failed to update roster name: " + nameError.message);
+                                        return;
+                                    }
+
+                                    // Update roster members
+                                    const checkboxes = document.querySelectorAll(".roster-member-checkbox");
+                                    const selectedMemberIds = [];
+                                    checkboxes.forEach((cb) => {
+                                        if (cb.checked) selectedMemberIds.push(cb.getAttribute("data-member-id"));
+                                    });
+
+                                    // Delete existing roster members
+                                    const { error: deleteError } = await localSupabase
+                                        .from("roster_members")
+                                        .delete()
+                                        .eq("roster_id", currentEditingRosterId);
+                                    if (deleteError) {
+                                        alert("Failed to update roster members: " + deleteError.message);
+                                        return;
+                                    }
+
+                                    // Insert new roster members
+                                    if (selectedMemberIds.length > 0) {
+                                        const memberInserts = selectedMemberIds.map((memberId) => ({
+                                            roster_id: currentEditingRosterId,
+                                            member_id: memberId
+                                        }));
+                                        const { error: insertError } = await localSupabase
+                                            .from("roster_members")
+                                            .insert(memberInserts);
+                                        if (insertError) {
+                                            alert("Failed to update roster members: " + insertError.message);
+                                            return;
+                                        }
+                                    }
+
+                                    alert("Roster updated successfully!");
+                                    const editorView = document.getElementById("rosterEditorView");
+                                    if (editorView) editorView.classList.remove("open");
+                                    currentEditingRosterId = null;
+                                    loadRosters();
+                                } catch (err) {
+                                    alert("An unexpected error occurred.");
+                                    console.error(err);
+                                }
+                            });
+                        }
                         async function loadDepartments() {
                             if (!departmentsList || !localSupabase) return;
                             try {
