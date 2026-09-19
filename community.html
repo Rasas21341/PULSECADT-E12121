@@ -471,7 +471,7 @@
             background: #f8fafc;
         }
 
-        .departments-view, .documents-view, .settings-view, .rosters-view {
+        .departments-view, .documents-view, .settings-view, .rosters-view, .roster-editor-view {
             position: fixed;
             top: 0;
             left: 280px;
@@ -484,7 +484,7 @@
             padding: 24px;
         }
 
-        .departments-view.open, .documents-view.open, .settings-view.open, .rosters-view.open {
+        .departments-view.open, .documents-view.open, .settings-view.open, .rosters-view.open, .roster-editor-view.open {
             display: flex;
         }
 
@@ -1639,6 +1639,24 @@
                                         <div id="rostersList"><div class="empty">No rosters yet. Click "Create Roster" to get started.</div></div>
                                     </div>
                                 </div>
+                                <div class="roster-editor-view" id="rosterEditorView">
+                                    <div class="members-view-header">
+                                        <div class="members-view-title" id="rosterEditorTitle">Edit Roster</div>
+                                        <button type="button" class="members-view-close" id="rosterEditorClose" aria-label="Close">×</button>
+                                    </div>
+                                    <div class="view-body">
+                                        <div class="field">
+                                            <label for="rosterEditorName">Roster Name</label>
+                                            <input type="text" id="rosterEditorName" placeholder="Roster name" />
+                                        </div>
+                                        <div style="margin-top:16px; border-top:1px solid #e2e8f0; padding-top:16px;">
+                                            <div style="font-size:14px; font-weight:600; color:#334155; margin-bottom:8px;">Roster Members</div>
+                                            <div id="rosterEditorMembers"><div class="empty">Loading members...</div></div>
+                                        </div>
+                                        <div style="margin-top:16px;">
+                                            <button type="button" class="submit-btn" id="rosterEditorSaveBtn">Save Changes</button>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div class="licences-view" id="licencesView">
                                     <div class="members-view-header">
@@ -2523,7 +2541,7 @@
                                     btn.addEventListener("click", () => {
                                         const rosterId = btn.getAttribute("data-roster-id");
                                         const rosterName = btn.getAttribute("data-roster-name");
-                                        alert("Opening roster: " + rosterName + " (ID: " + rosterId + ")\n\nRoster management feature coming soon.");
+                                        openRosterEditor(rosterId, rosterName);
                                     });
                                 });
                             } catch (err) {
