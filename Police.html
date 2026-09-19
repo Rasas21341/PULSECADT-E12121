@@ -2408,7 +2408,7 @@
                         return;
                     }
                     
-                    alert("Attached to Call #" + currentCallId);
+                    alert("Attached to Call #" + String(currentCallId).slice(0, 8));
                     loadCallsBar();
                 } catch (err) {
                     alert("An unexpected error occurred.");
