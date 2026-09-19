@@ -2292,15 +2292,27 @@
                     return;
                 }
 
+                // Store full call IDs for context menu
+                window.callIdMap = {};
+                data.forEach(c => {
+                    window.callIdMap[String(c.id).slice(0, 8)] = c.id;
+                });
+
                 const esc = (t) => (t || "").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+                const displayName = officerCallsign || (officerRank ? officerRank + " " : "") + officerName;
                 tbody.innerHTML = data.map((c) => {
                     const statusClass = (c.status || "pending").toLowerCase();
+                    const attachedOfficers = c.units ? c.units.split(",").map(u => u.trim()).filter(u => u) : [];
+                    const isAttached = attachedOfficers.some(u => u === displayName);
                     return `<tr data-call-id="${c.id}">
                         <td>${esc(String(c.id || "").slice(0, 8))}</td>
                         <td>${esc(c.nature || "")}</td>
                         <td>${esc(c.location || "")}</td>
                         <td>${esc(c.postal || "")}</td>
-                        <td><span class="status-badge status-${statusClass}">${esc(c.status || "Pending")}</span></td>
+                        <td>
+                            <span class="status-badge status-${statusClass}">${esc(c.status || "Pending")}</span>
+                            ${isAttached ? `<span style="margin-left:6px; font-size:11px; font-weight:700; color:#16a34a;">✓ Attached</span>` : ""}
+                        </td>
                         <td>${esc(c.units || "")}</td>
                         <td>${esc(c.caller || "")}</td>
                     </tr>`;
