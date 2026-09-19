@@ -1626,6 +1626,20 @@
                                         <div id="documentsList"></div>
                                     </div>
                                 </div>
+                                <div class="rosters-view" id="rostersView" style="display:none; position:fixed; top:0; left:280px; right:0; bottom:0; background:#ffffff; z-index:550; flex-direction:column; padding:24px;">
+                                    <div class="members-view-header">
+                                        <div class="members-view-title">Rosters</div>
+                                        <button type="button" class="add-department-btn" id="openAddRosterBtn">
+                                            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                                            Create Roster
+                                        </button>
+                                        <button type="button" class="members-view-close" id="rostersViewClose" aria-label="Close">×</button>
+                                    </div>
+                                    <div class="view-body">
+                                        <div id="rostersList"><div class="empty">No rosters yet. Click "Create Roster" to get started.</div></div>
+                                    </div>
+                                </div>
+                                </div>
                                 <div class="licences-view" id="licencesView">
                                     <div class="members-view-header">
                                         <div class="members-view-title">Licences</div>
@@ -2422,8 +2436,16 @@
 
                         const rostersBtn = document.getElementById("rostersBtn");
                         if (rostersBtn) {
-                            rostersBtn.addEventListener("click", () => {
-                                alert("Rosters feature coming soon.");
+                            rostersBtn.addEventListener("click", (e) => {
+                                e.stopPropagation();
+                                const rostersView = document.getElementById("rostersView");
+                                if (rostersView.classList.contains("open")) {
+                                    rostersView.classList.remove("open");
+                                } else {
+                                    closeAllPages();
+                                    rostersView.classList.add("open");
+                                    loadRosters();
+                                }
                             });
                         }
 
@@ -2432,6 +2454,105 @@
                             rolesBtn.addEventListener("click", () => {
                                 alert("Roles feature coming soon.");
                             });
+                        }
+
+                        const rostersView = document.getElementById("rostersView");
+                        const rostersViewClose = document.getElementById("rostersViewClose");
+                        const openAddRosterBtn = document.getElementById("openAddRosterBtn");
+                        const rostersList = document.getElementById("rostersList");
+
+                        if (rostersViewClose) {
+                            rostersViewClose.addEventListener("click", () => {
+                                rostersView.classList.remove("open");
+                            });
+                        }
+
+                        async function loadRosters() {
+                            if (!rostersList || !localSupabase) return;
+                            try {
+                                const { data, error } = await localSupabase
+                                    .from("rosters")
+                                    .select("*")
+                                    .eq("community_id", id)
+                                    .order("created_at", { ascending: false });
+
+                                if (error) {
+                                    rostersList.innerHTML = '<div class="empty">Failed to load rosters.</div>';
+                                    return;
+                                }
+
+                                if (!Array.isArray(data) || data.length === 0) {
+                                    rostersList.innerHTML = '<div class="empty">No rosters yet. Click "Create Roster" to get started.</div>';
+                                    return;
+                                }
+
+                                rostersList.innerHTML = data.map((r) => `
+                                    <div class="request-item" data-roster-id="${r.id}">
+                                        <div>
+                                            <strong>${(r.name || 'Roster').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</strong>
+                                        </div>
+                                        <div>
+                                            <button type="button" class="deny" data-action="delete" data-roster-id="${r.id}">Delete</button>
+                                        </div>
+                                    </div>
+                                `).join('');
+
+                                rostersList.querySelectorAll("[data-action='delete']").forEach((btn) => {
+                                    btn.addEventListener("click", async (e) => {
+                                        const rosterId = btn.getAttribute("data-roster-id");
+                                        if (!confirm("Delete this roster?")) return;
+                                        try {
+                                            const { error } = await localSupabase
+                                                .from("rosters")
+                                                .delete()
+                                                .eq("id", rosterId);
+                                            if (error) {
+                                                alert("Failed to delete roster: " + error.message);
+                                                return;
+                                            }
+                                            loadRosters();
+                                        } catch (err) {
+                                            alert("An unexpected error occurred.");
+                                            console.error(err);
+                                        }
+                                    });
+                                });
+                            } catch (err) {
+                                rostersList.innerHTML = '<div class="empty">Failed to load rosters.</div>';
+                                console.error(err);
+                            }
+                        }
+
+                        if (openAddRosterBtn) {
+                            openAddRosterBtn.addEventListener("click", () => {
+                                const name = prompt("Enter roster name:");
+                                if (!name || !name.trim()) return;
+                                createRoster(name.trim());
+                            });
+                        }
+
+                        async function createRoster(name) {
+                            if (!localSupabase) {
+                                alert("Database unavailable.");
+                                return;
+                            }
+                            try {
+                                const { error } = await localSupabase
+                                    .from("rosters")
+                                    .insert([{
+                                        community_id: id,
+                                        name: name,
+                                        created_at: new Date().toISOString()
+                                    }]);
+                                if (error) {
+                                    alert("Failed to create roster: " + error.message);
+                                    return;
+                                }
+                                loadRosters();
+                            } catch (err) {
+                                alert("An unexpected error occurred.");
+                                console.error(err);
+                            }
                         }
                         async function loadDepartments() {
                             if (!departmentsList || !localSupabase) return;
