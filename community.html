@@ -2491,7 +2491,8 @@
                                         <div>
                                             <strong>${(r.name || 'Roster').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</strong>
                                         </div>
-                                        <div>
+                                        <div style="display:flex; gap:6px;">
+                                            <button type="button" class="approve" data-action="open" data-roster-id="${r.id}" data-roster-name="${(r.name || '').replace(/"/g, '&quot;')}">Open</button>
                                             <button type="button" class="deny" data-action="delete" data-roster-id="${r.id}">Delete</button>
                                         </div>
                                     </div>
@@ -2515,6 +2516,14 @@
                                             alert("An unexpected error occurred.");
                                             console.error(err);
                                         }
+                                    });
+                                });
+
+                                rostersList.querySelectorAll("[data-action='open']").forEach((btn) => {
+                                    btn.addEventListener("click", () => {
+                                        const rosterId = btn.getAttribute("data-roster-id");
+                                        const rosterName = btn.getAttribute("data-roster-name");
+                                        alert("Opening roster: " + rosterName + " (ID: " + rosterId + ")\n\nRoster management feature coming soon.");
                                     });
                                 });
                             } catch (err) {
