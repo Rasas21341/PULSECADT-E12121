@@ -2768,6 +2768,109 @@
                                 }
                             });
                         }
+
+                        // Add Section button
+                        const addSectionToRosterBtn = document.getElementById("addSectionToRosterBtn");
+                        if (addSectionToRosterBtn) {
+                            addSectionToRosterBtn.addEventListener("click", async () => {
+                                if (!currentEditingRosterId || !localSupabase) return;
+                                const sectionName = prompt("Enter section name:");
+                                if (!sectionName || !sectionName.trim()) return;
+                                try {
+                                    const { error } = await localSupabase
+                                        .from("roster_sections")
+                                        .insert([{
+                                            roster_id: currentEditingRosterId,
+                                            name: sectionName.trim(),
+                                            created_at: new Date().toISOString()
+                                        }]);
+                                    if (error) {
+                                        alert("Failed to create section: " + error.message);
+                                        return;
+                                    }
+                                    loadRosterMembers(currentEditingRosterId);
+                                } catch (err) {
+                                    alert("An unexpected error occurred.");
+                                    console.error(err);
+                                }
+                            });
+                        }
+
+                        // Event delegation for section/role buttons
+                        document.getElementById("rosterEditorSections").addEventListener("click", async (e) => {
+                            if (!currentEditingRosterId || !localSupabase) return;
+
+                            // Add Role button
+                            if (e.target.classList.contains("add-role-btn")) {
+                                const sectionId = e.target.getAttribute("data-section-id");
+                                const roleName = prompt("Enter role name:");
+                                if (!roleName || !roleName.trim()) return;
+                                try {
+                                    const { error } = await localSupabase
+                                        .from("roster_roles")
+                                        .insert([{
+                                            section_id: sectionId,
+                                            name: roleName.trim(),
+                                            created_at: new Date().toISOString()
+                                        }]);
+                                    if (error) {
+                                        alert("Failed to create role: " + error.message);
+                                        return;
+                                    }
+                                    loadRosterMembers(currentEditingRosterId);
+                                } catch (err) {
+                                    alert("An unexpected error occurred.");
+                                    console.error(err);
+                                }
+                            }
+
+                            // Delete Role button
+                            if (e.target.classList.contains("delete-role-btn")) {
+                                const sectionId = e.target.getAttribute("data-section-id");
+                                const roleId = e.target.getAttribute("data-role-id");
+                                if (!confirm("Delete this role?")) return;
+                                try {
+                                    const { error } = await localSupabase
+                                        .from("roster_roles")
+                                        .delete()
+                                        .eq("id", roleId);
+                                    if (error) {
+                                        alert("Failed to delete role: " + error.message);
+                                        return;
+                                    }
+                                    loadRosterMembers(currentEditingRosterId);
+                                } catch (err) {
+                                    alert("An unexpected error occurred.");
+                                    console.error(err);
+                                }
+                            }
+
+                            // Delete Section button
+                            if (e.target.classList.contains("delete-section-btn")) {
+                                const sectionId = e.target.getAttribute("data-section-id");
+                                if (!confirm("Delete this section and all its roles?")) return;
+                                try {
+                                    // Delete roles first
+                                    await localSupabase
+                                        .from("roster_roles")
+                                        .delete()
+                                        .eq("section_id", sectionId);
+                                    // Delete section
+                                    const { error } = await localSupabase
+                                        .from("roster_sections")
+                                        .delete()
+                                        .eq("id", sectionId);
+                                    if (error) {
+                                        alert("Failed to delete section: " + error.message);
+                                        return;
+                                    }
+                                    loadRosterMembers(currentEditingRosterId);
+                                } catch (err) {
+                                    alert("An unexpected error occurred.");
+                                    console.error(err);
+                                }
+                            }
+                        });
                         async function loadDepartments() {
                             if (!departmentsList || !localSupabase) return;
                             try {
