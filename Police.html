@@ -2218,7 +2218,7 @@
             if (!tbody) return;
 
             const esc = (t) => (t || "").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-            const displayName = (officerRank ? officerRank + " " : "") + officerName;
+            const displayName = officerCallsign || (officerRank ? officerRank + " " : "") + officerName;
 
             if (!localSupabase) {
                 tbody.innerHTML = `<tr><td colspan="8" class="units-empty">Database unavailable</td></tr>`;
@@ -2233,12 +2233,33 @@
 
                 if (error) throw error;
 
+                // Fetch calls to find which call the current officer is attached to
+                let attachedCallNumber = "";
+                try {
+                    const { data: callsData } = await localSupabase
+                        .from("calls")
+                        .select("id, units")
+                        .order("created_at", { ascending: false })
+                        .limit(50);
+                    if (Array.isArray(callsData)) {
+                        for (const call of callsData) {
+                            const units = call.units ? call.units.split(",").map(u => u.trim()).filter(u => u) : [];
+                            if (units.includes(displayName)) {
+                                attachedCallNumber = String(call.id).slice(0, 8);
+                                break;
+                            }
+                        }
+                    }
+                } catch (callErr) {
+                    console.error("Could not fetch calls for units bar:", callErr);
+                }
+
                 const currentStatusClass = (currentStatus || "available").toLowerCase();
                 const currentRow = `<tr>
                     <td><strong>${esc(officerName)}</strong></td>
                     <td>${esc(officerRank || "")}</td>
                     <td><span class="status-badge status-${currentStatusClass}">${esc(STATUS_LABELS[currentStatus] || "Available")}</span></td>
-                    <td></td>
+                    <td><strong>${esc(attachedCallNumber || "")}</strong></td>
                     <td></td>
                     <td></td>
                     <td></td>
