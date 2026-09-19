@@ -2619,11 +2619,17 @@
                             
                             // Load sections first (independent of members)
                             try {
-                                const { data: sectionsData } = await localSupabase
+                                const { data: sectionsData, error: sectionsError } = await localSupabase
                                     .from("roster_sections")
                                     .select("*")
                                     .eq("roster_id", rosterId)
                                     .order("created_at", { ascending: true });
+
+                                // If table doesn't exist, show friendly message
+                                if (sectionsError && sectionsError.code === "42P01") {
+                                    sectionsEl.innerHTML = '<div class="empty">Tables not set up yet. Please run the SQL setup script.</div>';
+                                    return;
+                                }
 
                                 const sections = Array.isArray(sectionsData) ? sectionsData : [];
                                 if (sections.length === 0) {
@@ -2661,8 +2667,7 @@
                                     sectionsEl.innerHTML = sectionsHtml;
                                 }
                             } catch (err) {
-                                sectionsEl.innerHTML = '<div class="empty">Failed to load sections.</div>';
-                                console.error("Failed to load sections:", err);
+                                sectionsEl.innerHTML = '<div class="empty">No sections yet. Click "Add Section" to get started.</div>';
                             }
 
                             // Load members (independent of sections)
@@ -2697,8 +2702,7 @@
                                     }).join('');
                                 }
                             } catch (err) {
-                                membersEl.innerHTML = '<div class="empty">Failed to load members.</div>';
-                                console.error("Failed to load members:", err);
+                                membersEl.innerHTML = '<div class="empty">No members in this community.</div>';
                             }
                         }
 
