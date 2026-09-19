@@ -1530,7 +1530,7 @@
         .panic-floating-button {
             position: fixed;
             top: 24px;
-            left: 24px;
+            right: 130px;
             padding: 8px 14px;
             border-radius: 10px;
             border: 1px solid #e2e8f0;
@@ -1841,14 +1841,6 @@
             <div class="bodycam-label">Dispatch FG 1</div>
         </div>
     </div>
-    <button type="button" class="panic-floating-button" id="panicButton" aria-label="Panic button">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
-            <line x1="12" y1="9" x2="12" y2="13"></line>
-            <line x1="12" y1="17" x2="12.01" y2="17"></line>
-        </svg>
-        <span class="panic-label">Panic</span>
-    </button>
     <div class="status-bar">
         <div class="status-current">
             <span class="status-dot" id="statusDot"></span>
@@ -1916,6 +1908,14 @@
             <polyline points="10 9 9 9 8 9"></polyline>
         </svg>
         Notes
+    </button>
+    <button type="button" class="panic-floating-button" id="panicButton" aria-label="Panic button">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+            <line x1="12" y1="9" x2="12" y2="13"></line>
+            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+        </svg>
+        <span class="panic-label">Panic</span>
     </button>
     <button type="button" class="new-call-btn" id="newCallBtn">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
