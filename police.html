@@ -2204,8 +2204,7 @@
 
                 const currentStatusClass = (currentStatus || "available").toLowerCase();
                 const currentRow = `<tr>
-                    <td><strong>${esc(displayName)}</strong></td>
-                    <td>${esc(officerRank || "")}</td>
+                    <td><strong>${esc(officerName)}</strong></td>
                     <td><span class="status-badge status-${currentStatusClass}">${esc(STATUS_LABELS[currentStatus] || "Available")}</span></td>
                     <td>${esc(officerCallsign || "")}</td>
                     <td></td>
