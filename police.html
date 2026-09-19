@@ -2204,9 +2204,9 @@
 
                 const currentStatusClass = (currentStatus || "available").toLowerCase();
                 const currentRow = `<tr>
-                    <td><strong>${esc(officerName)}</strong></td>
+                    <td><strong>${esc(officerRank ? officerRank + " " : "")}${esc(officerName)}</strong></td>
                     <td><span class="status-badge status-${currentStatusClass}">${esc(STATUS_LABELS[currentStatus] || "Available")}</span></td>
-                    <td>${esc(officerCallsign || "")}</td>
+                    <td></td>
                     <td></td>
                     <td></td>
                     <td></td>
@@ -2378,6 +2378,8 @@
             } catch (err) {
                 console.error("Could not save status:", err);
             }
+            // Update units bar in real time
+            loadUnitsBar();
         }
 
         if (statusSelect) {
