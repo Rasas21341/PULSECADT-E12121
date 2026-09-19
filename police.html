@@ -2356,10 +2356,54 @@
         });
 
         if (attachToCallBtn) {
-            attachToCallBtn.addEventListener("click", () => {
-                if (currentCallId) {
-                    alert("Attach to Call #" + currentCallId + " (feature coming soon)");
+            attachToCallBtn.addEventListener("click", async () => {
+                if (!currentCallId || !localSupabase) return;
+                
+                const displayName = officerCallsign || (officerRank ? officerRank + " " : "") + officerName;
+                
+                try {
+                    // Get current call data
+                    const { data: callData, error: fetchError } = await localSupabase
+                        .from("calls")
+                        .select("units")
+                        .eq("id", currentCallId)
+                        .maybeSingle();
+                    
+                    if (fetchError) {
+                        alert("Failed to fetch call: " + fetchError.message);
+                        return;
+                    }
+                    
+                    const currentUnits = callData?.units || "";
+                    const unitsList = currentUnits ? currentUnits.split(",").map(u => u.trim()).filter(u => u) : [];
+                    
+                    // Check if already attached
+                    if (unitsList.includes(displayName)) {
+                        alert("You are already attached to this call.");
+                        return;
+                    }
+                    
+                    // Add officer to units
+                    unitsList.push(displayName);
+                    const newUnits = unitsList.join(", ");
+                    
+                    const { error: updateError } = await localSupabase
+                        .from("calls")
+                        .update({ units: newUnits })
+                        .eq("id", currentCallId);
+                    
+                    if (updateError) {
+                        alert("Failed to attach to call: " + updateError.message);
+                        return;
+                    }
+                    
+                    alert("Attached to Call #" + currentCallId);
+                    loadCallsBar();
+                } catch (err) {
+                    alert("An unexpected error occurred.");
+                    console.error(err);
                 }
+                
                 if (callsContextMenu) callsContextMenu.style.display = "none";
             });
         }
