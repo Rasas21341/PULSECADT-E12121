@@ -2295,7 +2295,7 @@
                 const esc = (t) => (t || "").replace(/</g, "&lt;").replace(/>/g, "&gt;");
                 tbody.innerHTML = data.map((c) => {
                     const statusClass = (c.status || "pending").toLowerCase();
-                    return `<tr>
+                    return `<tr data-call-id="${c.id}">
                         <td>${esc(String(c.id || "").slice(0, 8))}</td>
                         <td>${esc(c.nature || "")}</td>
                         <td>${esc(c.location || "")}</td>
@@ -2343,9 +2343,8 @@
             e.preventDefault();
             const row = e.target.closest("tr");
             if (!row) return;
-            const cells = row.querySelectorAll("td");
-            if (cells.length < 7) return;
-            currentCallId = cells[0].textContent.trim();
+            currentCallId = row.getAttribute("data-call-id");
+            if (!currentCallId) return;
             callsContextMenu.style.display = "block";
             callsContextMenu.style.left = e.pageX + "px";
             callsContextMenu.style.top = e.pageY + "px";
