@@ -1898,6 +1898,12 @@
         </table>
     </div>
 
+    <div class="calls-context-menu" id="callsContextMenu" style="display:none; position:fixed; z-index:10000; background:#ffffff; border:1px solid #e2e8f0; border-radius:8px; box-shadow:0 4px 12px rgba(0,0,0,0.15); padding:4px 0; min-width:160px;">
+        <button type="button" id="attachToCallBtn" style="width:100%; text-align:left; padding:10px 14px; border:none; background:transparent; font-size:14px; font-weight:600; color:#0f172a; cursor:pointer; border-radius:6px;">
+            Attach to Call
+        </button>
+    </div>
+
     <button class="back-btn" id="backBtn">← Back</button>
     <button type="button" class="status-top-btn" id="notesBtn">
         <svg class="notes-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -2325,6 +2331,36 @@
                 if (e.target === newCallModal) {
                     newCallModal.classList.remove("open");
                 }
+            });
+        }
+
+        // Context menu for calls
+        const callsContextMenu = document.getElementById("callsContextMenu");
+        const attachToCallBtn = document.getElementById("attachToCallBtn");
+        let currentCallId = null;
+
+        document.getElementById("callsTableBody").addEventListener("contextmenu", (e) => {
+            e.preventDefault();
+            const row = e.target.closest("tr");
+            if (!row) return;
+            const cells = row.querySelectorAll("td");
+            if (cells.length < 7) return;
+            currentCallId = cells[0].textContent.trim();
+            callsContextMenu.style.display = "block";
+            callsContextMenu.style.left = e.pageX + "px";
+            callsContextMenu.style.top = e.pageY + "px";
+        });
+
+        document.addEventListener("click", () => {
+            if (callsContextMenu) callsContextMenu.style.display = "none";
+        });
+
+        if (attachToCallBtn) {
+            attachToCallBtn.addEventListener("click", () => {
+                if (currentCallId) {
+                    alert("Attach to Call #" + currentCallId + " (feature coming soon)");
+                }
+                if (callsContextMenu) callsContextMenu.style.display = "none";
             });
         }
 
