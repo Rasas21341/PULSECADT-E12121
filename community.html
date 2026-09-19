@@ -1626,7 +1626,7 @@
                                         <div id="documentsList"></div>
                                     </div>
                                 </div>
-                                <div class="rosters-view" id="rostersView" style="display:none; position:fixed; top:0; left:280px; right:0; bottom:0; background:#ffffff; z-index:550; flex-direction:column; padding:24px;">
+                                <div class="rosters-view" id="rostersView">
                                     <div class="members-view-header">
                                         <div class="members-view-title">Rosters</div>
                                         <button type="button" class="add-department-btn" id="openAddRosterBtn">
@@ -2405,7 +2405,7 @@
                         });
 
                         function closeAllPages() {
-                            const pages = [membersView, departmentsView, documentsView, licencesView, vehiclesView, applicationsView, settingsView];
+                            const pages = [membersView, departmentsView, documentsView, licencesView, vehiclesView, applicationsView, settingsView, rostersView];
                             pages.forEach((p) => { if (p) p.classList.remove("open"); });
                         }
 
