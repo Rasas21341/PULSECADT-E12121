@@ -2126,38 +2126,38 @@
                 <div class="modal-title">New Call</div>
                 <button class="modal-close" id="newCallModalClose" type="button" aria-label="Close">×</button>
             </div>
-            <div class="field">
+            <div class="lookup-field">
                 <label for="newCallNature">Nature</label>
                 <input type="text" id="newCallNature" placeholder="e.g. Robbery, Disturbance" />
             </div>
-            <div class="field">
+            <div class="lookup-field">
                 <label for="newCallLocation">Location</label>
                 <input type="text" id="newCallLocation" placeholder="e.g. 123 Main St" />
             </div>
-            <div class="field">
+            <div class="lookup-field">
                 <label for="newCallPostal">Postal</label>
                 <input type="text" id="newCallPostal" placeholder="e.g. 12345" />
             </div>
-            <div class="field">
+            <div class="lookup-field">
                 <label for="newCallStatus">Status</label>
-                <select id="newCallStatus">
+                <select id="newCallStatus" style="width:100%; padding:12px 14px; border-radius:12px; border:1px solid #cbd5e1; font-size:15px; color:#0f172a; outline:none; background:#ffffff;">
                     <option value="pending">Pending</option>
                     <option value="dispatched">Dispatched</option>
                     <option value="on-scene">On Scene</option>
                     <option value="closed">Closed</option>
                 </select>
             </div>
-            <div class="field">
+            <div class="lookup-field">
                 <label for="newCallUnits">Units</label>
                 <input type="text" id="newCallUnits" placeholder="e.g. Unit 1, Unit 2" />
             </div>
-            <div class="field">
+            <div class="lookup-field">
                 <label for="newCallCaller">Caller</label>
                 <input type="text" id="newCallCaller" placeholder="Caller name or phone" />
             </div>
-            <button type="button" class="submit-btn" id="newCallSubmitBtn">Create Call</button>
-            <div class="modal-error" id="newCallError"></div>
-            <div class="modal-error" id="newCallSuccess" style="background:#f0fdf4; color:#166534; border-color:#bbf7d0;"></div>
+            <button type="button" class="lookup-submit" id="newCallSubmitBtn">Create Call</button>
+            <div class="lookup-error" id="newCallError"></div>
+            <div class="lookup-error" id="newCallSuccess" style="background:#f0fdf4; color:#166534; border-color:#bbf7d0;"></div>
         </div>
     </div>
 
