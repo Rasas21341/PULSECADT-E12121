@@ -2207,7 +2207,7 @@
                     <td><strong>${esc(displayName)}</strong></td>
                     <td>${esc(officerRank || "")}</td>
                     <td><span class="status-badge status-${currentStatusClass}">${esc(STATUS_LABELS[currentStatus] || "Available")}</span></td>
-                    <td><strong>${esc(officerId || "")}</strong></td>
+                    <td>${esc(officerCallsign || "")}</td>
                     <td></td>
                     <td></td>
                     <td></td>
@@ -2314,6 +2314,7 @@
 
         let officerName = "Officer";
         let officerRank = "";
+        let officerCallsign = "";
 
         (function loadOfficerDetails() {
             const officerInfo = document.getElementById("officerInfo");
@@ -2324,6 +2325,7 @@
             if (pName) {
                 officerName = pName;
                 officerRank = pRank || "";
+                officerCallsign = pCallsign || "";
                 try {
                     localStorage.setItem("policeOfficerName", officerName);
                     localStorage.setItem("policeOfficerRank", officerRank);
@@ -2335,6 +2337,7 @@
                 try {
                     officerName = localStorage.getItem("policeOfficerName") || "Officer";
                     officerRank = localStorage.getItem("policeOfficerRank") || "";
+                    officerCallsign = localStorage.getItem("policeOfficerCallsign") || "";
                 } catch (err) {
                     console.error("Could not read officer details:", err);
                 }
@@ -3642,7 +3645,7 @@
         let panicActive = false;
 
         if (panicUnit) {
-            panicUnit.textContent = officerId ? `Unit ${officerId}` : "";
+            panicUnit.textContent = officerCallsign ? `Callsign: ${officerCallsign}` : "";
         }
 
         if (panicButton) {
