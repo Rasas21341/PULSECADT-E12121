@@ -2615,7 +2615,58 @@
                         async function loadRosterMembers(rosterId) {
                             const membersEl = document.getElementById("rosterEditorMembers");
                             const sectionsEl = document.getElementById("rosterEditorSections");
-                            if (!membersEl || !sectionsEl) return;
+                            if (!sectionsEl) return;
+                            
+                            // Load sections first (independent of members)
+                            try {
+                                const { data: sectionsData } = await localSupabase
+                                    .from("roster_sections")
+                                    .select("*")
+                                    .eq("roster_id", rosterId)
+                                    .order("created_at", { ascending: true });
+
+                                const sections = Array.isArray(sectionsData) ? sectionsData : [];
+                                if (sections.length === 0) {
+                                    sectionsEl.innerHTML = '<div class="empty">No sections yet. Click "Add Section" to get started.</div>';
+                                } else {
+                                    // Load roles for each section
+                                    const sectionsHtml = await Promise.all(sections.map(async (section) => {
+                                        const { data: rolesData } = await localSupabase
+                                            .from("roster_roles")
+                                            .select("*")
+                                            .eq("section_id", section.id)
+                                            .order("created_at", { ascending: true });
+                                        const roles = Array.isArray(rolesData) ? rolesData : [];
+
+                                        const rolesHtml = roles.length === 0
+                                            ? '<div style="font-size:12px; color:#94a3b8; margin-top:4px;">No roles</div>'
+                                            : roles.map((role) => `
+                                                <div style="display:flex; align-items:center; gap:4px; margin-top:4px;">
+                                                    <span style="font-size:12px; color:#475569; font-weight:600;">• ${role.name.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</span>
+                                                    <button type="button" class="delete-role-btn" data-section-id="${section.id}" data-role-id="${role.id}" style="background:none; border:none; color:#dc2626; cursor:pointer; font-size:11px; padding:2px 6px;">✕</button>
+                                                </div>
+                                            `).join('');
+
+                                        return `<div style="border:1px solid #e2e8f0; border-radius:8px; padding:12px; margin-bottom:8px;">
+                                            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:4px;">
+                                                <strong style="font-size:14px; color:#0f172a;">${section.name.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</strong>
+                                                <div style="display:flex; gap:4px;">
+                                                    <button type="button" class="add-role-btn" data-section-id="${section.id}" style="background:#2563eb; color:#fff; border:none; border-radius:6px; padding:4px 8px; font-size:11px; font-weight:700; cursor:pointer;">+ Role</button>
+                                                    <button type="button" class="delete-section-btn" data-section-id="${section.id}" style="background:none; border:1px solid #dc2626; color:#dc2626; border-radius:6px; padding:4px 8px; font-size:11px; font-weight:700; cursor:pointer;">Delete</button>
+                                                </div>
+                                            </div>
+                                            ${rolesHtml}
+                                        </div>`;
+                                    })).join('');
+                                    sectionsEl.innerHTML = sectionsHtml;
+                                }
+                            } catch (err) {
+                                sectionsEl.innerHTML = '<div class="empty">Failed to load sections.</div>';
+                                console.error("Failed to load sections:", err);
+                            }
+
+                            // Load members (independent of sections)
+                            if (!membersEl) return;
                             try {
                                 // Fetch members from the community
                                 const { data: membersData } = await localSupabase
@@ -2645,52 +2696,9 @@
                                         </div>`;
                                     }).join('');
                                 }
-
-                                // Fetch current roster sections
-                                const { data: sectionsData } = await localSupabase
-                                    .from("roster_sections")
-                                    .select("*")
-                                    .eq("roster_id", rosterId)
-                                    .order("created_at", { ascending: true });
-
-                                const sections = Array.isArray(sectionsData) ? sectionsData : [];
-                                if (sections.length === 0) {
-                                    sectionsEl.innerHTML = '<div class="empty">No sections yet. Click "Add Section" to get started.</div>';
-                                } else {
-                                    sectionsEl.innerHTML = await Promise.all(sections.map(async (section) => {
-                                        // Fetch roles for this section
-                                        const { data: rolesData } = await localSupabase
-                                            .from("roster_roles")
-                                            .select("*")
-                                            .eq("section_id", section.id)
-                                            .order("created_at", { ascending: true });
-                                        const roles = Array.isArray(rolesData) ? rolesData : [];
-
-                                        const rolesHtml = roles.length === 0
-                                            ? '<div style="font-size:12px; color:#94a3b8; margin-top:4px;">No roles</div>'
-                                            : roles.map((role) => `
-                                                <div style="display:flex; align-items:center; gap:4px; margin-top:4px;">
-                                                    <span style="font-size:12px; color:#475569; font-weight:600;">• ${role.name.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</span>
-                                                    <button type="button" class="delete-role-btn" data-section-id="${section.id}" data-role-id="${role.id}" style="background:none; border:none; color:#dc2626; cursor:pointer; font-size:11px; padding:2px 6px;">✕</button>
-                                                </div>
-                                            `).join('');
-
-                                        return `<div style="border:1px solid #e2e8f0; border-radius:8px; padding:12px; margin-bottom:8px;">
-                                            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:4px;">
-                                                <strong style="font-size:14px; color:#0f172a;">${section.name.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</strong>
-                                                <div style="display:flex; gap:4px;">
-                                                    <button type="button" class="add-role-btn" data-section-id="${section.id}" style="background:#2563eb; color:#fff; border:none; border-radius:6px; padding:4px 8px; font-size:11px; font-weight:700; cursor:pointer;">+ Role</button>
-                                                    <button type="button" class="delete-section-btn" data-section-id="${section.id}" style="background:none; border:1px solid #dc2626; color:#dc2626; border-radius:6px; padding:4px 8px; font-size:11px; font-weight:700; cursor:pointer;">Delete</button>
-                                                </div>
-                                            </div>
-                                            ${rolesHtml}
-                                        </div>`;
-                                    })).join('');
-                                }
                             } catch (err) {
                                 membersEl.innerHTML = '<div class="empty">Failed to load members.</div>';
-                                sectionsEl.innerHTML = '<div class="empty">Failed to load sections.</div>';
-                                console.error(err);
+                                console.error("Failed to load members:", err);
                             }
                         }
 
