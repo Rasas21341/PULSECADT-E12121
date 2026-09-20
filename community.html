@@ -2650,6 +2650,7 @@
                                             <strong>${(r.name || 'Role').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</strong>
                                         </div>
                                         <div style="display:flex; gap:6px;">
+                                            <button type="button" class="approve" data-action="edit" data-role-id="${r.id}" data-role-name="${(r.name || '').replace(/"/g, '&quot;')}">Edit</button>
                                             <button type="button" class="deny" data-action="delete" data-role-id="${r.id}">Delete</button>
                                         </div>
                                     </div>
@@ -2673,6 +2674,20 @@
                                             alert("An unexpected error occurred.");
                                             console.error(err);
                                         }
+                                    });
+                                });
+
+                                rolesList.querySelectorAll("[data-action='edit']").forEach((btn) => {
+                                    btn.addEventListener("click", () => {
+                                        const roleId = btn.getAttribute("data-role-id");
+                                        const currentName = btn.getAttribute("data-role-name");
+                                        const newName = prompt("Edit role name:", currentName);
+                                        if (newName === null) return;
+                                        if (!newName || !newName.trim()) {
+                                            alert("Please enter a role name.");
+                                            return;
+                                        }
+                                        editRole(roleId, newName.trim());
                                     });
                                 });
                             } catch (err) {
@@ -2704,6 +2719,24 @@
                                     }]);
                                 if (error) {
                                     alert("Failed to create role: " + error.message);
+                                    return;
+                                }
+                                loadRoles();
+                            } catch (err) {
+                                alert("An unexpected error occurred.");
+                                console.error(err);
+                            }
+                        }
+
+                        async function editRole(roleId, newName) {
+                            if (!localSupabase) return;
+                            try {
+                                const { error } = await localSupabase
+                                    .from("roles")
+                                    .update({ name: newName })
+                                    .eq("id", roleId);
+                                if (error) {
+                                    alert("Failed to update role: " + error.message);
                                     return;
                                 }
                                 loadRoles();
