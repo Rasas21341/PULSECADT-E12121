@@ -471,7 +471,7 @@
             background: #f8fafc;
         }
 
-        .departments-view, .documents-view, .settings-view, .rosters-view, .roster-editor-view {
+        .departments-view, .documents-view, .settings-view, .rosters-view, .roster-editor-view, .roles-view {
             position: fixed;
             top: 0;
             left: 280px;
@@ -484,7 +484,7 @@
             padding: 24px;
         }
 
-        .departments-view.open, .documents-view.open, .settings-view.open, .rosters-view.open, .roster-editor-view.open {
+        .departments-view.open, .documents-view.open, .settings-view.open, .rosters-view.open, .roster-editor-view.open, .roles-view.open {
             display: flex;
         }
 
@@ -1668,6 +1668,19 @@
                                         </div>
                                     </div>
                                 </div>
+                                <div class="roles-view" id="rolesView">
+                                    <div class="members-view-header">
+                                        <div class="members-view-title">Roles</div>
+                                        <button type="button" class="add-department-btn" id="openAddRoleBtn">
+                                            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                                            Create Role
+                                        </button>
+                                        <button type="button" class="members-view-close" id="rolesViewClose" aria-label="Close">×</button>
+                                    </div>
+                                    <div class="view-body">
+                                        <div id="rolesList"><div class="empty">No roles yet. Click "Create Role" to get started.</div></div>
+                                    </div>
+                                </div>
                                 <div class="licences-view" id="licencesView">
                                     <div class="members-view-header">
                                         <div class="members-view-title">Licences</div>
@@ -2479,8 +2492,16 @@
 
                         const rolesBtn = document.getElementById("rolesBtn");
                         if (rolesBtn) {
-                            rolesBtn.addEventListener("click", () => {
-                                alert("Roles feature coming soon.");
+                            rolesBtn.addEventListener("click", (e) => {
+                                e.stopPropagation();
+                                const rolesView = document.getElementById("rolesView");
+                                if (rolesView.classList.contains("open")) {
+                                    rolesView.classList.remove("open");
+                                } else {
+                                    closeAllPages();
+                                    rolesView.classList.add("open");
+                                    loadRoles();
+                                }
                             });
                         }
 
@@ -2586,6 +2607,106 @@
                                     return;
                                 }
                                 loadRosters();
+                            } catch (err) {
+                                alert("An unexpected error occurred.");
+                                console.error(err);
+                            }
+                        }
+
+                        // Roles page
+                        const rolesList = document.getElementById("rolesList");
+                        const rolesViewClose = document.getElementById("rolesViewClose");
+                        const openAddRoleBtn = document.getElementById("openAddRoleBtn");
+
+                        if (rolesViewClose) {
+                            rolesViewClose.addEventListener("click", () => {
+                                const rolesView = document.getElementById("rolesView");
+                                if (rolesView) rolesView.classList.remove("open");
+                            });
+                        }
+
+                        async function loadRoles() {
+                            if (!rolesList || !localSupabase) return;
+                            try {
+                                const { data, error } = await localSupabase
+                                    .from("roles")
+                                    .select("*")
+                                    .eq("community_id", id)
+                                    .order("created_at", { ascending: false });
+
+                                if (error) {
+                                    rolesList.innerHTML = '<div class="empty">Failed to load roles.</div>';
+                                    return;
+                                }
+
+                                if (!Array.isArray(data) || data.length === 0) {
+                                    rolesList.innerHTML = '<div class="empty">No roles yet. Click "Create Role" to get started.</div>';
+                                    return;
+                                }
+
+                                rolesList.innerHTML = data.map((r) => `
+                                    <div class="request-item" data-role-id="${r.id}">
+                                        <div>
+                                            <strong>${(r.name || 'Role').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</strong>
+                                        </div>
+                                        <div style="display:flex; gap:6px;">
+                                            <button type="button" class="deny" data-action="delete" data-role-id="${r.id}">Delete</button>
+                                        </div>
+                                    </div>
+                                `).join('');
+
+                                rolesList.querySelectorAll("[data-action='delete']").forEach((btn) => {
+                                    btn.addEventListener("click", async (e) => {
+                                        const roleId = btn.getAttribute("data-role-id");
+                                        if (!confirm("Delete this role?")) return;
+                                        try {
+                                            const { error } = await localSupabase
+                                                .from("roles")
+                                                .delete()
+                                                .eq("id", roleId);
+                                            if (error) {
+                                                alert("Failed to delete role: " + error.message);
+                                                return;
+                                            }
+                                            loadRoles();
+                                        } catch (err) {
+                                            alert("An unexpected error occurred.");
+                                            console.error(err);
+                                        }
+                                    });
+                                });
+                            } catch (err) {
+                                rolesList.innerHTML = '<div class="empty">Failed to load roles.</div>';
+                                console.error(err);
+                            }
+                        }
+
+                        if (openAddRoleBtn) {
+                            openAddRoleBtn.addEventListener("click", () => {
+                                const roleName = prompt("Enter role name:");
+                                if (!roleName || !roleName.trim()) return;
+                                createRole(roleName.trim());
+                            });
+                        }
+
+                        async function createRole(name) {
+                            if (!localSupabase) {
+                                alert("Database unavailable.");
+                                return;
+                            }
+                            try {
+                                const { error } = await localSupabase
+                                    .from("roles")
+                                    .insert([{
+                                        community_id: id,
+                                        name: name,
+                                        created_at: new Date().toISOString()
+                                    }]);
+                                if (error) {
+                                    alert("Failed to create role: " + error.message);
+                                    return;
+                                }
+                                loadRoles();
                             } catch (err) {
                                 alert("An unexpected error occurred.");
                                 console.error(err);
