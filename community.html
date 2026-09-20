@@ -1337,8 +1337,29 @@
              </div>
              <button type="button" class="submit-btn" id="editDeptSubmitBtn">Save Changes</button>
              <div class="modal-error" id="editDeptError"></div>
-         </div>
-     </div>
+</div>
+    </div>
+
+    <div class="modal-overlay" id="editRoleModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">Edit Role</div>
+                <button class="modal-close" id="editRoleModalClose" type="button" aria-label="Close">×</button>
+            </div>
+            <div class="field">
+                <label for="editRoleName">Role Name</label>
+                <input type="text" id="editRoleName" placeholder="Role name" />
+            </div>
+            <div class="field">
+                <label>Assign to Rosters</label>
+                <div id="editRoleRosterCheckboxes" style="max-height:200px; overflow-y:auto; border:1px solid #e2e8f0; border-radius:8px; padding:8px;">
+                    <div class="empty">Loading rosters...</div>
+                </div>
+            </div>
+            <button type="button" class="submit-btn" id="editRoleSubmitBtn">Save Changes</button>
+            <div class="modal-error" id="editRoleError"></div>
+        </div>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
@@ -2681,13 +2702,7 @@
                                     btn.addEventListener("click", () => {
                                         const roleId = btn.getAttribute("data-role-id");
                                         const currentName = btn.getAttribute("data-role-name");
-                                        const newName = prompt("Edit role name:", currentName);
-                                        if (newName === null) return;
-                                        if (!newName || !newName.trim()) {
-                                            alert("Please enter a role name.");
-                                            return;
-                                        }
-                                        editRole(roleId, newName.trim());
+                                        openEditRoleModal(roleId, currentName);
                                     });
                                 });
                             } catch (err) {
@@ -2744,6 +2759,138 @@
                                 alert("An unexpected error occurred.");
                                 console.error(err);
                             }
+                        }
+
+                        // Edit Role Modal
+                        let currentEditingRoleId = null;
+                        const editRoleModal = document.getElementById("editRoleModal");
+                        const editRoleModalClose = document.getElementById("editRoleModalClose");
+                        const editRoleName = document.getElementById("editRoleName");
+                        const editRoleRosterCheckboxes = document.getElementById("editRoleRosterCheckboxes");
+                        const editRoleSubmitBtn = document.getElementById("editRoleSubmitBtn");
+                        const editRoleError = document.getElementById("editRoleError");
+
+                        if (editRoleModalClose) {
+                            editRoleModalClose.addEventListener("click", () => {
+                                editRoleModal.classList.remove("open");
+                                currentEditingRoleId = null;
+                            });
+                        }
+
+                        if (editRoleModal) {
+                            editRoleModal.addEventListener("click", (e) => {
+                                if (e.target === editRoleModal) {
+                                    editRoleModal.classList.remove("open");
+                                    currentEditingRoleId = null;
+                                }
+                            });
+                        }
+
+                        async function openEditRoleModal(roleId, currentName) {
+                            currentEditingRoleId = roleId;
+                            if (editRoleName) editRoleName.value = currentName;
+                            if (editRoleError) { editRoleError.textContent = ""; editRoleError.style.display = "none"; }
+                            if (editRoleRosterCheckboxes) editRoleRosterCheckboxes.innerHTML = '<div class="empty">Loading rosters...</div>';
+                            if (editRoleModal) editRoleModal.classList.add("open");
+                            await loadRostersForRole(roleId);
+                        }
+
+                        async function loadRostersForRole(roleId) {
+                            if (!editRoleRosterCheckboxes || !localSupabase) return;
+                            try {
+                                // Fetch all rosters for this community
+                                const { data: rostersData } = await localSupabase
+                                    .from("rosters")
+                                    .select("id, name")
+                                    .eq("community_id", id)
+                                    .order("name");
+
+                                // Fetch which rosters this role is assigned to
+                                const { data: roleRostersData } = await localSupabase
+                                    .from("role_rosters")
+                                    .select("roster_id")
+                                    .eq("role_id", roleId);
+
+                                const assignedRosterIds = new Set((roleRostersData || []).map(r => r.roster_id));
+                                const rosters = Array.isArray(rostersData) ? rostersData : [];
+
+                                if (rosters.length === 0) {
+                                    editRoleRosterCheckboxes.innerHTML = '<div class="empty">No rosters yet. Create a roster first.</div>';
+                                    return;
+                                }
+
+                                editRoleRosterCheckboxes.innerHTML = rosters.map((r) => `
+                                    <label style="display:flex; align-items:center; gap:8px; padding:6px 0; cursor:pointer; font-size:14px; color:#334155;">
+                                        <input type="checkbox" class="role-roster-checkbox" data-roster-id="${r.id}" ${assignedRosterIds.has(r.id) ? 'checked' : ''} style="cursor:pointer;" />
+                                        <span>${(r.name || 'Roster').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</span>
+                                    </label>
+                                `).join('');
+                            } catch (err) {
+                                editRoleRosterCheckboxes.innerHTML = '<div class="empty">Failed to load rosters.</div>';
+                                console.error(err);
+                            }
+                        }
+
+                        if (editRoleSubmitBtn) {
+                            editRoleSubmitBtn.addEventListener("click", async () => {
+                                if (!currentEditingRoleId || !localSupabase) return;
+                                const newName = editRoleName ? editRoleName.value.trim() : "";
+                                if (!newName) {
+                                    if (editRoleError) { editRoleError.textContent = "Please enter a role name."; editRoleError.style.display = "block"; }
+                                    return;
+                                }
+                                try {
+                                    // Update role name
+                                    const { error: nameError } = await localSupabase
+                                        .from("roles")
+                                        .update({ name: newName })
+                                        .eq("id", currentEditingRoleId);
+                                    if (nameError) {
+                                        if (editRoleError) { editRoleError.textContent = "Failed to update role: " + nameError.message; editRoleError.style.display = "block"; }
+                                        return;
+                                    }
+
+                                    // Update roster assignments
+                                    const checkboxes = document.querySelectorAll(".role-roster-checkbox");
+                                    const selectedRosterIds = [];
+                                    checkboxes.forEach((cb) => {
+                                        if (cb.checked) selectedRosterIds.push(cb.getAttribute("data-roster-id"));
+                                    });
+
+                                    // Delete existing role-roster assignments
+                                    const { error: deleteError } = await localSupabase
+                                        .from("role_rosters")
+                                        .delete()
+                                        .eq("role_id", currentEditingRoleId);
+                                    if (deleteError) {
+                                        if (editRoleError) { editRoleError.textContent = "Failed to update roster assignments: " + deleteError.message; editRoleError.style.display = "block"; }
+                                        return;
+                                    }
+
+                                    // Insert new role-roster assignments
+                                    if (selectedRosterIds.length > 0) {
+                                        const rosterInserts = selectedRosterIds.map((rosterId) => ({
+                                            role_id: currentEditingRoleId,
+                                            roster_id: rosterId
+                                        }));
+                                        const { error: insertError } = await localSupabase
+                                            .from("role_rosters")
+                                            .insert(rosterInserts);
+                                        if (insertError) {
+                                            if (editRoleError) { editRoleError.textContent = "Failed to update roster assignments: " + insertError.message; editRoleError.style.display = "block"; }
+                                            return;
+                                        }
+                                    }
+
+                                    alert("Role updated successfully!");
+                                    editRoleModal.classList.remove("open");
+                                    currentEditingRoleId = null;
+                                    loadRoles();
+                                } catch (err) {
+                                    if (editRoleError) { editRoleError.textContent = "An unexpected error occurred."; editRoleError.style.display = "block"; }
+                                    console.error(err);
+                                }
+                            });
                         }
 
                         let currentEditingRosterId = null;
