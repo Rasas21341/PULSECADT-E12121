@@ -16,97 +16,42 @@
             background: #0f172a;
             color: #e2e8f0;
             min-height: 100vh;
-            padding: 24px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
         .container {
-            max-width: 800px;
-            margin: 0 auto;
+            text-align: center;
+            padding: 60px 32px;
+            max-width: 560px;
+            background: #1e293b;
+            border-radius: 12px;
+            border: 1px solid #334155;
         }
 
         h1 {
             font-size: 32px;
             font-weight: 700;
             color: #ffffff;
-            margin-bottom: 8px;
-        }
-
-        .subtitle {
-            font-size: 14px;
-            color: #94a3b8;
-            margin-bottom: 32px;
-        }
-
-        .changelog-entry {
-            background: #1e293b;
-            border: 1px solid #334155;
-            border-radius: 12px;
-            padding: 24px;
             margin-bottom: 16px;
         }
 
-        .changelog-version {
-            font-size: 18px;
-            font-weight: 700;
-            color: #2563eb;
-            margin-bottom: 8px;
-        }
-
-        .changelog-date {
-            font-size: 12px;
-            color: #64748b;
-            margin-bottom: 12px;
-        }
-
-        .changelog-item {
-            font-size: 14px;
-            color: #cbd5e1;
-            margin-bottom: 8px;
-            padding-left: 20px;
-            position: relative;
-        }
-
-        .changelog-item::before {
-            content: "•";
-            color: #2563eb;
-            position: absolute;
-            left: 0;
-        }
-
-        .changelog-type {
-            display: inline-block;
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-size: 10px;
-            font-weight: 700;
-            margin-right: 8px;
-        }
-
-        .type-feature {
-            background: #166534;
-            color: #bbf7d0;
-        }
-
-        .type-fix {
-            background: #991b1b;
-            color: #fecaca;
-        }
-
-        .type-update {
-            background: #854d0e;
-            color: #fde68a;
+        p {
+            font-size: 16px;
+            color: #94a3b8;
+            margin-bottom: 20px;
         }
 
         .back-btn {
             display: inline-block;
-            padding: 8px 16px;
+            padding: 10px 20px;
             border-radius: 8px;
             background: #2563eb;
             color: #ffffff;
             text-decoration: none;
             font-size: 14px;
             font-weight: 600;
-            margin-bottom: 24px;
         }
 
         .back-btn:hover {
@@ -116,60 +61,9 @@
 </head>
 <body>
     <div class="container">
-        <a href="pulsecad-revamp.html" class="back-btn">← Back</a>
         <h1>Changelogs</h1>
-        <p class="subtitle">Latest updates and changes to PulseCAD</p>
-
-        <div class="changelog-entry">
-            <div class="changelog-version">v2.0.0</div>
-            <div class="changelog-date">September 20, 2026</div>
-            <div class="changelog-item">
-                <span class="changelog-type type-feature">FEATURE</span>
-                Added Rosters system with sections and roles
-            </div>
-            <div class="changelog-item">
-                <span class="changelog-type type-feature">FEATURE</span>
-                Added Roles page with create/edit functionality
-            </div>
-            <div class="changelog-item">
-                <span class="changelog-type type-feature">FEATURE</span>
-                Added Dispatch System with radio signal interface
-            </div>
-            <div class="changelog-item">
-                <span class="changelog-type type-update">UPDATE</span>
-                Updated Features dropdown with Records, Tickets, Civilians, and Warrants
-            </div>
-            <div class="changelog-item">
-                <span class="changelog-type type-fix">FIX</span>
-                Fixed panic button positioning in police panel
-            </div>
-        </div>
-
-        <div class="changelog-entry">
-            <div class="changelog-version">v1.5.0</div>
-            <div class="changelog-date">September 15, 2026</div>
-            <div class="changelog-item">
-                <span class="changelog-type type-feature">FEATURE</span>
-                Added New Call modal with form fields
-            </div>
-            <div class="changelog-item">
-                <span class="changelog-type type-feature">FEATURE</span>
-                Added right-click context menu for calls
-            </div>
-            <div class="changelog-item">
-                <span class="changelog-type type-fix">FIX</span>
-                Fixed UUID handling in call attachment
-            </div>
-        </div>
-
-        <div class="changelog-entry">
-            <div class="changelog-version">v1.0.0</div>
-            <div class="changelog-date">September 1, 2026</div>
-            <div class="changelog-item">
-                <span class="changelog-type type-feature">FEATURE</span>
-                Initial release of PulseCAD Revamp
-            </div>
-        </div>
+        <p>No changelog entries available at this time.</p>
+        <a href="pulsecad-revamp.html" class="back-btn">Back to PulseCAD</a>
     </div>
 </body>
 </html>
