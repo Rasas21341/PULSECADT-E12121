@@ -2,6 +2,7 @@
   "rewrites": [
     { "source": "/dashboard", "destination": "/pulsecad-revamp.html" },
     { "source": "/suggestionmake", "destination": "/suggestionmake.html" },
+    { "source": "/changelogs", "destination": "/changelogs.html" },
     { "source": "/community/:id", "destination": "/community.html" }
   ]
 }

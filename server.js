@@ -308,6 +308,15 @@ const server = http.createServer(async (req, res) => {
     if (urlPath === "/") urlPath = "/index.html";
     if (urlPath.startsWith("/community/")) urlPath = "/community.html";
     if (urlPath === "/suggestionmake") urlPath = "/suggestionmake.html";
+
+    if (!path.extname(urlPath)) {
+        const htmlCandidate = urlPath + ".html";
+        const candidatePath = path.join(ROOT, htmlCandidate);
+        if (candidatePath.startsWith(ROOT) && fs.existsSync(candidatePath)) {
+            urlPath = htmlCandidate;
+        }
+    }
+
     const filePath = path.join(ROOT, urlPath);
     if (!filePath.startsWith(ROOT)) {
         res.writeHead(403);
