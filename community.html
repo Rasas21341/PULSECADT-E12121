@@ -974,6 +974,17 @@
             background: #ede9fe;
         }
 
+        .member-item .role-select {
+            padding: 3px 8px;
+            border-radius: 6px;
+            border: 1px solid #cbd5e1;
+            background: #ffffff;
+            color: #0f172a;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            height: 26px;
+
         .discord-invite-link {
             display: inline-block;
             padding: 8px 12px;
@@ -1977,6 +1988,25 @@
                                     (users || []).forEach((u) => { emailById[u.id] = u.email; deptById[u.id] = u.department; });
                                 }
 
+                                const { data: rolesData, error: rolesError } = await localSupabase
+                                    .from("roles")
+                                    .select("id, name")
+                                    .eq("community_id", id)
+                                    .order("name");
+                                const communityRoles = Array.isArray(rolesData) ? rolesData : [];
+
+                                const { data: memberRolesData, error: memberRolesError } = await localSupabase
+                                    .from("member_roles")
+                                    .select("user_id, role_id")
+                                    .eq("community_id", id);
+                                const userRoleByUserId = {};
+                                if (Array.isArray(memberRolesData)) {
+                                    memberRolesData.forEach((mr) => {
+                                        const role = communityRoles.find((r) => r.id === mr.role_id);
+                                        userRoleByUserId[mr.user_id] = role ? role.name : null;
+                                    });
+                                }
+
                                 const esc = (t) => (t || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
                                 let html = '';
                                 const creatorEmail = community && community.creator_email ? community.creator_email : "";
@@ -2007,7 +2037,15 @@
                                         const supBadge = isSupervisor ? ' <span class="member-badge supervisor">Supervisor</span>' : '';
                                         if (canKickBan) {
                                             const supBtn = `<button type="button" class="supervisor-btn" data-user-id="${esc(r.user_id)}">${isSupervisor ? "Remove Supervisor" : "Make Supervisor"}</button>`;
-                                            return `<div class="member-item"><span class="member-email">${email}${supBadge}</span><div class="member-actions"><button type="button" class="kick-btn" data-user-id="${esc(r.user_id)}">Kick</button><button type="button" class="ban-btn" data-user-id="${esc(r.user_id)}">Ban</button>${supBtn}</div></div>`;
+                                            let roleSelectHtml = '';
+                                            if (communityRoles.length > 0) {
+                                                const currentRoleId = Object.keys(userRoleByUserId).find((uid) => uid === r.user_id) ? memberRolesData.find((mr) => mr.user_id === r.user_id)?.role_id : "";
+                                                const options = communityRoles.map((role) =>
+                                                    `<option value="${esc(role.id)}" ${role.id === currentRoleId ? 'selected' : ''}>${esc(role.name)}</option>`
+                                                ).join('');
+                                                roleSelectHtml = `<select class="role-select" data-user-id="${esc(r.user_id)}"><option value="">No role</option>${options}</select>`;
+                                            }
+                                            return `<div class="member-item"><span class="member-email">${email}${supBadge}</span><div class="member-actions"><button type="button" class="kick-btn" data-user-id="${esc(r.user_id)}">Kick</button><button type="button" class="ban-btn" data-user-id="${esc(r.user_id)}">Ban</button>${supBtn}${roleSelectHtml}</div></div>`;
                                         }
                                         return `<button type="button" class="member-btn">${email}${supBadge}</button>`;
                                     }).join('');
@@ -2046,6 +2084,33 @@
                                 loadMembersInto(targetEl, { loadingText: "Loading members...", openDropdown });
                             } catch (err) {
                                 alert("Failed to update supervisor status: " + (err.message || err));
+                            }
+                        }
+
+                        async function assignRole(userId, roleId, targetEl, openDropdown) {
+                            if (!localSupabase) return;
+                            try {
+                                const { error: delError } = await localSupabase
+                                    .from("member_roles")
+                                    .delete()
+                                    .eq("community_id", id)
+                                    .eq("user_id", userId);
+                                if (delError) throw delError;
+
+                                if (roleId) {
+                                    const { error: insError } = await localSupabase
+                                        .from("member_roles")
+                                        .insert([{
+                                            community_id: id,
+                                            user_id: userId,
+                                            role_id: roleId
+                                        }]);
+                                    if (insError) throw insError;
+                                }
+
+                                loadMembersInto(targetEl, { loadingText: "Loading members...", openDropdown });
+                            } catch (err) {
+                                alert("Failed to assign role: " + (err.message || err));
                             }
                         }
 
@@ -2111,6 +2176,14 @@
                                 if (supBtn) {
                                     const userId = supBtn.getAttribute("data-user-id");
                                     await toggleSupervisor(userId, membersViewList, false);
+                                }
+                            });
+                            membersViewList.addEventListener("change", async (e) => {
+                                const select = e.target.closest(".role-select");
+                                if (select) {
+                                    const userId = select.getAttribute("data-user-id");
+                                    const roleId = select.value || null;
+                                    await assignRole(userId, roleId, membersViewList, false);
                                 }
                             });
                         }
@@ -2205,6 +2278,14 @@
                                 if (supBtn) {
                                     const userId = supBtn.getAttribute("data-user-id");
                                     await toggleSupervisor(userId, memberList, true);
+                                }
+                            });
+                            memberList.addEventListener("change", async (e) => {
+                                const select = e.target.closest(".role-select");
+                                if (select) {
+                                    const userId = select.getAttribute("data-user-id");
+                                    const roleId = select.value || null;
+                                    await assignRole(userId, roleId, memberList, true);
                                 }
                             });
                         }
