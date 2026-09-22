@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS roles (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     community_id TEXT NOT NULL,
     name TEXT NOT NULL,
+    permissions TEXT DEFAULT '',
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
