@@ -374,23 +374,23 @@
             }
         }
 
-         async function getStaffProfile() {
-             const { data: staffData } = await localSupabase
-                 .from("staff")
-                 .select("department, name")
-                 .eq("user_id", currentUser.id)
-                 .maybeSingle();
-             if (staffData && staffData.department) return staffData;
-             const { data: userData } = await localSupabase
-                 .from("users")
-                 .select("department, email")
-                 .eq("id", currentUser.id)
-                 .maybeSingle();
-             if (userData && userData.department) {
-                 return { department: userData.department, name: userData.email || "" };
-             }
-             return {};
-         }
+async function getStaffProfile() {
+              const { data: staffData } = await localSupabase
+                  .from("staff")
+                  .select("department, name")
+                  .eq("user_id", currentUser.id)
+                  .maybeSingle();
+              if (staffData && staffData.department) return staffData;
+              const { data: userData } = await localSupabase
+                  .from("users")
+                  .select("department, email")
+                  .eq("id", currentUser.id)
+                  .maybeSingle();
+              if (userData && userData.department) {
+                  return { department: userData.department, name: userData.email || "" };
+              }
+              return { department: "", name: "" };
+          }
 
         function statusBadge(status) {
             const s = (status || "open").toLowerCase().replace(/\s+/g, "-");
@@ -405,7 +405,7 @@
             const allowedDepts = ["management", "supportteam", "supportteamlead", "support"];
             let profile = {};
             try { profile = await getStaffProfile(); } catch (e) {}
-            const deptLower = (profile.department || "").toLowerCase();
+            const deptLower = (profile.department || "").toLowerCase().replace(/\s+/g, "");
             if (!allowedDepts.includes(deptLower)) {
                 showStatus("Access denied. Management or Support only.", "error");
                 return;
