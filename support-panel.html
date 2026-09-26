@@ -380,12 +380,14 @@ async function getStaffProfile() {
                   .select("department, name")
                   .eq("user_id", currentUser.id)
                   .maybeSingle();
+              console.log("Staff table lookup:", staffData);
               if (staffData && staffData.department) return staffData;
               const { data: userData } = await localSupabase
                   .from("users")
                   .select("department, email")
                   .eq("id", currentUser.id)
                   .maybeSingle();
+              console.log("Users table lookup:", userData);
               if (userData && userData.department) {
                   return { department: userData.department, name: userData.email || "" };
               }
@@ -406,8 +408,9 @@ async function getStaffProfile() {
             let profile = {};
             try { profile = await getStaffProfile(); } catch (e) {}
             const deptLower = (profile.department || "").toLowerCase().replace(/\s+/g, "");
+            console.log("Department check:", profile.department, "->", deptLower, "allowed:", allowedDepts.includes(deptLower));
             if (!allowedDepts.includes(deptLower)) {
-                showStatus("Access denied. Management or Support only.", "error");
+                showStatus("Access denied. Management or Support only. Your dept: " + profile.department, "error");
                 return;
             }
 
@@ -576,6 +579,16 @@ async function getStaffProfile() {
             if (ticketLive) { localSupabase.removeChannel(ticketLive); ticketLive = null; }
             currentTicket = null;
             showStatus("");
+            const allowedDepts = ["management", "supportteam", "supportteamlead", "support"];
+            let profile = {};
+            try { profile = await getStaffProfile(); } catch (e) {}
+            const deptLower = (profile.department || "").toLowerCase().replace(/\s+/g, "");
+            console.log("Staff Chat Department check:", profile.department, "->", deptLower, "allowed:", allowedDepts.includes(deptLower));
+            if (!allowedDepts.includes(deptLower)) {
+                showStatus("Access denied. Management or Support only. Your dept: " + profile.department, "error");
+                return;
+            }
+
             panelEl.innerHTML = `
                 <div class="chat-wrap">
                     <div class="chat-messages" id="chatMessages">
@@ -587,8 +600,6 @@ async function getStaffProfile() {
                     </form>
                 </div>
             `;
-
-            document.getElementById("chatForm").addEventListener("submit", async (e) => {
                 e.preventDefault();
                 const input = document.getElementById("chatInput");
                 const message = input.value.trim();
