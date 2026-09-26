@@ -2267,7 +2267,7 @@
                 </tr>`;
 
                 if (!Array.isArray(data) || data.length === 0) {
-                    tbody.innerHTML = currentRow + '<tr><td colspan="8" class="units-empty">No other active units</td></tr>';
+                    tbody.innerHTML = currentRow;
                     return;
                 }
 
