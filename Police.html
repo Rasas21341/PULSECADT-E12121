@@ -3850,12 +3850,16 @@
                 if (label) label.textContent = panicActive ? "PANIC ON" : "PANIC";
                 if (panicActive) {
                     bodycamOverlay?.classList.add("open");
-                    // Speak the panic announcement
+                    // Speak the panic announcement with female voice
                     if ('speechSynthesis' in window) {
                         const utterance = new SpeechSynthesisUtterance(`Panic unit ${officerCallsign || officerName}`);
                         utterance.rate = 1.1;
                         utterance.pitch = 1.2;
                         utterance.volume = 1.0;
+                        // Use female voice if available
+                        const voices = speechSynthesis.getVoices();
+                        const femaleVoice = voices.find(v => v.name.toLowerCase().includes('female') || v.name.toLowerCase().includes('woman') || v.name.toLowerCase().includes('samantha') || v.name.toLowerCase().includes('victoria') || v.name.toLowerCase().includes('karen') || v.name.toLowerCase().includes('allison'));
+                        if (femaleVoice) utterance.voice = femaleVoice;
                         speechSynthesis.speak(utterance);
                     }
                 } else {
