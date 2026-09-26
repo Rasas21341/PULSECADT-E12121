@@ -3850,6 +3850,14 @@
                 if (label) label.textContent = panicActive ? "PANIC ON" : "PANIC";
                 if (panicActive) {
                     bodycamOverlay?.classList.add("open");
+                    // Speak the panic announcement
+                    if ('speechSynthesis' in window) {
+                        const utterance = new SpeechSynthesisUtterance(`Panic unit ${officerCallsign || officerName}`);
+                        utterance.rate = 1.1;
+                        utterance.pitch = 1.2;
+                        utterance.volume = 1.0;
+                        speechSynthesis.speak(utterance);
+                    }
                 } else {
                     bodycamOverlay?.classList.remove("open");
                 }
