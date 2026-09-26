@@ -974,6 +974,18 @@
             background: #ede9fe;
         }
 
+        .member-item .role-select {
+            padding: 3px 8px;
+            border-radius: 6px;
+            border: 1px solid #cbd5e1;
+            background: #ffffff;
+            color: #0f172a;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            height: 26px;
+        }
+
         .discord-invite-link {
             display: inline-block;
             padding: 8px 12px;
@@ -1343,7 +1355,7 @@
     <div class="modal-overlay" id="editRoleModal">
         <div class="modal">
             <div class="modal-header">
-                <div class="modal-title">Edit Role</div>
+                <div class="modal-title">Assign to Rosters Role Permission</div>
                 <button class="modal-close" id="editRoleModalClose" type="button" aria-label="Close">×</button>
             </div>
             <div class="field">
@@ -1351,10 +1363,10 @@
                 <input type="text" id="editRoleName" placeholder="Role name" />
             </div>
             <div class="field">
-                <label>Assign to Rosters</label>
-                <div id="editRoleRosterCheckboxes" style="max-height:200px; overflow-y:auto; border:1px solid #e2e8f0; border-radius:8px; padding:8px;">
-                    <div class="empty">Loading rosters...</div>
-                </div>
+                <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:14px; font-weight:600; color:#334155;">
+                    <input type="checkbox" id="editRoleRostersPermission" style="cursor:pointer;" />
+                    <span>Rosters</span>
+                </label>
             </div>
             <button type="button" class="submit-btn" id="editRoleSubmitBtn">Save Changes</button>
             <div class="modal-error" id="editRoleError"></div>
@@ -1431,9 +1443,11 @@
                     try {
                         let currentEmail = "";
                         let currentUserDepartment = "";
+                        let currentUserId = null;
                         try {
                             const userData = await localSupabase.auth.getUser();
                             currentEmail = userData?.data?.user?.email || "";
+                            currentUserId = userData?.data?.user?.id || null;
                             if (currentEmail) {
                                 try {
                                     const { data: currentUserData } = await localSupabase
@@ -1452,8 +1466,31 @@
                             .select("*")
                             .eq("id", id)
                             .maybeSingle();
-                        if (!communityData || communityData.creator_email !== currentEmail) {
-                            contentEl.innerHTML = `<div class="empty">Access denied. Community creator only.</div>`;
+                        let hasRostersPermission = false;
+                        if (communityData && communityData.creator_email !== currentEmail && currentUserId) {
+                            try {
+                                const { data: roleAssignments } = await localSupabase
+                                    .from("member_roles")
+                                    .select("role_id")
+                                    .eq("community_id", id)
+                                    .eq("user_id", currentUserId);
+                                if (Array.isArray(roleAssignments) && roleAssignments.length > 0) {
+                                    const roleIds = roleAssignments.map(r => r.role_id);
+                                    const { data: rolesData } = await localSupabase
+                                        .from("roles")
+                                        .select("permissions")
+                                        .in("id", roleIds);
+                                    hasRostersPermission = (rolesData || []).some(r => {
+                                        const perms = ((r.permissions || "").split(",").map(p => p.trim()));
+                                        return perms.includes("rosters");
+                                    });
+                                }
+                            } catch (e) { console.error("Failed to check rosters permission:", e); }
+                        }
+
+                        const isCreator = communityData && communityData.creator_email === currentEmail;
+                        if (!communityData || (!isCreator && !hasRostersPermission)) {
+                            contentEl.innerHTML = `<div class="empty">Access denied.</div>`;
                             return;
                         }
                         const serverName = (communityData.name || "").replace(/</g, "&lt;").replace(/>/g, "&gt;");
@@ -1764,9 +1801,28 @@
                          const applicationsView = document.getElementById("applicationsView");
                          const applicationsViewClose = document.getElementById("applicationsViewClose");
                          const applicationsList = document.getElementById("applicationsList");
-                         const supervisorInput = document.getElementById("supervisorInput");
+                          const supervisorInput = document.getElementById("supervisorInput");
 
-                        if (settingsBtn && settingsView) {
+                         if (!isCreator) {
+                             const allBtnWraps = contentEl.querySelectorAll('.dashboard-top-right > .btn-dropdown-wrap');
+                             allBtnWraps.forEach((wrap) => {
+                                 const btn = wrap.querySelector('button');
+                                 if (btn && btn.id !== 'rostersBtn') {
+                                     wrap.style.display = 'none';
+                                 }
+                             });
+                             const cadBadge = contentEl.querySelector('.cad-config-badge');
+                             if (cadBadge) cadBadge.style.display = 'none';
+                             const departmentsBtn = contentEl.querySelector('.departments-btn');
+                             if (departmentsBtn) departmentsBtn.style.display = 'none';
+                             const serverAdminBadge = contentEl.querySelector('.server-admin-badge');
+                             if (serverAdminBadge) serverAdminBadge.style.display = 'none';
+                             if (settingsBtn) settingsBtn.style.display = 'none';
+                             const views = contentEl.querySelectorAll('.departments-view, .documents-view, .settings-view, .vehicles-view, .licences-view, .applications-view, .members-view');
+                             views.forEach((v) => { v.style.display = 'none'; });
+                         }
+
+                         if (settingsBtn && settingsView) {
                             settingsBtn.addEventListener("click", (e) => {
                                 e.stopPropagation();
                                 if (settingsView.classList.contains("open")) {
@@ -1977,6 +2033,25 @@
                                     (users || []).forEach((u) => { emailById[u.id] = u.email; deptById[u.id] = u.department; });
                                 }
 
+                                const { data: rolesData, error: rolesError } = await localSupabase
+                                    .from("roles")
+                                    .select("id, name")
+                                    .eq("community_id", id)
+                                    .order("name");
+                                const communityRoles = Array.isArray(rolesData) ? rolesData : [];
+
+                                const { data: memberRolesData, error: memberRolesError } = await localSupabase
+                                    .from("member_roles")
+                                    .select("user_id, role_id")
+                                    .eq("community_id", id);
+                                const userRoleByUserId = {};
+                                if (Array.isArray(memberRolesData)) {
+                                    memberRolesData.forEach((mr) => {
+                                        const role = communityRoles.find((r) => r.id === mr.role_id);
+                                        userRoleByUserId[mr.user_id] = role ? role.name : null;
+                                    });
+                                }
+
                                 const esc = (t) => (t || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
                                 let html = '';
                                 const creatorEmail = community && community.creator_email ? community.creator_email : "";
@@ -2007,7 +2082,15 @@
                                         const supBadge = isSupervisor ? ' <span class="member-badge supervisor">Supervisor</span>' : '';
                                         if (canKickBan) {
                                             const supBtn = `<button type="button" class="supervisor-btn" data-user-id="${esc(r.user_id)}">${isSupervisor ? "Remove Supervisor" : "Make Supervisor"}</button>`;
-                                            return `<div class="member-item"><span class="member-email">${email}${supBadge}</span><div class="member-actions"><button type="button" class="kick-btn" data-user-id="${esc(r.user_id)}">Kick</button><button type="button" class="ban-btn" data-user-id="${esc(r.user_id)}">Ban</button>${supBtn}</div></div>`;
+                                            let roleSelectHtml = '';
+                                            if (communityRoles.length > 0) {
+                                                const currentRoleId = Object.keys(userRoleByUserId).find((uid) => uid === r.user_id) ? memberRolesData.find((mr) => mr.user_id === r.user_id)?.role_id : "";
+                                                const options = communityRoles.map((role) =>
+                                                    `<option value="${esc(role.id)}" ${role.id === currentRoleId ? 'selected' : ''}>${esc(role.name)}</option>`
+                                                ).join('');
+                                                roleSelectHtml = `<select class="role-select" data-user-id="${esc(r.user_id)}"><option value="">No role</option>${options}</select>`;
+                                            }
+                                            return `<div class="member-item"><span class="member-email">${email}${supBadge}</span><div class="member-actions"><button type="button" class="kick-btn" data-user-id="${esc(r.user_id)}">Kick</button><button type="button" class="ban-btn" data-user-id="${esc(r.user_id)}">Ban</button>${supBtn}${roleSelectHtml}</div></div>`;
                                         }
                                         return `<button type="button" class="member-btn">${email}${supBadge}</button>`;
                                     }).join('');
@@ -2046,6 +2129,33 @@
                                 loadMembersInto(targetEl, { loadingText: "Loading members...", openDropdown });
                             } catch (err) {
                                 alert("Failed to update supervisor status: " + (err.message || err));
+                            }
+                        }
+
+                        async function assignRole(userId, roleId, targetEl, openDropdown) {
+                            if (!localSupabase) return;
+                            try {
+                                const { error: delError } = await localSupabase
+                                    .from("member_roles")
+                                    .delete()
+                                    .eq("community_id", id)
+                                    .eq("user_id", userId);
+                                if (delError) throw delError;
+
+                                if (roleId) {
+                                    const { error: insError } = await localSupabase
+                                        .from("member_roles")
+                                        .insert([{
+                                            community_id: id,
+                                            user_id: userId,
+                                            role_id: roleId
+                                        }]);
+                                    if (insError) throw insError;
+                                }
+
+                                loadMembersInto(targetEl, { loadingText: "Loading members...", openDropdown });
+                            } catch (err) {
+                                alert("Failed to assign role: " + (err.message || err));
                             }
                         }
 
@@ -2111,6 +2221,14 @@
                                 if (supBtn) {
                                     const userId = supBtn.getAttribute("data-user-id");
                                     await toggleSupervisor(userId, membersViewList, false);
+                                }
+                            });
+                            membersViewList.addEventListener("change", async (e) => {
+                                const select = e.target.closest(".role-select");
+                                if (select) {
+                                    const userId = select.getAttribute("data-user-id");
+                                    const roleId = select.value || null;
+                                    await assignRole(userId, roleId, membersViewList, false);
                                 }
                             });
                         }
@@ -2205,6 +2323,14 @@
                                 if (supBtn) {
                                     const userId = supBtn.getAttribute("data-user-id");
                                     await toggleSupervisor(userId, memberList, true);
+                                }
+                            });
+                            memberList.addEventListener("change", async (e) => {
+                                const select = e.target.closest(".role-select");
+                                if (select) {
+                                    const userId = select.getAttribute("data-user-id");
+                                    const roleId = select.value || null;
+                                    await assignRole(userId, roleId, memberList, true);
                                 }
                             });
                         }
@@ -2665,17 +2791,22 @@
                                     return;
                                 }
 
-                                rolesList.innerHTML = data.map((r) => `
+                                rolesList.innerHTML = data.map((r) => {
+                                    const perms = ((r.permissions || "").split(",").map(p => p.trim()));
+                                    const hasRosters = perms.includes("rosters");
+                                    return `
                                     <div class="request-item" data-role-id="${r.id}">
                                         <div>
                                             <strong>${(r.name || 'Role').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</strong>
+                                            ${hasRosters ? '<span class="member-badge supervisor" style="background:#2563eb; margin-left:6px;">Rosters</span>' : ''}
                                         </div>
                                         <div style="display:flex; gap:6px;">
                                             <button type="button" class="approve" data-action="edit" data-role-id="${r.id}" data-role-name="${(r.name || '').replace(/"/g, '&quot;')}">Edit</button>
                                             <button type="button" class="deny" data-action="delete" data-role-id="${r.id}">Delete</button>
                                         </div>
                                     </div>
-                                `).join('');
+                                    `;
+                                }).join('');
 
                                 rolesList.querySelectorAll("[data-action='delete']").forEach((btn) => {
                                     btn.addEventListener("click", async (e) => {
@@ -2730,6 +2861,7 @@
                                     .insert([{
                                         community_id: id,
                                         name: name,
+                                        permissions: "",
                                         created_at: new Date().toISOString()
                                     }]);
                                 if (error) {
@@ -2766,7 +2898,7 @@
                         const editRoleModal = document.getElementById("editRoleModal");
                         const editRoleModalClose = document.getElementById("editRoleModalClose");
                         const editRoleName = document.getElementById("editRoleName");
-                        const editRoleRosterCheckboxes = document.getElementById("editRoleRosterCheckboxes");
+                        const editRoleRostersPermission = document.getElementById("editRoleRostersPermission");
                         const editRoleSubmitBtn = document.getElementById("editRoleSubmitBtn");
                         const editRoleError = document.getElementById("editRoleError");
 
@@ -2790,44 +2922,25 @@
                             currentEditingRoleId = roleId;
                             if (editRoleName) editRoleName.value = currentName;
                             if (editRoleError) { editRoleError.textContent = ""; editRoleError.style.display = "none"; }
-                            if (editRoleRosterCheckboxes) editRoleRosterCheckboxes.innerHTML = '<div class="empty">Loading rosters...</div>';
                             if (editRoleModal) editRoleModal.classList.add("open");
-                            await loadRostersForRole(roleId);
+                            await loadRolePermissions(roleId);
                         }
 
-                        async function loadRostersForRole(roleId) {
-                            if (!editRoleRosterCheckboxes || !localSupabase) return;
+                        async function loadRolePermissions(roleId) {
+                            if (!editRoleRostersPermission || !localSupabase) return;
                             try {
-                                // Fetch all rosters for this community
-                                const { data: rostersData } = await localSupabase
-                                    .from("rosters")
-                                    .select("id, name")
-                                    .eq("community_id", id)
-                                    .order("name");
-
-                                // Fetch which rosters this role is assigned to
-                                const { data: roleRostersData } = await localSupabase
-                                    .from("role_rosters")
-                                    .select("roster_id")
-                                    .eq("role_id", roleId);
-
-                                const assignedRosterIds = new Set((roleRostersData || []).map(r => r.roster_id));
-                                const rosters = Array.isArray(rostersData) ? rostersData : [];
-
-                                if (rosters.length === 0) {
-                                    editRoleRosterCheckboxes.innerHTML = '<div class="empty">No rosters yet. Create a roster first.</div>';
-                                    return;
+                                const { data: roleData, error: roleError } = await localSupabase
+                                    .from("roles")
+                                    .select("permissions")
+                                    .eq("id", roleId)
+                                    .maybeSingle();
+                                if (roleError) throw roleError;
+                                const perms = (roleData && roleData.permissions) ? roleData.permissions : "";
+                                if (editRoleRostersPermission) {
+                                    editRoleRostersPermission.checked = perms.split(",").map(p => p.trim()).includes("rosters");
                                 }
-
-                                editRoleRosterCheckboxes.innerHTML = rosters.map((r) => `
-                                    <label style="display:flex; align-items:center; gap:8px; padding:6px 0; cursor:pointer; font-size:14px; color:#334155;">
-                                        <input type="checkbox" class="role-roster-checkbox" data-roster-id="${r.id}" ${assignedRosterIds.has(r.id) ? 'checked' : ''} style="cursor:pointer;" />
-                                        <span>${(r.name || 'Roster').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</span>
-                                    </label>
-                                `).join('');
                             } catch (err) {
-                                editRoleRosterCheckboxes.innerHTML = '<div class="empty">Failed to load rosters.</div>';
-                                console.error(err);
+                                console.error("Failed to load role permissions:", err);
                             }
                         }
 
@@ -2840,46 +2953,16 @@
                                     return;
                                 }
                                 try {
-                                    // Update role name
-                                    const { error: nameError } = await localSupabase
+                                    const hasRostersPermission = editRoleRostersPermission ? editRoleRostersPermission.checked : false;
+                                    const newPermissions = hasRostersPermission ? "rosters" : "";
+
+                                    const { error: updateError } = await localSupabase
                                         .from("roles")
-                                        .update({ name: newName })
+                                        .update({ name: newName, permissions: newPermissions })
                                         .eq("id", currentEditingRoleId);
-                                    if (nameError) {
-                                        if (editRoleError) { editRoleError.textContent = "Failed to update role: " + nameError.message; editRoleError.style.display = "block"; }
+                                    if (updateError) {
+                                        if (editRoleError) { editRoleError.textContent = "Failed to update role: " + updateError.message; editRoleError.style.display = "block"; }
                                         return;
-                                    }
-
-                                    // Update roster assignments
-                                    const checkboxes = document.querySelectorAll(".role-roster-checkbox");
-                                    const selectedRosterIds = [];
-                                    checkboxes.forEach((cb) => {
-                                        if (cb.checked) selectedRosterIds.push(cb.getAttribute("data-roster-id"));
-                                    });
-
-                                    // Delete existing role-roster assignments
-                                    const { error: deleteError } = await localSupabase
-                                        .from("role_rosters")
-                                        .delete()
-                                        .eq("role_id", currentEditingRoleId);
-                                    if (deleteError) {
-                                        if (editRoleError) { editRoleError.textContent = "Failed to update roster assignments: " + deleteError.message; editRoleError.style.display = "block"; }
-                                        return;
-                                    }
-
-                                    // Insert new role-roster assignments
-                                    if (selectedRosterIds.length > 0) {
-                                        const rosterInserts = selectedRosterIds.map((rosterId) => ({
-                                            role_id: currentEditingRoleId,
-                                            roster_id: rosterId
-                                        }));
-                                        const { error: insertError } = await localSupabase
-                                            .from("role_rosters")
-                                            .insert(rosterInserts);
-                                        if (insertError) {
-                                            if (editRoleError) { editRoleError.textContent = "Failed to update roster assignments: " + insertError.message; editRoleError.style.display = "block"; }
-                                            return;
-                                        }
                                     }
 
                                     alert("Role updated successfully!");
