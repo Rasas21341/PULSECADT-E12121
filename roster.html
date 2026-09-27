@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Roster - PulseCAD</title>
+    <title>Rosters - PulseCAD</title>
     <style>
         * {
             margin: 0;
@@ -40,7 +40,7 @@
         }
 
         .rost-status.success {
-            background: #f0dfd4;
+            background: #f0fdf4;
             color: #166534;
             border: 1px solid #bbf7d0;
             display: block;
@@ -60,37 +60,9 @@
             border-bottom: 1px solid #e2e8f0;
         }
 
-        .rost-toolbar-id { min-width: 0; }
+        .rost-crumb { font-size: 12px; color: #94a3b8; }
 
-        .rost-crumb {
-            font-size: 12px;
-            color: #94a3b8;
-            margin-bottom: 2px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-
-        .rost-name-input {
-            font-size: 22px;
-            font-weight: 700;
-            color: #0f172a;
-            border: 1px solid transparent;
-            border-radius: 10px;
-            padding: 4px 8px;
-            outline: none;
-            width: 100%;
-            max-width: 460px;
-            font-family: inherit;
-        }
-
-        .rost-name-input:hover { border-color: #e2e8f0; }
-
-        .rost-name-input:focus {
-            border-color: #2563eb;
-            background: #f8fafc;
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
-        }
+        .rost-title { font-size: 20px; font-weight: 700; color: #0f172a; }
 
         .rost-actions { display: flex; gap: 8px; flex-wrap: wrap; }
 
@@ -111,133 +83,91 @@
         .btn.primary { background: #2563eb; color: #ffffff; border-color: #2563eb; }
         .btn.primary:hover { background: #1d4ed8; }
 
-        .btn.sm { padding: 4px 10px; font-size: 12px; }
-
-        .btn.danger { color: #dc2626; border-color: #fecaca; }
-        .btn.danger:hover { background: #fef2f2; }
+        .btn.sm { padding: 5px 12px; font-size: 12px; }
 
         .btn:disabled { opacity: 0.6; cursor: not-allowed; }
 
         .rost-main {
-            max-width: 760px;
+            max-width: 900px;
             margin: 0 auto;
             padding: 24px 32px 80px;
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 18px;
         }
 
         .rost-card {
             background: #ffffff;
             border: 1px solid #e2e8f0;
             border-radius: 16px;
-            padding: 20px;
+            padding: 18px 20px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.04);
         }
 
         .rost-card-head {
             display: flex;
             align-items: center;
-            justify-content: space-between;
             gap: 10px;
-            margin-bottom: 14px;
+            margin-bottom: 12px;
         }
 
-        .rost-card-title { font-size: 15px; font-weight: 700; color: #0f172a; }
+        .rost-slot {
+            flex: 0 0 auto;
+            width: 26px;
+            height: 26px;
+            border-radius: 8px;
+            background: #eff6ff;
+            color: #1d4ed8;
+            font-size: 12px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
 
-        .rost-card-count { font-size: 12px; color: #94a3b8; font-weight: 600; }
-
-        .rost-add-row { display: flex; gap: 8px; margin-bottom: 14px; }
-
-        .rost-add-row input {
+        .rost-name-input {
             flex: 1;
             min-width: 0;
-            padding: 9px 12px;
-            border: 1px solid #cbd5e1;
-            border-radius: 10px;
-            font-size: 14px;
+            font-size: 17px;
+            font-weight: 700;
             color: #0f172a;
+            border: 1px solid transparent;
+            border-radius: 10px;
+            padding: 5px 8px;
             outline: none;
             font-family: inherit;
         }
 
-        .rost-add-row input:focus {
+        .rost-name-input:hover { border-color: #e2e8f0; }
+
+        .rost-name-input:focus {
             border-color: #2563eb;
+            background: #f8fafc;
             box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
         }
 
-        .rost-section {
-            border: 1px solid #e2e8f0;
-            border-radius: 12px;
-            padding: 12px 14px;
-            margin-bottom: 10px;
-            background: #fcfdff;
-        }
-
-        .rost-section-head {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 8px;
-        }
-
-        .rost-section-name {
-            font-size: 14px;
-            font-weight: 700;
-            color: #0f172a;
-            word-break: break-word;
-            min-width: 0;
-        }
-
-        .rost-section-tools { display: flex; gap: 6px; flex: 0 0 auto; }
-
-        .rost-ranks { margin-top: 10px; }
-
-        .rost-rank {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 10px;
-            padding: 7px 0 7px 14px;
-            border-left: 2px solid #e2e8f0;
-        }
-
-        .rost-rank-label {
-            font-size: 13px;
-            color: #475569;
+        .rost-count {
+            font-size: 12px;
+            color: #94a3b8;
             font-weight: 600;
-            word-break: break-word;
+            white-space: nowrap;
         }
 
-        .rost-row-del {
-            flex: 0 0 auto;
-            background: none;
-            border: 1px solid transparent;
-            border-radius: 6px;
-            color: #dc2626;
-            cursor: pointer;
-            font-size: 15px;
-            line-height: 1;
-            padding: 2px 8px;
+        .rost-members {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 2px 16px;
+            margin-bottom: 12px;
         }
-
-        .rost-row-del:hover { background: #fef2f2; border-color: #fecaca; }
-
-        .rost-rank-draft { padding: 8px 0 0 14px; }
-        .rost-rank-draft .rost-add-row { margin-bottom: 0; }
 
         .rost-member {
             display: flex;
             align-items: center;
-            justify-content: space-between;
             gap: 8px;
-            padding: 8px 10px;
-            border-bottom: 1px solid #f1f5f9;
+            padding: 6px 2px;
             font-size: 13px;
             color: #334155;
         }
-
-        .rost-member:last-child { border-bottom: none; }
 
         .rost-member-email {
             flex: 1;
@@ -247,9 +177,16 @@
             white-space: nowrap;
         }
 
-        .rost-member input[type="checkbox"] { cursor: pointer; }
+        .rost-member input[type="checkbox"] { cursor: pointer; flex: 0 0 auto; }
 
-        .rost-empty { font-size: 13px; color: #94a3b8; padding: 8px 0; }
+        .rost-card-foot {
+            display: flex;
+            justify-content: flex-end;
+            border-top: 1px solid #f1f5f9;
+            padding-top: 12px;
+        }
+
+        .rost-empty { font-size: 13px; color: #94a3b8; padding: 10px 0; }
 
         .rost-picker-item {
             display: flex;
@@ -323,46 +260,21 @@
     </div>
 
     <div class="rost-toolbar" id="rostToolbar" style="display:none;">
-        <div class="rost-toolbar-id">
+        <div>
             <div class="rost-crumb" id="rostCrumb"></div>
-            <input type="text" class="rost-name-input" id="rostName" placeholder="Roster name" aria-label="Roster name" />
+            <div class="rost-title">Rosters</div>
         </div>
         <div class="rost-actions">
             <button type="button" class="btn" id="backBtn">&#8592; Back</button>
-            <button type="button" class="btn danger" id="deleteRosterBtn">Delete</button>
-            <button type="button" class="btn primary" id="saveBtn">Save Changes</button>
         </div>
     </div>
 
     <div class="rost-main" id="rostMain" style="display:none;">
         <div class="rost-card" id="rostPickerCard" style="display:none;">
-            <div class="rost-card-head">
-                <div class="rost-card-title">Choose a roster</div>
-            </div>
+            <div class="rost-card-head"><div class="rost-title">Choose a community</div></div>
             <div id="rostPickerList"></div>
         </div>
-
-        <div class="rost-card" id="rostRanksCard">
-            <div class="rost-card-head">
-                <div class="rost-card-title">Sections &amp; Ranks</div>
-                <div class="rost-card-count" id="rostRankCount"></div>
-            </div>
-
-            <div class="rost-add-row">
-                <input type="text" id="newSectionInput" placeholder="Add a section, e.g. High Command" aria-label="New section" maxlength="80" />
-                <button type="button" class="btn primary" id="addSectionBtn">Add Section</button>
-            </div>
-
-            <div id="rostSectionsList"></div>
-        </div>
-
-        <div class="rost-card" id="rostMembersCard">
-            <div class="rost-card-head">
-                <div class="rost-card-title">Roster Members</div>
-                <div class="rost-card-count" id="rostMemberCount"></div>
-            </div>
-            <div id="rostMembers"></div>
-        </div>
+        <div id="rostRosterCards"></div>
     </div>
 
     <div class="rost-footer" id="rostFooter">Powered by <strong>PulseCAD</strong></div>
@@ -372,9 +284,11 @@
         const SUPABASE_URL = "https://zwdogalwbczdtvxvhrfd.supabase.co";
         const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp3ZG9nYWx3YmN6ZHR2eHZocmZkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM2NTA2MjQsImV4cCI6MjA5OTIyNjYyNH0.baPVVTtW0d3FDC2pTd1P3d5aoIc2FZkaD-6bBvDPFWw";
 
+        const ROSTER_SLOTS = 5;
+
         const params = new URLSearchParams(window.location.search);
-        let rosterId = params.get("id");
-        const communityId = params.get("communityId");
+        let communityId = params.get("communityId");
+        const rosterIdParam = params.get("id");
 
         const statusEl = document.getElementById("rostStatus");
         const layoutToolbar = document.getElementById("rostToolbar");
@@ -384,31 +298,17 @@
         const fullscreenDetail = document.getElementById("fullscreenDetail");
         const retryBtn = document.getElementById("retryBtn");
         const rostCrumb = document.getElementById("rostCrumb");
-        const rostName = document.getElementById("rostName");
-        const rostSectionsList = document.getElementById("rostSectionsList");
-        const rostRankCount = document.getElementById("rostRankCount");
-        const newSectionInput = document.getElementById("newSectionInput");
-        const addSectionBtn = document.getElementById("addSectionBtn");
-        const rostMembers = document.getElementById("rostMembers");
-        const rostMemberCount = document.getElementById("rostMemberCount");
+        const rostRosterCards = document.getElementById("rostRosterCards");
         const rostPickerCard = document.getElementById("rostPickerCard");
         const rostPickerList = document.getElementById("rostPickerList");
-        const rostRanksCard = document.getElementById("rostRanksCard");
-        const rostMembersCard = document.getElementById("rostMembersCard");
         const rostFooter = document.getElementById("rostFooter");
         const backBtn = document.getElementById("backBtn");
-        const saveBtn = document.getElementById("saveBtn");
-        const deleteRosterBtn = document.getElementById("deleteRosterBtn");
 
         let localSupabase = null;
-        let roster = null;
         let communityName = "";
-        let sections = [];
-        let ranks = [];
+        let rosters = [];
         let members = [];
-        let selectedMemberIds = new Set();
-        let rankDraftSectionId = null;
-        let ranksHaveRosterId = null;
+        let memberIdsByRoster = new Map();
 
         try {
             if (typeof window.supabase !== "undefined") {
@@ -514,432 +414,235 @@
             }
         }
 
-        // ---------- sections + ranks ----------
+        // ---------- data ----------
 
-        function ranksForSection(sectionId) {
-            return ranks.filter((r) => r.section_id === sectionId);
+        function fetchRosterRows(communityIdParam) {
+            return localSupabase
+                .from("rosters")
+                .select("*")
+                .eq("community_id", communityIdParam)
+                .order("created_at", { ascending: true });
         }
 
-        function renderStructure() {
-            if (rostRankCount) {
-                const total = ranks.length;
-                rostRankCount.textContent = sections.length
-                    ? sections.length + (sections.length === 1 ? " section, " : " sections, ") + total + (total === 1 ? " rank" : " ranks")
-                    : "";
-            }
-            if (!rostSectionsList) return;
+        // Every community gets exactly ROSTER_SLOTS rosters, created on first open.
+        async function ensureRosterSlots(communityIdParam) {
+            let { data, error } = await fetchRosterRows(communityIdParam);
+            if (error) throw new Error(error.message);
 
-            if (sections.length === 0) {
-                rostSectionsList.innerHTML = '<div class="rost-empty">No sections yet. Add one above, then add ranks inside it.</div>';
+            let rows = Array.isArray(data) ? data : [];
+            if (rows.length >= ROSTER_SLOTS) return rows.slice(0, ROSTER_SLOTS);
+
+            const missing = [];
+            for (let i = rows.length; i < ROSTER_SLOTS; i++) {
+                missing.push({
+                    community_id: communityIdParam,
+                    name: "Roster " + (i + 1),
+                    created_at: new Date().toISOString()
+                });
+            }
+
+            const { error: insertError } = await localSupabase.from("rosters").insert(missing);
+            if (insertError) {
+                showStatus("Could not create the remaining rosters: " + insertError.message, "error");
+                return rows;
+            }
+
+            const recheck = await fetchRosterRows(communityIdParam);
+            if (!recheck.error && Array.isArray(recheck.data)) {
+                rows = recheck.data;
+            } else {
+                rows = rows.concat(missing.map((m, i) => ({
+                    id: "pending-" + (rows.length + i),
+                    name: m.name,
+                    community_id: communityIdParam
+                })));
+            }
+            return rows.slice(0, ROSTER_SLOTS);
+        }
+
+        async function loadAll() {
+            rosters = await ensureRosterSlots(communityId);
+
+            const { data: membersData } = await localSupabase
+                .from("members")
+                .select("*")
+                .eq("community_id", communityId)
+                .order("email");
+            members = Array.isArray(membersData) ? membersData : [];
+
+            const { data: linkData } = await localSupabase
+                .from("roster_members")
+                .select("roster_id, member_id")
+                .in("roster_id", rosters.map((r) => r.id));
+
+            memberIdsByRoster = new Map();
+            rosters.forEach((r) => memberIdsByRoster.set(r.id, new Set()));
+            (Array.isArray(linkData) ? linkData : []).forEach((row) => {
+                const set = memberIdsByRoster.get(row.roster_id);
+                if (set) set.add(row.member_id);
+            });
+
+            renderRosters();
+        }
+
+        // ---------- render ----------
+
+        function selectedFor(rosterId) {
+            return memberIdsByRoster.get(rosterId) || new Set();
+        }
+
+        function renderRosters() {
+            if (!rostRosterCards) return;
+
+            if (rosters.length === 0) {
+                rostRosterCards.innerHTML = '<div class="rost-card"><div class="rost-empty">No rosters yet.</div></div>';
                 return;
             }
 
-            rostSectionsList.innerHTML = sections.map((section) => {
-                const sectionRanks = ranksForSection(section.id);
-                const ranksHtml = sectionRanks.length === 0
-                    ? '<div class="rost-empty" style="padding-left:14px;">No ranks yet.</div>'
-                    : '<div class="rost-ranks">' + sectionRanks.map((r) => `
-                        <div class="rost-rank">
-                            <div class="rost-rank-label">${escapeHtml(r.name || "Untitled")}</div>
-                            <button type="button" class="rost-row-del" data-del-rank="${escapeHtml(r.id)}" title="Delete rank">&times;</button>
-                        </div>
-                    `).join("") + "</div>";
-
-                const draftHtml = rankDraftSectionId === section.id ? `
-                    <div class="rost-rank-draft">
-                        <div class="rost-add-row">
-                            <input type="text" id="rankDraftInput" placeholder="Rank name, e.g. Commander" aria-label="New rank" maxlength="80" />
-                            <button type="button" class="btn primary sm" id="rankDraftSave">Add</button>
-                        </div>
-                    </div>
-                ` : "";
+            rostRosterCards.innerHTML = rosters.map((r, index) => {
+                const selected = selectedFor(r.id);
+                const list = members.length === 0
+                    ? '<div class="rost-empty">This community has no members yet.</div>'
+                    : members.map((m) => `
+                        <label class="rost-member">
+                            <input type="checkbox" class="rost-member-checkbox" data-roster-id="${escapeHtml(r.id)}" data-member-id="${escapeHtml(m.id)}" ${selected.has(m.id) ? "checked" : ""} />
+                            <span class="rost-member-email">${escapeHtml(m.email || "Unknown")}</span>
+                        </label>
+                    `).join("");
 
                 return `
-                    <div class="rost-section">
-                        <div class="rost-section-head">
-                            <div class="rost-section-name">${escapeHtml(section.name || "Section")}</div>
-                            <div class="rost-section-tools">
-                                <button type="button" class="btn sm" data-add-rank-to="${escapeHtml(section.id)}">+ Rank</button>
-                                <button type="button" class="btn sm danger" data-del-section="${escapeHtml(section.id)}">Delete</button>
-                            </div>
+                    <div class="rost-card">
+                        <div class="rost-card-head">
+                            <div class="rost-slot">${index + 1}</div>
+                            <input type="text" class="rost-name-input" data-roster-id="${escapeHtml(r.id)}" value="${escapeHtml(r.name || "")}" placeholder="Roster name" aria-label="Roster ${index + 1} name" maxlength="60" />
+                            <div class="rost-count">${selected.size} of ${members.length}</div>
                         </div>
-                        ${ranksHtml}
-                        ${draftHtml}
+                        <div class="rost-members">${list}</div>
+                        <div class="rost-card-foot">
+                            <button type="button" class="btn primary sm" data-save-roster="${escapeHtml(r.id)}">Save Roster ${index + 1}</button>
+                        </div>
                     </div>
                 `;
             }).join("");
 
-            rostSectionsList.querySelectorAll("[data-add-rank-to]").forEach((btn) => {
-                btn.addEventListener("click", () => {
-                    const target = btn.getAttribute("data-add-rank-to");
-                    rankDraftSectionId = (rankDraftSectionId === target) ? null : target;
-                    renderStructure();
-                    const input = document.getElementById("rankDraftInput");
-                    if (input) input.focus();
-                });
-            });
-
-            rostSectionsList.querySelectorAll("[data-del-section]").forEach((btn) => {
-                btn.addEventListener("click", () => deleteSection(btn.getAttribute("data-del-section")));
-            });
-
-            rostSectionsList.querySelectorAll("[data-del-rank]").forEach((btn) => {
-                btn.addEventListener("click", () => deleteRank(btn.getAttribute("data-del-rank")));
-            });
-
-            const draftSave = document.getElementById("rankDraftSave");
-            if (draftSave) {
-                draftSave.addEventListener("click", () => commitRankDraft());
-            }
-            const draftInput = document.getElementById("rankDraftInput");
-            if (draftInput) {
-                draftInput.addEventListener("keydown", (e) => {
-                    if (e.key === "Enter") {
-                        e.preventDefault();
-                        commitRankDraft();
-                    }
-                });
-            }
-        }
-
-        async function commitRankDraft() {
-            const input = document.getElementById("rankDraftInput");
-            const sectionId = rankDraftSectionId;
-            if (!input || !sectionId) return;
-            await addRank(sectionId, input.value);
-        }
-
-        async function loadStructure() {
-            const { data: sectionsData, error: sectionsError } = await localSupabase
-                .from("roster_sections")
-                .select("*")
-                .eq("roster_id", roster.id)
-                .order("created_at", { ascending: true });
-
-            if (sectionsError) {
-                showStatus("Failed to load sections: " + sectionsError.message, "error");
-                sections = [];
-                renderStructure();
-                return;
-            }
-            sections = Array.isArray(sectionsData) ? sectionsData : [];
-
-            // Prefer the single roster_id query when that optional column exists,
-            // otherwise fall back to one query per section.
-            if (ranksHaveRosterId === null) {
-                const probe = await localSupabase
-                    .from("roster_roles")
-                    .select("id,roster_id")
-                    .eq("roster_id", roster.id)
-                    .limit(1);
-                ranksHaveRosterId = !probe.error;
-            }
-
-            const collected = [];
-            if (ranksHaveRosterId) {
-                const { data, error } = await localSupabase
-                    .from("roster_roles")
-                    .select("*")
-                    .eq("roster_id", roster.id)
-                    .order("created_at", { ascending: true });
-                if (error) {
-                    showStatus("Failed to load ranks: " + error.message, "error");
-                } else if (Array.isArray(data)) {
-                    data.forEach((r) => collected.push(r));
-                }
-            } else {
-                for (const section of sections) {
-                    const { data } = await localSupabase
-                        .from("roster_roles")
-                        .select("*")
-                        .eq("section_id", section.id)
-                        .order("created_at", { ascending: true });
-                    if (Array.isArray(data)) data.forEach((r) => collected.push(r));
-                }
-            }
-
-            ranks = collected;
-            if (rankDraftSectionId && !sections.some((s) => s.id === rankDraftSectionId)) {
-                rankDraftSectionId = null;
-            }
-            renderStructure();
-        }
-
-        async function addSection(name) {
-            const { error } = await localSupabase
-                .from("roster_sections")
-                .insert([{ roster_id: roster.id, name: name, created_at: new Date().toISOString() }]);
-            if (error) {
-                showStatus("Failed to add section: " + error.message, "error");
-                return null;
-            }
-            await loadStructure();
-            return true;
-        }
-
-        async function commitSectionDraft() {
-            const name = newSectionInput ? newSectionInput.value.trim() : "";
-            if (!name) {
-                showStatus("Enter a section name first.", "error");
-                return;
-            }
-            if (addSectionBtn) { addSectionBtn.disabled = true; }
-            const ok = await addSection(name);
-            if (addSectionBtn) { addSectionBtn.disabled = false; }
-            if (ok) {
-                if (newSectionInput) newSectionInput.value = "";
-                showStatus("Section added.", "success");
-            }
-        }
-
-        async function deleteSection(sectionId) {
-            const section = sections.find((s) => s.id === sectionId);
-            const count = ranksForSection(sectionId).length;
-            const label = (section && section.name) || "this section";
-            const extra = count ? " and its " + count + (count === 1 ? " rank" : " ranks") : "";
-            if (!confirm('Delete "' + label + '"' + extra + "?")) return;
-
-            const { error: ranksError } = await localSupabase
-                .from("roster_roles")
-                .delete()
-                .eq("section_id", sectionId);
-            if (ranksError) {
-                showStatus("Failed to delete ranks: " + ranksError.message, "error");
-                return;
-            }
-
-            const { error } = await localSupabase
-                .from("roster_sections")
-                .delete()
-                .eq("id", sectionId);
-            if (error) {
-                showStatus("Failed to delete section: " + error.message, "error");
-                return;
-            }
-            await loadStructure();
-        }
-
-        async function addRank(sectionId, rawName) {
-            const name = (rawName || "").trim();
-            if (!name) {
-                showStatus("Enter a rank name first.", "error");
-                return false;
-            }
-            if (!sectionId) {
-                showStatus("Pick a section first.", "error");
-                return false;
-            }
-
-            const payload = {
-                section_id: sectionId,
-                name: name,
-                created_at: new Date().toISOString()
-            };
-            if (ranksHaveRosterId) payload.roster_id = roster.id;
-
-            const { error } = await localSupabase.from("roster_roles").insert([payload]);
-            if (error) {
-                showStatus("Failed to add rank: " + error.message, "error");
-                return false;
-            }
-
-            rankDraftSectionId = null;
-            await loadStructure();
-            showStatus("Rank added.", "success");
-            return true;
-        }
-
-        async function deleteRank(rankId) {
-            if (!confirm("Delete this rank?")) return;
-            const { error } = await localSupabase
-                .from("roster_roles")
-                .delete()
-                .eq("id", rankId);
-            if (error) {
-                showStatus("Failed to delete rank: " + error.message, "error");
-                return;
-            }
-            await loadStructure();
-        }
-
-        // ---------- members ----------
-
-        function renderMembers() {
-            if (rostMemberCount) {
-                rostMemberCount.textContent = members.length
-                    ? selectedMemberIds.size + " of " + members.length + " selected"
-                    : "";
-            }
-            if (!rostMembers) return;
-            if (members.length === 0) {
-                rostMembers.innerHTML = '<div class="rost-empty">No members in this community.</div>';
-                return;
-            }
-
-            rostMembers.innerHTML = members.map((m) => `
-                <div class="rost-member">
-                    <span class="rost-member-email">${escapeHtml(m.email || "Unknown")}</span>
-                    <input type="checkbox" class="rost-member-checkbox" data-member-id="${escapeHtml(m.id)}" ${selectedMemberIds.has(m.id) ? "checked" : ""} />
-                </div>
-            `).join("");
-
-            rostMembers.querySelectorAll(".rost-member-checkbox").forEach((cb) => {
+            rostRosterCards.querySelectorAll(".rost-member-checkbox").forEach((cb) => {
                 cb.addEventListener("change", () => {
+                    const rosterId = cb.getAttribute("data-roster-id");
                     const memberId = cb.getAttribute("data-member-id");
-                    if (cb.checked) selectedMemberIds.add(memberId);
-                    else selectedMemberIds.delete(memberId);
-                    renderMembers();
+                    if (!rosterId || !memberId) return;
+                    const set = selectedFor(rosterId);
+                    if (cb.checked) set.add(memberId);
+                    else set.delete(memberId);
+                    updateCount(rosterId);
                 });
+            });
+
+            rostRosterCards.querySelectorAll("[data-save-roster]").forEach((btn) => {
+                btn.addEventListener("click", () => saveRoster(btn.getAttribute("data-save-roster"), btn));
             });
         }
 
-        async function loadMembers() {
-            const { data: membersData } = await localSupabase
-                .from("members")
-                .select("*")
-                .eq("community_id", roster.community_id)
-                .order("email");
-
-            const { data: rosterMembersData } = await localSupabase
-                .from("roster_members")
-                .select("member_id")
-                .eq("roster_id", roster.id);
-
-            members = Array.isArray(membersData) ? membersData : [];
-            selectedMemberIds = new Set((rosterMembersData || []).map((r) => r.member_id));
-            renderMembers();
+        function updateCount(rosterId) {
+            const card = document.querySelector('.rost-name-input[data-roster-id="' + rosterId + '"]');
+            if (!card) return;
+            const countEl = card.parentElement ? card.parentElement.querySelector(".rost-count") : null;
+            if (countEl) {
+                countEl.textContent = selectedFor(rosterId).size + " of " + members.length;
+            }
         }
 
-        async function refresh() {
-            await loadStructure();
-            await loadMembers();
-        }
+        // ---------- save ----------
 
-        // ---------- save / delete ----------
-
-        async function save() {
-            const newName = rostName ? rostName.value.trim() : "";
+        async function saveRoster(rosterId, btn) {
+            const nameInput = rostRosterCards.querySelector('.rost-name-input[data-roster-id="' + rosterId + '"]');
+            const newName = nameInput ? nameInput.value.trim() : "";
             if (!newName) {
                 showStatus("Roster name cannot be empty.", "error");
                 return;
             }
-            if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = "Saving..."; }
+
+            if (btn) { btn.disabled = true; btn.textContent = "Saving..."; }
 
             const { error: nameError } = await localSupabase
                 .from("rosters")
                 .update({ name: newName, updated_at: new Date().toISOString() })
-                .eq("id", roster.id);
+                .eq("id", rosterId);
             if (nameError) {
-                if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = "Save Changes"; }
-                showStatus("Failed to update roster name: " + nameError.message, "error");
+                if (btn) { btn.disabled = false; btn.textContent = "Save"; }
+                showStatus("Failed to rename roster: " + nameError.message, "error");
                 return;
             }
 
-            const { error: deleteError } = await localSupabase
+            const { error: clearError } = await localSupabase
                 .from("roster_members")
                 .delete()
-                .eq("roster_id", roster.id);
-            if (deleteError) {
-                if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = "Save Changes"; }
-                showStatus("Failed to update members: " + deleteError.message, "error");
+                .eq("roster_id", rosterId);
+            if (clearError) {
+                if (btn) { btn.disabled = false; btn.textContent = "Save"; }
+                showStatus("Failed to update members: " + clearError.message, "error");
                 return;
             }
 
-            const memberIds = Array.from(selectedMemberIds);
+            const memberIds = Array.from(selectedFor(rosterId));
             if (memberIds.length > 0) {
                 const { error: insertError } = await localSupabase
                     .from("roster_members")
                     .insert(memberIds.map((memberId) => ({
-                        roster_id: roster.id,
+                        roster_id: rosterId,
                         member_id: memberId
                     })));
                 if (insertError) {
-                    if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = "Save Changes"; }
-                    showStatus("Failed to update members: " +insertError.message, "error");
+                    if (btn) { btn.disabled = false; btn.textContent = "Save"; }
+                    showStatus("Failed to update members: " + insertError.message, "error");
                     return;
                 }
             }
 
-            if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = "Save Changes"; }
-            showStatus("Roster updated.", "success");
+            const local = rosters.find((r) => r.id === rosterId);
+            if (local) local.name = newName;
+            if (btn) { btn.disabled = false; btn.textContent = "Save"; }
+            showStatus("Roster saved.", "success");
         }
 
-        async function deleteRoster() {
-            if (!confirm("Delete this roster, its sections, ranks and members?")) return;
-
-            if (sections.length) {
-                await localSupabase.from("roster_roles").delete().in(
-                    "section_id",
-                    sections.map((s) => s.id)
-                );
-            }
-            if (ranks.length) {
-                await localSupabase.from("roster_roles").delete().in(
-                    "id",
-                    ranks.map((r) => r.id)
-                );
-            }
-            await localSupabase.from("roster_sections").delete().eq("roster_id", roster.id);
-            await localSupabase.from("roster_members").delete().eq("roster_id", roster.id);
-
-            const { error } = await localSupabase
-                .from("rosters")
-                .delete()
-                .eq("id", roster.id);
-            if (error) {
-                showStatus("Failed to delete roster: " + error.message, "error");
-                return;
-            }
-            window.close();
-        }
-
-        if (saveBtn) saveBtn.addEventListener("click", save);
-        if (deleteRosterBtn) deleteRosterBtn.addEventListener("click", deleteRoster);
-        if (addSectionBtn) addSectionBtn.addEventListener("click", commitSectionDraft);
-        if (newSectionInput) {
-            newSectionInput.addEventListener("keydown", (e) => {
-                if (e.key === "Enter") {
-                    e.preventDefault();
-                    commitSectionDraft();
-                }
-            });
-        }
-
-        // ---------- picker fallback ----------
+        // ---------- community picker ----------
 
         function hideAllViews() {
             if (layoutToolbar) layoutToolbar.style.display = "none";
             if (layoutMain) layoutMain.style.display = "none";
             if (rostPickerCard) rostPickerCard.style.display = "none";
-            if (rostRanksCard) rostRanksCard.style.display = "";
-            if (rostMembersCard) rostMembersCard.style.display = "";
         }
 
-        async function showRosterPicker() {
-            if (!rostPickerList || !communityId) return;
+        async function showCommunityPicker() {
+            if (!rostPickerList) return;
+            const user = await waitForAuthUser(2000);
+            if (!user) {
+                showFullscreenMessage("Please log in to view rosters.", "No active session in this tab.", true);
+                return;
+            }
+
             const { data, error } = await localSupabase
-                .from("rosters")
-                .select("*")
-                .eq("community_id", communityId)
-                .order("created_at", { ascending: false });
+                .from("communities")
+                .select("id, name, creator_email")
+                .eq("creator_email", user.email);
 
             if (error) {
-                rostPickerList.innerHTML = '<div class="rost-empty">Failed to load rosters.</div>';
+                rostPickerList.innerHTML = '<div class="rost-empty">Failed to load your communities.</div>';
             } else if (!Array.isArray(data) || data.length === 0) {
-                rostPickerList.innerHTML = '<div class="rost-empty">This community has no rosters yet.</div>';
+                rostPickerList.innerHTML = '<div class="rost-empty">You do not own any communities.</div>';
             } else {
-                rostPickerList.innerHTML = data.map((r) => `
-                    <button type="button" class="rost-picker-item" data-roster-id="${escapeHtml(r.id)}">
-                        <span>${escapeHtml(r.name || "Roster")}</span>
+                rostPickerList.innerHTML = data.map((c) => `
+                    <button type="button" class="rost-picker-item" data-community-id="${escapeHtml(c.id)}">
+                        <span>${escapeHtml(c.name || "Community")}</span>
                         <span class="rost-picker-go">Open &#8594;</span>
                     </button>
                 `).join("");
 
-                rostPickerList.querySelectorAll("[data-roster-id]").forEach((b) => {
+                rostPickerList.querySelectorAll("[data-community-id]").forEach((b) => {
                     b.addEventListener("click", () => {
-                        rosterId = b.getAttribute("data-roster-id");
+                        communityId = b.getAttribute("data-community-id");
                         const url = new URL(window.location.href);
-                        url.searchParams.set("id", rosterId);
+                        url.searchParams.set("communityId", communityId);
+                        url.searchParams.delete("id");
                         window.history.replaceState({}, "", url.toString());
                         hideAllViews();
                         init();
@@ -947,18 +650,35 @@
                 });
             }
 
-            if (layoutToolbar) layoutToolbar.style.display = "none";
-            if (rostRanksCard) rostRanksCard.style.display = "none";
-            if (rostMembersCard) rostMembersCard.style.display = "none";
             if (rostPickerCard) rostPickerCard.style.display = "block";
-            if (layoutMain) layoutMain.style.display = "flex";
+            if (layoutMain) layoutMain.style.display = "block";
+        }
+
+        async function resolveCommunity() {
+            if (communityId) return true;
+
+            // Support old per-roster links: derive the community from the roster id.
+            if (rosterIdParam) {
+                const { data } = await localSupabase
+                    .from("rosters")
+                    .select("community_id")
+                    .eq("id", rosterIdParam)
+                    .limit(1)
+                    .maybeSingle();
+                if (data && data.community_id) {
+                    communityId = data.community_id;
+                    const url = new URL(window.location.href);
+                    url.searchParams.set("communityId", communityId);
+                    url.searchParams.delete("id");
+                    window.history.replaceState({}, "", url.toString());
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         async function init() {
-            if (!rosterId && !communityId) {
-                showFullscreenMessage("No roster specified.");
-                return;
-            }
             if (!localSupabase) {
                 showFullscreenMessage("Service unavailable.");
                 return;
@@ -966,8 +686,6 @@
 
             if (fullscreenMsg) fullscreenMsg.style.display = "none";
             hideAllViews();
-            rankDraftSectionId = null;
-            ranksHaveRosterId = null;
 
             try {
                 // Wait for the persisted session to finish loading before any
@@ -976,40 +694,18 @@
                 const user = await waitForAuthUser();
 
                 if (!user) {
-                    showFullscreenMessage("Please log in to view this roster.", "No active session in this tab.", true);
+                    showFullscreenMessage("Please log in to view rosters.", "No active session in this tab.", true);
                     return;
                 }
 
-                let rosterData = null;
-                if (rosterId) {
-                    const lookup = await localSupabase
-                        .from("rosters")
-                        .select("*")
-                        .eq("id", rosterId)
-                        .limit(1)
-                        .maybeSingle();
-
-                    if (lookup.error) {
-                        console.error("Roster lookup failed:", lookup.error, { rosterId });
-                        showFullscreenMessage("Could not load this roster.", lookup.error.message, true);
-                        return;
-                    }
-                    rosterData = lookup.data;
-                }
-
-                if (!rosterData) {
-                    console.warn("Roster lookup returned no row", { rosterId, user: user.email });
-                    if (communityId) {
-                        await showRosterPicker();
-                        return;
-                    }
-                    showFullscreenMessage("Roster not found or you don't have access to it.", "id: " + rosterId, true);
+                const resolved = await resolveCommunity();
+                if (!resolved) {
+                    await showCommunityPicker();
                     return;
                 }
-                roster = rosterData;
 
-                if (!await hasRostersAccess(roster.community_id, user)) {
-                    showFullscreenMessage("You do not have access to this roster.");
+                if (!await hasRostersAccess(communityId, user)) {
+                    showFullscreenMessage("You do not have access to these rosters.");
                     return;
                 }
 
@@ -1017,7 +713,7 @@
                     const { data: community } = await localSupabase
                         .from("communities")
                         .select("name, pro")
-                        .eq("id", roster.community_id)
+                        .eq("id", communityId)
                         .maybeSingle();
                     communityName = (community && community.name) || "";
                     if (rostFooter) rostFooter.style.display = community && community.pro === true ? "none" : "block";
@@ -1025,16 +721,15 @@
                     console.error("Community lookup failed:", err);
                 }
 
-                document.title = (roster.name || "Roster") + " - PulseCAD";
-                if (rostCrumb) rostCrumb.textContent = communityName || "Roster";
-                if (rostName) rostName.value = roster.name || "";
+                document.title = (communityName ? communityName + " - Rosters" : "Rosters") + " - PulseCAD";
+                if (rostCrumb) rostCrumb.textContent = communityName || "";
                 if (layoutToolbar) layoutToolbar.style.display = "flex";
-                if (layoutMain) layoutMain.style.display = "flex";
+                if (layoutMain) layoutMain.style.display = "block";
 
-                await refresh();
+                await loadAll();
             } catch (err) {
                 console.error("Init failed:", err);
-                showFullscreenMessage("Failed to load roster.", (err && err.message) || String(err), true);
+                showFullscreenMessage("Failed to load rosters.", (err && err.message) || String(err), true);
             }
         }
 
