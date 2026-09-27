@@ -40,7 +40,7 @@
         }
 
         .rost-status.success {
-            background: #f0fdf4;
+            background: #f0dfd4;
             color: #166534;
             border: 1px solid #bbf7d0;
             display: block;
@@ -60,9 +60,7 @@
             border-bottom: 1px solid #e2e8f0;
         }
 
-        .rost-toolbar-id {
-            min-width: 0;
-        }
+        .rost-toolbar-id { min-width: 0; }
 
         .rost-crumb {
             font-size: 12px;
@@ -94,11 +92,7 @@
             box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
         }
 
-        .rost-actions {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
+        .rost-actions { display: flex; gap: 8px; flex-wrap: wrap; }
 
         .btn {
             padding: 8px 14px;
@@ -116,6 +110,8 @@
 
         .btn.primary { background: #2563eb; color: #ffffff; border-color: #2563eb; }
         .btn.primary:hover { background: #1d4ed8; }
+
+        .btn.sm { padding: 4px 10px; font-size: 12px; }
 
         .btn.danger { color: #dc2626; border-color: #fecaca; }
         .btn.danger:hover { background: #fef2f2; }
@@ -147,23 +143,11 @@
             margin-bottom: 14px;
         }
 
-        .rost-card-title {
-            font-size: 15px;
-            font-weight: 700;
-            color: #0f172a;
-        }
+        .rost-card-title { font-size: 15px; font-weight: 700; color: #0f172a; }
 
-        .rost-card-count {
-            font-size: 12px;
-            color: #94a3b8;
-            font-weight: 600;
-        }
+        .rost-card-count { font-size: 12px; color: #94a3b8; font-weight: 600; }
 
-        .rost-add-row {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 14px;
-        }
+        .rost-add-row { display: flex; gap: 8px; margin-bottom: 14px; }
 
         .rost-add-row input {
             flex: 1;
@@ -182,20 +166,45 @@
             box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
         }
 
-        .rost-list-row {
+        .rost-section {
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 12px 14px;
+            margin-bottom: 10px;
+            background: #fcfdff;
+        }
+
+        .rost-section-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+        }
+
+        .rost-section-name {
+            font-size: 14px;
+            font-weight: 700;
+            color: #0f172a;
+            word-break: break-word;
+            min-width: 0;
+        }
+
+        .rost-section-tools { display: flex; gap: 6px; flex: 0 0 auto; }
+
+        .rost-ranks { margin-top: 10px; }
+
+        .rost-rank {
             display: flex;
             align-items: center;
             justify-content: space-between;
             gap: 10px;
-            padding: 10px 4px;
-            border-bottom: 1px solid #f1f5f9;
+            padding: 7px 0 7px 14px;
+            border-left: 2px solid #e2e8f0;
         }
 
-        .rost-list-row:last-child { border-bottom: none; }
-
-        .rost-list-label {
-            font-size: 14px;
-            color: #334155;
+        .rost-rank-label {
+            font-size: 13px;
+            color: #475569;
             font-weight: 600;
             word-break: break-word;
         }
@@ -209,10 +218,13 @@
             cursor: pointer;
             font-size: 15px;
             line-height: 1;
-            padding: 3px 8px;
+            padding: 2px 8px;
         }
 
         .rost-row-del:hover { background: #fef2f2; border-color: #fecaca; }
+
+        .rost-rank-draft { padding: 8px 0 0 14px; }
+        .rost-rank-draft .rost-add-row { margin-bottom: 0; }
 
         .rost-member {
             display: flex;
@@ -237,11 +249,7 @@
 
         .rost-member input[type="checkbox"] { cursor: pointer; }
 
-        .rost-empty {
-            font-size: 13px;
-            color: #94a3b8;
-            padding: 12px 0;
-        }
+        .rost-empty { font-size: 13px; color: #94a3b8; padding: 8px 0; }
 
         .rost-picker-item {
             display: flex;
@@ -336,14 +344,16 @@
 
         <div class="rost-card" id="rostRanksCard">
             <div class="rost-card-head">
-                <div class="rost-card-title">Ranks</div>
+                <div class="rost-card-title">Sections &amp; Ranks</div>
                 <div class="rost-card-count" id="rostRankCount"></div>
             </div>
+
             <div class="rost-add-row">
-                <input type="text" id="newRankInput" placeholder="Add a rank..." aria-label="New rank" maxlength="80" />
-                <button type="button" class="btn primary" id="addRankBtn">Add</button>
+                <input type="text" id="newSectionInput" placeholder="Add a section, e.g. High Command" aria-label="New section" maxlength="80" />
+                <button type="button" class="btn primary" id="addSectionBtn">Add Section</button>
             </div>
-            <div id="rostRanks"></div>
+
+            <div id="rostSectionsList"></div>
         </div>
 
         <div class="rost-card" id="rostMembersCard">
@@ -375,10 +385,10 @@
         const retryBtn = document.getElementById("retryBtn");
         const rostCrumb = document.getElementById("rostCrumb");
         const rostName = document.getElementById("rostName");
-        const rostRanks = document.getElementById("rostRanks");
+        const rostSectionsList = document.getElementById("rostSectionsList");
         const rostRankCount = document.getElementById("rostRankCount");
-        const newRankInput = document.getElementById("newRankInput");
-        const addRankBtn = document.getElementById("addRankBtn");
+        const newSectionInput = document.getElementById("newSectionInput");
+        const addSectionBtn = document.getElementById("addSectionBtn");
         const rostMembers = document.getElementById("rostMembers");
         const rostMemberCount = document.getElementById("rostMemberCount");
         const rostPickerCard = document.getElementById("rostPickerCard");
@@ -393,9 +403,12 @@
         let localSupabase = null;
         let roster = null;
         let communityName = "";
+        let sections = [];
         let ranks = [];
         let members = [];
         let selectedMemberIds = new Set();
+        let rankDraftSectionId = null;
+        let ranksHaveRosterId = null;
 
         try {
             if (typeof window.supabase !== "undefined") {
@@ -501,79 +514,239 @@
             }
         }
 
-        // ---------- ranks ----------
+        // ---------- sections + ranks ----------
 
-        function renderRanks() {
+        function ranksForSection(sectionId) {
+            return ranks.filter((r) => r.section_id === sectionId);
+        }
+
+        function renderStructure() {
             if (rostRankCount) {
-                rostRankCount.textContent = ranks.length ? ranks.length + (ranks.length === 1 ? " rank" : " ranks") : "";
+                const total = ranks.length;
+                rostRankCount.textContent = sections.length
+                    ? sections.length + (sections.length === 1 ? " section, " : " sections, ") + total + (total === 1 ? " rank" : " ranks")
+                    : "";
             }
-            if (!rostRanks) return;
-            if (ranks.length === 0) {
-                rostRanks.innerHTML = '<div class="rost-empty">No ranks yet. Add one above.</div>';
+            if (!rostSectionsList) return;
+
+            if (sections.length === 0) {
+                rostSectionsList.innerHTML = '<div class="rost-empty">No sections yet. Add one above, then add ranks inside it.</div>';
                 return;
             }
 
-            rostRanks.innerHTML = ranks.map((r) => `
-                <div class="rost-list-row">
-                    <div class="rost-list-label">${escapeHtml(r.name || "Untitled")}</div>
-                    <button type="button" class="rost-row-del" data-rank-id="${escapeHtml(r.id)}" title="Delete rank">&times;</button>
-                </div>
-            `).join("");
+            rostSectionsList.innerHTML = sections.map((section) => {
+                const sectionRanks = ranksForSection(section.id);
+                const ranksHtml = sectionRanks.length === 0
+                    ? '<div class="rost-empty" style="padding-left:14px;">No ranks yet.</div>'
+                    : '<div class="rost-ranks">' + sectionRanks.map((r) => `
+                        <div class="rost-rank">
+                            <div class="rost-rank-label">${escapeHtml(r.name || "Untitled")}</div>
+                            <button type="button" class="rost-row-del" data-del-rank="${escapeHtml(r.id)}" title="Delete rank">&times;</button>
+                        </div>
+                    `).join("") + "</div>";
 
-            rostRanks.querySelectorAll("[data-rank-id]").forEach((btn) => {
-                btn.addEventListener("click", () => deleteRank(btn.getAttribute("data-rank-id")));
+                const draftHtml = rankDraftSectionId === section.id ? `
+                    <div class="rost-rank-draft">
+                        <div class="rost-add-row">
+                            <input type="text" id="rankDraftInput" placeholder="Rank name, e.g. Commander" aria-label="New rank" maxlength="80" />
+                            <button type="button" class="btn primary sm" id="rankDraftSave">Add</button>
+                        </div>
+                    </div>
+                ` : "";
+
+                return `
+                    <div class="rost-section">
+                        <div class="rost-section-head">
+                            <div class="rost-section-name">${escapeHtml(section.name || "Section")}</div>
+                            <div class="rost-section-tools">
+                                <button type="button" class="btn sm" data-add-rank-to="${escapeHtml(section.id)}">+ Rank</button>
+                                <button type="button" class="btn sm danger" data-del-section="${escapeHtml(section.id)}">Delete</button>
+                            </div>
+                        </div>
+                        ${ranksHtml}
+                        ${draftHtml}
+                    </div>
+                `;
+            }).join("");
+
+            rostSectionsList.querySelectorAll("[data-add-rank-to]").forEach((btn) => {
+                btn.addEventListener("click", () => {
+                    const target = btn.getAttribute("data-add-rank-to");
+                    rankDraftSectionId = (rankDraftSectionId === target) ? null : target;
+                    renderStructure();
+                    const input = document.getElementById("rankDraftInput");
+                    if (input) input.focus();
+                });
             });
+
+            rostSectionsList.querySelectorAll("[data-del-section]").forEach((btn) => {
+                btn.addEventListener("click", () => deleteSection(btn.getAttribute("data-del-section")));
+            });
+
+            rostSectionsList.querySelectorAll("[data-del-rank]").forEach((btn) => {
+                btn.addEventListener("click", () => deleteRank(btn.getAttribute("data-del-rank")));
+            });
+
+            const draftSave = document.getElementById("rankDraftSave");
+            if (draftSave) {
+                draftSave.addEventListener("click", () => commitRankDraft());
+            }
+            const draftInput = document.getElementById("rankDraftInput");
+            if (draftInput) {
+                draftInput.addEventListener("keydown", (e) => {
+                    if (e.key === "Enter") {
+                        e.preventDefault();
+                        commitRankDraft();
+                    }
+                });
+            }
         }
 
-        async function loadRanks() {
-            const { data, error } = await localSupabase
-                .from("roster_roles")
+        async function commitRankDraft() {
+            const input = document.getElementById("rankDraftInput");
+            const sectionId = rankDraftSectionId;
+            if (!input || !sectionId) return;
+            await addRank(sectionId, input.value);
+        }
+
+        async function loadStructure() {
+            const { data: sectionsData, error: sectionsError } = await localSupabase
+                .from("roster_sections")
                 .select("*")
                 .eq("roster_id", roster.id)
                 .order("created_at", { ascending: true });
 
-            if (error) {
-                // Most likely the flattening migration has not been run yet.
-                if (/column .*roster_id|schema cache/i.test(error.message || "")) {
-                    showStatus("Run migrate_flat_roster_ranks.sql in Supabase, then retry.", "error");
-                } else {
-                    showStatus("Failed to load ranks: " + error.message, "error");
-                }
-                ranks = [];
-                renderRanks();
+            if (sectionsError) {
+                showStatus("Failed to load sections: " + sectionsError.message, "error");
+                sections = [];
+                renderStructure();
                 return;
             }
+            sections = Array.isArray(sectionsData) ? sectionsData : [];
 
-            ranks = Array.isArray(data) ? data : [];
-            renderRanks();
+            // Prefer the single roster_id query when that optional column exists,
+            // otherwise fall back to one query per section.
+            if (ranksHaveRosterId === null) {
+                const probe = await localSupabase
+                    .from("roster_roles")
+                    .select("id,roster_id")
+                    .eq("roster_id", roster.id)
+                    .limit(1);
+                ranksHaveRosterId = !probe.error;
+            }
+
+            const collected = [];
+            if (ranksHaveRosterId) {
+                const { data, error } = await localSupabase
+                    .from("roster_roles")
+                    .select("*")
+                    .eq("roster_id", roster.id)
+                    .order("created_at", { ascending: true });
+                if (error) {
+                    showStatus("Failed to load ranks: " + error.message, "error");
+                } else if (Array.isArray(data)) {
+                    data.forEach((r) => collected.push(r));
+                }
+            } else {
+                for (const section of sections) {
+                    const { data } = await localSupabase
+                        .from("roster_roles")
+                        .select("*")
+                        .eq("section_id", section.id)
+                        .order("created_at", { ascending: true });
+                    if (Array.isArray(data)) data.forEach((r) => collected.push(r));
+                }
+            }
+
+            ranks = collected;
+            if (rankDraftSectionId && !sections.some((s) => s.id === rankDraftSectionId)) {
+                rankDraftSectionId = null;
+            }
+            renderStructure();
         }
 
-        async function addRank() {
-            const name = newRankInput ? newRankInput.value.trim() : "";
+        async function addSection(name) {
+            const { error } = await localSupabase
+                .from("roster_sections")
+                .insert([{ roster_id: roster.id, name: name, created_at: new Date().toISOString() }]);
+            if (error) {
+                showStatus("Failed to add section: " + error.message, "error");
+                return null;
+            }
+            await loadStructure();
+            return true;
+        }
+
+        async function commitSectionDraft() {
+            const name = newSectionInput ? newSectionInput.value.trim() : "";
             if (!name) {
-                showStatus("Enter a rank name first.", "error");
+                showStatus("Enter a section name first.", "error");
                 return;
             }
-            if (addRankBtn) { addRankBtn.disabled = true; }
+            if (addSectionBtn) { addSectionBtn.disabled = true; }
+            const ok = await addSection(name);
+            if (addSectionBtn) { addSectionBtn.disabled = false; }
+            if (ok) {
+                if (newSectionInput) newSectionInput.value = "";
+                showStatus("Section added.", "success");
+            }
+        }
+
+        async function deleteSection(sectionId) {
+            const section = sections.find((s) => s.id === sectionId);
+            const count = ranksForSection(sectionId).length;
+            const label = (section && section.name) || "this section";
+            const extra = count ? " and its " + count + (count === 1 ? " rank" : " ranks") : "";
+            if (!confirm('Delete "' + label + '"' + extra + "?")) return;
+
+            const { error: ranksError } = await localSupabase
+                .from("roster_roles")
+                .delete()
+                .eq("section_id", sectionId);
+            if (ranksError) {
+                showStatus("Failed to delete ranks: " + ranksError.message, "error");
+                return;
+            }
 
             const { error } = await localSupabase
-                .from("roster_roles")
-                .insert([{ roster_id: roster.id, name: name, created_at: new Date().toISOString() }]);
-
-            if (addRankBtn) { addRankBtn.disabled = false; }
-
+                .from("roster_sections")
+                .delete()
+                .eq("id", sectionId);
             if (error) {
-                if (/column .*roster_id|schema cache/i.test(error.message || "")) {
-                    showStatus("Run migrate_flat_roster_ranks.sql in Supabase, then retry.", "error");
-                } else {
-                    showStatus("Failed to add rank: " + error.message, "error");
-                }
+                showStatus("Failed to delete section: " + error.message, "error");
                 return;
             }
+            await loadStructure();
+        }
 
-            if (newRankInput) newRankInput.value = "";
-            await loadRanks();
+        async function addRank(sectionId, rawName) {
+            const name = (rawName || "").trim();
+            if (!name) {
+                showStatus("Enter a rank name first.", "error");
+                return false;
+            }
+            if (!sectionId) {
+                showStatus("Pick a section first.", "error");
+                return false;
+            }
+
+            const payload = {
+                section_id: sectionId,
+                name: name,
+                created_at: new Date().toISOString()
+            };
+            if (ranksHaveRosterId) payload.roster_id = roster.id;
+
+            const { error } = await localSupabase.from("roster_roles").insert([payload]);
+            if (error) {
+                showStatus("Failed to add rank: " + error.message, "error");
+                return false;
+            }
+
+            rankDraftSectionId = null;
+            await loadStructure();
             showStatus("Rank added.", "success");
+            return true;
         }
 
         async function deleteRank(rankId) {
@@ -586,14 +759,16 @@
                 showStatus("Failed to delete rank: " + error.message, "error");
                 return;
             }
-            await loadRanks();
+            await loadStructure();
         }
 
         // ---------- members ----------
 
         function renderMembers() {
             if (rostMemberCount) {
-                rostMemberCount.textContent = members.length ? selectedMemberIds.size + " of " + members.length + " selected" : "";
+                rostMemberCount.textContent = members.length
+                    ? selectedMemberIds.size + " of " + members.length + " selected"
+                    : "";
             }
             if (!rostMembers) return;
             if (members.length === 0) {
@@ -636,7 +811,7 @@
         }
 
         async function refresh() {
-            await loadRanks();
+            await loadStructure();
             await loadMembers();
         }
 
@@ -680,7 +855,7 @@
                     })));
                 if (insertError) {
                     if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = "Save Changes"; }
-                    showStatus("Failed to update members: " + insertError.message, "error");
+                    showStatus("Failed to update members: " +insertError.message, "error");
                     return;
                 }
             }
@@ -690,9 +865,23 @@
         }
 
         async function deleteRoster() {
-            if (!confirm("Delete this roster, its ranks and its members?")) return;
-            await localSupabase.from("roster_roles").delete().eq("roster_id", roster.id);
+            if (!confirm("Delete this roster, its sections, ranks and members?")) return;
+
+            if (sections.length) {
+                await localSupabase.from("roster_roles").delete().in(
+                    "section_id",
+                    sections.map((s) => s.id)
+                );
+            }
+            if (ranks.length) {
+                await localSupabase.from("roster_roles").delete().in(
+                    "id",
+                    ranks.map((r) => r.id)
+                );
+            }
+            await localSupabase.from("roster_sections").delete().eq("roster_id", roster.id);
             await localSupabase.from("roster_members").delete().eq("roster_id", roster.id);
+
             const { error } = await localSupabase
                 .from("rosters")
                 .delete()
@@ -706,12 +895,12 @@
 
         if (saveBtn) saveBtn.addEventListener("click", save);
         if (deleteRosterBtn) deleteRosterBtn.addEventListener("click", deleteRoster);
-        if (addRankBtn) addRankBtn.addEventListener("click", addRank);
-        if (newRankInput) {
-            newRankInput.addEventListener("keydown", (e) => {
+        if (addSectionBtn) addSectionBtn.addEventListener("click", commitSectionDraft);
+        if (newSectionInput) {
+            newSectionInput.addEventListener("keydown", (e) => {
                 if (e.key === "Enter") {
                     e.preventDefault();
-                    addRank();
+                    commitSectionDraft();
                 }
             });
         }
@@ -777,6 +966,8 @@
 
             if (fullscreenMsg) fullscreenMsg.style.display = "none";
             hideAllViews();
+            rankDraftSectionId = null;
+            ranksHaveRosterId = null;
 
             try {
                 // Wait for the persisted session to finish loading before any
