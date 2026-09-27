@@ -86,9 +86,7 @@
             font-family: inherit;
         }
 
-        .rost-name-input:hover {
-            border-color: #e2e8f0;
-        }
+        .rost-name-input:hover { border-color: #e2e8f0; }
 
         .rost-name-input:focus {
             border-color: #2563eb;
@@ -111,6 +109,7 @@
             font-size: 13px;
             font-weight: 600;
             cursor: pointer;
+            font-family: inherit;
         }
 
         .btn:hover { background: #f1f5f9; }
@@ -121,19 +120,15 @@
         .btn.danger { color: #dc2626; border-color: #fecaca; }
         .btn.danger:hover { background: #fef2f2; }
 
-        .btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
+        .btn:disabled { opacity: 0.6; cursor: not-allowed; }
 
         .rost-main {
-            max-width: 1080px;
+            max-width: 760px;
             margin: 0 auto;
             padding: 24px 32px 80px;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
+            display: flex;
+            flex-direction: column;
             gap: 20px;
-            align-items: start;
         }
 
         .rost-card {
@@ -158,78 +153,66 @@
             color: #0f172a;
         }
 
-        .rost-section {
-            border: 1px solid #e2e8f0;
-            border-radius: 10px;
-            padding: 12px;
-            margin-bottom: 8px;
-        }
-
-        .rost-section-head {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 8px;
-            margin-bottom: 6px;
-        }
-
-        .rost-section-name {
-            font-size: 14px;
-            font-weight: 700;
-            color: #0f172a;
-            word-break: break-word;
-        }
-
-        .rost-section-tools {
-            display: flex;
-            gap: 4px;
-            flex: 0 0 auto;
-        }
-
-        .mini-btn {
-            border: none;
-            border-radius: 6px;
-            padding: 4px 8px;
-            font-size: 11px;
-            font-weight: 700;
-            cursor: pointer;
-        }
-
-        .mini-btn.add { background: #2563eb; color: #ffffff; }
-        .mini-btn.add:hover { background: #1d4ed8; }
-
-        .mini-btn.del {
-            background: #ffffff;
-            color: #dc2626;
-            border: 1px solid #dc2626;
-        }
-
-        .mini-btn.del:hover { background: #fef2f2; }
-
-        .rost-role {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 8px;
-            margin-top: 4px;
-        }
-
-        .rost-role span {
+        .rost-card-count {
             font-size: 12px;
-            color: #475569;
+            color: #94a3b8;
+            font-weight: 600;
+        }
+
+        .rost-add-row {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .rost-add-row input {
+            flex: 1;
+            min-width: 0;
+            padding: 9px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 10px;
+            font-size: 14px;
+            color: #0f172a;
+            outline: none;
+            font-family: inherit;
+        }
+
+        .rost-add-row input:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+        }
+
+        .rost-list-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 10px 4px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .rost-list-row:last-child { border-bottom: none; }
+
+        .rost-list-label {
+            font-size: 14px;
+            color: #334155;
             font-weight: 600;
             word-break: break-word;
         }
 
-        .rost-role button {
+        .rost-row-del {
+            flex: 0 0 auto;
             background: none;
-            border: none;
+            border: 1px solid transparent;
+            border-radius: 6px;
             color: #dc2626;
             cursor: pointer;
-            font-size: 11px;
-            padding: 2px 6px;
-            flex: 0 0 auto;
+            font-size: 15px;
+            line-height: 1;
+            padding: 3px 8px;
         }
+
+        .rost-row-del:hover { background: #fef2f2; border-color: #fecaca; }
 
         .rost-member {
             display: flex;
@@ -279,17 +262,9 @@
             font-family: inherit;
         }
 
-        .rost-picker-item:hover {
-            background: #f8fafc;
-            border-color: #94a3b8;
-        }
+        .rost-picker-item:hover { background: #f8fafc; border-color: #94a3b8; }
 
-        .rost-picker-go {
-            font-size: 12px;
-            font-weight: 600;
-            color: #2563eb;
-            flex: 0 0 auto;
-        }
+        .rost-picker-go { font-size: 12px; font-weight: 600; color: #2563eb; flex: 0 0 auto; }
 
         .rost-fullscreen-msg {
             max-width: 600px;
@@ -308,9 +283,7 @@
             word-break: break-word;
         }
 
-        .rost-fullscreen-msg .btn {
-            margin-top: 18px;
-        }
+        .rost-fullscreen-msg .btn { margin-top: 18px; }
 
         .rost-footer {
             position: fixed;
@@ -324,16 +297,10 @@
             pointer-events: none;
         }
 
-        .rost-footer strong {
-            color: #475569;
-            font-weight: 700;
-        }
+        .rost-footer strong { color: #475569; font-weight: 700; }
 
         @media (max-width: 860px) {
-            .rost-main {
-                grid-template-columns: 1fr;
-                padding: 20px 16px 80px;
-            }
+            .rost-main { padding: 20px 16px 80px; }
             .rost-toolbar { padding: 14px 16px; }
         }
     </style>
@@ -360,24 +327,29 @@
     </div>
 
     <div class="rost-main" id="rostMain" style="display:none;">
-        <div class="rost-card" id="rostPickerCard" style="display:none; grid-column: 1 / -1;">
+        <div class="rost-card" id="rostPickerCard" style="display:none;">
             <div class="rost-card-head">
                 <div class="rost-card-title">Choose a roster</div>
             </div>
             <div id="rostPickerList"></div>
         </div>
 
-        <div class="rost-card" id="rostSectionsCard">
+        <div class="rost-card" id="rostRanksCard">
             <div class="rost-card-head">
-                <div class="rost-card-title">Sections &amp; Roles</div>
-                <button type="button" class="mini-btn add" id="addSectionBtn">+ Add Section</button>
+                <div class="rost-card-title">Ranks</div>
+                <div class="rost-card-count" id="rostRankCount"></div>
             </div>
-            <div id="rostSections"></div>
+            <div class="rost-add-row">
+                <input type="text" id="newRankInput" placeholder="Add a rank..." aria-label="New rank" maxlength="80" />
+                <button type="button" class="btn primary" id="addRankBtn">Add</button>
+            </div>
+            <div id="rostRanks"></div>
         </div>
 
         <div class="rost-card" id="rostMembersCard">
             <div class="rost-card-head">
                 <div class="rost-card-title">Roster Members</div>
+                <div class="rost-card-count" id="rostMemberCount"></div>
             </div>
             <div id="rostMembers"></div>
         </div>
@@ -403,21 +375,25 @@
         const retryBtn = document.getElementById("retryBtn");
         const rostCrumb = document.getElementById("rostCrumb");
         const rostName = document.getElementById("rostName");
-        const rostSections = document.getElementById("rostSections");
+        const rostRanks = document.getElementById("rostRanks");
+        const rostRankCount = document.getElementById("rostRankCount");
+        const newRankInput = document.getElementById("newRankInput");
+        const addRankBtn = document.getElementById("addRankBtn");
         const rostMembers = document.getElementById("rostMembers");
+        const rostMemberCount = document.getElementById("rostMemberCount");
         const rostPickerCard = document.getElementById("rostPickerCard");
         const rostPickerList = document.getElementById("rostPickerList");
-        const rostSectionsCard = document.getElementById("rostSectionsCard");
+        const rostRanksCard = document.getElementById("rostRanksCard");
         const rostMembersCard = document.getElementById("rostMembersCard");
         const rostFooter = document.getElementById("rostFooter");
         const backBtn = document.getElementById("backBtn");
         const saveBtn = document.getElementById("saveBtn");
         const deleteRosterBtn = document.getElementById("deleteRosterBtn");
-        const addSectionBtn = document.getElementById("addSectionBtn");
 
         let localSupabase = null;
         let roster = null;
         let communityName = "";
+        let ranks = [];
         let members = [];
         let selectedMemberIds = new Set();
 
@@ -455,6 +431,10 @@
             return div.innerHTML;
         }
 
+        function sleep(ms) {
+            return new Promise((resolve) => setTimeout(resolve, ms));
+        }
+
         if (backBtn) {
             backBtn.addEventListener("click", () => {
                 if (window.history.length > 1) window.history.back();
@@ -462,14 +442,10 @@
             });
         }
 
-        function sleep(ms) {
-            return new Promise((resolve) => setTimeout(resolve, ms));
-        }
-
         // A freshly opened tab starts with an empty in-memory auth state; supabase-js
         // only recovers the persisted session asynchronously. Polling getSession()
-        // (which triggers that recovery) avoids treating a not-yet-loaded session
-        // as "logged out" and then failing every RLS-protected query.
+        // avoids treating a not-yet-loaded session as "logged out" and then failing
+        // every RLS-protected query.
         async function waitForAuthUser(timeoutMs) {
             const deadline = Date.now() + (timeoutMs || 10000);
             let user = null;
@@ -494,19 +470,20 @@
             return null;
         }
 
-        async function hasRostersAccess(communityId, user) {            if (!user) return false;
+        async function hasRostersAccess(communityIdParam, user) {
+            if (!user) return false;
             try {
                 const { data: community } = await localSupabase
                     .from("communities")
                     .select("creator_email")
-                    .eq("id", communityId)
+                    .eq("id", communityIdParam)
                     .maybeSingle();
                 if (community && community.creator_email === user.email) return true;
 
                 const { data: roleAssignments } = await localSupabase
                     .from("member_roles")
                     .select("role_id")
-                    .eq("community_id", communityId)
+                    .eq("community_id", communityIdParam)
                     .eq("user_id", user.id);
                 if (!Array.isArray(roleAssignments) || roleAssignments.length === 0) return false;
 
@@ -524,55 +501,106 @@
             }
         }
 
-        function renderSections(sections, rolesBySection) {
-            if (!rostSections) return;
-            if (!Array.isArray(sections) || sections.length === 0) {
-                rostSections.innerHTML = '<div class="rost-empty">No sections yet. Use "Add Section" to get started.</div>';
+        // ---------- ranks ----------
+
+        function renderRanks() {
+            if (rostRankCount) {
+                rostRankCount.textContent = ranks.length ? ranks.length + (ranks.length === 1 ? " rank" : " ranks") : "";
+            }
+            if (!rostRanks) return;
+            if (ranks.length === 0) {
+                rostRanks.innerHTML = '<div class="rost-empty">No ranks yet. Add one above.</div>';
                 return;
             }
 
-            rostSections.innerHTML = sections.map((section) => {
-                const roles = rolesBySection[section.id] || [];
-                const rolesHtml = roles.length === 0
-                    ? '<div class="rost-empty" style="padding:4px 0;">No roles</div>'
-                    : roles.map((role) => `
-                        <div class="rost-role">
-                            <span>&bull; ${escapeHtml(role.name)}</span>
-                            <button type="button" data-del-role="${escapeHtml(role.id)}" data-section-id="${escapeHtml(section.id)}" title="Delete role">&times;</button>
-                        </div>
-                    `).join("");
+            rostRanks.innerHTML = ranks.map((r) => `
+                <div class="rost-list-row">
+                    <div class="rost-list-label">${escapeHtml(r.name || "Untitled")}</div>
+                    <button type="button" class="rost-row-del" data-rank-id="${escapeHtml(r.id)}" title="Delete rank">&times;</button>
+                </div>
+            `).join("");
 
-                return `
-                    <div class="rost-section">
-                        <div class="rost-section-head">
-                            <div class="rost-section-name">${escapeHtml(section.name)}</div>
-                            <div class="rost-section-tools">
-                                <button type="button" class="mini-btn add" data-add-role="${escapeHtml(section.id)}">+ Role</button>
-                                <button type="button" class="mini-btn del" data-del-section="${escapeHtml(section.id)}">Delete</button>
-                            </div>
-                        </div>
-                        ${rolesHtml}
-                    </div>
-                `;
-            }).join('');
-
-            rostSections.querySelectorAll("[data-add-role]").forEach((btn) => {
-                btn.addEventListener("click", () => addRole(btn.getAttribute("data-add-role")));
-            });
-            rostSections.querySelectorAll("[data-del-role]").forEach((btn) => {
-                btn.addEventListener("click", () => deleteRole(btn.getAttribute("data-del-role"), btn.getAttribute("section-id")));
-            });
-            rostSections.querySelectorAll("[data-del-section]").forEach((btn) => {
-                btn.addEventListener("click", () => deleteSection(btn.getAttribute("data-del-section")));
+            rostRanks.querySelectorAll("[data-rank-id]").forEach((btn) => {
+                btn.addEventListener("click", () => deleteRank(btn.getAttribute("data-rank-id")));
             });
         }
 
+        async function loadRanks() {
+            const { data, error } = await localSupabase
+                .from("roster_roles")
+                .select("*")
+                .eq("roster_id", roster.id)
+                .order("created_at", { ascending: true });
+
+            if (error) {
+                // Most likely the flattening migration has not been run yet.
+                if (/column .*roster_id|schema cache/i.test(error.message || "")) {
+                    showStatus("Run migrate_flat_roster_ranks.sql in Supabase, then retry.", "error");
+                } else {
+                    showStatus("Failed to load ranks: " + error.message, "error");
+                }
+                ranks = [];
+                renderRanks();
+                return;
+            }
+
+            ranks = Array.isArray(data) ? data : [];
+            renderRanks();
+        }
+
+        async function addRank() {
+            const name = newRankInput ? newRankInput.value.trim() : "";
+            if (!name) {
+                showStatus("Enter a rank name first.", "error");
+                return;
+            }
+            if (addRankBtn) { addRankBtn.disabled = true; }
+
+            const { error } = await localSupabase
+                .from("roster_roles")
+                .insert([{ roster_id: roster.id, name: name, created_at: new Date().toISOString() }]);
+
+            if (addRankBtn) { addRankBtn.disabled = false; }
+
+            if (error) {
+                if (/column .*roster_id|schema cache/i.test(error.message || "")) {
+                    showStatus("Run migrate_flat_roster_ranks.sql in Supabase, then retry.", "error");
+                } else {
+                    showStatus("Failed to add rank: " + error.message, "error");
+                }
+                return;
+            }
+
+            if (newRankInput) newRankInput.value = "";
+            await loadRanks();
+            showStatus("Rank added.", "success");
+        }
+
+        async function deleteRank(rankId) {
+            if (!confirm("Delete this rank?")) return;
+            const { error } = await localSupabase
+                .from("roster_roles")
+                .delete()
+                .eq("id", rankId);
+            if (error) {
+                showStatus("Failed to delete rank: " + error.message, "error");
+                return;
+            }
+            await loadRanks();
+        }
+
+        // ---------- members ----------
+
         function renderMembers() {
+            if (rostMemberCount) {
+                rostMemberCount.textContent = members.length ? selectedMemberIds.size + " of " + members.length + " selected" : "";
+            }
             if (!rostMembers) return;
-            if (!Array.isArray(members) || members.length === 0) {
+            if (members.length === 0) {
                 rostMembers.innerHTML = '<div class="rost-empty">No members in this community.</div>';
                 return;
             }
+
             rostMembers.innerHTML = members.map((m) => `
                 <div class="rost-member">
                     <span class="rost-member-email">${escapeHtml(m.email || "Unknown")}</span>
@@ -585,35 +613,9 @@
                     const memberId = cb.getAttribute("data-member-id");
                     if (cb.checked) selectedMemberIds.add(memberId);
                     else selectedMemberIds.delete(memberId);
+                    renderMembers();
                 });
             });
-        }
-
-        async function loadSections() {
-            const { data: sectionsData, error } = await localSupabase
-                .from("roster_sections")
-                .select("*")
-                .eq("roster_id", roster.id)
-                .order("created_at", { ascending: true });
-
-            if (error) {
-                if (rostSections) rostSections.innerHTML = '<div class="rost-empty">Failed to load sections. Please run the roster SQL setup script.</div>';
-                return;
-            }
-
-            const sections = Array.isArray(sectionsData) ? sectionsData : [];
-            const rolesBySection = {};
-
-            for (const section of sections) {
-                const { data: rolesData } = await localSupabase
-                    .from("roster_roles")
-                    .select("*")
-                    .eq("section_id", section.id)
-                    .order("created_at", { ascending: true });
-                rolesBySection[section.id] = Array.isArray(rolesData) ? rolesData : [];
-            }
-
-            renderSections(sections, rolesBySection);
         }
 
         async function loadMembers() {
@@ -634,64 +636,11 @@
         }
 
         async function refresh() {
-            await loadSections();
+            await loadRanks();
             await loadMembers();
         }
 
-        async function addSection() {
-            const name = prompt("Enter section name:");
-            if (!name || !name.trim()) return;
-            const { error } = await localSupabase
-                .from("roster_sections")
-                .insert([{ roster_id: roster.id, name: name.trim(), created_at: new Date().toISOString() }]);
-            if (error) {
-                showStatus("Failed to create section: " + error.message, "error");
-                return;
-            }
-            await loadSections();
-            showStatus("Section added.", "success");
-        }
-
-        async function addRole(sectionId) {
-            const name = prompt("Enter role name:");
-            if (!name || !name.trim()) return;
-            const { error } = await localSupabase
-                .from("roster_roles")
-                .insert([{ section_id: sectionId, name: name.trim(), created_at: new Date().toISOString() }]);
-            if (error) {
-                showStatus("Failed to create role: " + error.message, "error");
-                return;
-            }
-            await loadSections();
-            showStatus("Role added.", "success");
-        }
-
-        async function deleteRole(roleId, sectionId) {
-            if (!confirm("Delete this role?")) return;
-            const { error } = await localSupabase
-                .from("roster_roles")
-                .delete()
-                .eq("id", roleId);
-            if (error) {
-                showStatus("Failed to delete role: " + error.message, "error");
-                return;
-            }
-            await loadSections();
-        }
-
-        async function deleteSection(sectionId) {
-            if (!confirm("Delete this section and all its roles?")) return;
-            await localSupabase.from("roster_roles").delete().eq("section_id", sectionId);
-            const { error } = await localSupabase
-                .from("roster_sections")
-                .delete()
-                .eq("id", sectionId);
-            if (error) {
-                showStatus("Failed to delete section: " + error.message, "error");
-                return;
-            }
-            await loadSections();
-        }
+        // ---------- save / delete ----------
 
         async function save() {
             const newName = rostName ? rostName.value.trim() : "";
@@ -741,15 +690,8 @@
         }
 
         async function deleteRoster() {
-            if (!confirm("Delete this roster, its sections and its members?")) return;
-            const { data: sections } = await localSupabase
-                .from("roster_sections")
-                .select("id")
-                .eq("roster_id", roster.id);
-            for (const section of sections || []) {
-                await localSupabase.from("roster_roles").delete().eq("section_id", section.id);
-            }
-            await localSupabase.from("roster_sections").delete().eq("roster_id", roster.id);
+            if (!confirm("Delete this roster, its ranks and its members?")) return;
+            await localSupabase.from("roster_roles").delete().eq("roster_id", roster.id);
             await localSupabase.from("roster_members").delete().eq("roster_id", roster.id);
             const { error } = await localSupabase
                 .from("rosters")
@@ -764,13 +706,23 @@
 
         if (saveBtn) saveBtn.addEventListener("click", save);
         if (deleteRosterBtn) deleteRosterBtn.addEventListener("click", deleteRoster);
-        if (addSectionBtn) addSectionBtn.addEventListener("click", addSection);
+        if (addRankBtn) addRankBtn.addEventListener("click", addRank);
+        if (newRankInput) {
+            newRankInput.addEventListener("keydown", (e) => {
+                if (e.key === "Enter") {
+                    e.preventDefault();
+                    addRank();
+                }
+            });
+        }
+
+        // ---------- picker fallback ----------
 
         function hideAllViews() {
             if (layoutToolbar) layoutToolbar.style.display = "none";
             if (layoutMain) layoutMain.style.display = "none";
             if (rostPickerCard) rostPickerCard.style.display = "none";
-            if (rostSectionsCard) rostSectionsCard.style.display = "";
+            if (rostRanksCard) rostRanksCard.style.display = "";
             if (rostMembersCard) rostMembersCard.style.display = "";
         }
 
@@ -807,10 +759,10 @@
             }
 
             if (layoutToolbar) layoutToolbar.style.display = "none";
-            if (rostSectionsCard) rostSectionsCard.style.display = "none";
+            if (rostRanksCard) rostRanksCard.style.display = "none";
             if (rostMembersCard) rostMembersCard.style.display = "none";
             if (rostPickerCard) rostPickerCard.style.display = "block";
-            if (layoutMain) layoutMain.style.display = "grid";
+            if (layoutMain) layoutMain.style.display = "flex";
         }
 
         async function init() {
@@ -886,7 +838,7 @@
                 if (rostCrumb) rostCrumb.textContent = communityName || "Roster";
                 if (rostName) rostName.value = roster.name || "";
                 if (layoutToolbar) layoutToolbar.style.display = "flex";
-                if (layoutMain) layoutMain.style.display = "grid";
+                if (layoutMain) layoutMain.style.display = "flex";
 
                 await refresh();
             } catch (err) {
