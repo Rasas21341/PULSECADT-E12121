@@ -269,6 +269,18 @@
             padding: 0 20px;
         }
 
+        .rost-fullscreen-msg .rost-msg-detail {
+            display: block;
+            margin-top: 10px;
+            font-size: 12px;
+            color: #94a3b8;
+            word-break: break-word;
+        }
+
+        .rost-fullscreen-msg .btn {
+            margin-top: 18px;
+        }
+
         .rost-footer {
             position: fixed;
             bottom: 10px;
@@ -298,7 +310,11 @@
 <body>
     <div class="rost-status" id="rostStatus"></div>
 
-    <div id="fullscreenMsg" class="rost-fullscreen-msg" style="display:none;"></div>
+    <div id="fullscreenMsg" class="rost-fullscreen-msg" style="display:none;">
+        <div id="fullscreenText"></div>
+        <span class="rost-msg-detail" id="fullscreenDetail"></span>
+        <button type="button" class="btn" id="retryBtn" style="display:none;">Retry</button>
+    </div>
 
     <div class="rost-toolbar" id="rostToolbar" style="display:none;">
         <div class="rost-toolbar-id">
@@ -313,7 +329,14 @@
     </div>
 
     <div class="rost-main" id="rostMain" style="display:none;">
-        <div class="rost-card">
+        <div class="rost-card" id="rostPickerCard" style="display:none; grid-column: 1 / -1;">
+            <div class="rost-card-head">
+                <div class="rost-card-title">Choose a roster</div>
+            </div>
+            <div id="rostPickerList"></div>
+        </div>
+
+        <div class="rost-card" id="rostSectionsCard">
             <div class="rost-card-head">
                 <div class="rost-card-title">Sections &amp; Roles</div>
                 <button type="button" class="mini-btn add" id="addSectionBtn">+ Add Section</button>
@@ -321,7 +344,7 @@
             <div id="rostSections"></div>
         </div>
 
-        <div class="rost-card">
+        <div class="rost-card" id="rostMembersCard">
             <div class="rost-card-head">
                 <div class="rost-card-title">Roster Members</div>
             </div>
@@ -337,12 +360,16 @@
         const SUPABASE_ANON_KEY = "eyJhbJciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp3ZG9nYWx3YmN6ZHR2eHZocmZkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM2NTA2MjQsImV4cCI6MjA5OTIyNjYyNH0.baPVVTtW0d3FDC2pTd1P3d5aoIc2FZkaD-6bBvDPFWw";
 
         const params = new URLSearchParams(window.location.search);
-        const rosterId = params.get("id");
+        let rosterId = params.get("id");
+        const communityId = params.get("communityId");
 
         const statusEl = document.getElementById("rostStatus");
         const layoutToolbar = document.getElementById("rostToolbar");
         const layoutMain = document.getElementById("rostMain");
         const fullscreenMsg = document.getElementById("fullscreenMsg");
+        const fullscreenText = document.getElementById("fullscreenText");
+        const fullscreenDetail = document.getElementById("fullscreenDetail");
+        const retryBtn = document.getElementById("retryBtn");
         const rostCrumb = document.getElementById("rostCrumb");
         const rostName = document.getElementById("rostName");
         const rostSections = document.getElementById("rostSections");
@@ -376,9 +403,11 @@
             }
         }
 
-        function showFullscreenMessage(message) {
+        function showFullscreenMessage(message, detail, showRetry) {
             if (fullscreenMsg) {
-                fullscreenMsg.textContent = message;
+                if (fullscreenText) fullscreenText.textContent = message;
+                if (fullscreenDetail) fullscreenDetail.textContent = detail || "";
+                if (retryBtn) retryBtn.style.display = showRetry ? "inline-block" : "none";
                 fullscreenMsg.style.display = "block";
             }
             if (rostFooter) rostFooter.style.display = "none";
@@ -681,17 +710,35 @@
                 return;
             }
 
+            if (fullscreenMsg) fullscreenMsg.style.display = "none";
+
             try {
+                // Restore the stored session before any RLS-protected query, otherwise
+                // PostgREST answers as an anonymous role and every row looks missing.
+                await localSupabase.auth.getSession();
                 const { data: { user } } = await localSupabase.auth.getUser();
+
+                if (!user) {
+                    showFullscreenMessage("Please log in to view this roster.", "No active session in this tab.", true);
+                    return;
+                }
 
                 const { data: rosterData, error: rosterError } = await localSupabase
                     .from("rosters")
                     .select("*")
                     .eq("id", rosterId)
+                    .limit(1)
                     .maybeSingle();
 
-                if (rosterError || !rosterData) {
-                    showFullscreenMessage("Roster not found or you don't have access to it.");
+                if (rosterError) {
+                    console.error("Roster lookup failed:", rosterError, { rosterId });
+                    showFullscreenMessage("Could not load this roster.", rosterError.message, true);
+                    return;
+                }
+
+                if (!rosterData) {
+                    console.error("Roster lookup returned no row", { rosterId, user: user.email });
+                    showFullscreenMessage("Roster not found or you don't have access to it.", "id: " + rosterId, true);
                     return;
                 }
                 roster = rosterData;
@@ -722,8 +769,15 @@
                 await refresh();
             } catch (err) {
                 console.error("Init failed:", err);
-                showFullscreenMessage("Failed to load roster.");
+                showFullscreenMessage("Failed to load roster.", (err && err.message) || String(err), true);
             }
+        }
+
+        if (retryBtn) {
+            retryBtn.addEventListener("click", () => {
+                retryBtn.style.display = "none";
+                init();
+            });
         }
 
         init();

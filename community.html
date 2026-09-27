@@ -2692,7 +2692,8 @@
                                 rostersList.querySelectorAll("[data-action='open']").forEach((btn) => {
                                     btn.addEventListener("click", () => {
                                         const rosterId = btn.getAttribute("data-roster-id");
-                                        window.open("/roster.html?id=" + encodeURIComponent(rosterId), "_blank");
+                                        window.open("/roster.html?id=" + encodeURIComponent(rosterId)
+                                            + "&communityId=" + encodeURIComponent(id), "_blank");
                                     });
                                 });
                             } catch (err) {
