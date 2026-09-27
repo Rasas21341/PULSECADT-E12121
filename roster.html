@@ -462,8 +462,39 @@
             });
         }
 
-        async function hasRostersAccess(communityId, user) {
-            if (!user) return false;
+        function sleep(ms) {
+            return new Promise((resolve) => setTimeout(resolve, ms));
+        }
+
+        // A freshly opened tab starts with an empty in-memory auth state; supabase-js
+        // only recovers the persisted session asynchronously. Polling getSession()
+        // (which triggers that recovery) avoids treating a not-yet-loaded session
+        // as "logged out" and then failing every RLS-protected query.
+        async function waitForAuthUser(timeoutMs) {
+            const deadline = Date.now() + (timeoutMs || 10000);
+            let user = null;
+
+            while (Date.now() < deadline) {
+                try {
+                    const { data } = await localSupabase.auth.getSession();
+                    if (data && data.session && data.session.user) {
+                        user = data.session.user;
+                    } else {
+                        const res = await localSupabase.auth.getUser();
+                        if (res && res.data && res.data.user) user = res.data.user;
+                    }
+                } catch (err) {
+                    console.warn("Session probe failed:", err);
+                }
+
+                if (user) return user;
+                await sleep(300);
+            }
+
+            return null;
+        }
+
+        async function hasRostersAccess(communityId, user) {            if (!user) return false;
             try {
                 const { data: community } = await localSupabase
                     .from("communities")
@@ -796,10 +827,10 @@
             hideAllViews();
 
             try {
-                // Restore the stored session before any RLS-protected query, otherwise
-                // PostgREST answers as an anonymous role and every row looks missing.
-                await localSupabase.auth.getSession();
-                const { data: { user } } = await localSupabase.auth.getUser();
+                // Wait for the persisted session to finish loading before any
+                // RLS-protected query, otherwise PostgREST answers as an anonymous
+                // role and every row looks missing.
+                const user = await waitForAuthUser();
 
                 if (!user) {
                     showFullscreenMessage("Please log in to view this roster.", "No active session in this tab.", true);
