@@ -260,6 +260,37 @@
             padding: 12px 0;
         }
 
+        .rost-picker-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            width: 100%;
+            text-align: left;
+            padding: 12px 14px;
+            margin-bottom: 8px;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            background: #ffffff;
+            color: #0f172a;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        .rost-picker-item:hover {
+            background: #f8fafc;
+            border-color: #94a3b8;
+        }
+
+        .rost-picker-go {
+            font-size: 12px;
+            font-weight: 600;
+            color: #2563eb;
+            flex: 0 0 auto;
+        }
+
         .rost-fullscreen-msg {
             max-width: 600px;
             margin: 90px auto;
@@ -704,8 +735,55 @@
         if (deleteRosterBtn) deleteRosterBtn.addEventListener("click", deleteRoster);
         if (addSectionBtn) addSectionBtn.addEventListener("click", addSection);
 
+        function hideAllViews() {
+            if (layoutToolbar) layoutToolbar.style.display = "none";
+            if (layoutMain) layoutMain.style.display = "none";
+            if (rostPickerCard) rostPickerCard.style.display = "none";
+            if (rostSectionsCard) rostSectionsCard.style.display = "";
+            if (rostMembersCard) rostMembersCard.style.display = "";
+        }
+
+        async function showRosterPicker() {
+            if (!rostPickerList || !communityId) return;
+            const { data, error } = await localSupabase
+                .from("rosters")
+                .select("*")
+                .eq("community_id", communityId)
+                .order("created_at", { ascending: false });
+
+            if (error) {
+                rostPickerList.innerHTML = '<div class="rost-empty">Failed to load rosters.</div>';
+            } else if (!Array.isArray(data) || data.length === 0) {
+                rostPickerList.innerHTML = '<div class="rost-empty">This community has no rosters yet.</div>';
+            } else {
+                rostPickerList.innerHTML = data.map((r) => `
+                    <button type="button" class="rost-picker-item" data-roster-id="${escapeHtml(r.id)}">
+                        <span>${escapeHtml(r.name || "Roster")}</span>
+                        <span class="rost-picker-go">Open &#8594;</span>
+                    </button>
+                `).join("");
+
+                rostPickerList.querySelectorAll("[data-roster-id]").forEach((b) => {
+                    b.addEventListener("click", () => {
+                        rosterId = b.getAttribute("data-roster-id");
+                        const url = new URL(window.location.href);
+                        url.searchParams.set("id", rosterId);
+                        window.history.replaceState({}, "", url.toString());
+                        hideAllViews();
+                        init();
+                    });
+                });
+            }
+
+            if (layoutToolbar) layoutToolbar.style.display = "none";
+            if (rostSectionsCard) rostSectionsCard.style.display = "none";
+            if (rostMembersCard) rostMembersCard.style.display = "none";
+            if (rostPickerCard) rostPickerCard.style.display = "block";
+            if (layoutMain) layoutMain.style.display = "grid";
+        }
+
         async function init() {
-            if (!rosterId) {
+            if (!rosterId && !communityId) {
                 showFullscreenMessage("No roster specified.");
                 return;
             }
@@ -715,6 +793,7 @@
             }
 
             if (fullscreenMsg) fullscreenMsg.style.display = "none";
+            hideAllViews();
 
             try {
                 // Restore the stored session before any RLS-protected query, otherwise
@@ -727,21 +806,29 @@
                     return;
                 }
 
-                const { data: rosterData, error: rosterError } = await localSupabase
-                    .from("rosters")
-                    .select("*")
-                    .eq("id", rosterId)
-                    .limit(1)
-                    .maybeSingle();
+                let rosterData = null;
+                if (rosterId) {
+                    const lookup = await localSupabase
+                        .from("rosters")
+                        .select("*")
+                        .eq("id", rosterId)
+                        .limit(1)
+                        .maybeSingle();
 
-                if (rosterError) {
-                    console.error("Roster lookup failed:", rosterError, { rosterId });
-                    showFullscreenMessage("Could not load this roster.", rosterError.message, true);
-                    return;
+                    if (lookup.error) {
+                        console.error("Roster lookup failed:", lookup.error, { rosterId });
+                        showFullscreenMessage("Could not load this roster.", lookup.error.message, true);
+                        return;
+                    }
+                    rosterData = lookup.data;
                 }
 
                 if (!rosterData) {
-                    console.error("Roster lookup returned no row", { rosterId, user: user.email });
+                    console.warn("Roster lookup returned no row", { rosterId, user: user.email });
+                    if (communityId) {
+                        await showRosterPicker();
+                        return;
+                    }
                     showFullscreenMessage("Roster not found or you don't have access to it.", "id: " + rosterId, true);
                     return;
                 }
