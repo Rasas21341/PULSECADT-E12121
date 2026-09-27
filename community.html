@@ -2595,6 +2595,10 @@
                         function closeAllPages() {
                             const pages = [membersView, departmentsView, documentsView, licencesView, vehiclesView, applicationsView, settingsView, rostersView];
                             pages.forEach((p) => { if (p) p.classList.remove("open"); });
+                            if (contentEl) {
+                                contentEl.querySelectorAll(".members-view.open, .departments-view.open, .documents-view.open, .licences-view.open, .vehicles-view.open, .settings-view.open, .rosters-view.open, .roster-editor-view.open, .roles-view.open")
+                                    .forEach((p) => p.classList.remove("open"));
+                            }
                         }
 
                         if (requestsDropdownToggle && requestsDropdownMenu) {
@@ -2626,7 +2630,6 @@
                         if (rostersBtn) {
                             rostersBtn.addEventListener("click", (e) => {
                                 e.stopPropagation();
-                                const rostersView = document.getElementById("rostersView");
                                 if (rostersView.classList.contains("open")) {
                                     rostersView.classList.remove("open");
                                 } else {
@@ -2641,7 +2644,6 @@
                         if (rolesBtn) {
                             rolesBtn.addEventListener("click", (e) => {
                                 e.stopPropagation();
-                                const rolesView = document.getElementById("rolesView");
                                 if (rolesView.classList.contains("open")) {
                                     rolesView.classList.remove("open");
                                 } else {
@@ -2653,6 +2655,7 @@
                         }
 
                         const rostersView = document.getElementById("rostersView");
+                        const rolesView = document.getElementById("rolesView");
                         const rostersViewClose = document.getElementById("rostersViewClose");
                         const openAddRosterBtn = document.getElementById("openAddRosterBtn");
                         const rostersList = document.getElementById("rostersList");
@@ -2767,7 +2770,6 @@
 
                         if (rolesViewClose) {
                             rolesViewClose.addEventListener("click", () => {
-                                const rolesView = document.getElementById("rolesView");
                                 if (rolesView) rolesView.classList.remove("open");
                             });
                         }
