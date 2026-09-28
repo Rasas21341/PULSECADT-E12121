@@ -184,7 +184,7 @@
 
         .units-bar {
             position: fixed;
-            top: 56px;
+            top: 86px;
             left: 50%;
             transform: translateX(-50%);
             width: min(1200px, calc(100% - 48px));
@@ -693,9 +693,38 @@
             background: #eff6ff;
         }
 
+        .bodycam-btn {
+            position: fixed;
+            right: 648px;
+            bottom: 24px;
+            padding: 12px 20px;
+            border-radius: 12px;
+            border: 1px solid #2563eb;
+            background: #ffffff;
+            color: #2563eb;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            z-index: 700;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .bodycam-btn:hover {
+            background: #eff6ff;
+        }
+
+        .bodycam-btn.active {
+            background: #fef2f2;
+            border-color: #fecaca;
+            color: #991b1b;
+        }
+
         .calls-bar {
             position: fixed;
-            top: 140px;
+            top: 170px;
             left: 50%;
             transform: translateX(-50%);
             width: min(1200px, calc(100% - 48px));
@@ -1476,50 +1505,63 @@
             display: none;
             align-items: center;
             justify-content: center;
-            background: transparent;
+            background: rgba(0, 0, 0, 0.85);
             pointer-events: none;
         }
 
         .bodycam-overlay.open {
             display: flex;
-        }
-
-        .bodycam-rec-dot,
-        .bodycam-rec-label,
-        .bodycam-time {
-            display: none !important;
-        }
-
-        .bodycam-image-wrap {
-            position: relative;
-            display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
         }
 
-        .bodycam-icon {
-            width: min(72vw, 820px);
-            max-height: 85vh;
-            object-fit: contain;
-            display: block;
-            margin: auto;
-            filter: none;
+        .bodycam-rec-bar {
+            position: fixed;
+            top: 16px;
+            left: 16px;
+            z-index: 10000;
+            display: none;
+            align-items: center;
+            gap: 8px;
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid #ef4444;
+            padding: 8px 14px;
+            border-radius: 999px;
         }
 
-        .bodycam-label {
-            position: absolute;
-            left: 50%;
-            top: 44%;
-            transform: translate(-50%, -50%);
-            color: #000000;
-            font-size: clamp(12px, 1.5vw, 28px);
+        .bodycam-overlay.open .bodycam-rec-bar {
+            display: inline-flex;
+        }
+
+        .bodycam-rec-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #ef4444;
+            animation: bodycam-pulse 1.5s infinite;
+        }
+
+        .bodycam-rec-label,
+        .bodycam-time {
+            font-size: 12px;
             font-weight: 800;
-            letter-spacing: 0.08em;
+            color: #ffffff;
+            font-family: 'Courier New', monospace;
+        }
+
+        .bodycam-rec-label {
             text-transform: uppercase;
-            text-align: center;
-            pointer-events: none;
-            white-space: nowrap;
-            text-shadow: none;
+            letter-spacing: 0.5px;
+        }
+
+        .bodycam-video {
+            width: min(90vw, 1280px);
+            max-height: 80vh;
+            object-fit: contain;
+            display: block;
+            border: 2px solid #333333;
+            border-radius: 4px;
         }
 
         @keyframes bodycam-pulse {
@@ -1836,10 +1878,12 @@
 </head>
 <body>
     <div class="bodycam-overlay" id="bodycamOverlay">
-        <div class="bodycam-image-wrap">
-            <img src="pdr.png" class="bodycam-icon" alt="PDR" />
-            <div class="bodycam-label">Dispatch FG 1</div>
+        <div class="bodycam-rec-bar">
+            <span class="bodycam-rec-dot"></span>
+            <span class="bodycam-rec-label">REC</span>
+            <span class="bodycam-time" id="bodycamTime">00:00:00</span>
         </div>
+        <video class="bodycam-video" id="bodycamVideo" autoplay playsinline></video>
     </div>
     <div class="status-bar">
         <div class="status-current">
@@ -1929,6 +1973,13 @@
     <button type="button" class="civilian-lookup-btn" id="civilianLookupBtn">Lookup Civilian</button>
     <button type="button" class="supervisor-panel-btn" id="supervisorPanelBtn">Supervisor Panel</button>
     <button type="button" class="units-citations-btn" id="unitsCitationsBtn">Units / Citations</button>
+    <button type="button" class="bodycam-btn" id="bodycamBtn" aria-label="Body cam">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M10 12a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"></path>
+            <path d="M21 12v2a2 2 0 0 1-2 2h-4.5l-2 3-2-3H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+        </svg>
+        <span class="bodycam-btn-label">Body Cam</span>
+    </button>
 
     <div class="units-citations-overlay" id="unitsCitationsOverlay">
         <div class="units-citations-modal">
@@ -2267,7 +2318,7 @@
                 </tr>`;
 
                 if (!Array.isArray(data) || data.length === 0) {
-                    tbody.innerHTML = currentRow + '<tr><td colspan="8" class="units-empty">No other active units</td></tr>';
+                    tbody.innerHTML = currentRow;
                     return;
                 }
 
@@ -3833,25 +3884,111 @@
         loadCallsBar();
 
         const bodycamOverlay = document.getElementById("bodycamOverlay");
+        const bodycamBtn = document.getElementById("bodycamBtn");
+        const bodycamTimeEl = document.getElementById("bodycamTime");
+        const bodycamVideo = document.getElementById("bodycamVideo");
+        let bodycamActive = false;
+        let bodycamTimer = null;
+        let bodycamStartTime = null;
+        let bodycamStream = null;
+
+        function updateBodycamTimer() {
+            if (!bodycamActive || !bodycamStartTime) return;
+            const elapsed = Date.now() - bodycamStartTime;
+            const totalSeconds = Math.floor(elapsed / 1000);
+            const hours = Math.floor(totalSeconds / 3600);
+            const minutes = Math.floor((totalSeconds % 3600) / 60);
+            const seconds = totalSeconds % 60;
+            const timeStr = String(hours).padStart(2, '0') + ':' + String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
+            if (bodycamTimeEl) bodycamTimeEl.textContent = timeStr;
+        }
+
+        async function startBodycam() {
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getDisplayMedia) {
+                alert("Screen sharing is not supported by your browser.");
+                return false;
+            }
+            let stream = null;
+            try {
+                stream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: true });
+            } catch (err) {
+                alert("Screen share cancelled or unavailable.");
+                return false;
+            }
+            bodycamStream = stream;
+            if (bodycamVideo) {
+                bodycamVideo.srcObject = stream;
+            }
+            bodycamActive = true;
+            if (bodycamOverlay) bodycamOverlay.classList.add("open");
+            if (bodycamBtn) bodycamBtn.classList.add("active");
+            if (bodycamBtn) {
+                const label = bodycamBtn.querySelector(".bodycam-btn-label");
+                if (label) label.textContent = "Recording";
+            }
+            if (bodycamTimeEl) bodycamTimeEl.textContent = "00:00:00";
+            bodycamStartTime = Date.now();
+            bodycamTimer = setInterval(updateBodycamTimer, 1000);
+            updateBodycamTimer();
+            return true;
+        }
+
+        function stopBodycam() {
+            bodycamActive = false;
+            if (bodycamStream) {
+                bodycamStream.getTracks().forEach(track => track.stop());
+                bodycamStream = null;
+            }
+            if (bodycamVideo) {
+                bodycamVideo.srcObject = null;
+            }
+            if (bodycamOverlay) bodycamOverlay.classList.remove("open");
+            if (bodycamBtn) bodycamBtn.classList.remove("active");
+            if (bodycamBtn) {
+                const label = bodycamBtn.querySelector(".bodycam-btn-label");
+                if (label) label.textContent = "Body Cam";
+            }
+            if (bodycamTimer) clearInterval(bodycamTimer);
+            bodycamTimer = null;
+            bodycamStartTime = null;
+            if (bodycamTimeEl) bodycamTimeEl.textContent = "00:00:00";
+        }
 
         function toggleBodycam() {
-            if (!bodycamOverlay) return;
-            bodycamOverlay.classList.toggle("open");
+            if (bodycamActive) {
+                stopBodycam();
+            } else {
+                startBodycam();
+            }
+        }
+
+        if (bodycamBtn) {
+            bodycamBtn.addEventListener("click", toggleBodycam);
         }
 
         const panicButton = document.getElementById("panicButton");
         let panicActive = false;
 
         if (panicButton) {
-            panicButton.addEventListener("click", () => {
+            panicButton.addEventListener("click", async () => {
                 panicActive = !panicActive;
                 panicButton.classList.toggle("active", panicActive);
                 const label = panicButton.querySelector(".panic-label");
                 if (label) label.textContent = panicActive ? "PANIC ON" : "PANIC";
                 if (panicActive) {
-                    bodycamOverlay?.classList.add("open");
+                    await startBodycam();
+                    if ('speechSynthesis' in window) {
+                        const utterance = new SpeechSynthesisUtterance(`Panic unit ${officerCallsign || officerName}`);
+                        utterance.rate = 1.1;
+                        utterance.pitch = 1.2;
+                        utterance.volume = 1.0;
+                        const voices = speechSynthesis.getVoices();
+                        const femaleVoice = voices.find(v => v.name.toLowerCase().includes('female') || v.name.toLowerCase().includes('woman') || v.name.toLowerCase().includes('samantha') || v.name.toLowerCase().includes('victoria') || v.name.toLowerCase().includes('karen') || v.name.toLowerCase().includes('allison'));
+                        if (femaleVoice) utterance.voice = femaleVoice;
+                        speechSynthesis.speak(utterance);
+                    }
                 } else {
-                    bodycamOverlay?.classList.remove("open");
+                    stopBodycam();
                 }
             });
         }
