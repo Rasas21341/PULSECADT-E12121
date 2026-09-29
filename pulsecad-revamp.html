@@ -38,6 +38,38 @@
             color: #64748b;
         }
 
+        .app-banner {
+            position: fixed;
+            top: 14px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 700;
+            max-width: 1100px;
+            width: calc(100% - 28px);
+            padding: 11px 26px;
+            border-radius: 999px;
+            background: #fef3c7;
+            border: 1px solid #f59e0b;
+            box-shadow: 0 4px 14px rgba(245, 158, 11, 0.2);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #92400e;
+        }
+
+        .app-banner a {
+            color: #92400e;
+            font-weight: 600;
+            text-decoration: underline;
+            white-space: nowrap;
+        }
+
+        .app-banner a:hover {
+            opacity: 0.85;
+        }
+
         h1 {
             font-size: 32px;
             font-weight: 700;
@@ -80,7 +112,7 @@
 
         .topbar {
             position: fixed;
-            top: 24px;
+            top: 60px;
             left: 50%;
             transform: translateX(-50%);
             display: flex;
@@ -1790,6 +1822,10 @@ enable-ga="false"
 ></call-us>--> 
 <script defer src="https://downloads-global.3cx.com/downloads/livechatandtalk/v1/callus.js" id="tcx-callus-js" charset="utf-8"></script>
 <body>
+    <div class="app-banner" id="appBanner">
+        <span>This CAD is now available on an app. Download it</span>
+        <a href="/download" class="app-banner-link">here</a>
+    </div>
     <img class="top-left-logo" id="topLeftLogo" src="https://cdn.discordapp.com/icons/1498000979101093999/c96c547fbd94e68254d8335dadb2e437.webp?size=1024" alt="Logo" />
     <div class="topbar" id="topbar">
         <span class="pill">
@@ -3152,9 +3188,12 @@ enable-ga="false"
              if (topLeftLogo) topLeftLogo.classList.add("visible");
              const moderationBtn = document.getElementById("staffDashboardBtn");
              if (moderationBtn) moderationBtn.classList.add("visible");
-             const trustedFooter = document.getElementById("trustedFooter");
-             if (trustedFooter) trustedFooter.style.display = "none";
-             updateStaffButtonVisibility();
+              const trustedFooter = document.getElementById("trustedFooter");
+              if (trustedFooter) trustedFooter.style.display = "none";
+              const appBanner = document.getElementById("appBanner");
+              if (appBanner) appBanner.style.display = "none";
+              if (topbar) topbar.style.top = "24px";
+              updateStaffButtonVisibility();
         }
 
         function applyLoggedOutUI() {
@@ -3164,19 +3203,21 @@ enable-ga="false"
             const container = document.querySelector(".container");
             const loggedInScreen = document.getElementById("loggedInScreen");
             const settingsScreen = document.getElementById("settingsScreen");
-            const topLeftLogo = document.getElementById("topLeftLogo");
-            if (topbar) topbar.style.display = "block";
-            if (topbarLoginBtn) topbarLoginBtn.textContent = "Login";
-            if (userDropdown) userDropdown.style.display = "none";
-            if (loggedInScreen) loggedInScreen.classList.remove("open");
-            if (settingsScreen) settingsScreen.classList.remove("open");
-            if (container) container.style.display = "block";
-             if (topLeftLogo) topLeftLogo.classList.remove("visible");
-             const moderationBtn = document.getElementById("staffDashboardBtn");
-             if (moderationBtn) moderationBtn.classList.remove("visible");
-             const trustedFooter = document.getElementById("trustedFooter");
-             if (trustedFooter) trustedFooter.style.display = "block";
-        }
+             const topLeftLogo = document.getElementById("topLeftLogo");
+             if (topbar) { topbar.style.display = "block"; topbar.style.top = "60px"; }
+             if (topbarLoginBtn) topbarLoginBtn.textContent = "Login";
+             if (userDropdown) userDropdown.style.display = "none";
+             if (loggedInScreen) loggedInScreen.classList.remove("open");
+             if (settingsScreen) settingsScreen.classList.remove("open");
+             if (container) container.style.display = "block";
+              if (topLeftLogo) topLeftLogo.classList.remove("visible");
+              const moderationBtn = document.getElementById("staffDashboardBtn");
+              if (moderationBtn) moderationBtn.classList.remove("visible");
+              const trustedFooter = document.getElementById("trustedFooter");
+              if (trustedFooter) trustedFooter.style.display = "block";
+              const appBanner = document.getElementById("appBanner");
+              if (appBanner) appBanner.style.display = "inline-flex";
+         }
 
         async function restoreSession() {
             if (!localSupabase) return;
