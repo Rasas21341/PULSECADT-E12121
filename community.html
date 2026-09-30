@@ -1833,6 +1833,21 @@
                              }
                          });
 
+                         function refreshMembersList() {
+                             if (membersView && membersView.classList.contains("open")) {
+                                 loadMembersInto(membersViewList, { openDropdown: false });
+                             }
+                         }
+
+                         if (localSupabase && currentCommunityId) {
+                             localSupabase
+                                 .channel("public:user_communities:community_id=eq." + currentCommunityId)
+                                 .on("postgres_changes", { event: "*", schema: "public", table: "user_communities", filter: "community_id=eq." + currentCommunityId }, (payload) => {
+                                     refreshMembersList();
+                                 })
+                                 .subscribe();
+                         }
+
                         if (serverNameInput) {
                             serverNameInput.addEventListener("blur", async () => {
                                 const newName = serverNameInput.value.trim();
