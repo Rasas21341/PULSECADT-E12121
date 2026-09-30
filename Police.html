@@ -4121,26 +4121,38 @@
                 showLiveMapStatus("ERLC API key is not set. Add it in Community Settings → ERLC API Key.", "error");
                 return null;
             }
+
             const proxyUrl = "/api/erlc/v2/server?Players=true&Staff=true";
-            try {
-                const resp = await fetch(proxyUrl, {
-                    headers: { "server-key": erlcApiKey, "accept": "application/json" }
-                });
-                console.log("[ERLC Live Map] Proxy response status:", resp.status, "for", proxyUrl);
-                if (!resp.ok) {
+            const directUrl = "https://api.erlc.gg/v2/server?Players=true&Staff=true";
+
+            // Try the PulseCAD server proxy first, fall back to direct ERLC API
+            const urls = [proxyUrl, directUrl];
+            let lastError = "";
+
+            for (const url of urls) {
+                try {
+                    const resp = await fetch(url, {
+                        headers: { "server-key": erlcApiKey, "accept": "application/json" }
+                    });
+                    console.log("[ERLC Live Map] " + url + " → HTTP " + resp.status);
+
+                    if (resp.ok) {
+                        const data = await resp.json();
+                        console.log("[ERLC Live Map] Got data keys:", Object.keys(data));
+                        return data;
+                    }
+
                     const body = await resp.text().catch(() => "");
-                    console.error("[ERLC Live Map] Proxy error body:", body.slice(0, 500));
-                    showLiveMapStatus("ERLC API error (HTTP " + resp.status + "). Check your API key.", "error");
-                    return null;
+                    console.error("[ERLC Live Map] Error body:", body.slice(0, 500));
+                    lastError = "HTTP " + resp.status;
+                } catch (err) {
+                    console.error("[ERLC Live Map] Fetch failed for " + url + ":", err.message);
+                    lastError = err.message;
                 }
-                const data = await resp.json();
-                console.log("[ERLC Live Map] Got data keys:", Object.keys(data));
-                return data;
-            } catch (err) {
-                console.error("ERLC API fetch failed:", err);
-                showLiveMapStatus("Failed to reach ERLC API: " + err.message, "error");
-                return null;
             }
+
+            showLiveMapStatus("ERLC API error (" + lastError + "). Check your API key or server connection.", "error");
+            return null;
         }
 
         async function loadUnitLocations() {
