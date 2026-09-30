@@ -1792,11 +1792,49 @@
                             });
                         }
 
-                        if (settingsViewClose && settingsView) {
-                            settingsViewClose.addEventListener("click", () => {
-                                settingsView.classList.remove("open");
-                            });
-                        }
+                         if (settingsViewClose && settingsView) {
+                             settingsViewClose.addEventListener("click", () => {
+                                 settingsView.classList.remove("open");
+                             });
+                         }
+
+                         function closeAllPages() {
+                             const allViews = contentEl.querySelectorAll('.members-view, .departments-view, .documents-view, .settings-view, .rosters-view, .roster-editor-view, .roles-view, .licences-view, .vehicles-view, .applications-view');
+                             allViews.forEach((v) => { v.classList.remove("open"); });
+                         }
+
+                         if (membersBtn && memberList) {
+                             membersBtn.addEventListener("click", (e) => {
+                                 e.stopPropagation();
+                                 if (memberList.classList.contains("open")) {
+                                     memberList.classList.remove("open");
+                                 } else {
+                                     document.querySelectorAll('.member-list').forEach((ml) => { ml.classList.remove("open"); });
+                                     memberList.classList.add("open");
+                                     loadMembers();
+                                 }
+                             });
+                         }
+
+                         if (membersView && membersViewList) {
+                             membersView.addEventListener("click", (e) => {
+                                 if (e.target === membersView) {
+                                     membersView.classList.remove("open");
+                                 }
+                             });
+                         }
+
+                         if (membersViewClose && membersView) {
+                             membersViewClose.addEventListener("click", () => {
+                                 membersView.classList.remove("open");
+                             });
+                         }
+
+                         document.addEventListener("click", (e) => {
+                             if (!membersBtn || !e.target.closest(".members-btn")) {
+                                 if (memberList) memberList.classList.remove("open");
+                             }
+                         });
 
                         if (serverNameInput) {
                             serverNameInput.addEventListener("blur", async () => {
