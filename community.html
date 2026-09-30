@@ -2276,7 +2276,10 @@
                                             alert("Failed to ban member: " + (err.message || err));
                                         }
                                     }
-}
+                                }
+                            });
+                        }
+
                         const rolesBtn = document.getElementById("rolesBtn");
                         if (rolesBtn) {
                             rolesBtn.addEventListener("click", (e) => {
