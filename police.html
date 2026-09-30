@@ -4121,19 +4121,24 @@
                 showLiveMapStatus("ERLC API key is not set. Add it in Community Settings → ERLC API Key.", "error");
                 return null;
             }
+            const proxyUrl = "/api/erlc/v2/server?Players=true&Staff=true";
             try {
-                const resp = await fetch("/api/erlc/v2/server?Players=true&Staff=true", {
+                const resp = await fetch(proxyUrl, {
                     headers: { "server-key": erlcApiKey, "accept": "application/json" }
                 });
+                console.log("[ERLC Live Map] Proxy response status:", resp.status, "for", proxyUrl);
                 if (!resp.ok) {
-                    showLiveMapStatus("ERLC API error (HTTP " + resp.status + ").", "error");
+                    const body = await resp.text().catch(() => "");
+                    console.error("[ERLC Live Map] Proxy error body:", body.slice(0, 500));
+                    showLiveMapStatus("ERLC API error (HTTP " + resp.status + "). Check your API key.", "error");
                     return null;
                 }
                 const data = await resp.json();
+                console.log("[ERLC Live Map] Got data keys:", Object.keys(data));
                 return data;
             } catch (err) {
                 console.error("ERLC API fetch failed:", err);
-                showLiveMapStatus("Failed to reach ERLC API.", "error");
+                showLiveMapStatus("Failed to reach ERLC API: " + err.message, "error");
                 return null;
             }
         }
