@@ -1803,16 +1803,13 @@
                              allViews.forEach((v) => { v.classList.remove("open"); });
                          }
 
-                         if (membersBtn && memberList) {
+                         if (membersBtn && membersView && membersViewList) {
                              membersBtn.addEventListener("click", (e) => {
                                  e.stopPropagation();
-                                 if (memberList.classList.contains("open")) {
-                                     memberList.classList.remove("open");
-                                 } else {
-                                     document.querySelectorAll('.member-list').forEach((ml) => { ml.classList.remove("open"); });
-                                     memberList.classList.add("open");
-                                     loadMembers();
-                                 }
+                                 if (memberList) memberList.classList.remove("open");
+                                 closeAllPages();
+                                 membersView.classList.add("open");
+                                 loadMembersInto(membersViewList, { openDropdown: false });
                              });
                          }
 
