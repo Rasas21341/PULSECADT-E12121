@@ -2416,7 +2416,7 @@ const rolesBtn = document.getElementById("rolesBtn");
                             });
                         }
 
-                        const rolesView = document.getElementById("rolesView");
+const rolesView = document.getElementById("rolesView");
                         const rolesViewClose = document.getElementById("rolesViewClose");
                         if (rolesViewClose) {
                             rolesViewClose.addEventListener("click", () => {
@@ -2439,6 +2439,10 @@ const rolesBtn = document.getElementById("rolesBtn");
                             });
                         }
 
+                        const rostersView = document.getElementById("rostersView");
+                        const rostersViewClose = document.getElementById("rostersViewClose");
+                        const rostersList = document.getElementById("rostersList");
+                        const openRosterPageBtn = document.getElementById("openRosterPageBtn");
                         if (rostersViewClose) {
                             rostersViewClose.addEventListener("click", () => {
                                 rostersView.classList.remove("open");
