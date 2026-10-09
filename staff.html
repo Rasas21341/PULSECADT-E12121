@@ -500,6 +500,118 @@
         .give-key-btn:hover {
             background: #15803d;
         }
+
+        .view-key-btn {
+            background: #ffffff;
+            color: #0f172a;
+            border: 1px solid #cbd5e1;
+            padding: 6px 12px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .view-key-btn:hover {
+            background: #f1f5f9;
+            border-color: #94a3b8;
+        }
+
+        .key-row-actions {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .key-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.55);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            z-index: 1000;
+        }
+
+        .key-modal-card {
+            background: #ffffff;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 560px;
+            max-height: 80vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .key-modal-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 18px 20px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .key-modal-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: #0f172a;
+            word-break: break-word;
+        }
+
+        .key-modal-close {
+            background: none;
+            border: none;
+            font-size: 22px;
+            line-height: 1;
+            color: #94a3b8;
+            cursor: pointer;
+            padding: 0 4px;
+        }
+
+        .key-modal-close:hover { color: #0f172a; }
+
+        .key-modal-body {
+            padding: 18px 20px;
+            overflow-y: auto;
+        }
+
+        .key-view-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 10px 0;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 13px;
+        }
+
+        .key-view-row:last-child { border-bottom: none; }
+
+        .key-view-code {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+            font-weight: 700;
+            color: #0f172a;
+            word-break: break-all;
+        }
+
+        .key-view-date { color: #94a3b8; font-size: 12px; white-space: nowrap; }
+
+        .key-copy-btn {
+            border: 1px solid #cbd5e1;
+            background: #ffffff;
+            border-radius: 6px;
+            padding: 3px 8px;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            flex: 0 0 auto;
+        }
+
+        .key-copy-btn:hover { background: #f1f5f9; }
     </style></head>
 <body>
     <div class="sidebar">
@@ -517,6 +629,17 @@
             <div id="content"></div>
         </div>
     </div>
+
+    <div class="key-modal" id="keyModal" style="display:none;">
+        <div class="key-modal-card">
+            <div class="key-modal-head">
+                <div class="key-modal-title">Keys given to <span id="keyModalEmail"></span></div>
+                <button type="button" class="key-modal-close" id="keyModalClose" aria-label="Close">&times;</button>
+            </div>
+            <div class="key-modal-body" id="keyModalBody"></div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         const SUPABASE_URL = "https://zwdogalwbczdtvxvhrfd.supabase.co";
@@ -798,7 +921,7 @@
                     const created = row.created_at ? new Date(row.created_at).toLocaleString() : "";
                     const currentDept = row.department || "";
                     const ipCell = (isManagement || isSupportLead) ? `<td>${(row.ip || "N/A").replace(/</g, "&lt;").replace(/>/g, "&gt;")}</td>` : "";
-                    const giveKeyBtn = (isManagement || isSupportLead) ? `<button type="button" class="give-key-btn" data-user-id="${row.id}" data-email="${email.replace(/"/g, '&quot;')}">Give Key</button>` : `<span style="color:#94a3b8;font-size:12px;font-weight:600;">No Permission</span>`;
+                    const keyActions = (isManagement || isSupportLead) ? `<div class="key-row-actions"><button type="button" class="view-key-btn" data-user-id="${row.id}" data-email="${email.replace(/"/g, '&quot;')}">View</button><button type="button" class="give-key-btn" data-user-id="${row.id}" data-email="${email.replace(/"/g, '&quot;')}">Give Key</button></div>` : `<span style="color:#94a3b8;font-size:12px;font-weight:600;">No Permission</span>`;
                     let deptDisabled = "";
                     let deptOptions = `<option value="">Unassigned</option><option value="Management" ${currentDept === 'Management' ? 'selected' : ''}>Management</option><option value="Support Team Lead" ${currentDept === 'Support Team Lead' ? 'selected' : ''}>Support Team Lead</option><option value="Support Team" ${currentDept === 'Support Team' ? 'selected' : ''}>Support Team</option><option value="Development Team" ${currentDept === 'Development Team' ? 'selected' : ''}>Development Team</option>`;
                     if (!isManagement && !isSupportLead) {
@@ -807,7 +930,7 @@
                     if (isSupportLead) {
                         deptOptions = `<option value="">Unassigned</option><option value="Support Team Lead" ${currentDept === 'Support Team Lead' ? 'selected' : ''}>Support Team Lead</option><option value="Support Team" ${currentDept === 'Support Team' ? 'selected' : ''}>Support Team</option><option value="Development Team" ${currentDept === 'Development Team' ? 'selected' : ''}>Development Team</option>`;
                     }
-                    html += `<tr><td>${email}</td><td>${created}</td><td><select class="department-select" data-user-id="${row.id}" data-current-dept="${(currentDept || '').replace(/</g, '&lt;').replace(/>/g, '&gt;')}" ${deptDisabled}>${deptOptions}</select></td>${ipCell}<td>${giveKeyBtn}</td></tr>`;
+                    html += `<tr><td>${email}</td><td>${created}</td><td><select class="department-select" data-user-id="${row.id}" data-current-dept="${(currentDept || '').replace(/</g, '&lt;').replace(/>/g, '&gt;')}" ${deptDisabled}>${deptOptions}</select></td>${ipCell}<td>${keyActions}</td></tr>`;
                 });
                 html += "</table>";
                 contentEl.innerHTML = html;
@@ -877,8 +1000,91 @@
                         alert("Key given successfully: " + key);
                     });
                 });
+
+                contentEl.querySelectorAll(".view-key-btn").forEach((btn) => {
+                    btn.addEventListener("click", async () => {
+                        const dept = await getUserDepartment();
+                        if (dept !== "Management" && dept !== "Support Team Lead") {
+                            alert("Access denied. Management only.");
+                            return;
+                        }
+                        openKeyModal(btn.getAttribute("data-email"));
+                    });
+                });
             } catch (err) {
                 contentEl.innerHTML = `<div class="empty">An unexpected error occurred.</div>`;
+                console.error(err);
+            }
+        }
+
+        const keyModal = document.getElementById("keyModal");
+        const keyModalEmail = document.getElementById("keyModalEmail");
+        const keyModalBody = document.getElementById("keyModalBody");
+        const keyModalClose = document.getElementById("keyModalClose");
+
+        function closeKeyModal() {
+            if (keyModal) keyModal.style.display = "none";
+        }
+
+        if (keyModalClose) {
+            keyModalClose.addEventListener("click", closeKeyModal);
+        }
+
+        if (keyModal) {
+            keyModal.addEventListener("click", (e) => {
+                if (e.target === keyModal) closeKeyModal();
+            });
+        }
+
+        document.addEventListener("keydown", (e) => {
+            if (e.key === "Escape" && keyModal && keyModal.style.display !== "none") closeKeyModal();
+        });
+
+        async function openKeyModal(userEmail) {
+            if (!keyModal) return;
+            if (keyModalEmail) keyModalEmail.textContent = userEmail;
+            if (keyModalBody) keyModalBody.innerHTML = '<div class="empty">Loading keys...</div>';
+            keyModal.style.display = "flex";
+
+            try {
+                const { data, error } = await localSupabase
+                    .from("premium_keys")
+                    .select("id, key, used, used_by, used_at, created_at")
+                    .eq("used_by", userEmail)
+                    .order("created_at", { ascending: false });
+
+                if (error) {
+                    keyModalBody.innerHTML = `<div class="empty">Failed to load keys: ${error.message}</div>`;
+                    return;
+                }
+
+                const rows = Array.isArray(data) ? data : [];
+                if (rows.length === 0) {
+                    keyModalBody.innerHTML = '<div class="empty">No keys have been given to this user yet.</div>';
+                    return;
+                }
+
+                keyModalBody.innerHTML = rows.map((row) => {
+                    const code = (row.key || "").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+                    const when = row.used_at || row.created_at;
+                    const dateText = when ? new Date(when).toLocaleString() : "";
+                    return `<div class="key-view-row"><span class="key-view-code">${code}</span><span class="key-view-date">${dateText}</span><button type="button" class="key-copy-btn" data-copy="${code}">Copy</button></div>`;
+                }).join("");
+
+                keyModalBody.querySelectorAll("[data-copy]").forEach((btn) => {
+                    btn.addEventListener("click", async () => {
+                        const code = btn.getAttribute("data-copy");
+                        try {
+                            await navigator.clipboard.writeText(code);
+                            btn.textContent = "Copied";
+                        } catch (err) {
+                            prompt("Copy the key:", code);
+                        }
+                        setTimeout(() => { btn.textContent = "Copy"; }, 1500);
+                    });
+                });
+            } catch (err) {
+                keyModalBody.innerHTML = '<div class="empty">An unexpected error occurred.</div>';
                 console.error(err);
             }
         }
