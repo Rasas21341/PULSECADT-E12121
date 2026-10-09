@@ -2670,7 +2670,7 @@ async function saveRoleOrder() {
                             }
                         }
 
-                        async function createRole(name) {
+async function createRole(name) {
                             if (!localSupabase) {
                                 alert("Database unavailable.");
                                 return;
@@ -2696,46 +2696,13 @@ async function saveRoleOrder() {
                                 console.error(err);
                             }
                         }
-                                reorderDirty = false;
-                                const bar = document.getElementById("rolesSaveBar");
-                                if (bar) bar.classList.remove("show");
-                                loadRoles();
-                            } catch (err) {
-                                alert("Failed to save role order: " + (err.message || err));
-                            }
-                        }
 
-                        if (openAddRoleBtn) {
+if (openAddRoleBtn) {
                             openAddRoleBtn.addEventListener("click", () => {
                                 const roleName = prompt("Enter role name:");
                                 if (!roleName || !roleName.trim()) return;
                                 createRole(roleName.trim());
                             });
-                        }
-
-                        async function createRole(name) {
-                            if (!localSupabase) {
-                                alert("Database unavailable.");
-                                return;
-                            }
-                            try {
-                                const { error } = await localSupabase
-                                    .from("roles")
-                                    .insert([{
-                                        community_id: id,
-                                        name: name,
-                                        permissions: "",
-                                        created_at: new Date().toISOString()
-                                    }]);
-                                if (error) {
-                                    alert("Failed to create role: " + error.message);
-                                    return;
-                                }
-                                loadRoles();
-                            } catch (err) {
-                                alert("An unexpected error occurred.");
-                                console.error(err);
-                            }
                         }
 
                         async function editRole(roleId, newName) {
