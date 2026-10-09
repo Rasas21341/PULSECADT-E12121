@@ -2402,7 +2402,8 @@
                             });
                         }
 
-const rolesBtn = document.getElementById("rolesBtn");
+const rolesView = document.getElementById("rolesView");
+                        const rolesBtn = document.getElementById("rolesBtn");
                         if (rolesBtn) {
                             rolesBtn.addEventListener("click", (e) => {
                                 e.stopPropagation();
@@ -2416,7 +2417,6 @@ const rolesBtn = document.getElementById("rolesBtn");
                             });
                         }
 
-const rolesView = document.getElementById("rolesView");
                         const rolesViewClose = document.getElementById("rolesViewClose");
                         if (rolesViewClose) {
                             rolesViewClose.addEventListener("click", () => {
@@ -2489,14 +2489,7 @@ const rolesView = document.getElementById("rolesView");
 
                         // Roles page
                         const rolesList = document.getElementById("rolesList");
-                        const rolesViewClose = document.getElementById("rolesViewClose");
                         const openAddRoleBtn = document.getElementById("openAddRoleBtn");
-
-                        if (rolesViewClose) {
-                            rolesViewClose.addEventListener("click", () => {
-                                if (rolesView) rolesView.classList.remove("open");
-                            });
-                        }
 
                         async function loadRoles() {
                             if (!rolesList || !localSupabase) return;
