@@ -1991,6 +1991,15 @@
         </svg>
         New Call
     </button>
+    <button type="button" class="new-call-btn" id="formsBtn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <line x1="9" y1="13" x2="15" y2="13"></line>
+            <line x1="9" y1="17" x2="15" y2="17"></line>
+        </svg>
+        Forms
+    </button>
 
     <button type="button" class="plate-lookup-btn" id="plateLookupBtn">Plate Lookup</button>
     <button type="button" class="civilian-lookup-btn" id="civilianLookupBtn">Lookup Civilian</button>
@@ -2263,6 +2272,41 @@
             <button type="button" class="lookup-submit" id="newCallSubmitBtn">Create Call</button>
             <div class="lookup-error" id="newCallError"></div>
             <div class="lookup-error" id="newCallSuccess" style="background:#f0fdf4; color:#166534; border-color:#bbf7d0;"></div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="formsModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">Forms</div>
+                <button class="modal-close" id="formsModalClose" type="button" aria-label="Close">×</button>
+            </div>
+            <div class="lookup-field">
+                <label for="formsTitle">Title</label>
+                <input type="text" id="formsTitle" placeholder="e.g. Traffic Stop Report" />
+            </div>
+            <div class="lookup-field">
+                <label for="formsType">Form type</label>
+                <select id="formsType" style="width:100%; padding:12px 14px; border-radius:12px; border:1px solid #cbd5e1; font-size:15px; color:#0f172a; outline:none; background:#ffffff;">
+                    <option value="traffic">Traffic Stop</option>
+                    <option value="arrest">Arrest Warrant</option>
+                    <option value="citation">Citation</option>
+                    <option value="intake">Suspect Intake</option>
+                    <option value="property">Property Release</option>
+                    <option value="other">Other</option>
+                </select>
+            </div>
+            <div class="lookup-field">
+                <label for="formsOfficer">Officer</label>
+                <input type="text" id="formsOfficer" placeholder="Officer name" />
+            </div>
+            <div class="lookup-field">
+                <label for="formsDetails">Details</label>
+                <textarea id="formsDetails" rows="4" style="width:100%; padding:12px 14px; border-radius:12px; border:1px solid #cbd5e1; font-size:15px; color:#0f172a; outline:none; background:#ffffff; resize:vertical;" placeholder="Notes, names, vehicle info, etc."></textarea>
+            </div>
+            <button type="button" class="lookup-submit" id="formsSubmitBtn">Create Form</button>
+            <div class="lookup-error" id="formsError"></div>
+            <div class="lookup-error" id="formsSuccess" style="background:#f0fdf4; color:#166534; border-color:#bbf7d0;"></div>
         </div>
     </div>
 
