@@ -74,22 +74,17 @@
             flex-shrink: 0;
         }
 
-        .new-call-btn {
+        .top-buttons {
             position: fixed;
             top: 24px;
             right: 20px;
-            padding: 8px 14px;
-            border-radius: 10px;
-            border: 1px solid #e2e8f0;
-            background: #ffffff;
-            color: #0f172a;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
+            display: flex;
             gap: 8px;
             z-index: 600;
+        }
+
+        .top-buttons .new-call-btn {
+            position: static;
         }
 
         .new-call-btn:hover {
@@ -2689,6 +2684,89 @@
                 officerInfo.innerHTML = display;
             }
         })();
+
+        // Forms panel (next to New Call)
+        const formsBtn = document.getElementById("formsBtn");
+        const formsModal = document.getElementById("formsModal");
+        const formsModalClose = document.getElementById("formsModalClose");
+        const formsSubmitBtn = document.getElementById("formsSubmitBtn");
+        const formsError = document.getElementById("formsError");
+        const formsSuccess = document.getElementById("formsSuccess");
+
+        if (formsBtn && formsModal) {
+            formsBtn.addEventListener("click", () => {
+                formsModal.classList.add("open");
+            });
+        }
+        if (formsModalClose && formsModal) {
+            formsModalClose.addEventListener("click", () => {
+                formsModal.classList.remove("open");
+            });
+        }
+        if (formsModal) {
+            formsModal.addEventListener("click", (e) => {
+                if (e.target === formsModal) {
+                    formsModal.classList.remove("open");
+                }
+            });
+        }
+
+        if (formsSubmitBtn) {
+            formsSubmitBtn.addEventListener("click", async () => {
+                const title = document.getElementById("formsTitle").value.trim();
+                const formType = document.getElementById("formsType").value;
+                const officer = document.getElementById("formsOfficer").value.trim();
+                const details = document.getElementById("formsDetails").value.trim();
+
+                if (formsError) { formsError.textContent = ""; formsError.style.display = "none"; }
+                if (formsSuccess) { formsSuccess.style.display = "none"; }
+
+                if (!title) {
+                    if (formsError) { formsError.textContent = "Please enter a form title."; formsError.style.display = "block"; }
+                    return;
+                }
+
+                if (!localSupabase) {
+                    if (formsError) { formsError.textContent = "Database unavailable."; formsError.style.display = "block"; }
+                    return;
+                }
+
+                try {
+                    const { data, error } = await localSupabase
+                        .from("forms")
+                        .insert([{
+                            title: title,
+                            form_type: formType,
+                            officer_name: officer || officerName,
+                            officer_id: officerId,
+                            officer_rank: officerRank || null,
+                            officer_callsign: officerCallsign || null,
+                            details: details || null,
+                            created_at: new Date().toISOString()
+                        }]);
+
+                    if (error) {
+                        if (formsError) { formsError.textContent = "Failed to create form: " + error.message; formsError.style.display = "block"; }
+                        return;
+                    }
+
+                    if (formsSuccess) {
+                        formsSuccess.textContent = "Form created successfully! #" + (data && data[0] && data[0].id ? data[0].id : "created");
+                        formsSuccess.style.display = "block";
+                    }
+
+                    ["formsTitle", "formsOfficer", "formsDetails"].forEach((id) => {
+                        const el = document.getElementById(id);
+                        if (el) el.value = "";
+                    });
+                    document.getElementById("formsType").value = "traffic";
+                    formsModal.classList.remove("open");
+                } catch (err) {
+                    if (formsError) { formsError.textContent = "An unexpected error occurred."; formsError.style.display = "block"; }
+                    console.error(err);
+                }
+            });
+        }
 
         const STATUS_LABELS = {
             available: "Available",
