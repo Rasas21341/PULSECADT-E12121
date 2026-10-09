@@ -1046,6 +1046,28 @@
             gap: 8px;
         }
 
+        .request-item.dragging {
+            opacity: 0.4;
+            border: 2px dashed #2563eb;
+        }
+
+        .request-item.drag-over {
+            border-top: 2px solid #2563eb;
+            margin-top: -2px;
+        }
+
+        .drag-handle {
+            cursor: grab;
+            color: #94a3b8;
+            padding-right: 8px;
+            font-size: 16px;
+            user-select: none;
+        }
+
+        .drag-handle:hover {
+            color: #64748b;
+        }
+
         .request-item button {
             padding: 4px 8px;
             border-radius: 6px;
@@ -1067,6 +1089,49 @@
             background: #fef2f2;
             border-color: #fecaca;
             color: #991b1b;
+        }
+
+        .roles-save-bar {
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 10px 14px;
+            margin-bottom: 12px;
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            border-radius: 10px;
+            font-size: 13px;
+            color: #1e40af;
+            font-weight: 600;
+        }
+
+        .roles-save-bar.show {
+            display: flex;
+        }
+
+        .roles-save-bar button {
+            padding: 6px 14px;
+            border-radius: 8px;
+            border: none;
+            background: #2563eb;
+            color: #ffffff;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .roles-save-bar button:hover {
+            background: #1d4ed8;
+        }
+
+        .roles-save-bar .cancel-btn {
+            background: #e2e8f0;
+            color: #334155;
+        }
+
+        .roles-save-bar .cancel-btn:hover {
+            background: #cbd5e1;
         }
 
         .role-btn {
@@ -1684,7 +1749,7 @@
                                         <div id="documentsList"></div>
 </div>
                                 </div>
-                                <div class="roles-view" id="rolesView">
+<div class="roles-view" id="rolesView">
                                     <div class="members-view-header">
                                         <div class="members-view-title">Roles</div>
                                         <button type="button" class="add-department-btn" id="openAddRoleBtn">
@@ -1694,6 +1759,13 @@
                                         <button type="button" class="members-view-close" id="rolesViewClose" aria-label="Close"></button>
                                     </div>
                                     <div class="view-body">
+                                        <div class="roles-save-bar" id="rolesSaveBar">
+                                            <span>Reorder roles</span>
+                                            <div>
+                                                <button type="button" class="cancel-btn" id="rolesReorderCancel">Cancel</button>
+                                                <button type="button" id="rolesReorderSave">Save Order</button>
+                                            </div>
+                                        </div>
                                         <div id="rolesList"><div class="empty">No roles yet. Click "Create Role" to get started.</div></div>
                                     </div>
                                 </div>
@@ -2330,7 +2402,7 @@
                             });
                         }
 
-                        const rolesBtn = document.getElementById("rolesBtn");
+const rolesBtn = document.getElementById("rolesBtn");
                         if (rolesBtn) {
                             rolesBtn.addEventListener("click", (e) => {
                                 e.stopPropagation();
@@ -2344,11 +2416,28 @@
                             });
                         }
 
-                        const rostersView = document.getElementById("rostersView");
                         const rolesView = document.getElementById("rolesView");
-                        const rostersViewClose = document.getElementById("rostersViewClose");
-                        const rostersList = document.getElementById("rostersList");
-                        const openRosterPageBtn = document.getElementById("openRosterPageBtn");
+                        const rolesViewClose = document.getElementById("rolesViewClose");
+                        if (rolesViewClose) {
+                            rolesViewClose.addEventListener("click", () => {
+                                if (rolesView) rolesView.classList.remove("open");
+                            });
+                        }
+
+                        const rolesReorderSave = document.getElementById("rolesReorderSave");
+                        const rolesReorderCancel = document.getElementById("rolesReorderCancel");
+                        if (rolesReorderSave) {
+                            rolesReorderSave.addEventListener("click", async () => {
+                                await saveRoleOrder();
+                            });
+                        }
+                        if (rolesReorderCancel) {
+                            rolesReorderCancel.addEventListener("click", () => {
+                                const bar = document.getElementById("rolesSaveBar");
+                                if (bar) bar.classList.remove("show");
+                                loadRoles();
+                            });
+                        }
 
                         if (rostersViewClose) {
                             rostersViewClose.addEventListener("click", () => {
@@ -2412,7 +2501,8 @@
                                     .from("roles")
                                     .select("*")
                                     .eq("community_id", id)
-                                    .order("created_at", { ascending: false });
+                                    .order("display_order", { ascending: true })
+                                    .order("created_at", { ascending: true });
 
                                 if (error) {
                                     rolesList.innerHTML = '<div class="empty">Failed to load roles.</div>';
@@ -2424,22 +2514,8 @@
                                     return;
                                 }
 
-                                rolesList.innerHTML = data.map((r) => {
-                                    const perms = ((r.permissions || "").split(",").map(p => p.trim()));
-                                    const hasRosters = perms.includes("rosters");
-                                    return `
-                                    <div class="request-item" data-role-id="${r.id}">
-                                        <div>
-                                            <strong>${(r.name || 'Role').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</strong>
-                                            ${hasRosters ? '<span class="member-badge supervisor" style="background:#2563eb; margin-left:6px;">Rosters</span>' : ''}
-                                        </div>
-                                        <div style="display:flex; gap:6px;">
-                                            <button type="button" class="approve" data-action="edit" data-role-id="${r.id}" data-role-name="${(r.name || '').replace(/"/g, '&quot;')}">Edit</button>
-                                            <button type="button" class="deny" data-action="delete" data-role-id="${r.id}">Delete</button>
-                                        </div>
-                                    </div>
-                                    `;
-                                }).join('');
+                                currentRoles = data;
+                                renderRolesList(data);
 
                                 rolesList.querySelectorAll("[data-action='delete']").forEach((btn) => {
                                     btn.addEventListener("click", async (e) => {
@@ -2472,6 +2548,161 @@
                             } catch (err) {
                                 rolesList.innerHTML = '<div class="empty">Failed to load roles.</div>';
                                 console.error(err);
+                            }
+                        }
+
+                        function renderRolesList(data) {
+                            rolesList.innerHTML = data.map((r) => {
+                                const perms = ((r.permissions || "").split(",").map(p => p.trim()));
+                                const hasRosters = perms.includes("rosters");
+                                return `
+                                <div class="request-item" data-role-id="${r.id}">
+                                    <span class="drag-handle" title="Drag to reorder">&#x2826;</span>
+                                    <div>
+                                        <strong>${(r.name || 'Role').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</strong>
+                                        ${hasRosters ? '<span class="member-badge supervisor" style="background:#2563eb; margin-left:6px;">Rosters</span>' : ''}
+                                    </div>
+                                    <div style="display:flex; gap:6px;">
+                                        <button type="button" class="approve" data-action="edit" data-role-id="${r.id}" data-role-name="${(r.name || '').replace(/"/g, '&quot;')}">Edit</button>
+                                        <button type="button" class="deny" data-action="delete" data-role-id="${r.id}">Delete</button>
+                                    </div>
+                                </div>
+                                `;
+                            }).join('');
+                        }
+
+                        let currentRoles = [];
+                        let isReordering = false;
+                        let reorderDirty = false;
+
+                        function setupRoleReorder() {
+                            const list = rolesList;
+                            let dragEl = null;
+                            let dragIndex = null;
+
+                            list.addEventListener("dragstart", (e) => {
+                                const item = e.target.closest(".request-item");
+                                if (!item) return;
+                                dragEl = item;
+                                dragIndex = Array.from(list.children).indexOf(item);
+                                item.classList.add("dragging");
+                                e.dataTransfer.effectAllowed = "move";
+                                e.dataTransfer.setData("text/plain", String(dragIndex));
+                            });
+
+                            list.addEventListener("dragover", (e) => {
+                                e.preventDefault();
+                                const item = e.target.closest(".request-item");
+                                if (!item || item === dragEl) return;
+                                const items = Array.from(list.children);
+                                const targetIndex = items.indexOf(item);
+                                const rect = item.getBoundingClientRect();
+                                const midpoint = rect.top + rect.height / 2;
+                                const isAfter = e.clientY > midpoint;
+                                list.insertBefore(dragEl, isAfter ? item.nextSibling : item);
+                                item.classList.remove("drag-over");
+                            });
+
+                            list.addEventListener("dragenter", (e) => {
+                                const item = e.target.closest(".request-item");
+                                if (item && item !== dragEl) item.classList.add("drag-over");
+                            });
+
+                            list.addEventListener("dragleave", (e) => {
+                                const item = e.target.closest(".request-item");
+                                if (item) item.classList.remove("drag-over");
+                            });
+
+                            list.addEventListener("drop", (e) => {
+                                e.preventDefault();
+                                const item = e.target.closest(".request-item");
+                                if (item) item.classList.remove("drag-over");
+                                reorderDirty = true;
+                                updateReorderBar();
+                            });
+
+                            list.addEventListener("dragend", () => {
+                                if (dragEl) dragEl.classList.remove("dragging");
+                                document.querySelectorAll(".drag-over").forEach((el) => el.classList.remove("drag-over"));
+                                dragEl = null;
+                                dragIndex = null;
+                            });
+                        }
+
+                        function updateReorderBar() {
+                            const bar = document.getElementById("rolesSaveBar");
+                            if (bar) bar.classList.add("show");
+                        }
+
+async function saveRoleOrder() {
+                            const items = Array.from(rolesList.children);
+                            const orderedIds = items.map((el) => el.getAttribute("data-role-id")).filter(Boolean);
+                            if (orderedIds.length === 0) return;
+
+                            try {
+                                for (let i = 0; i < orderedIds.length; i++) {
+                                    const { error } = await localSupabase
+                                        .from("roles")
+                                        .update({ display_order: i })
+                                        .eq("id", orderedIds[i]);
+                                    if (error) throw error;
+                                }
+                                reorderDirty = false;
+                                const bar = document.getElementById("rolesSaveBar");
+                                if (bar) bar.classList.remove("show");
+                                loadRoles();
+                            } catch (err) {
+                                alert("Failed to save role order: " + (err.message || err));
+                            }
+                        }
+
+                        async function fetchMaxDisplayOrder() {
+                            try {
+                                const { data, error } = await localSupabase
+                                    .from("roles")
+                                    .select("display_order")
+                                    .eq("community_id", id)
+                                    .order("display_order", { ascending: false })
+                                    .limit(1);
+                                if (error) return 0;
+                                return (data && data.length > 0 && typeof data[0].display_order === "number") ? data[0].display_order : 0;
+                            } catch (e) {
+                                return 0;
+                            }
+                        }
+
+                        async function createRole(name) {
+                            if (!localSupabase) {
+                                alert("Database unavailable.");
+                                return;
+                            }
+                            try {
+                                const nextOrder = await fetchMaxDisplayOrder();
+                                const { error } = await localSupabase
+                                    .from("roles")
+                                    .insert([{
+                                        community_id: id,
+                                        name: name,
+                                        permissions: "",
+                                        display_order: nextOrder + 1,
+                                        created_at: new Date().toISOString()
+                                    }]);
+                                if (error) {
+                                    alert("Failed to create role: " + error.message);
+                                    return;
+                                }
+                                loadRoles();
+                            } catch (err) {
+                                alert("An unexpected error occurred.");
+                                console.error(err);
+                            }
+                        }
+                                reorderDirty = false;
+                                const bar = document.getElementById("rolesSaveBar");
+                                if (bar) bar.classList.remove("show");
+                                loadRoles();
+                            } catch (err) {
+                                alert("Failed to save role order: " + (err.message || err));
                             }
                         }
 
