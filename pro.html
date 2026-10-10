@@ -131,6 +131,111 @@
         .back-btn:hover {
             background: #dbeafe;
         }
+
+        .f7-hint {
+            position: fixed;
+            bottom: 16px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 11px;
+            color: #94a3b8;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            padding: 4px 10px;
+            border-radius: 999px;
+            z-index: 500;
+            pointer-events: none;
+        }
+
+        /* Phone-style slide-up sheet */
+        .phone-sheet {
+            position: fixed;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            max-height: 80vh;
+            background: #ffffff;
+            border-top: 1px solid #e2e8f0;
+            border-radius: 20px 20px 0 0;
+            box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.18);
+            z-index: 900;
+            transform: translateY(120%);
+            transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+            display: flex;
+            flex-direction: column;
+        }
+        .phone-sheet.open {
+            transform: translateY(0);
+        }
+        .phone-sheet-handle {
+            width: 40px;
+            height: 4px;
+            background: #cbd5e1;
+            border-radius: 999px;
+            margin: 10px auto 4px;
+        }
+        .phone-sheet-body {
+            padding: 8px 24px 24px;
+            overflow-y: auto;
+        }
+        .phone-sheet-title {
+            font-size: 20px;
+            font-weight: 800;
+            color: #0f172a;
+            margin-bottom: 6px;
+        }
+        .phone-sheet-sub {
+            font-size: 14px;
+            color: #64748b;
+            margin-bottom: 18px;
+        }
+        .phone-sheet-btn {
+            display: block;
+            width: 100%;
+            padding: 14px 16px;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 700;
+            text-align: center;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            margin-bottom: 10px;
+        }
+        .phone-sheet-btn.primary {
+            background: #2563eb;
+            color: #ffffff;
+        }
+        .phone-sheet-btn.primary:hover { background: #1d4ed8; }
+        .phone-sheet-btn.ghost {
+            background: #f1f5f9;
+            color: #0f172a;
+        }
+        .phone-sheet-btn.ghost:hover { background: #e2e8f0; }
+        .phone-sheet-close {
+            position: absolute;
+            top: 12px;
+            right: 14px;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 1px solid #e2e8f0;
+            background: #ffffff;
+            font-size: 18px;
+            color: #64748b;
+            cursor: pointer;
+            line-height: 1;
+        }
+        .phone-sheet-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.45);
+            z-index: 800;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+        .phone-sheet-overlay.open { opacity: 1; pointer-events: auto; }
     </style>
 </head>
 <body>
@@ -145,5 +250,51 @@
         <p>Support PulseCAD Unlock Premium</p>
         <a href="/" class="back-btn">GET PULSECAD Premium</a>
     </div>
+
+    <div class="phone-sheet-overlay" id="phoneSheetOverlay"></div>
+    <div class="phone-sheet" id="phoneSheet">
+        <button class="phone-sheet-close" id="phoneSheetClose" aria-label="Close">×</button>
+        <div class="phone-sheet-handle"></div>
+        <div class="phone-sheet-body">
+            <div class="phone-sheet-title">PulseCAD Pro</div>
+            <div class="phone-sheet-sub">Unlock premium support and features.</div>
+            <a href="/changelogs" class="phone-sheet-btn primary">Changelogs</a>
+            <a href="https://zwdogalwbczdtvxvhrfd.supabase.co/auth/login" class="phone-sheet-btn ghost">Login / Sign up</a>
+            <a href="/" class="phone-sheet-btn ghost">GET PULSECAD Premium</a>
+        </div>
+    </div>
+
+    <div class="f7-hint" id="f7Hint">Press F7 to open menu</div>
+
+    <script>
+        (function () {
+            var sheet = document.getElementById("phoneSheet");
+            var overlay = document.getElementById("phoneSheetOverlay");
+            var closeBtn = document.getElementById("phoneSheetClose");
+            var hint = document.getElementById("f7Hint");
+
+            function openSheet() {
+                if (!sheet) return;
+                sheet.classList.add("open");
+                if (overlay) overlay.classList.add("open");
+                if (hint) hint.style.display = "none";
+            }
+            function closeSheet() {
+                if (!sheet) return;
+                sheet.classList.remove("open");
+                if (overlay) overlay.classList.remove("open");
+            }
+
+            document.addEventListener("keydown", function (e) {
+                if (e.key === "F7") {
+                    e.preventDefault();
+                    if (sheet.classList.contains("open")) closeSheet();
+                    else openSheet();
+                }
+            });
+
+            if (closeBtn) closeBtn.addEventListener("click", closeSheet);
+            if (overlay) overlay.addEventListener("click", closeSheet);
+        })();
+    </script>
 </body>
-</html>
