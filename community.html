@@ -1652,6 +1652,10 @@
                                         <div class="field">
                                             <label>Community Passcode</label>
                                             <input type="text" id="communityPasscodeInput" placeholder="Leave blank for no passcode" value="${(communityData.passcode || '').replace(/</g, '&lt;').replace(/>/g, '&gt;')}" />
+                                            <div style="margin-top:8px; display:flex; gap:8px; flex-wrap:wrap;">
+                                                <button type="button" class="submit-btn" id="generatePasscodeBtn" style="padding:6px 12px; font-size:12px;">Generate Code</button>
+                                                <button type="button" class="submit-btn" id="copyPasscodeBtn" style="padding:6px 12px; font-size:12px;">Copy Code</button>
+                                            </div>
                                         </div>
                                          <div class="field">
                                              <label>ERLC API Key</label>
@@ -1946,6 +1950,46 @@
                                         .eq("id", id);
                                 } catch (err) {
                                     alert("Failed to save community passcode.");
+                                }
+                            });
+                        }
+
+                        const generatePasscodeBtn = document.getElementById("generatePasscodeBtn");
+                        if (generatePasscodeBtn && communityPasscodeInput) {
+                            generatePasscodeBtn.addEventListener("click", () => {
+                                const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+                                let code = "";
+                                for (let i = 0; i < 6; i++) {
+                                    code += chars.charAt(Math.floor(Math.random() * chars.length));
+                                }
+                                communityPasscodeInput.value = code;
+                                communityPasscodeInput.dispatchEvent(new Event("blur"));
+                            });
+                        }
+
+                        const copyPasscodeBtn = document.getElementById("copyPasscodeBtn");
+                        if (copyPasscodeBtn && communityPasscodeInput) {
+                            copyPasscodeBtn.addEventListener("click", async () => {
+                                const code = communityPasscodeInput.value.trim();
+                                if (!code) {
+                                    alert("No passcode to copy.");
+                                    return;
+                                }
+                                try {
+                                    await navigator.clipboard.writeText(code);
+                                    alert("Passcode copied: " + code);
+                                } catch (e) {
+                                    try {
+                                        const ta = document.createElement("textarea");
+                                        ta.value = code;
+                                        document.body.appendChild(ta);
+                                        ta.select();
+                                        document.execCommand("copy");
+                                        document.body.removeChild(ta);
+                                        alert("Passcode copied: " + code);
+                                    } catch (e2) {
+                                        alert("Failed to copy passcode.");
+                                    }
                                 }
                             });
                         }
