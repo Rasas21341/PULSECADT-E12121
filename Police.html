@@ -2129,6 +2129,7 @@
                 <div class="lookup-error" id="civilianError"></div>
                 <div class="lookup-result" id="civilianResult"></div>
                 <div id="civilianDetails" style="display:none; margin-top:14px;">
+                    <button type="button" class="modal-close" id="civilianDetailsClose" style="position:absolute; top:10px; right:12px; width:30px; height:30px; border-radius:50%; border:1px solid #e2e8f0; background:#ffffff; font-size:18px; color:#64748b; cursor:pointer; line-height:1;" aria-label="Close">×</button>
                     <div class="tabs">
                         <button type="button" class="tab-btn active" data-tab="details" data-target="civilianDetailsPanel">Details</button>
                         <button type="button" class="tab-btn" data-tab="records" data-target="civilianRecordsPanel">Records</button>
@@ -3070,6 +3071,15 @@
             if (civilianNameBtn) {
                 civilianNameBtn.addEventListener("click", () => {
                     showIdPicture(civilian);
+                });
+            }
+
+            const civilianDetailsClose = document.getElementById("civilianDetailsClose");
+            if (civilianDetailsClose) {
+                civilianDetailsClose.addEventListener("click", () => {
+                    if (civilianDetails) civilianDetails.style.display = "none";
+                    if (civilianResult) civilianResult.style.display = "block";
+                    selectedCivilian = null;
                 });
             }
             loadCivilianLicenseStatus(civilian.id);
