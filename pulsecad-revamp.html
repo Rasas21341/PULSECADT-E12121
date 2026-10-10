@@ -2955,12 +2955,24 @@ enable-ga="false"
                             return;
                         }
                         if (Array.isArray(data)) {
+                            // Management can manage any community, so show them all.
+                            let isManagement = false;
+                            if (userEmail) {
+                                try {
+                                    const { data: u } = await localSupabase
+                                        .from("users")
+                                        .select("department")
+                                        .eq("email", userEmail)
+                                        .maybeSingle();
+                                    isManagement = !!(u && (u.department || "").trim() === "Management");
+                                } catch (e) {}
+                            }
                             for (const row of data) {
                                 const isCreator = row.creator_email === userEmail;
                                 const joined = isCreator || await checkUserJoined(userId, row.id);
-                                // Only show communities the user created or has joined
-                                if (!isCreator && !joined) continue;
-                                addCommunityCard(row.name, row.description || "Community", joined, row.id, isCreator, !!row.verification_requested, !!row.suspended, !!row.members_only, row.banner, !!row.partner);
+                                // Show the card if the user created it, joined it, or is Management.
+                                if (!isCreator && !joined && !isManagement) continue;
+                                addCommunityCard(row.name, row.description || "Community", joined, row.id, isCreator, !!row.verification_requested, !!row.suspended, !!row.members_only, row.banner, !!row.partner, isManagement);
                             }
                         }
                     })
