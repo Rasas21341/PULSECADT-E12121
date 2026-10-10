@@ -25,20 +25,36 @@ CREATE POLICY "user_communities_insert_self"
     TO authenticated
     WITH CHECK (user_id = auth.uid());
 
--- Owners/moderators can update (supervisor flag, banned flag) and delete
--- (kick/ban) rows in their communities.
+-- Owners/moderators can update (supervisor flag, banned flag) rows in their
+-- communities. A user can also toggle their own supervisor flag.
 DROP POLICY IF EXISTS "user_communities_update_auth" ON public.user_communities;
 CREATE POLICY "user_communities_update_auth"
     ON public.user_communities FOR UPDATE
     TO authenticated
-    USING (true)
+    USING (
+        user_id = auth.uid()
+        OR EXISTS (
+            SELECT 1 FROM public.communities c
+            WHERE c.id = user_communities.community_id
+              AND c.creator_email = (SELECT email FROM auth.users WHERE id = auth.uid())
+        )
+    )
     WITH CHECK (true);
 
+-- A user can delete their own row (the "Leave" flow); community creators
+-- can also delete any member's row (kick/ban).
 DROP POLICY IF EXISTS "user_communities_delete_auth" ON public.user_communities;
 CREATE POLICY "user_communities_delete_auth"
     ON public.user_communities FOR DELETE
     TO authenticated
-    USING (true);
+    USING (
+        user_id = auth.uid()
+        OR EXISTS (
+            SELECT 1 FROM public.communities c
+            WHERE c.id = user_communities.community_id
+              AND c.creator_email = (SELECT email FROM auth.users WHERE id = auth.uid())
+        )
+    );
 
 -- Refresh PostgREST schema cache.
 NOTIFY pgrst, 'reload schema';

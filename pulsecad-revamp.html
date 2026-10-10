@@ -3159,22 +3159,32 @@ async function joinCommunity(communityId, passcode) {
                     alert("You must be logged in to leave.");
                     return;
                 }
-                const { error } = await localSupabase
+                const { data: removed, error } = await localSupabase
                     .from("user_communities")
                     .delete()
                     .eq("user_id", user.id)
-                    .eq("community_id", communityId);
-                    if (error) {
+                    .eq("community_id", communityId)
+                    .select("id");
+                if (error) {
+                    const msg = (error.message || "").toLowerCase();
+                    if (msg.includes("row-level security") || msg.includes("permission")) {
+                        alert("Could not leave: database permissions are blocking the delete. Ask an admin to enable DELETE on the user_communities table.");
+                    } else {
                         alert("Failed to leave community: " + error.message);
-                        return;
                     }
-                    const { data: leftCommunity } = await localSupabase
-                        .from("communities")
-                        .select("name")
-                        .eq("id", communityId)
-                        .maybeSingle();
-                    notifyDiscordLeave(communityId, user.email, leftCommunity ? leftCommunity.name : "");
-                    loadCommunities();
+                    return;
+                }
+                if (!removed || removed.length === 0) {
+                    alert("Could not leave: you are not listed as a member of this community (or permissions are blocking the delete).");
+                    return;
+                }
+                const { data: leftCommunity } = await localSupabase
+                    .from("communities")
+                    .select("name")
+                    .eq("id", communityId)
+                    .maybeSingle();
+                notifyDiscordLeave(communityId, user.email, leftCommunity ? leftCommunity.name : "");
+                loadCommunities();
             } catch (err) {
                 alert("Failed to leave community: " + (err.message || err));
             }
