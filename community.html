@@ -1554,7 +1554,8 @@
                         }
 
                         const isCreator = communityData && communityData.creator_email === currentEmail;
-                        if (!communityData || (!isCreator && !hasRostersPermission)) {
+                        const isManagement = (currentUserDepartment || "").trim() === "Management";
+                        if (!communityData || (!isCreator && !hasRostersPermission && !isManagement)) {
                             contentEl.innerHTML = `<div class="empty">Access denied.</div>`;
                             return;
                         }
@@ -1837,7 +1838,7 @@
                          const applicationsList = document.getElementById("applicationsList");
                           const supervisorInput = document.getElementById("supervisorInput");
 
-                         if (!isCreator) {
+                         if (!isCreator && !isManagement) {
                              const allBtnWraps = contentEl.querySelectorAll('.dashboard-top-right > .btn-dropdown-wrap');
                              allBtnWraps.forEach((wrap) => {
                                  const btn = wrap.querySelector('button');
@@ -2188,21 +2189,22 @@
                                 }
                                 const isMembersView = targetEl === membersViewList;
                                 const isDropdown = targetEl === memberList;
-                                const showKickBan = (isMembersView || isDropdown) && creatorEmail === currentEmail;
+                                const isManagementViewer = (currentUserDepartment || "").trim() === "Management";
+                                const showKickBan = (isMembersView || isDropdown) && (creatorEmail === currentEmail || isManagementViewer);
                                 const deptTrimmed = (currentUserDepartment || "").trim();
                                 const isSupport = deptTrimmed === "Support Team";
                                 if (rows.length === 0) {
                                     if (!html) html = '<div class="empty">No members yet.</div>';
                                 } else {
                                     html += rows.map((r) => {
-                                        if (creatorUserId && r.user_id === creatorUserId) {
+                                        if (creatorUserId && r.user_id === currentUserId) {
                                             return "";
                                         }
                                         const email = esc(emailById[r.user_id] || r.user_id);
                                         const memberDept = (deptById[r.user_id] || "").trim();
-                                        const isManagement = memberDept === "Management";
+                                        const memberIsManagement = memberDept === "Management";
                                         const isSupervisor = !!r.is_supervisor;
-                                        const canKickBan = showKickBan && !(isSupport && isManagement);
+                                        const canKickBan = showKickBan && !(isSupport && memberIsManagement);
                                         const supBadge = isSupervisor ? ' <span class="member-badge supervisor">Supervisor</span>' : '';
                                         if (canKickBan) {
                                             const supBtn = `<button type="button" class="supervisor-btn" data-user-id="${esc(r.user_id)}">${isSupervisor ? "Remove Supervisor" : "Make Supervisor"}</button>`;
