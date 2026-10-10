@@ -3121,7 +3121,15 @@ async function joinCommunity(communityId, passcode) {
             .from("user_communities")
             .insert([{ user_id: user.id, community_id: communityId, joined_at: new Date().toISOString() }]);
         if (error) {
-            alert("Failed to join community: " + error.message);
+            // Surface the real reason instead of a generic message.
+            const msg = (error.message || "").toLowerCase();
+            if (msg.includes("row-level security") || msg.includes("permission")) {
+                alert("Could not join: database permissions are blocking the join. Ask an admin to enable INSERT/SELECT on the user_communities table.");
+            } else if (msg.includes("duplicate") || msg.includes("unique")) {
+                alert("You have already joined this community.");
+            } else {
+                alert("Failed to join community: " + error.message);
+            }
             return;
         }
         notifyDiscordJoin(communityId, user.email, community ? community.name : "");
