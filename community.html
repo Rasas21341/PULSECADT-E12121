@@ -3223,6 +3223,15 @@ if (openAddRoleBtn) {
                             });
                         }
 
+                        if (requestsDropdownToggle && requestsDropdownMenu) {
+                            requestsDropdownToggle.addEventListener("click", () => {
+                                requestsDropdownMenu.classList.toggle("open");
+                                if (requestsDropdownMenu.classList.contains("open")) {
+                                    loadRequests();
+                                }
+                            });
+                        }
+
                         if (saveDiscordInviteBtn) {
                             saveDiscordInviteBtn.addEventListener("click", async () => {
                                 const invite = discordServerInviteInput ? discordServerInviteInput.value.trim() : "";
@@ -3526,6 +3535,99 @@ if (openAddRoleBtn) {
                                 applicationsList.innerHTML = html;
                             } catch (err) {
                                 applicationsList.innerHTML = '<div class="empty">An unexpected error occurred.</div>';
+                                console.error(err);
+                            }
+                        }
+
+                        async function loadRequests() {
+                            if (!requestsList || !requestsStatus || !localSupabase || !currentCommunityId) return;
+                            try {
+                                const { data, error } = await localSupabase
+                                    .from("application_submissions")
+                                    .select("*")
+                                    .eq("community_id", currentCommunityId)
+                                    .order("created_at", { ascending: false });
+                                if (error) {
+                                    requestsList.innerHTML = '<div class="empty">Failed to load requests.</div>';
+                                    return;
+                                }
+                                if (!Array.isArray(data) || data.length === 0) {
+                                    requestsList.innerHTML = '<div class="empty">No pending requests.</div>';
+                                    return;
+                                }
+                                const esc = (v) => (v == null ? "" : String(v).replace(/</g, "&lt;").replace(/>/g, "&gt;"));
+                                let html = '<div class="members-view-list">';
+                                data.forEach((row) => {
+                                    const created = row.created_at ? new Date(row.created_at).toLocaleString() : "";
+                                    html += `<div class="members-item">
+                                        <div class="members-item-name">${esc(row.email || "Unnamed")}</div>
+                                        <div class="members-item-role">Discord: ${esc(row.discord || "")} | Age: ${esc(row.age || "")} | TZ: ${esc(row.timezone || "")}</div>
+                                        <div style="font-size:12px; color:#64748b; margin-top:2px;">${esc(created)}</div>
+                                        <div style="margin-top:6px;">
+                                            <button type="button" class="submit-btn approve-req-btn" data-id="${esc(row.id)}" style="padding:4px 10px; font-size:12px;">Approve</button>
+                                            <button type="button" class="delete-btn reject-req-btn" data-id="${esc(row.id)}" style="padding:4px 10px; font-size:12px;">Reject</button>
+                                        </div>
+                                    </div>`;
+                                });
+                                html += '</div>';
+                                requestsList.innerHTML = html;
+
+                                requestsList.querySelectorAll(".approve-req-btn").forEach((btn) => {
+                                    btn.addEventListener("click", async () => {
+                                        const id = btn.getAttribute("data-id");
+                                        if (!id) return;
+                                        const row = (data || []).find((r) => r.id === id);
+                                        const email = row ? row.email : null;
+                                        try {
+                                            // 1. Look up the user by email
+                                            let userId = null;
+                                            if (email) {
+                                                const { data: users } = await localSupabase
+                                                    .from("users")
+                                                    .select("id")
+                                                    .eq("email", email)
+                                                    .maybeSingle();
+                                                userId = users ? users.id : null;
+                                            }
+                                            // 2. Insert into user_communities if we have a user
+                                            if (userId) {
+                                                const { error: ucErr } = await localSupabase
+                                                    .from("user_communities")
+                                                    .insert([{ user_id: userId, community_id: currentCommunityId, joined_at: new Date().toISOString() }]);
+                                                if (ucErr) throw ucErr;
+                                            }
+                                            // 3. Delete the application
+                                            const { error: delErr } = await localSupabase
+                                                .from("application_submissions")
+                                                .delete()
+                                                .eq("id", id);
+                                            if (delErr) throw delErr;
+                                            loadRequests();
+                                        } catch (err) {
+                                            alert("Failed to approve request: " + (err.message || err));
+                                        }
+                                    });
+                                });
+
+                                requestsList.querySelectorAll(".reject-req-btn").forEach((btn) => {
+                                    btn.addEventListener("click", async () => {
+                                        const id = btn.getAttribute("data-id");
+                                        if (!id) return;
+                                        if (!confirm("Reject this application?")) return;
+                                        try {
+                                            const { error } = await localSupabase
+                                                .from("application_submissions")
+                                                .delete()
+                                                .eq("id", id);
+                                            if (error) throw error;
+                                            loadRequests();
+                                        } catch (err) {
+                                            alert("Failed to reject request: " + (err.message || err));
+                                        }
+                                    });
+                                });
+                            } catch (err) {
+                                requestsList.innerHTML = '<div class="empty">An unexpected error occurred.</div>';
                                 console.error(err);
                             }
                         }
