@@ -146,14 +146,16 @@
                 }
                 const isCreator = data.creator_email === user.email;
                 let isManagement = false;
-                try {
-                    const { data: u } = await localSupabase
-                        .from("users")
-                        .select("department")
-                        .eq("email", user.email)
-                        .maybeSingle();
-                    isManagement = !!(u && (u.department || "").trim() === "Management");
-                } catch (e) {}
+                if (user.id) {
+                    try {
+                        const { data: u } = await localSupabase
+                            .from("users")
+                            .select("department")
+                            .eq("id", user.id)
+                            .maybeSingle();
+                        isManagement = !!(u && (u.department || "").trim() === "Management");
+                    } catch (e) {}
+                }
                 let hasModRole = false;
                 if (!isCreator && !isManagement && user.id) {
                     try {
