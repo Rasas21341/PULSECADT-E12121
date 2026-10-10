@@ -126,6 +126,11 @@
                 return;
             }
             try {
+                const { data: { user } } = await localSupabase.auth.getUser();
+                if (!user) {
+                    communityNameEl.textContent = "You must be logged in to access the Mod Panel.";
+                    return;
+                }
                 const { data, error } = await localSupabase
                     .from("communities")
                     .select("*")
@@ -137,6 +142,41 @@
                 }
                 if (!data) {
                     communityNameEl.textContent = "Community not found.";
+                    return;
+                }
+                const isCreator = data.creator_email === user.email;
+                let isManagement = false;
+                try {
+                    const { data: u } = await localSupabase
+                        .from("users")
+                        .select("department")
+                        .eq("email", user.email)
+                        .maybeSingle();
+                    isManagement = !!(u && (u.department || "").trim() === "Management");
+                } catch (e) {}
+                let hasModRole = false;
+                if (!isCreator && !isManagement && user.id) {
+                    try {
+                        const { data: assignments } = await localSupabase
+                            .from("member_roles")
+                            .select("role_id")
+                            .eq("community_id", communityId)
+                            .eq("user_id", user.id);
+                        if (Array.isArray(assignments) && assignments.length > 0) {
+                            const roleIds = assignments.map(r => r.role_id);
+                            const { data: rolesData } = await localSupabase
+                                .from("roles")
+                                .select("permissions")
+                                .in("id", roleIds);
+                            hasModRole = (rolesData || []).some(r => {
+                                const perms = ((r.permissions || "").split(",").map(p => p.trim()));
+                                return perms.includes("manage") || perms.includes("moderate") || perms.includes("admin");
+                            });
+                        }
+                    } catch (e) {}
+                }
+                if (!isCreator && !isManagement && !hasModRole) {
+                    communityNameEl.textContent = "Access denied. You do not have permission to manage this community.";
                     return;
                 }
                 communityNameEl.textContent = data.name || "Community";
