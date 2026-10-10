@@ -1623,7 +1623,7 @@
                                             Roles
                                         </button>
                                     </div>
-                                    <button type="button" class="departments-btn" id="departmentsBtn" style="display:none;">
+                                    <button type="button" class="departments-btn" id="departmentsBtn">
                                         <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M3 10h18M5 6l7-3 7 3M4 10v11M20 10v11M8 14v3M12 14v3M16 14v3"/></svg>
                                         Departments
                                     </button>
@@ -1898,11 +1898,28 @@
                              });
                          }
 
-                         if (membersViewClose && membersView) {
-                             membersViewClose.addEventListener("click", () => {
-                                 membersView.classList.remove("open");
-                             });
-                         }
+if (membersViewClose && membersView) {
+                            membersViewClose.addEventListener("click", () => {
+                                membersView.classList.remove("open");
+                            });
+                        }
+
+                        if (departmentsBtn && departmentsView) {
+                            departmentsBtn.addEventListener("click", (e) => {
+                                e.stopPropagation();
+                                closeAllPages();
+                                departmentsView.classList.add("open");
+                                loadDepartments();
+                            });
+                        }
+
+                        if (departmentsView) {
+                            departmentsView.addEventListener("click", (e) => {
+                                if (e.target === departmentsView) {
+                                    departmentsView.classList.remove("open");
+                                }
+                            });
+                        }
 
                          document.addEventListener("click", (e) => {
                              if (!membersBtn || !e.target.closest(".members-btn")) {
