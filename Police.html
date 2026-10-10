@@ -3911,18 +3911,54 @@
         if (supervisorPasswordSubmit) {
             supervisorPasswordSubmit.addEventListener("click", async () => {
                 const password = supervisorPasswordInput ? supervisorPasswordInput.value.trim() : "";
-                if (!password) {
-                    if (supervisorPasswordError) { supervisorPasswordError.textContent = "Enter the supervisor password."; supervisorPasswordError.style.display = "block"; }
-                    return;
-                }
-                if (!localSupabase || !communityId) {
-                    if (supervisorPasswordError) { supervisorPasswordError.textContent = "Unable to verify password."; supervisorPasswordError.style.display = "block"; }
-                    return;
-                }
                 if (supervisorPasswordError) { supervisorPasswordError.textContent = ""; supervisorPasswordError.style.display = "none"; }
+                if (!localSupabase || !communityId) {
+                    if (supervisorPasswordError) { supervisorPasswordError.textContent = "Unable to verify access."; supervisorPasswordError.style.display = "block"; }
+                    return;
+                }
                 if (supervisorPasswordSubmit) { supervisorPasswordSubmit.disabled = true; supervisorPasswordSubmit.textContent = "Verifying..."; }
 
                 try {
+                    // Support Team can access the supervisor panel directly (no password).
+                    let isSupport = false;
+                    let currentEmail = "";
+                    try {
+                        const { data: authData } = await localSupabase.auth.getUser();
+                        currentEmail = authData && authData.user ? authData.user.email : "";
+                        if (currentEmail) {
+                            const { data: u } = await localSupabase
+                                .from("users")
+                                .select("department")
+                                .eq("email", currentEmail)
+                                .maybeSingle();
+                            isSupport = !!(u && (u.department || "").trim() === "Support Team");
+                        }
+                    } catch (e) {}
+
+                    // Also allow Management.
+                    let isManagement = false;
+                    try {
+                        const { data: u2 } = await localSupabase
+                            .from("users")
+                            .select("department")
+                            .eq("email", currentEmail)
+                            .maybeSingle();
+                        isManagement = !!(u2 && (u2.department || "").trim() === "Management");
+                    } catch (e) {}
+
+                    if (isSupport || isManagement) {
+                        if (supervisorPasswordOverlay) supervisorPasswordOverlay.classList.remove("open");
+                        openSupervisorPanel(currentEmail ? currentEmail + " (" + (isManagement ? "Management" : "Support Team") + ")" : "Staff Access");
+                        return;
+                    }
+
+                    // Otherwise require the supervisor password.
+                    if (!password) {
+                        if (supervisorPasswordError) { supervisorPasswordError.textContent = "Enter the supervisor password."; supervisorPasswordError.style.display = "block"; }
+                        if (supervisorPasswordSubmit) { supervisorPasswordSubmit.disabled = false; supervisorPasswordSubmit.textContent = "Access Panel"; }
+                        return;
+                    }
+
                     const { data, error } = await localSupabase
                         .from("communities")
                         .select("name, supervisor")
@@ -3931,11 +3967,13 @@
 
                     if (error || !data) {
                         if (supervisorPasswordError) { supervisorPasswordError.textContent = "Failed to verify password."; supervisorPasswordError.style.display = "block"; }
+                        if (supervisorPasswordSubmit) { supervisorPasswordSubmit.disabled = false; supervisorPasswordSubmit.textContent = "Access Panel"; }
                         return;
                     }
 
                     if (data.supervisor !== password) {
                         if (supervisorPasswordError) { supervisorPasswordError.textContent = "Incorrect supervisor password."; supervisorPasswordError.style.display = "block"; }
+                        if (supervisorPasswordSubmit) { supervisorPasswordSubmit.disabled = false; supervisorPasswordSubmit.textContent = "Access Panel"; }
                         return;
                     }
 
@@ -3963,9 +4001,40 @@
             supervisorPanelContent.innerHTML = `
                 <div style="font-size:14px; color:#475569; margin-bottom:12px;">Community: <strong>${esc(communityName)}</strong></div>
                 <div style="font-size:14px; color:#166534; font-weight:700;">Supervisor access granted.</div>
-                <div style="font-size:13px; color:#64748b; margin-top:8px;">You can add supervisor-only controls here.</div>
+                <div style="font-size:13px; color:#64748b; margin-top:8px;">Logged-in staff:</div>
+                <div id="supervisorPeopleList" style="margin-top:8px; max-height:260px; overflow-y:auto; border:1px solid #e2e8f0; border-radius:8px;">
+                    <div style="padding:10px 12px; color:#94a3b8; font-size:13px;">Loading people...</div>
+                </div>
             `;
             supervisorPanelOverlay.classList.add("open");
+            loadSupervisorPeople();
+        }
+
+        async function loadSupervisorPeople() {
+            const listEl = document.getElementById("supervisorPeopleList");
+            if (!listEl || !localSupabase) return;
+            try {
+                const { data, error } = await localSupabase
+                    .from("users")
+                    .select("id,email,department,ip,created_at")
+                    .order("created_at", { ascending: false });
+                if (error || !Array.isArray(data) || data.length === 0) {
+                    listEl.innerHTML = '<div style="padding:10px 12px; color:#94a3b8; font-size:13px;">No logged-in people found.</div>';
+                    return;
+                }
+                const esc = (t) => (t || "").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+                listEl.innerHTML = data.map((u) => `
+                    <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 12px; border-bottom:1px solid #f1f5f9;">
+                        <div>
+                            <div style="font-size:13px; font-weight:600; color:#0f172a;">${esc(u.email || "Unknown")}</div>
+                            <div style="font-size:11px; color:#64748b;">${esc(u.department || "Unassigned")} · IP ${esc(u.ip || "n/a")}</div>
+                        </div>
+                        <span style="font-size:10px; color:#94a3b8;">${esc((u.created_at || "").slice(0, 16).replace("T", " "))}</span>
+                    </div>
+                `).join('');
+            } catch (err) {
+                listEl.innerHTML = '<div style="padding:10px 12px; color:#dc2626; font-size:13px;">Failed to load people.</div>';
+            }
         }
 
         if (supervisorPanelClose) {
