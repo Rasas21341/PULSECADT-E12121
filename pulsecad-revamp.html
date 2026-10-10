@@ -3074,32 +3074,62 @@ enable-ga="false"
             }
         }
 
-        async function joinCommunity(communityId) {
-            if (!localSupabase) return;
-            try {
-                const { data: { user } } = await localSupabase.auth.getUser();
-                if (!user) {
-                    alert("You must be logged in to join.");
-                    return;
-                }
-                const { data: community } = await localSupabase
-                    .from("communities")
-                    .select("name")
-                    .eq("id", communityId)
-                    .maybeSingle();
-                const { error } = await localSupabase
-                    .from("user_communities")
-                    .insert([{ user_id: user.id, community_id: communityId, joined_at: new Date().toISOString() }]);
-                if (error) {
-                    alert("Failed to join community: " + error.message);
-                    return;
-                }
-                notifyDiscordJoin(communityId, user.email, community ? community.name : "");
-                loadCommunities();
-            } catch (err) {
-                alert("Failed to join community: " + (err.message || err));
+async function joinCommunity(communityId, passcode) {
+    if (!localSupabase) return;
+    try {
+        const { data: { user } } = await localSupabase.auth.getUser();
+        if (!user) {
+            alert("You must be logged in to join.");
+            return;
+        }
+        const { data: community, error: commErr } = await localSupabase
+            .from("communities")
+            .select("name, join_approval, passcode")
+            .eq("id", communityId)
+            .maybeSingle();
+        if (commErr || !community) {
+            alert("Community not found.");
+            return;
+        }
+
+        // A passcode is required when the community uses manual approval OR has a passcode set.
+        const requiresCode = community.join_approval === "manual" || community.passcode;
+        if (requiresCode) {
+            const code = (passcode || "").trim();
+            if (!code) {
+                alert("This community requires a passcode to join.");
+                return;
+            }
+            if (community.passcode && code !== community.passcode) {
+                alert("Incorrect passcode.");
+                return;
             }
         }
+
+        const { data: existing } = await localSupabase
+            .from("user_communities")
+            .select("id")
+            .eq("user_id", user.id)
+            .eq("community_id", communityId)
+            .maybeSingle();
+        if (existing) {
+            alert("You have already joined this community.");
+            return;
+        }
+
+        const { error } = await localSupabase
+            .from("user_communities")
+            .insert([{ user_id: user.id, community_id: communityId, joined_at: new Date().toISOString() }]);
+        if (error) {
+            alert("Failed to join community: " + error.message);
+            return;
+        }
+        notifyDiscordJoin(communityId, user.email, community ? community.name : "");
+        loadCommunities();
+    } catch (err) {
+        alert("Failed to join community: " + (err.message || err));
+    }
+}
 
         async function leaveCommunity(communityId) {
             if (!localSupabase || !communityId) return;
@@ -3354,16 +3384,21 @@ enable-ga="false"
                         if (!rowId || !localSupabase) return;
                         const { data: community } = await localSupabase
                             .from("communities")
-                            .select("passcode, name")
+                            .select("passcode, name, join_approval")
                             .eq("id", rowId)
                             .maybeSingle();
-                        const passcode = prompt("Enter community passcode for " + (community?.name || "this community") + ":");
-                        if (!passcode || !passcode.trim()) return;
-                        if (community?.passcode && passcode.trim() !== community.passcode) {
-                            alert("Incorrect passcode.");
-                            return;
+                        const needsCode = community && (community.join_approval === "manual" || community.passcode);
+                        if (needsCode) {
+                            const passcode = prompt("Enter community passcode for " + (community?.name || "this community") + ":");
+                            if (!passcode || !passcode.trim()) return;
+                            if (community.passcode && passcode.trim() !== community.passcode) {
+                                alert("Incorrect passcode.");
+                                return;
+                            }
+                            await joinCommunity(rowId, passcode.trim());
+                        } else {
+                            await joinCommunity(rowId);
                         }
-                        await joinCommunity(rowId);
                     });
                 }
             }
@@ -3529,31 +3564,7 @@ if (action === "dashboard") {
                     alert("No community found with that passcode.");
                     return;
                 }
-                const { data: { user } } = await localSupabase.auth.getUser();
-                if (!user) {
-                    alert("You must be logged in to join.");
-                    return;
-                }
-                const { data: existing } = await localSupabase
-                    .from("user_communities")
-                    .select("id")
-                    .eq("user_id", user.id)
-                    .eq("community_id", data.id)
-                    .maybeSingle();
-                if (existing) {
-                    alert("You have already joined this community.");
-                    loadCommunities();
-                    return;
-                }
-                const { error: joinError } = await localSupabase
-                    .from("user_communities")
-                    .insert([{ user_id: user.id, community_id: data.id, joined_at: new Date().toISOString() }]);
-                if (joinError) {
-                    alert("Failed to join community: " + joinError.message);
-                    return;
-                }
-                alert("Joined " + data.name + " successfully!");
-                loadCommunities();
+                await joinCommunity(data.id, passcode.trim());
             });
         }
 
