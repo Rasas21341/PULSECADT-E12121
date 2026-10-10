@@ -3291,6 +3291,15 @@ async function joinCommunity(communityId, passcode) {
             updateDiscordUserUI(storedDiscordUser, displayName);
         }
 
+        function generatePasscode() {
+            const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+            let code = "";
+            for (let i = 0; i < 6; i++) {
+                code += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return code;
+        }
+
         function saveCommunity(name, meta, passcode, membersOnly) {
             if (!localSupabase) return Promise.resolve(null);
             return localSupabase.auth.getUser().then(({ data }) => {
@@ -3526,7 +3535,8 @@ if (action === "dashboard") {
             createCommunityCenteredBtn.addEventListener("click", async () => {
                 const name = prompt("Enter community name:");
                 if (!name || !name.trim()) return;
-                const passcode = prompt("Enter community passcode (leave blank for none):");
+                let passcode = (prompt("Enter community passcode (leave blank to auto-generate one):") || "").trim();
+                if (!passcode) passcode = generatePasscode();
                 const membersOnly = confirm("Make this community members-only? (Only members can see it)");
                 if (!localSupabase) {
                     alert("Service unavailable.");
@@ -3543,6 +3553,7 @@ if (action === "dashboard") {
                     return;
                 }
                 await saveCommunity(name.trim(), "", passcode, membersOnly);
+                alert("Your community passcode is: " + passcode + "\n\nShare this with your members to let them join.");
                 updatePremiumUI();
             });
         }
