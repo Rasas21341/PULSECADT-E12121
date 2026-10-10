@@ -2957,12 +2957,12 @@ enable-ga="false"
                         if (Array.isArray(data)) {
                             // Management can manage any community, so show them all.
                             let isManagement = false;
-                            if (userEmail) {
+                            if (userId) {
                                 try {
                                     const { data: u } = await localSupabase
                                         .from("users")
                                         .select("department")
-                                        .eq("email", userEmail)
+                                        .eq("id", userId)
                                         .maybeSingle();
                                     isManagement = !!(u && (u.department || "").trim() === "Management");
                                 } catch (e) {}

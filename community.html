@@ -1513,12 +1513,12 @@
                             const userData = await localSupabase.auth.getUser();
                             currentEmail = userData?.data?.user?.email || "";
                             currentUserId = userData?.data?.user?.id || null;
-                            if (currentEmail) {
+                            if (currentUserId) {
                                 try {
                                     const { data: currentUserData } = await localSupabase
                                         .from("users")
                                         .select("department")
-                                        .eq("email", currentEmail)
+                                        .eq("id", currentUserId)
                                         .maybeSingle();
                                     currentUserDepartment = (currentUserData && currentUserData.department) ? currentUserData.department : "";
                                 } catch (e) {}
