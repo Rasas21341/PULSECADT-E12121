@@ -3355,7 +3355,7 @@ async function joinCommunity(communityId, passcode) {
             });
         }
 
-        function addCommunityCard(name, meta, joined, id, creator, verified, suspended, membersOnly, banner) {
+        function addCommunityCard(name, meta, joined, id, creator, verified, suspended, membersOnly, banner, partner, isManagement) {
             if (!loggedInCommunities) return;
             if (id && loggedInCommunities.querySelector(`[data-id="${id}"]`)) {
                 return;
