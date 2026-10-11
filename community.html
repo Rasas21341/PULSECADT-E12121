@@ -3536,6 +3536,12 @@ if (openAddRoleBtn) {
                         if (openAddDocumentBtn) {
                             openAddDocumentBtn.addEventListener("click", openNewDocumentModal);
                         }
+
+                        const openAddPenalCodeBtn = document.getElementById("openAddPenalCodeBtn");
+                        if (openAddPenalCodeBtn) {
+                            openAddPenalCodeBtn.addEventListener("click", openNewPenalCodeModal);
+                        }
+
                         if (newDocModalClose) {
                             newDocModalClose.addEventListener("click", closeNewDocumentModal);
                         }
