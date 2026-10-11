@@ -2072,6 +2072,9 @@
         <button type="button" id="attachToCallBtn" style="width:100%; text-align:left; padding:10px 14px; border:none; background:transparent; font-size:14px; font-weight:600; color:#0f172a; cursor:pointer; border-radius:6px;">
             Attach to Call
         </button>
+        <button type="button" id="closeCallBtn" style="width:100%; text-align:left; padding:10px 14px; border:none; background:transparent; font-size:14px; font-weight:600; color:#dc2626; cursor:pointer; border-radius:6px;">
+            Close Call
+        </button>
     </div>
 
     <button class="back-btn" id="backBtn">← Back</button>
@@ -2702,6 +2705,28 @@
                     console.error(err);
                 }
                 
+                if (callsContextMenu) callsContextMenu.style.display = "none";
+            });
+        }
+
+        const closeCallBtn = document.getElementById("closeCallBtn");
+        if (closeCallBtn) {
+            closeCallBtn.addEventListener("click", async () => {
+                if (!currentCallId || !localSupabase) return;
+                try {
+                    const { error } = await localSupabase
+                        .from("calls")
+                        .update({ status: "closed" })
+                        .eq("id", currentCallId);
+                    if (error) {
+                        alert("Failed to close call: " + error.message);
+                        return;
+                    }
+                    loadCallsBar();
+                } catch (err) {
+                    alert("An unexpected error occurred.");
+                    console.error(err);
+                }
                 if (callsContextMenu) callsContextMenu.style.display = "none";
             });
         }
