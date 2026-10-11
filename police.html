@@ -2559,20 +2559,16 @@ console.error("Permission check failed:", err);
             tbody.innerHTML = `<tr><td colspan="8" class="units-empty">Loading units...</td></tr>`;
             try {
                 // Fetch officers and calls in parallel
-                const [officersRes, callsRes] = await Promise.all([
-                    localSupabase
-                        .from("officers")
-                        .select("*")
-                        .eq("community_id", communityId)
-                        .order("created_at", { ascending: false })
-                        .limit(20),
-                    localSupabase
-                        .from("calls")
-                        .select("id, units")
-                        .eq("community_id", communityId)
-                        .order("created_at", { ascending: false })
-                        .limit(50)
-                ]);
+                const officersQuery = localSupabase.from("officers").select("*").order("created_at", { ascending: false }).limit(20);
+                const callsQuery = localSupabase.from("calls").select("id, units").order("created_at", { ascending: false }).limit(50);
+                
+                // Only filter by community_id if available
+                if (communityId) {
+                    officersQuery.eq("community_id", communityId);
+                    callsQuery.eq("community_id", communityId);
+                }
+                
+                const [officersRes, callsRes] = await Promise.all([officersQuery, callsQuery]);
 
                 if (officersRes.error) throw officersRes.error;
                 if (callsRes.error) throw callsRes.error;
@@ -2644,12 +2640,9 @@ tbody.innerHTML = currentRow + otherRows;
             // Show loading state
             tbody.innerHTML = '<tr><td colspan="7" class="calls-empty">Loading calls...</td></tr>';
             try {
-                const { data, error } = await localSupabase
-                    .from("calls")
-                    .select("*")
-                    .eq("community_id", communityId)
-                    .order("created_at", { ascending: false })
-                    .limit(20);
+                const callsQuery = localSupabase.from("calls").select("*").order("created_at", { ascending: false }).limit(20);
+                if (communityId) callsQuery.eq("community_id", communityId);
+                const { data, error } = await callsQuery;
 
                 if (error) throw error;
 
