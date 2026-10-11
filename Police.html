@@ -2623,12 +2623,13 @@ console.error("Permission check failed:", err);
                     </tr>`;
                 }).join("");
 
-                tbody.innerHTML = currentRow + otherRows;
+tbody.innerHTML = currentRow + otherRows;
             } catch (err) {
                 tbody.innerHTML = '<tr><td colspan="8" class="units-empty">Failed to load units</td></tr>';
                 console.error("Failed to load units:", err);
             }
-        }
+} catch (err) {
+                tbody.innerHTML = '<tr><td colspan="8" class="units-empty">Failed to load units</td></tr>';
                 console.error("Failed to load units:", err);
             }
         }
@@ -2640,10 +2641,13 @@ console.error("Permission check failed:", err);
                 tbody.innerHTML = '<tr><td colspan="7" class="calls-empty">Database unavailable</td></tr>';
                 return;
             }
+            // Show loading state
+            tbody.innerHTML = '<tr><td colspan="7" class="calls-empty">Loading calls...</td></tr>';
             try {
                 const { data, error } = await localSupabase
                     .from("calls")
                     .select("*")
+                    .eq("community_id", communityId)
                     .order("created_at", { ascending: false })
                     .limit(20);
 
@@ -2660,7 +2664,7 @@ console.error("Permission check failed:", err);
                     window.callIdMap[String(c.id).slice(0, 8)] = c.id;
                 });
 
-                const esc = (t) => (t || "").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+                const esc = (t) => (t || "").replace(/</g, "<").replace(/>/g, ">");
                 const displayName = officerCallsign || (officerRank ? officerRank + " " : "") + officerName;
                 tbody.innerHTML = data.map((c) => {
                     const statusClass = (c.status || "pending").toLowerCase();
@@ -4360,8 +4364,17 @@ console.error("Permission check failed:", err);
             }
         }
 
-        loadUnitsBar();
-        loadCallsBar();
+        // Initialize - wait for session then load data
+        async function init() {
+            const sessionReady = await waitForSession();
+            if (!sessionReady) {
+                console.warn("Session not ready, loading data anyway...");
+            }
+            loadUnitsBar();
+            loadCallsBar();
+        }
+
+        init();
 
         const bodycamOverlay = document.getElementById("bodycamOverlay");
         const bodycamBtn = document.getElementById("bodycamBtn");
