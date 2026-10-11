@@ -2529,6 +2529,7 @@ enable-ga="false"
         if (loginForm) {
             loginForm.addEventListener("submit", async (e) => {
                 e.preventDefault();
+                console.log("Login form submitted");
                 const loginError = document.getElementById("loginError");
                 const loginSuccess = document.getElementById("loginSuccess");
                 const loginAccount = document.getElementById("loginAccount");
@@ -2706,6 +2707,7 @@ enable-ga="false"
         if (topbarLoginBtn) {
             topbarLoginBtn.addEventListener("click", async (e) => {
             e.preventDefault();
+            console.log("Login button clicked, localSupabase:", localSupabase);
             if (localSupabase) {
                 try {
                     const { data } = await localSupabase.auth.getSession();
