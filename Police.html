@@ -1910,6 +1910,92 @@
             text-transform: uppercase;
         }
 
+        /* Phone-style slide-up sheet */
+        .phone-sheet-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.5);
+            z-index: 850;
+            opacity: 0;
+            transition: opacity 0.25s;
+            pointer-events: none;
+        }
+        .phone-sheet-overlay.open { opacity: 1; pointer-events: auto; }
+        .phone-sheet {
+            position: fixed;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            max-height: 85vh;
+            background: #0b0f15;
+            border-top: 1px solid #1f2937;
+            border-radius: 22px 22px 0 0;
+            box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.55);
+            z-index: 900;
+            transform: translateY(130%);
+            transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+            display: flex;
+            flex-direction: column;
+            color: #e5e7eb;
+        }
+        .phone-sheet.open { transform: translateY(0); }
+        .phone-sheet-handle {
+            width: 44px;
+            height: 4px;
+            background: #374151;
+            border-radius: 999px;
+            margin: 10px auto 6px;
+        }
+        .phone-sheet-body {
+            padding: 6px 20px 24px;
+            overflow-y: auto;
+        }
+        .phone-sheet-title {
+            font-size: 22px;
+            font-weight: 800;
+            color: #f9fafb;
+            margin-bottom: 2px;
+        }
+        .phone-sheet-sub {
+            font-size: 13px;
+            color: #9ca3af;
+            margin-bottom: 18px;
+        }
+        .phone-sheet-btn {
+            display: block;
+            width: 100%;
+            padding: 13px 16px;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 700;
+            text-align: left;
+            border: 1px solid #1f2937;
+            cursor: pointer;
+            margin-bottom: 8px;
+            background: #111827;
+            color: #e5e7eb;
+        }
+        .phone-sheet-btn:hover { background: #1f2937; }
+        .phone-sheet-btn.primary {
+            background: #2563eb;
+            border-color: #2563eb;
+            color: #ffffff;
+        }
+        .phone-sheet-btn.primary:hover { background: #1d4ed8; }
+        .phone-sheet-close {
+            position: absolute;
+            top: 10px;
+            right: 14px;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: 1px solid #374151;
+            background: #111827;
+            color: #9ca3af;
+            font-size: 18px;
+            cursor: pointer;
+            line-height: 1;
+        }
     </style>
 </head>
 <body>
@@ -2098,6 +2184,22 @@
                 <button class="supervisor-panel-close" id="supervisorPanelClose" type="button" aria-label="Close">×</button>
             </div>
             <div id="supervisorPanelContent"></div>
+        </div>
+    </div>
+
+    <div class="phone-sheet-overlay" id="phoneSheetOverlay">
+    </div>
+    <div class="phone-sheet" id="phoneSheet">
+        <button class="phone-sheet-close" id="phoneSheetClose" aria-label="Close">×</button>
+        <div class="phone-sheet-handle"></div>
+        <div class="phone-sheet-body">
+            <div class="phone-sheet-title">PulseCAD</div>
+            <div class="phone-sheet-sub">Officer tools</div>
+            <button type="button" class="phone-sheet-btn primary" id="phoneSheetLookupBtn">Lookup Civilian</button>
+            <button type="button" class="phone-sheet-btn ghost" id="phoneSheetPlateBtn">Plate Lookup</button>
+            <button type="button" class="phone-sheet-btn ghost" id="phoneSheetUnitsBtn">Units / Citations</button>
+            <button type="button" class="phone-sheet-btn ghost" id="phoneSheetLiveMapBtn">Live Map</button>
+            <button type="button" class="phone-sheet-btn ghost" id="phoneSheetSupervisorBtn">Supervisor Panel</button>
         </div>
     </div>
 
@@ -4512,6 +4614,47 @@
                 }
             });
         }
+
+        // F4 opens a phone-style menu sheet (works anywhere on the police page).
+        (function () {
+            const sheet = document.getElementById("phoneSheet");
+            const overlay = document.getElementById("phoneSheetOverlay");
+            const closeBtn = document.getElementById("phoneSheetClose");
+            if (!sheet || !overlay) return;
+
+            function openSheet() {
+                sheet.classList.add("open");
+                overlay.classList.add("open");
+            }
+            function closeSheet() {
+                sheet.classList.remove("open");
+                overlay.classList.remove("open");
+            }
+
+            document.addEventListener("keydown", (e) => {
+                if (e.key === "F4") {
+                    e.preventDefault();
+                    if (sheet.classList.contains("open")) closeSheet();
+                    else openSheet();
+                }
+            });
+
+            if (closeBtn) closeBtn.addEventListener("click", closeSheet);
+            overlay.addEventListener("click", closeSheet);
+
+            // Wire the sheet buttons to the existing controls.
+            const byId = (id) => document.getElementById(id);
+            const wire = (sheetBtnId, targetBtnId) => {
+                const sb = byId(sheetBtnId);
+                const tb = byId(targetBtnId);
+                if (sb && tb) sb.addEventListener("click", () => { closeSheet(); tb.click(); });
+            };
+            wire("phoneSheetLookupBtn", "civilianLookupBtn");
+            wire("phoneSheetPlateBtn", "plateLookupBtn");
+            wire("phoneSheetUnitsBtn", "unitsCitationsBtn");
+            wire("phoneSheetLiveMapBtn", "liveMapBtn");
+            wire("phoneSheetSupervisorBtn", "supervisorPanelBtn");
+        })();
     </script>
 </body>
 </html>
