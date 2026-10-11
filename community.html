@@ -1882,18 +1882,7 @@
                          const applicationsView = document.getElementById("applicationsView");
                          const applicationsViewClose = document.getElementById("applicationsViewClose");
                          const applicationsList = document.getElementById("applicationsList");
-                          const supervisorInput = document.getElementById("supervisorInput");
-
-if (!canEditSettings) {
-                              // Keep sidebar visible, only hide admin-only elements
-                              const cadBadge = contentEl.querySelector('.cad-config-badge');
-                              if (cadBadge) cadBadge.style.display = 'none';
-                              const serverAdminBadge = contentEl.querySelector('.server-admin-badge');
-                              if (serverAdminBadge) serverAdminBadge.style.display = 'none';
-                              if (settingsBtn) settingsBtn.style.display = 'none';
-  const views = contentEl.querySelectorAll('.documents-view, .settings-view, .vehicles-view, .licences-view, .applications-view, .members-view');
-                             views.forEach((v) => { v.style.display = 'none'; });
-                         }
+const supervisorInput = document.getElementById("supervisorInput");
 
                         // Support Team gets a Moderation button in the top bar.
                         const topbarModerationBtn = contentEl.querySelector('#topbarModerationBtn');
