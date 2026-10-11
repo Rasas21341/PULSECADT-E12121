@@ -3569,6 +3569,20 @@ async function loadPenalCodes() {
                                 loadPenalCodes();
                             });
                         }
+                        const penalCodesView = document.getElementById("penalCodesView");
+                        const penalCodesViewClose = document.getElementById("penalCodesViewClose");
+                        if (penalCodesViewClose && penalCodesView) {
+                            penalCodesViewClose.addEventListener("click", () => {
+                                penalCodesView.classList.remove("open");
+                            });
+                        }
+                        if (penalCodesView) {
+                            penalCodesView.addEventListener("click", (e) => {
+                                if (e.target === penalCodesView) {
+                                    penalCodesView.classList.remove("open");
+                                }
+                            });
+                        }
 
                         // Discord Integration
                         const discordDropdownToggle = document.getElementById("discordDropdownToggle");
