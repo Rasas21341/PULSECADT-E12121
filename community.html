@@ -1594,8 +1594,9 @@
 
                         const isCreator = communityData && communityData.creator_email === currentEmail;
                         const isManagement = (currentUserDepartment || "").trim() === "Management";
-                        console.log("Access check:", { isCreator, isManagement, hasRostersPermission, currentEmail, creator_email: communityData?.creator_email });
-                        if (!communityData || (!isCreator && !hasRostersPermission && !isManagement)) {
+                        const canEditSettings = isCreator || isManagement || hasRostersPermission;
+                        console.log("Access check:", { isCreator, isManagement, hasRostersPermission, canEditSettings, currentEmail, creator_email: communityData?.creator_email });
+                        if (!communityData || !canEditSettings) {
                             contentEl.innerHTML = `<div class="empty">Access denied.</div>`;
                             return;
                         }
@@ -1888,24 +1889,24 @@
                          const applicationsList = document.getElementById("applicationsList");
                           const supervisorInput = document.getElementById("supervisorInput");
 
-                         if (!isCreator && !isManagement) {
-                             const allBtnWraps = contentEl.querySelectorAll('.dashboard-top-right > .btn-dropdown-wrap');
-                             allBtnWraps.forEach((wrap) => {
-                                 const btn = wrap.querySelector('button');
-                                 if (btn && btn.id !== 'rostersBtn') {
-                                     wrap.style.display = 'none';
-                                 }
-                             });
-                             const cadBadge = contentEl.querySelector('.cad-config-badge');
-                             if (cadBadge) cadBadge.style.display = 'none';
-                             const departmentsBtn = contentEl.querySelector('.departments-btn');
-                             if (departmentsBtn) departmentsBtn.style.display = 'none';
-                             const serverAdminBadge = contentEl.querySelector('.server-admin-badge');
-                             if (serverAdminBadge) serverAdminBadge.style.display = 'none';
-                             if (settingsBtn) settingsBtn.style.display = 'none';
-const views = contentEl.querySelectorAll('.documents-view, .settings-view, .vehicles-view, .licences-view, .applications-view, .members-view');
-                            views.forEach((v) => { v.style.display = 'none'; });
-                        }
+if (!canEditSettings) {
+                              const allBtnWraps = contentEl.querySelectorAll('.dashboard-top-right > .btn-dropdown-wrap');
+                              allBtnWraps.forEach((wrap) => {
+                                  const btn = wrap.querySelector('button');
+                                  if (btn && btn.id !== 'rostersBtn') {
+                                      wrap.style.display = 'none';
+                                  }
+                              });
+                              const cadBadge = contentEl.querySelector('.cad-config-badge');
+                              if (cadBadge) cadBadge.style.display = 'none';
+                              const departmentsBtn = contentEl.querySelector('.departments-btn');
+                              if (departmentsBtn) departmentsBtn.style.display = 'none';
+                              const serverAdminBadge = contentEl.querySelector('.server-admin-badge');
+                              if (serverAdminBadge) serverAdminBadge.style.display = 'none';
+                              if (settingsBtn) settingsBtn.style.display = 'none';
+ const views = contentEl.querySelectorAll('.documents-view, .settings-view, .vehicles-view, .licences-view, .applications-view, .members-view');
+                             views.forEach((v) => { v.style.display = 'none'; });
+                         }
 
                         // Support Team gets a Moderation button in the top bar.
                         const topbarModerationBtn = contentEl.querySelector('#topbarModerationBtn');
