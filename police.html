@@ -2517,50 +2517,79 @@
                     return perms.includes(permission);
                 });
             } catch (err) {
-                console.error("Permission check failed:", err);
+console.error("Permission check failed:", err);
                 return false;
             }
+        }
+
+        // Wait for session to be restored before loading data
+        async function waitForSession() {
+            if (!localSupabase) return false;
+            // First try to get existing session
+            const { data: { session } } = await localSupabase.auth.getSession();
+            if (session) return true;
+            // If no session, wait for auth state change
+            return new Promise((resolve) => {
+                const { data: { subscription } } = localSupabase.auth.onAuthStateChange((event, session) => {
+                    if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+                        subscription.unsubscribe();
+                        resolve(true);
+                    }
+                });
+                // Fallback timeout
+                setTimeout(() => {
+                    subscription.unsubscribe();
+                    resolve(false);
+                }, 3000);
+            });
         }
 
         async function loadUnitsBar() {
             const tbody = document.getElementById("unitsTableBody");
             if (!tbody) return;
 
-            const esc = (t) => (t || "").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+            const esc = (t) => (t || "").replace(/</g, "<").replace(/>/g, ">");
             const displayName = officerCallsign || (officerRank ? officerRank + " " : "") + officerName;
 
             if (!localSupabase) {
                 tbody.innerHTML = `<tr><td colspan="8" class="units-empty">Database unavailable</td></tr>`;
                 return;
             }
+            // Show loading state
+            tbody.innerHTML = `<tr><td colspan="8" class="units-empty">Loading units...</td></tr>`;
             try {
-                const { data, error } = await localSupabase
-                    .from("officers")
-                    .select("*")
-                    .order("created_at", { ascending: false })
-                    .limit(20);
-
-                if (error) throw error;
-
-                // Fetch calls to find which call the current officer is attached to
-                let attachedCallNumber = "";
-                try {
-                    const { data: callsData } = await localSupabase
+                // Fetch officers and calls in parallel
+                const [officersRes, callsRes] = await Promise.all([
+                    localSupabase
+                        .from("officers")
+                        .select("*")
+                        .eq("community_id", communityId)
+                        .order("created_at", { ascending: false })
+                        .limit(20),
+                    localSupabase
                         .from("calls")
                         .select("id, units")
+                        .eq("community_id", communityId)
                         .order("created_at", { ascending: false })
-                        .limit(50);
-                    if (Array.isArray(callsData)) {
-                        for (const call of callsData) {
-                            const units = call.units ? call.units.split(",").map(u => u.trim()).filter(u => u) : [];
-                            if (units.includes(displayName)) {
-                                attachedCallNumber = String(call.id).slice(0, 8);
-                                break;
-                            }
+                        .limit(50)
+                ]);
+
+                if (officersRes.error) throw officersRes.error;
+                if (callsRes.error) throw callsRes.error;
+
+                const data = officersRes.data || [];
+                const callsData = callsRes.data || [];
+
+                // Find which call the current officer is attached to
+                let attachedCallNumber = "";
+                if (Array.isArray(callsData)) {
+                    for (const call of callsData) {
+                        const units = call.units ? call.units.split(",").map(u => u.trim()).filter(u => u) : [];
+                        if (units.includes(displayName)) {
+                            attachedCallNumber = String(call.id).slice(0, 8);
+                            break;
                         }
                     }
-                } catch (callErr) {
-                    console.error("Could not fetch calls for units bar:", callErr);
                 }
 
                 const currentStatusClass = (currentStatus || "available").toLowerCase();
@@ -2597,6 +2626,9 @@
                 tbody.innerHTML = currentRow + otherRows;
             } catch (err) {
                 tbody.innerHTML = '<tr><td colspan="8" class="units-empty">Failed to load units</td></tr>';
+                console.error("Failed to load units:", err);
+            }
+        }
                 console.error("Failed to load units:", err);
             }
         }
