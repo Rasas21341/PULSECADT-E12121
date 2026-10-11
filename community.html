@@ -4083,7 +4083,7 @@ if (openAddRoleBtn) {
                     }
                     localStorage.setItem("policeActiveUnits", JSON.stringify(units));
                 } catch (e) {}
-                window.open("/Police.html?" + params.toString(), "_blank");
+                window.open("/police.html?" + params.toString(), "_blank");
                 if (policeModal) policeModal.classList.remove("open");
                 pendingDepartment = null;
             });
