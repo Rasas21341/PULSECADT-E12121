@@ -1574,6 +1574,38 @@
         </div>
     </div>
 
+    <div class="modal-overlay" id="editPenalCodeModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">Edit Penal Code</div>
+                <button class="modal-close" id="editPenalCodeModalClose" type="button" aria-label="Close">×</</button>
+            </div>
+            <input type="hidden" id="editPenalCodeId" />
+            <div class="field">
+                <label for="editPenalCodeTitle">Statute Name</label>
+                <input type="text" id="editPenalCodeTitle" placeholder="e.g., Murder, Assault, Theft" />
+            </div>
+            <div class="field">
+                <label for="editPenalCodeCode">Code/Section</label>
+                <input type="text" id="editPenalCodeCode" placeholder="e.g., PC 187, VC 23152" />
+            </div>
+            <div class="field">
+                <label for="editPenalCodeDescription">Description</label>
+                <textarea id="editPenalCodeDescription" placeholder="Description of the offense..."></textarea>
+            </div>
+            <div class="field">
+                <label for="editPenalCodeClassification">Classification</label>
+                <select id="editPenalCodeClassification">
+                    <option value="Misdemeanor">Misdemeanor</option>
+                    <option value="Felony">Felony</option>
+                    <option value="Infraction">Infraction</option>
+                </select>
+            </div>
+            <button type="button" class="submit-btn" id="editPenalCodeSubmitBtn">Save Changes</button>
+            <div class="modal-error" id="editPenalCodeError"></div>
+        </div>
+    </div>
+
     <div class="modal-overlay" id="newApplicationModal">
         <div class="modal">
             <div class="modal-header">
@@ -3375,10 +3407,9 @@ if (openAddRoleBtn) {
                             }
                         }
 
-                        async function loadPenalCodes() {
+async function loadPenalCodes() {
                             if (!penalCodesList || !localSupabase) return;
-                            penalCodesList.classList.add("open");
-                            penalCodesList.innerHTML = '<div class="empty">Loading penal codes...</div>';
+                            penalCodesList.innerHTML = '<div class="penal-codes-empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/><path d="M9 12l2 2 4-4"/></svg><p>No penal codes yet</p><small>Click "Add Penal Code" to create your first statute</small></div>';
                             try {
                                 const { data, error } = await localSupabase
                                     .from("penal_codes")
@@ -3387,21 +3418,106 @@ if (openAddRoleBtn) {
 
                                 if (error) throw error;
 
-                                const esc = (t) => (t || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                                const esc = (t) => (t || '').replace(/</g, '<').replace(/>/g, '>');
                                 if (!Array.isArray(data) || data.length === 0) {
-                                    penalCodesList.innerHTML = '<div class="empty">No penal codes yet.</div>';
-                                    return;
+                                    return; // Empty state already set
                                 }
 
-                                penalCodesList.innerHTML = data.map((pc) => {
+                                penalCodesList.innerHTML = '<div class="penal-codes-grid">' + data.map((pc) => {
                                     const title = esc(pc.title || 'Penal Code');
                                     const code = esc(pc.code || '');
-                                    const detail = [code, pc.description].filter(Boolean).join(" â€” ");
-                                    return `<button type="button" class="member-btn">${title}${detail ? ' â€” ' + esc(detail) : ''}</button>`;
-                                }).join('');
+                                    const description = esc(pc.description || '');
+                                    const classification = (pc.classification || 'Misdemeanor').toLowerCase();
+                                    const classLabel = pc.classification || 'Misdemeanor';
+                                    return `
+                                        <div class="penal-code-card" data-penal-code-id="${pc.id}">
+                                            <div class="penal-code-header">
+                                                <div class="penal-code-title-row">
+                                                    <span class="penal-code-title">${title}</span>
+                                                    ${code ? `<span class="penal-code-code">${code}</span>` : ''}
+                                                    <span class="penal-code-classification ${classification}">${classLabel}</span>
+                                                </div>
+                                                <div class="penal-code-actions">
+                                                    <button type="button" class="penal-code-action-btn edit" data-action="edit-penal-code" data-penal-code-id="${pc.id}">Edit</button>
+                                                    <button type="button" class="penal-code-action-btn delete" data-action="delete-penal-code" data-penal-code-id="${pc.id}">Delete</button>
+                                                </div>
+                                            </div>
+                                            ${description ? `<div class="penal-code-description">${description}</div>` : ''}
+                                        </div>
+                                    `;
+                                }).join('') + '</div>';
+
+                                // Attach event listeners for edit/delete
+                                penalCodesList.querySelectorAll("[data-action='edit-penal-code']").forEach((btn) => {
+                                    btn.addEventListener("click", (e) => {
+                                        const card = e.target.closest(".penal-code-card");
+                                        const penalCodeId = card.getAttribute("data-penal-code-id");
+                                        openEditPenalCodeModal(penalCodeId);
+                                    });
+                                });
+
+                                penalCodesList.querySelectorAll("[data-action='delete-penal-code']").forEach((btn) => {
+                                    btn.addEventListener("click", async (e) => {
+                                        const card = e.target.closest(".penal-code-card");
+                                        const penalCodeId = card.getAttribute("data-penal-code-id");
+                                        if (confirm("Delete this penal code?")) {
+                                            await deletePenalCode(penalCodeId);
+                                        }
+                                    });
+                                });
                             } catch (err) {
                                 console.error("Failed to load penal codes:", err);
-                                penalCodesList.innerHTML = '<div class="empty">Failed to load penal codes.</div>';
+                                penalCodesList.innerHTML = '<div class="penal-codes-empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg><p>Failed to load penal codes</p><small>Please try again</small></div>';
+                            }
+                        }
+
+                        async function addPenalCode(title, code, description, classification) {
+                            if (!title || !localSupabase) return;
+                            try {
+                                await localSupabase
+                                    .from("penal_codes")
+                                    .insert([{ 
+                                        community_id: id, 
+                                        title: title.trim(), 
+                                        code: code.trim(), 
+                                        description: description.trim(), 
+                                        classification: classification 
+                                    }]);
+                                loadPenalCodes();
+                            } catch (err) {
+                                alert("Failed to create penal code: " + (err.message || err));
+                            }
+                        }
+
+                        async function updatePenalCode(penalCodeId, title, code, description, classification) {
+                            if (!title || !localSupabase) return;
+                            try {
+                                await localSupabase
+                                    .from("penal_codes")
+                                    .update({ 
+                                        title: title.trim(), 
+                                        code: code.trim(), 
+                                        description: description.trim(), 
+                                        classification: classification 
+                                    })
+                                    .eq("id", penalCodeId);
+                                loadPenalCodes();
+                                closeEditPenalCodeModal();
+                            } catch (err) {
+                                alert("Failed to update penal code: " + (err.message || err));
+                            }
+                        }
+
+                        async function deletePenalCode(penalCodeId) {
+                            if (!localSupabase) return;
+                            try {
+                                await localSupabase
+                                    .from("penal_codes")
+                                    .delete()
+                                    .eq("id", penalCodeId);
+                                loadPenalCodes();
+                            } catch (err) {
+                                alert("Failed to delete penal code: " + (err.message || err));
                             }
                         }
 
@@ -3760,6 +3876,69 @@ if (openAddRoleBtn) {
                                 }
                                 closeNewPenalCodeModal();
                                 await addPenalCode(title, code, description, classification);
+                            };
+                        }
+
+                        // Edit Penal Code Modal handler
+                        const editPenalCodeModal = document.getElementById("editPenalCodeModal");
+                        const editPenalCodeId = document.getElementById("editPenalCodeId");
+                        const editPenalCodeTitle = document.getElementById("editPenalCodeTitle");
+                        const editPenalCodeCode = document.getElementById("editPenalCodeCode");
+                        const editPenalCodeDescription = document.getElementById("editPenalCodeDescription");
+                        const editPenalCodeClassification = document.getElementById("editPenalCodeClassification");
+                        const editPenalCodeSubmitBtn = document.getElementById("editPenalCodeSubmitBtn");
+                        const editPenalCodeModalClose = document.getElementById("editPenalCodeModalClose");
+                        const editPenalCodeError = document.getElementById("editPenalCodeError");
+
+                        function openEditPenalCodeModal(penalCodeId) {
+                            if (!editPenalCodeModal || !localSupabase) return;
+                            // Fetch the penal code data
+                            localSupabase
+                                .from("penal_codes")
+                                .select("*")
+                                .eq("id", penalCodeId)
+                                .single()
+                                .then(({ data, error }) => {
+                                    if (error || !data) {
+                                        console.error("Failed to fetch penal code:", error);
+                                        alert("Failed to load penal code data.");
+                                        return;
+                                    }
+                                    if (editPenalCodeId) editPenalCodeId.value = data.id;
+                                    if (editPenalCodeTitle) editPenalCodeTitle.value = data.title || "";
+                                    if (editPenalCodeCode) editPenalCodeCode.value = data.code || "";
+                                    if (editPenalCodeDescription) editPenalCodeDescription.value = data.description || "";
+                                    if (editPenalCodeClassification) editPenalCodeClassification.value = data.classification || "Misdemeanor";
+                                    if (editPenalCodeError) { editPenalCodeError.textContent = ""; editPenalCodeError.style.display = "none"; }
+                                    editPenalCodeModal.classList.add("open");
+                                });
+                        }
+
+                        function closeEditPenalCodeModal() {
+                            if (editPenalCodeModal) editPenalCodeModal.classList.remove("open");
+                            if (editPenalCodeId) editPenalCodeId.value = "";
+                        }
+
+                        if (editPenalCodeModalClose) {
+                            editPenalCodeModalClose.addEventListener("click", closeEditPenalCodeModal);
+                        }
+                        if (editPenalCodeModal) {
+                            editPenalCodeModal.addEventListener("click", (e) => {
+                                if (e.target === editPenalCodeModal) closeEditPenalCodeModal();
+                            });
+                        }
+                        if (editPenalCodeSubmitBtn) {
+                            editPenalCodeSubmitBtn.onclick = async () => {
+                                const penalCodeId = editPenalCodeId ? editPenalCodeId.value : "";
+                                const title = editPenalCodeTitle ? editPenalCodeTitle.value.trim() : "";
+                                const code = editPenalCodeCode ? editPenalCodeCode.value.trim() : "";
+                                const description = editPenalCodeDescription ? editPenalCodeDescription.value.trim() : "";
+                                const classification = editPenalCodeClassification ? editPenalCodeClassification.value : "Misdemeanor";
+                                if (!title) {
+                                    if (editPenalCodeError) { editPenalCodeError.textContent = "Statute name is required."; editPenalCodeError.style.display = "block"; }
+                                    return;
+                                }
+                                await updatePenalCode(penalCodeId, title, code, description, classification);
                             };
                         }
 
