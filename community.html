@@ -1690,7 +1690,6 @@
                                             <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
                                             Penal Codes
                                         </button>
-                                        <div class="penal-codes-list" id="penalCodesList"></div>
                                     </div>
                                     <div class="btn-dropdown-wrap">
                                         <button type="button" class="applications-btn" id="rostersBtn">
@@ -1950,10 +1949,10 @@ const supervisorInput = document.getElementById("supervisorInput");
                              });
                          }
 
-                         function closeAllPages() {
-                             const allViews = contentEl.querySelectorAll('.members-view, .departments-view, .documents-view, .settings-view, .rosters-view, .roster-editor-view, .roles-view, .licences-view, .vehicles-view, .applications-view');
-                             allViews.forEach((v) => { v.classList.remove("open"); });
-                         }
+function closeAllPages() {
+                              const allViews = contentEl.querySelectorAll('.members-view, .departments-view, .documents-view, .settings-view, .rosters-view, .roster-editor-view, .roles-view, .licences-view, .vehicles-view, .applications-view, .penal-codes-view');
+                              allViews.forEach((v) => { v.classList.remove("open"); });
+                          }
 
                          if (membersBtn && membersView && membersViewList) {
                              membersBtn.addEventListener("click", (e) => {
@@ -3294,11 +3293,12 @@ if (openAddRoleBtn) {
                             });
                         }
 
-                        if (penalCodesBtn && penalCodesList) {
+                        if (penalCodesBtn) {
                             penalCodesBtn.addEventListener("click", (e) => {
                                 e.stopPropagation();
                                 closeAllPages();
-                                penalCodesList.classList.add("open");
+                                const penalCodesView = document.getElementById("penalCodesView");
+                                if (penalCodesView) penalCodesView.classList.add("open");
                                 loadPenalCodes();
                             });
                         }
