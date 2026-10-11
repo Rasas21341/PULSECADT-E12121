@@ -1673,12 +1673,6 @@
                                             Roles
                                         </button>
                                     </div>
-                                    <div class="btn-dropdown-wrap">
-                                        <button type="button" class="moderation-btn" id="topbarModerationBtn" style="display:none;">
-                                            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                                            Moderation
-                                        </button>
-                                    </div>
                                     <button type="button" class="departments-btn" id="departmentsBtn">
                                         <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M3 10h18M5 6l7-3 7 3M4 10v11M20 10v11M8 14v3M12 14v3M16 14v3"/></svg>
                                         Departments
@@ -1789,10 +1783,6 @@
                                 <div class="departments-view" id="departmentsView">
                                     <div class="members-view-header">
                                         <div class="members-view-title">Departments</div>
-                                        <button type="button" class="moderation-btn" id="departmentsModerationBtn" style="display:none;">
-                                            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                                            Moderation
-                                        </button>
                                         <button type="button" class="add-department-btn" id="openAddDepartmentBtn">
                                             <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                                             Add department
@@ -1898,24 +1888,6 @@
                          const applicationsList = document.getElementById("applicationsList");
 const supervisorInput = document.getElementById("supervisorInput");
 
-                        // Support Team gets a Moderation button in the top bar.
-                        const topbarModerationBtn = contentEl.querySelector('#topbarModerationBtn');
-                        if (topbarModerationBtn) {
-                            const isSupport = (currentUserDepartment || "").trim() === "Support Team";
-                            if (isSupport) {
-                                topbarModerationBtn.style.display = "inline-flex";
-                            }
-                        }
-
-                        // Support Team gets a Moderation button inside the Departments view (legacy).
-                        const departmentsModerationBtn = contentEl.querySelector('#departmentsModerationBtn');
-                        if (departmentsModerationBtn) {
-                            const isSupport = (currentUserDepartment || "").trim() === "Support Team";
-                            if (isSupport) {
-                                departmentsModerationBtn.style.display = "inline-flex";
-                            }
-                        }
-
                          if (settingsBtn && settingsView) {
                             settingsBtn.addEventListener("click", (e) => {
                                 e.stopPropagation();
@@ -1971,25 +1943,6 @@ if (membersViewClose && membersView) {
                                 loadDepartments();
                             });
                         }
-
-                        if (departmentsModerationBtn) {
-                            departmentsModerationBtn.addEventListener("click", (e) => {
-                                e.stopPropagation();
-                                closeAllPages();
-                                if (membersView) membersView.classList.add("open");
-                                loadMembersInto(membersViewList, { openDropdown: false });
-                            });
-                        }
-
-                        if (topbarModerationBtn) {
-                            topbarModerationBtn.addEventListener("click", (e) => {
-                                e.stopPropagation();
-                                closeAllPages();
-                                if (membersView) membersView.classList.add("open");
-                                loadMembersInto(membersViewList, { openDropdown: false });
-                            });
-                        }
-
                         if (departmentsView) {
                             departmentsView.addEventListener("click", (e) => {
                                 if (e.target === departmentsView) {

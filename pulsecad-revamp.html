@@ -1826,7 +1826,7 @@ enable-ga="false"
         <span>This CAD is now available on an app. Download it</span>
         <a href="/download" class="app-banner-link">here</a>
     </div>
-    <img class="top-left-logo" id="topLeftLogo" src="https://cdn.discordapp.com/icons/1498000979101093999/c96c547fbd94e68254d8335dadb2e437.webp?size=1024" alt="Logo" />
+    <img class="top-left-logo" id="topLeftLogo" src="https://cdn.discordapp.com/icons/1498000979101093999/c96c547fbd94e68254d8335dadb2e437.webp?size=1024" alt="Logo" draggable="false" />
     <div class="topbar" id="topbar">
         <span class="pill">
             <a href="/changelogs" class="changelogs-btn" id="changelogsLink">Changelogs</a>
@@ -1926,7 +1926,6 @@ enable-ga="false"
     </div>
       <div class="logged-in-screen" id="loggedInScreen">
             <div class="top-actions">
-                <button type="button" class="moderation-btn" id="staffDashboardBtn">Moderation</button>
                 <button type="button" class="create-community-centered-btn" id="createCommunityCenteredBtn">+ Create</button>
                  <button type="button" class="join-community-centered-btn" id="joinCommunityCenteredBtn">
                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px; vertical-align:middle;">
@@ -2143,26 +2142,6 @@ enable-ga="false"
                 return "";
             }
         }
-
-        const STAFF_ACCESS_DEPARTMENTS = ["Management", "Support Team Lead"];
-
-        async function updateStaffButtonVisibility() {
-            const btn = document.getElementById("staffDashboardBtn");
-            if (!btn) return;
-            let allowed = false;
-            try {
-                const dept = await getUserDepartment();
-                allowed = STAFF_ACCESS_DEPARTMENTS.includes(dept);
-            } catch (err) {
-                console.error("Failed to check staff access:", err);
-            }
-            if (allowed) {
-                btn.classList.add("visible");
-            } else {
-                btn.classList.remove("visible");
-            }
-        }
-
         async function checkPremiumStatus() {
             if (!localSupabase) return false;
             try {
@@ -3245,16 +3224,13 @@ async function joinCommunity(communityId, passcode) {
             if (container) container.style.display = "none";
             if (loggedInScreen) loggedInScreen.classList.add("open");
             if (authModal) authModal.classList.remove("open");
-             if (topLeftLogo) topLeftLogo.classList.add("visible");
-             const moderationBtn = document.getElementById("staffDashboardBtn");
-             if (moderationBtn) moderationBtn.classList.add("visible");
-              const trustedFooter = document.getElementById("trustedFooter");
+if (topLeftLogo) topLeftLogo.classList.add("visible");
+               const trustedFooter = document.getElementById("trustedFooter");
               if (trustedFooter) trustedFooter.style.display = "none";
               const appBanner = document.getElementById("appBanner");
               if (appBanner) appBanner.style.display = "none";
               if (topbar) topbar.style.top = "24px";
-              updateStaffButtonVisibility();
-        }
+          }
 
         function applyLoggedOutUI() {
             const topbar = document.getElementById("topbar");
@@ -3270,10 +3246,8 @@ async function joinCommunity(communityId, passcode) {
              if (loggedInScreen) loggedInScreen.classList.remove("open");
              if (settingsScreen) settingsScreen.classList.remove("open");
              if (container) container.style.display = "block";
-              if (topLeftLogo) topLeftLogo.classList.remove("visible");
-              const moderationBtn = document.getElementById("staffDashboardBtn");
-              if (moderationBtn) moderationBtn.classList.remove("visible");
-              const trustedFooter = document.getElementById("trustedFooter");
+if (topLeftLogo) topLeftLogo.classList.remove("visible");
+               const trustedFooter = document.getElementById("trustedFooter");
               if (trustedFooter) trustedFooter.style.display = "block";
               const appBanner = document.getElementById("appBanner");
               if (appBanner) appBanner.style.display = "inline-flex";
@@ -3601,33 +3575,12 @@ if (action === "leave") {
                     alert("No community found with that passcode.");
                     return;
                 }
-                await joinCommunity(data.id, passcode.trim());
+await joinCommunity(data.id, passcode.trim());
             });
         }
 
-        const staffDashboardBtn = document.getElementById("staffDashboardBtn");
         const staffDashboardCard = document.getElementById("staffDashboardCard");
         const staffDashboardContent = document.getElementById("staffDashboardContent");
-
-        if (staffDashboardBtn) {
-            staffDashboardBtn.addEventListener("click", async () => {
-                if (!localSupabase) return;
-                const { data: { user } } = await localSupabase.auth.getUser();
-                if (!user) {
-                    alert("Access denied. Staff only.");
-                    return;
-                }
-                if (user.email === "oceanviewrp1@gmail.com") {
-                     window.location.href = "staff.html";
-                     return;
-                 }
-                const { data, error } = await localSupabase
-                    .from("users")
-                    .select("department")
-                    .eq("email", user.email)
-                    .maybeSingle();
-                if (error || !data || (data.department !== "Management" && data.department !== "Support Team Lead")) {
-                    alert("Access denied. Staff only.");
                     return;
                 }
                 window.location.href = "staff.html";
