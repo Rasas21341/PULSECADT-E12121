@@ -663,6 +663,30 @@
             border-color: #1e40af;
         }
 
+        .moderation-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 10px;
+            border-radius: 6px;
+            border: 1px solid #dc2626;
+            background: #dc2626;
+            color: #fff;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            white-space: nowrap;
+            margin-right: 8px;
+        }
+        .moderation-btn .btn-icon {
+            width: 14px;
+            height: 14px;
+        }
+        .moderation-btn:hover {
+            background: #b91c1c;
+            border-color: #b91c1c;
+        }
+
         .documents-btn {
             width: 100%;
             padding: 10px 12px;
@@ -1742,6 +1766,10 @@
                                 <div class="departments-view" id="departmentsView">
                                     <div class="members-view-header">
                                         <div class="members-view-title">Departments</div>
+                                        <button type="button" class="moderation-btn" id="departmentsModerationBtn" style="display:none;">
+                                            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                                            Moderation
+                                        </button>
                                         <button type="button" class="add-department-btn" id="openAddDepartmentBtn">
                                             <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                                             Add department
@@ -1919,6 +1947,16 @@ if (membersViewClose && membersView) {
                                 closeAllPages();
                                 departmentsView.classList.add("open");
                                 loadDepartments();
+                            });
+                        }
+
+                        const departmentsModerationBtn = document.getElementById("departmentsModerationBtn");
+                        if (departmentsModerationBtn) {
+                            departmentsModerationBtn.addEventListener("click", (e) => {
+                                e.stopPropagation();
+                                closeAllPages();
+                                if (membersView) membersView.classList.add("open");
+                                loadMembersInto(membersViewList, { openDropdown: false });
                             });
                         }
 
