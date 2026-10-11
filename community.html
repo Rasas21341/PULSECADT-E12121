@@ -1958,7 +1958,6 @@ if (membersViewClose && membersView) {
                             });
                         }
 
-                        const departmentsModerationBtn = document.getElementById("departmentsModerationBtn");
                         if (departmentsModerationBtn) {
                             departmentsModerationBtn.addEventListener("click", (e) => {
                                 e.stopPropagation();
@@ -1968,7 +1967,6 @@ if (membersViewClose && membersView) {
                             });
                         }
 
-                        const topbarModerationBtn = document.getElementById("topbarModerationBtn");
                         if (topbarModerationBtn) {
                             topbarModerationBtn.addEventListener("click", (e) => {
                                 e.stopPropagation();
@@ -3853,6 +3851,8 @@ if (openAddRoleBtn) {
                         }
                     }, 150);
                 } catch (err) {
+                }
+                return;
                 }
 
                 if (communityPasscode) {
