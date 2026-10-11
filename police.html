@@ -2482,6 +2482,46 @@
             console.error("Supabase init failed:", err);
         }
 
+        // Community ID from URL params
+        const communityId = new URLSearchParams(window.location.search).get("community") || "";
+
+        // Check if current user has a specific permission (e.g., "rosters", "close_call")
+        async function userHasPermission(permission) {
+            if (!localSupabase) return false;
+            try {
+                const { data: authData } = await localSupabase.auth.getUser();
+                const currentUserId = authData && authData.user ? authData.user.id : null;
+                if (!currentUserId || !communityId) return false;
+
+                // Get user's role IDs from member_roles
+                const { data: roleAssignments } = await localSupabase
+                    .from("member_roles")
+                    .select("role_id")
+                    .eq("community_id", communityId)
+                    .eq("user_id", currentUserId);
+
+                if (!Array.isArray(roleAssignments) || roleAssignments.length === 0) return false;
+
+                const roleIds = roleAssignments.map(r => r.role_id);
+
+                // Check if any role has the requested permission
+                const { data: roles } = await localSupabase
+                    .from("roles")
+                    .select("permissions")
+                    .in("id", roleIds);
+
+                if (!Array.isArray(roles) || roles.length === 0) return false;
+
+                return roles.some(role => {
+                    const perms = (role.permissions || "").split(",").map(p => p.trim());
+                    return perms.includes(permission);
+                });
+            } catch (err) {
+                console.error("Permission check failed:", err);
+                return false;
+            }
+        }
+
         async function loadUnitsBar() {
             const tbody = document.getElementById("unitsTableBody");
             if (!tbody) return;
@@ -2639,14 +2679,22 @@
         // Context menu for calls
         const callsContextMenu = document.getElementById("callsContextMenu");
         const attachToCallBtn = document.getElementById("attachToCallBtn");
+        const closeCallBtn = document.getElementById("closeCallBtn");
         let currentCallId = null;
 
-        document.getElementById("callsTableBody").addEventListener("contextmenu", (e) => {
+        document.getElementById("callsTableBody").addEventListener("contextmenu", async (e) => {
             e.preventDefault();
             const row = e.target.closest("tr");
             if (!row) return;
             currentCallId = row.getAttribute("data-call-id");
             if (!currentCallId) return;
+
+            // Check if user has "rosters" permission to show Close Call button
+            if (closeCallBtn) {
+                const hasRostersPerm = await userHasPermission("rosters");
+                closeCallBtn.style.display = hasRostersPerm ? "block" : "none";
+            }
+
             callsContextMenu.style.display = "block";
             callsContextMenu.style.left = e.pageX + "px";
             callsContextMenu.style.top = e.pageY + "px";
