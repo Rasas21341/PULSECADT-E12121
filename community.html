@@ -1657,7 +1657,7 @@
     <div class="modal-overlay" id="editRoleModal">
         <div class="modal">
             <div class="modal-header">
-                <div class="modal-title">Assign to Rosters Role Permission</div>
+                <div class="modal-title">Edit Role Permissions</div>
                 <button class="modal-close" id="editRoleModalClose" type="button" aria-label="Close">×</</button>
             </div>
             <div class="field">
@@ -1668,6 +1668,12 @@
                 <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:14px; font-weight:600; color:#334155;">
                     <input type="checkbox" id="editRoleRostersPermission" style="cursor:pointer;" />
                     <span>Rosters</span>
+                </label>
+            </div>
+            <div class="field">
+                <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:14px; font-weight:600; color:#334155;">
+                    <input type="checkbox" id="editRoleCloseCallPermission" style="cursor:pointer;" />
+                    <span>Close Call</span>
                 </label>
             </div>
             <button type="button" class="submit-btn" id="editRoleSubmitBtn">Save Changes</button>
@@ -3023,6 +3029,7 @@ if (openAddRoleBtn) {
                         const editRoleModalClose = document.getElementById("editRoleModalClose");
                         const editRoleName = document.getElementById("editRoleName");
                         const editRoleRostersPermission = document.getElementById("editRoleRostersPermission");
+                        const editRoleCloseCallPermission = document.getElementById("editRoleCloseCallPermission");
                         const editRoleSubmitBtn = document.getElementById("editRoleSubmitBtn");
                         const editRoleError = document.getElementById("editRoleError");
 
@@ -3063,6 +3070,9 @@ if (openAddRoleBtn) {
                                 if (editRoleRostersPermission) {
                                     editRoleRostersPermission.checked = perms.split(",").map(p => p.trim()).includes("rosters");
                                 }
+                                if (editRoleCloseCallPermission) {
+                                    editRoleCloseCallPermission.checked = perms.split(",").map(p => p.trim()).includes("close_call");
+                                }
                             } catch (err) {
                                 console.error("Failed to load role permissions:", err);
                             }
@@ -3078,7 +3088,11 @@ if (openAddRoleBtn) {
                                 }
                                 try {
                                     const hasRostersPermission = editRoleRostersPermission ? editRoleRostersPermission.checked : false;
-                                    const newPermissions = hasRostersPermission ? "rosters" : "";
+                                    const hasCloseCallPermission = editRoleCloseCallPermission ? editRoleCloseCallPermission.checked : false;
+                                    const perms = [];
+                                    if (hasRostersPermission) perms.push("rosters");
+                                    if (hasCloseCallPermission) perms.push("close_call");
+                                    const newPermissions = perms.join(",");
 
                                     const { error: updateError } = await localSupabase
                                         .from("roles")

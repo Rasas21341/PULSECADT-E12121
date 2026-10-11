@@ -2689,10 +2689,10 @@
             currentCallId = row.getAttribute("data-call-id");
             if (!currentCallId) return;
 
-            // Check if user has "rosters" permission to show Close Call button
+            // Check if user has "close_call" permission to show Close Call button
             if (closeCallBtn) {
-                const hasRostersPerm = await userHasPermission("rosters");
-                closeCallBtn.style.display = hasRostersPerm ? "block" : "none";
+                const hasCloseCallPerm = await userHasPermission("close_call");
+                closeCallBtn.style.display = hasCloseCallPerm ? "block" : "none";
             }
 
             callsContextMenu.style.display = "block";
