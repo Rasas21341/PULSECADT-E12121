@@ -1392,6 +1392,37 @@
         </div>
     </div>
 
+    <div class="modal-overlay" id="newPenalCodeModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">Add Penal Code</div>
+                <button class="modal-close" id="newPenalCodeModalClose" type="button" aria-label="Close">×</</button>
+            </div>
+            <div class="field">
+                <label for="newPenalCodeTitle">Statute Name</label>
+                <input type="text" id="newPenalCodeTitle" placeholder="e.g., Murder, Assault, Theft" />
+            </div>
+            <div class="field">
+                <label for="newPenalCodeCode">Code/Section</label>
+                <input type="text" id="newPenalCodeCode" placeholder="e.g., PC 187, VC 23152" />
+            </div>
+            <div class="field">
+                <label for="newPenalCodeDescription">Description</label>
+                <textarea id="newPenalCodeDescription" placeholder="Description of the offense..."></textarea>
+            </div>
+            <div class="field">
+                <label for="newPenalCodeClassification">Classification</label>
+                <select id="newPenalCodeClassification">
+                    <option value="Misdemeanor">Misdemeanor</option>
+                    <option value="Felony">Felony</option>
+                    <option value="Infraction">Infraction</option>
+                </select>
+            </div>
+            <button type="button" class="submit-btn" id="newPenalCodeSubmitBtn">Add Penal Code</button>
+            <div class="modal-error" id="newPenalCodeError"></div>
+        </div>
+    </div>
+
     <div class="modal-overlay" id="newApplicationModal">
         <div class="modal">
             <div class="modal-header">
@@ -1657,7 +1688,7 @@
                                     <div class="btn-dropdown-wrap">
                                         <button type="button" class="penal-codes-btn" id="penalCodesBtn">
                                             <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
-                                            Penal Codes (Coming Soon)
+                                            Penal Codes
                                         </button>
                                         <div class="penal-codes-list" id="penalCodesList"></div>
                                     </div>
@@ -3251,12 +3282,11 @@ if (openAddRoleBtn) {
                         }
 
                         if (penalCodesBtn && penalCodesList) {
-                            penalCodesBtn.disabled = true;
-                            penalCodesBtn.classList.add("locked");
                             penalCodesBtn.addEventListener("click", (e) => {
                                 e.stopPropagation();
+                                closeAllPages();
                                 penalCodesList.classList.add("open");
-                                penalCodesList.innerHTML = '<div class="empty">Coming soon.</div>';
+                                loadPenalCodes();
                             });
                         }
 
