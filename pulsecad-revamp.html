@@ -2707,7 +2707,9 @@ enable-ga="false"
         if (topbarLoginBtn) {
             topbarLoginBtn.addEventListener("click", async (e) => {
             e.preventDefault();
-            console.log("Login button clicked, localSupabase:", localSupabase);
+            console.log("Login button clicked");
+            console.log("localSupabase:", localSupabase);
+            console.log("window.supabase:", typeof window.supabase);
             if (localSupabase) {
                 try {
                     const { data } = await localSupabase.auth.getSession();
@@ -2734,7 +2736,9 @@ enable-ga="false"
                     console.error("Supabase session check failed:", err);
                 }
             }
+            console.log("Opening auth modal");
             const modal = document.getElementById("authModal");
+            console.log("authModal element:", modal);
             if (modal) modal.classList.add("open");
             window.switchTab("login");
         });
