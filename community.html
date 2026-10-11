@@ -1885,24 +1885,13 @@
                           const supervisorInput = document.getElementById("supervisorInput");
 
 if (!canEditSettings) {
-                              const allBtnWraps = contentEl.querySelectorAll('.dashboard-top-right > .btn-dropdown-wrap');
-                              allBtnWraps.forEach((wrap) => {
-                                  const btn = wrap.querySelector('button');
-                                  if (btn && btn.id !== 'rostersBtn') {
-                                      wrap.style.display = 'none';
-                                  }
-                              });
+                              // Keep sidebar visible, only hide admin-only elements
                               const cadBadge = contentEl.querySelector('.cad-config-badge');
                               if (cadBadge) cadBadge.style.display = 'none';
-                              // Departments: allow creator, management, or rosters permission
-                              if (!isCreator && !isManagement && !hasRostersPermission) {
-                                  const departmentsBtn = contentEl.querySelector('.departments-btn');
-                                  if (departmentsBtn) departmentsBtn.style.display = 'none';
-                              }
                               const serverAdminBadge = contentEl.querySelector('.server-admin-badge');
                               if (serverAdminBadge) serverAdminBadge.style.display = 'none';
                               if (settingsBtn) settingsBtn.style.display = 'none';
- const views = contentEl.querySelectorAll('.documents-view, .settings-view, .vehicles-view, .licences-view, .applications-view, .members-view');
+  const views = contentEl.querySelectorAll('.documents-view, .settings-view, .vehicles-view, .licences-view, .applications-view, .members-view');
                              views.forEach((v) => { v.style.display = 'none'; });
                          }
 
