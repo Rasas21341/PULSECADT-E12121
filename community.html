@@ -1503,6 +1503,7 @@
             try {
                 const id = getCommunityIdFromUrl();
                 const dashboard = new URLSearchParams(window.location.search).get("dashboard");
+                const mdt = new URLSearchParams(window.location.search).get("mdt");
                 if (!id) {
                     contentEl.innerHTML = `<div class="empty">No community specified.</div>`;
                     return;
@@ -3829,11 +3830,16 @@ if (openAddRoleBtn) {
                             if (requestsStatus) requestsStatus.style.display = "none";
                             loadRequests();
                         }
-                    } catch (err) {
-                        contentEl.innerHTML = `<div class="empty">Failed to load dashboard: ${err?.message || err}</div>`;
-                        console.error("Dashboard load failed:", err);
-                    }
-                    return;
+                    setTimeout(() => {
+                        if (mdt === "1") {
+                            closeAllPages();
+                            if (departmentsView) {
+                                departmentsView.classList.add("open");
+                            }
+                            loadDepartments();
+                        }
+                    }, 150);
+                } catch (err) {
                 }
 
                 if (communityPasscode) {
