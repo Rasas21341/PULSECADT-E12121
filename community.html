@@ -3546,6 +3546,53 @@ if (openAddRoleBtn) {
                             };
                         }
 
+                        // Penal Code Modal handler
+                        const newPenalCodeModal = document.getElementById("newPenalCodeModal");
+                        const newPenalCodeTitle = document.getElementById("newPenalCodeTitle");
+                        const newPenalCodeCode = document.getElementById("newPenalCodeCode");
+                        const newPenalCodeDescription = document.getElementById("newPenalCodeDescription");
+                        const newPenalCodeClassification = document.getElementById("newPenalCodeClassification");
+                        const newPenalCodeSubmitBtn = document.getElementById("newPenalCodeSubmitBtn");
+                        const newPenalCodeModalClose = document.getElementById("newPenalCodeModalClose");
+                        const newPenalCodeError = document.getElementById("newPenalCodeError");
+
+                        function openNewPenalCodeModal() {
+                            if (!newPenalCodeModal) return;
+                            if (newPenalCodeTitle) newPenalCodeTitle.value = "";
+                            if (newPenalCodeCode) newPenalCodeCode.value = "";
+                            if (newPenalCodeDescription) newPenalCodeDescription.value = "";
+                            if (newPenalCodeClassification) newPenalCodeClassification.value = "Misdemeanor";
+                            if (newPenalCodeError) { newPenalCodeError.textContent = ""; newPenalCodeError.style.display = "none"; }
+                            newPenalCodeModal.classList.add("open");
+                        }
+
+                        function closeNewPenalCodeModal() {
+                            if (newPenalCodeModal) newPenalCodeModal.classList.remove("open");
+                        }
+
+                        if (newPenalCodeModalClose) {
+                            newPenalCodeModalClose.addEventListener("click", closeNewPenalCodeModal);
+                        }
+                        if (newPenalCodeModal) {
+                            newPenalCodeModal.addEventListener("click", (e) => {
+                                if (e.target === newPenalCodeModal) closeNewPenalCodeModal();
+                            });
+                        }
+                        if (newPenalCodeSubmitBtn) {
+                            newPenalCodeSubmitBtn.onclick = async () => {
+                                const title = newPenalCodeTitle ? newPenalCodeTitle.value.trim() : "";
+                                const code = newPenalCodeCode ? newPenalCodeCode.value.trim() : "";
+                                const description = newPenalCodeDescription ? newPenalCodeDescription.value.trim() : "";
+                                const classification = newPenalCodeClassification ? newPenalCodeClassification.value : "Misdemeanor";
+                                if (!title) {
+                                    if (newPenalCodeError) { newPenalCodeError.textContent = "Statute name is required."; newPenalCodeError.style.display = "block"; }
+                                    return;
+                                }
+                                closeNewPenalCodeModal();
+                                await addPenalCode(title, code, description, classification);
+                            };
+                        }
+
                         const openAddApplicationBtn = document.getElementById("openAddApplicationBtn");
                         const newApplicationModal = document.getElementById("newApplicationModal");
                         const newAppName = document.getElementById("newAppName");
