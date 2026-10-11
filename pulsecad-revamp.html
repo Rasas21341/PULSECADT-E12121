@@ -2702,7 +2702,9 @@ enable-ga="false"
             });
         }
 
-        document.getElementById("topbarLoginBtn").addEventListener("click", async (e) => {
+        const topbarLoginBtn = document.getElementById("topbarLoginBtn");
+        if (topbarLoginBtn) {
+            topbarLoginBtn.addEventListener("click", async (e) => {
             e.preventDefault();
             if (localSupabase) {
                 try {
@@ -2734,6 +2736,7 @@ enable-ga="false"
             if (modal) modal.classList.add("open");
             window.switchTab("login");
         });
+        }
 
         const modalClose = document.getElementById("modalClose");
         const authModal = document.getElementById("authModal");
