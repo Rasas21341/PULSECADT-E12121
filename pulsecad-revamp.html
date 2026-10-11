@@ -3515,7 +3515,7 @@ if (action === "leave") {
                        e.stopPropagation();
                        const rowId = openMdtBtn.getAttribute("data-id");
                        if (!rowId) return;
-                       window.location.href = "community/" + encodeURIComponent(rowId);
+                       window.location.href = "community.html?id=" + encodeURIComponent(rowId) + "&mdt=1";
                    });
                }
 
