@@ -2118,9 +2118,14 @@ enable-ga="false"
          const LOGOUT_WEBHOOK = "https://discord.com/api/webhooks/1530427528219463824/vCYSOEzjMGAXBDiZG38hQpDjQMFmf-wwucDFBaH1ywewDa7Y-qPASas6oaQ6e9ESVdbM";
 
         let localSupabase = null;
+        console.log("Initializing Supabase...");
+        console.log("window.supabase:", typeof window.supabase);
         try {
             if (typeof window.supabase !== "undefined") {
                 localSupabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                console.log("Supabase client created:", !!localSupabase);
+            } else {
+                console.error("window.supabase is undefined - CDN script may not have loaded");
             }
         } catch (err) {
             console.error("Supabase init failed:", err);
