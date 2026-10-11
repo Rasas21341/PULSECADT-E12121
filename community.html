@@ -1899,8 +1899,11 @@ if (!canEditSettings) {
                               });
                               const cadBadge = contentEl.querySelector('.cad-config-badge');
                               if (cadBadge) cadBadge.style.display = 'none';
-                              const departmentsBtn = contentEl.querySelector('.departments-btn');
-                              if (departmentsBtn) departmentsBtn.style.display = 'none';
+                              // Departments: allow creator, management, or rosters permission
+                              if (!isCreator && !isManagement && !hasRostersPermission) {
+                                  const departmentsBtn = contentEl.querySelector('.departments-btn');
+                                  if (departmentsBtn) departmentsBtn.style.display = 'none';
+                              }
                               const serverAdminBadge = contentEl.querySelector('.server-admin-badge');
                               if (serverAdminBadge) serverAdminBadge.style.display = 'none';
                               if (settingsBtn) settingsBtn.style.display = 'none';
