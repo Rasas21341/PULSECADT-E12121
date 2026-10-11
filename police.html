@@ -3986,6 +3986,43 @@
         }
 
         const communityId = new URLSearchParams(window.location.search).get("community") || "";
+
+        // Load departments for this community
+        async function loadDepartments() {
+            if (!localSupabase || !communityId) {
+                const deptSelect = document.getElementById("departmentSelect");
+                if (deptSelect) deptSelect.style.display = "none";
+                return;
+            }
+            try {
+                const { data, error } = await localSupabase
+                    .from("departments")
+                    .select("id, name")
+                    .eq("community_id", communityId)
+                    .order("name", { ascending: true });
+                if (error) throw error;
+                const departments = Array.isArray(data) ? data : [];
+                const deptSelect = document.getElementById("departmentSelect");
+                if (!deptSelect) return;
+                if (departments.length === 0) {
+                    deptSelect.style.display = "none";
+                    return;
+                }
+                deptSelect.innerHTML = '<option value="">Select Department</option>' + departments.map(d => `<option value="${d.id}">${d.name}</option>`).join('');
+                deptSelect.style.display = "inline-block";
+                // Load saved department
+                const savedDeptId = localStorage.getItem("policeDepartmentId_" + communityId);
+                if (savedDeptId) deptSelect.value = savedDeptId;
+                deptSelect.addEventListener("change", () => {
+                    localStorage.setItem("policeDepartmentId_" + communityId, deptSelect.value);
+                });
+            } catch (err) {
+                console.error("Failed to load departments:", err);
+                const deptSelect = document.getElementById("departmentSelect");
+                if (deptSelect) deptSelect.style.display = "none";
+            }
+        }
+        loadDepartments();
         const supervisorPanelBtn = document.getElementById("supervisorPanelBtn");
         const supervisorPasswordOverlay = document.getElementById("supervisorPasswordOverlay");
         const supervisorPasswordClose = document.getElementById("supervisorPasswordClose");
