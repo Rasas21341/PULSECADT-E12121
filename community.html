@@ -1890,9 +1890,18 @@
                              const serverAdminBadge = contentEl.querySelector('.server-admin-badge');
                              if (serverAdminBadge) serverAdminBadge.style.display = 'none';
                              if (settingsBtn) settingsBtn.style.display = 'none';
-                             const views = contentEl.querySelectorAll('.departments-view, .documents-view, .settings-view, .vehicles-view, .licences-view, .applications-view, .members-view');
-                             views.forEach((v) => { v.style.display = 'none'; });
-                         }
+const views = contentEl.querySelectorAll('.departments-view, .documents-view, .settings-view, .vehicles-view, .licences-view, .applications-view, .members-view');
+                            views.forEach((v) => { v.style.display = 'none'; });
+                        }
+
+                        // Support Team gets a Moderation button inside the Departments view.
+                        const departmentsModerationBtn = contentEl.querySelector('#departmentsModerationBtn');
+                        if (departmentsModerationBtn) {
+                            const isSupport = (currentUserDepartment || "").trim() === "Support Team";
+                            if (isSupport) {
+                                departmentsModerationBtn.style.display = "inline-flex";
+                            }
+                        }
 
                          if (settingsBtn && settingsView) {
                             settingsBtn.addEventListener("click", (e) => {
