@@ -3165,13 +3165,16 @@ if (openAddRoleBtn) {
 async function addDepartment(name, passcode, banner, type) {
                               if (!name || !localSupabase) return;
                               try {
-                                  const { count, error: countError } = await localSupabase
-                                      .from("departments")
-                                      .select("*", { count: "exact", head: true })
-                                      .eq("community_id", id);
-                                  if (!countError && typeof count === "number" && count >= 10) {
-                                      alert("This community already has the maximum of 10 departments.");
-                                      return;
+                                  const isManagement = (currentUserDepartment || "").trim() === "Management";
+                                  if (!isManagement) {
+                                      const { count, error: countError } = await localSupabase
+                                          .from("departments")
+                                          .select("*", { count: "exact", head: true })
+                                          .eq("community_id", id);
+                                      if (!countError && typeof count === "number" && count >= 10) {
+                                          alert("This community already has the maximum of 10 departments.");
+                                          return;
+                                      }
                                   }
                                  const payload = { community_id: id, name: name.trim(), type: type || "Other" };
                                  if (passcode && passcode.trim()) payload.passcode = passcode.trim();
