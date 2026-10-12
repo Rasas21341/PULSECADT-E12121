@@ -4425,7 +4425,7 @@ async function loadPenalCodes() {
 
         const poSubmit = document.getElementById("poSubmit");
         if (poSubmit) {
-            poSubmit.addEventListener("click", () => {
+            poSubmit.addEventListener("click", async () => {
                 const name = poName ? poName.value.trim() : "";
                 const rank = poRank ? poRank.value.trim() : "";
                 const callsign = poCallsign ? poCallsign.value.trim() : "";
