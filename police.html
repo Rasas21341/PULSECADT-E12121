@@ -2624,10 +2624,6 @@ tbody.innerHTML = currentRow + otherRows;
                 tbody.innerHTML = '<tr><td colspan="8" class="units-empty">Failed to load units</td></tr>';
                 console.error("Failed to load units:", err);
             }
-} catch (err) {
-                tbody.innerHTML = '<tr><td colspan="8" class="units-empty">Failed to load units</td></tr>';
-                console.error("Failed to load units:", err);
-            }
         }
 
         async function loadCallsBar() {
@@ -2786,7 +2782,6 @@ tbody.innerHTML = currentRow + otherRows;
             });
         }
 
-        const closeCallBtn = document.getElementById("closeCallBtn");
         if (closeCallBtn) {
             closeCallBtn.addEventListener("click", async () => {
                 if (!currentCallId || !localSupabase) return;
