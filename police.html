@@ -2578,6 +2578,11 @@ async function loadUnitsBar() {
             // Show loading state
             tbody.innerHTML = `<tr><td colspan="8" class="units-empty">Loading units...</td></tr>`;
             try {
+                // Find which call the current officer is attached to
+                let attachedCallNumber = "";
+                let otherRows = "";
+                let loadedFromDb = false;
+
                 // Build the current officer's row (always shown, regardless of DB)
                 const currentStatusClass = (currentStatus || "available").toLowerCase();
                 const currentRow = `<tr>
@@ -2590,11 +2595,6 @@ async function loadUnitsBar() {
                     <td></td>
                     <td></td>
                 </tr>`;
-
-                // Find which call the current officer is attached to
-                let attachedCallNumber = "";
-                let otherRows = "";
-                let loadedFromDb = false;
 
                 if (localSupabase) {
                     try {
