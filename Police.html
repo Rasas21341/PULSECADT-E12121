@@ -3072,6 +3072,24 @@ async function loadUnitsBar() {
             } catch (err) {
                 console.error("Could not save status:", err);
             }
+            // Publish status to officers table so other tabs see it
+            try {
+                if (localSupabase && officerId) {
+                    localSupabase
+                        .from("officers")
+                        .upsert([{
+                            community_id: communityId || null,
+                            officer_id: officerId,
+                            name: officerName,
+                            rank: officerRank || null,
+                            callsign: officerCallsign || null,
+                            status: status,
+                            updated_at: new Date().toISOString()
+                        }], { onConflict: "officer_id" });
+                }
+            } catch (dbErr) {
+                console.warn("Could not publish status to officers table:", dbErr);
+            }
             // Update units bar in real time
             loadUnitsBar();
         }
@@ -4462,6 +4480,23 @@ civilianRecordsList.innerHTML = records.map((record) => {
             }
             loadUnitsBar();
             loadCallsBar();
+            // Subscribe to realtime officer updates so the units bar
+            // reflects status changes from other tabs instantly
+            if (localSupabase) {
+                try {
+                    const channel = localSupabase
+                        .channel("officers-changes")
+                        .on("postgres_changes", {
+                            event: "*",
+                            schema: "public",
+                            table: "officers"
+                        }, () => loadUnitsBar())
+                        .subscribe();
+                    window.officersRealtimeChannel = channel;
+                } catch (rtErr) {
+                    console.warn("Realtime subscription failed:", rtErr);
+                }
+            }
         }
 
         init();

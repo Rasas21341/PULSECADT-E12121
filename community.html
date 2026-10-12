@@ -4458,6 +4458,24 @@ async function loadPenalCodes() {
                         units.push(entry);
                     }
                     localStorage.setItem("policeActiveUnits", JSON.stringify(units));
+                    // Also publish to the officers table so other tabs see it in real time
+                    try {
+                        if (localSupabase && currentCommunityId) {
+                            await localSupabase
+                                .from("officers")
+                                .upsert([{
+                                    community_id: currentCommunityId,
+                                    officer_id: officerId,
+                                    name: name,
+                                    rank: rank || null,
+                                    callsign: callsign || null,
+                                    status: "available",
+                                    updated_at: new Date().toISOString()
+                                }], { onConflict: "officer_id" });
+                        }
+                    } catch (dbErr) {
+                        console.warn("Could not publish officer to DB:", dbErr);
+                    }
                 } catch (e) {}
                 window.open("/police.html?" + params.toString(), "_blank");
                 if (policeModal) policeModal.classList.remove("open");
