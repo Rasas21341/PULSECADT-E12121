@@ -2609,7 +2609,7 @@ async function loadUnitsBar() {
                         const [officersRes, callsRes] = await Promise.all([officersQuery, callsQuery]);
 
                         if (!officersRes.error && !callsRes.error) {
-                            const data = officersRes.data || [];
+                            const data = (officersRes.data || []).filter((o) => o.officer_id !== officerId);
                             const callsData = callsRes.data || [];
 
                             if (Array.isArray(callsData)) {
@@ -2626,14 +2626,14 @@ async function loadUnitsBar() {
                                 otherRows = data.map((o) => {
                                     const statusClass = (o.status || "available").toLowerCase();
                                     return `<tr>
-                                        <td>${esc(o.unit || o.name || "")}</td>
+                                        <td>${esc(o.name || o.officer_id || "")}</td>
                                         <td>${esc(o.rank || "")}</td>
                                         <td><span class="status-badge status-${statusClass}">${esc(o.status || "Available")}</span></td>
-                                        <td>${esc(o.call_number || "")}</td>
-                                        <td>${esc(o.agency || "")}</td>
-                                        <td>${esc(o.location || "")}</td>
-                                        <td>${esc(o.assignment || "")}</td>
-                                        <td>${esc(o.disposition || "")}</td>
+                                        <td>${esc(o.callsign || "")}</td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
                                     </tr>`;
                                 }).join("");
                                 loadedFromDb = true;

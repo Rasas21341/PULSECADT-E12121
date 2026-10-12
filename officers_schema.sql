@@ -28,6 +28,10 @@ CREATE INDEX IF NOT EXISTS idx_officers_community ON officers(community_id);
 CREATE INDEX IF NOT EXISTS idx_officers_officer_id ON officers(officer_id);
 CREATE INDEX IF NOT EXISTS idx_officers_updated ON officers(updated_at DESC);
 
+-- 4b. Unique constraint on officer_id so upsert works
+ALTER TABLE officers DROP CONSTRAINT IF EXISTS officers_officer_id_key;
+ALTER TABLE officers ADD CONSTRAINT officers_officer_id_key UNIQUE (officer_id);
+
 -- 5. Enable RLS
 ALTER TABLE officers ENABLE ROW LEVEL SECURITY;
 
