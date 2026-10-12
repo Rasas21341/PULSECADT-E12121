@@ -3666,7 +3666,11 @@ civilianRecordsList.innerHTML = records.map((record) => {
                 if (citationVehicleMake) citationVehicleMake.value = "";
                 if (citationVehicleModel) citationVehicleModel.value = "";
                 if (citationVehiclePlate) citationVehiclePlate.value = "";
-                if (citationCourtDate) citationCourtDate.value = "";
+                if (citationCourtDate) {
+                    const defaultDate = new Date();
+                    defaultDate.setDate(defaultDate.getDate() + 30);
+                    citationCourtDate.value = defaultDate.toISOString().slice(0, 10);
+                }
                 if (citationNotes) citationNotes.value = "";
                 if (citationError) { citationError.textContent = ""; citationError.style.display = "none"; }
                 if (citationSuccess) { citationSuccess.textContent = ""; citationSuccess.style.display = "none"; }
