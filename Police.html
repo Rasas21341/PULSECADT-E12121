@@ -4375,11 +4375,14 @@ civilianRecordsList.innerHTML = records.map((record) => {
                 const esc = (t) => (t || "").replace(/</g, "&lt;").replace(/>/g, "&gt;");
                 unitsCitationsList.innerHTML = data.map((c) => {
                     const date = c.created_at ? new Date(c.created_at).toLocaleString() : "";
-                    const details = [c.reason, c.location, c.notes].filter(Boolean).join(" | ");
+                    const citationNo = c.citation_number ? " #" + esc(c.citation_number) : "";
+                    const fine = c.fine != null && c.fine !== "" ? " ($" + Number(c.fine).toFixed(2) + ")" : "";
+                    const vehicle = [c.vehicle_make, c.vehicle_model, c.vehicle_plate].filter(Boolean).join(" ");
+                    const details = [c.reason, c.location, vehicle, c.notes].filter(Boolean).join(" | ");
                     return `
                         <div class="citation-record-item" data-citation-id="${c.id}">
                             <div class="citation-record-text">
-                                <strong>${esc(c.civilian_name || "Unknown")}</strong>
+                                <strong>${esc(c.civilian_name || "Unknown")}${citationNo}${fine}</strong>
                                 <span>${esc(details || "No details")}</span>
                                 <span style="display:block; margin-top:4px; color:#94a3b8; font-size:11px;">${esc(date)}</span>
                             </div>
