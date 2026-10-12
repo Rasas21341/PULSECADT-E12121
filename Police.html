@@ -2297,12 +2297,36 @@
                 <input type="text" id="citationCivilianName" readonly />
             </div>
             <div class="report-field">
+                <label for="citationStatute">Statute / Code</label>
+                <input type="text" id="citationStatute" placeholder="e.g. 18 U.S.C. § 1001, 2251(b)" />
+            </div>
+            <div class="report-field">
                 <label for="citationReason">Violation</label>
-                <input type="text" id="citationReason" placeholder="e.g. Speeding, Parking violation" />
+                <input type="text" id="citationReason" placeholder="e.g. Speeding, Illegal U-Turn" />
             </div>
             <div class="report-field">
                 <label for="citationLocation">Location</label>
                 <input type="text" id="citationLocation" placeholder="e.g. Highway 1" />
+            </div>
+            <div class="report-field">
+                <label for="citationFine">Fine Amount ($)</label>
+                <input type="number" id="citationFine" placeholder="e.g. 150" min="0" step="5" />
+            </div>
+            <div class="report-field">
+                <label for="citationVehicleMake">Vehicle Make</label>
+                <input type="text" id="citationVehicleMake" placeholder="e.g. Ford" />
+            </div>
+            <div class="report-field">
+                <label for="citationVehicleModel">Vehicle Model</label>
+                <input type="text" id="citationVehicleModel" placeholder="e.g. F-150" />
+            </div>
+            <div class="report-field">
+                <label for="citationVehiclePlate">License Plate</label>
+                <input type="text" id="citationVehiclePlate" placeholder="e.g. ABC1234" />
+            </div>
+            <div class="report-field">
+                <label for="citationCourtDate">Court Date</label>
+                <input type="date" id="citationCourtDate" />
             </div>
             <div class="report-field">
                 <label for="citationNotes">Notes</label>
@@ -3317,18 +3341,20 @@ tbody.innerHTML = currentRow + otherRows;
                     return;
                 }
 
-                civilianRecordsList.innerHTML = records.map((record) => {
+civilianRecordsList.innerHTML = records.map((record) => {
                     const date = record.row.created_at ? new Date(record.row.created_at).toLocaleString() : '';
+                    const citationNo = record.row.citation_number ? " #" + record.row.citation_number : "";
+                    const fine = record.row.fine != null && record.row.fine !== "" ? " ($" + Number(record.row.fine).toFixed(2) + ")" : "";
                     const details = [record.row.reason, record.row.charges, record.row.location, record.row.notes].filter(Boolean).join(' | ');
                     return `<div class="record-item">
                         <div class="record-text">
-                            <strong>${record.type} - ${date}</strong>
+                            <strong>${record.type}${citationNo}${fine} - ${date}</strong>
                             <span>${details || 'No details'}</span>
                         </div>
                         <button type="button" class="record-delete-btn" data-table="${record.table}" data-id="${record.row.id}" title="Delete record">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <polyline points="3 6 5 6 21 6"></polyline>
-                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                <path d="M19 6v14a2 0 0 1-2 2H7a2 0 0 1-2-2V6m3 0V4a2 0 0 1 2-2h4a2 0 0 1 2 2v2"></path>
                             </svg>
                         </button>
                     </div>`;
@@ -3620,15 +3646,27 @@ tbody.innerHTML = currentRow + otherRows;
                 if (!selectedCivilian) return;
                 const citationCivilianId = document.getElementById("citationCivilianId");
                 const citationCivilianName = document.getElementById("citationCivilianName");
+                const citationStatute = document.getElementById("citationStatute");
                 const citationReason = document.getElementById("citationReason");
                 const citationLocation = document.getElementById("citationLocation");
+                const citationFine = document.getElementById("citationFine");
+                const citationVehicleMake = document.getElementById("citationVehicleMake");
+                const citationVehicleModel = document.getElementById("citationVehicleModel");
+                const citationVehiclePlate = document.getElementById("citationVehiclePlate");
+                const citationCourtDate = document.getElementById("citationCourtDate");
                 const citationNotes = document.getElementById("citationNotes");
                 const citationError = document.getElementById("citationError");
                 const citationSuccess = document.getElementById("citationSuccess");
                 if (citationCivilianId) citationCivilianId.value = selectedCivilian.id || "";
                 if (citationCivilianName) citationCivilianName.value = selectedCivilian.name || "";
+                if (citationStatute) citationStatute.value = "";
                 if (citationReason) citationReason.value = "";
                 if (citationLocation) citationLocation.value = "";
+                if (citationFine) citationFine.value = "";
+                if (citationVehicleMake) citationVehicleMake.value = "";
+                if (citationVehicleModel) citationVehicleModel.value = "";
+                if (citationVehiclePlate) citationVehiclePlate.value = "";
+                if (citationCourtDate) citationCourtDate.value = "";
                 if (citationNotes) citationNotes.value = "";
                 if (citationError) { citationError.textContent = ""; citationError.style.display = "none"; }
                 if (citationSuccess) { citationSuccess.textContent = ""; citationSuccess.style.display = "none"; }
@@ -3749,8 +3787,15 @@ tbody.innerHTML = currentRow + otherRows;
             citationSubmitBtn.addEventListener("click", async () => {
                 const civilianId = document.getElementById("citationCivilianId")?.value.trim() || "";
                 const civilianName = document.getElementById("citationCivilianName")?.value.trim() || "";
+                const statute = document.getElementById("citationStatute")?.value.trim() || "";
                 const reason = document.getElementById("citationReason")?.value.trim() || "";
                 const location = document.getElementById("citationLocation")?.value.trim() || "";
+                const fineRaw = document.getElementById("citationFine")?.value.trim() || "";
+                const fine = fineRaw === "" ? null : Number(fineRaw);
+                const vehicleMake = document.getElementById("citationVehicleMake")?.value.trim() || "";
+                const vehicleModel = document.getElementById("citationVehicleModel")?.value.trim() || "";
+                const vehiclePlate = document.getElementById("citationVehiclePlate")?.value.trim() || "";
+                const courtDate = document.getElementById("citationCourtDate")?.value.trim() || "";
                 const notes = document.getElementById("citationNotes")?.value.trim() || "";
                 const citationError = document.getElementById("citationError");
                 const citationSuccess = document.getElementById("citationSuccess");
@@ -3769,15 +3814,25 @@ tbody.innerHTML = currentRow + otherRows;
                 if (citationSuccess) { citationSuccess.textContent = ""; citationSuccess.style.display = "none"; }
 
                 try {
+                    const citationNumber = "CIT-" + Date.now().toString(36).toUpperCase() + "-" + Math.random().toString(36).slice(2, 6).toUpperCase();
                     const { error } = await localSupabase
                         .from("citations")
                         .insert([{
+                            citation_number: citationNumber,
                             civilian_id: civilianId || null,
                             civilian_name: civilianName || null,
                             officer_id: officerId,
                             officer_name: officerName,
+                            officer_rank: officerRank || null,
+                            officer_callsign: officerCallsign || null,
+                            statute,
                             reason,
                             location,
+                            fine: fine,
+                            vehicle_make: vehicleMake || null,
+                            vehicle_model: vehicleModel || null,
+                            vehicle_plate: vehiclePlate || null,
+                            court_date: courtDate || null,
                             notes: notes || null,
                             created_at: new Date().toISOString()
                         }]);
@@ -3789,7 +3844,7 @@ tbody.innerHTML = currentRow + otherRows;
                     }
 
                     if (citationSuccess) {
-                        citationSuccess.textContent = "Citation issued.";
+                        citationSuccess.textContent = "Citation " + citationNumber + " issued.";
                         citationSuccess.style.display = "block";
                     }
                     if (selectedCivilian && selectedCivilian.id) loadCivilianRecords(selectedCivilian.id);
@@ -3954,24 +4009,38 @@ tbody.innerHTML = currentRow + otherRows;
                 const doc = new jsPDF();
                 doc.setFontSize(20);
                 doc.setFont(undefined, "bold");
-                doc.text("Citation", 14, 16);
+                doc.text("CITATION", 14, 16);
                 doc.setFont(undefined, "normal");
                 doc.setFontSize(11);
                 doc.text("PulseCAD Police Records", 14, 22);
                 doc.setLineWidth(0.3);
                 doc.line(14, 24, 196, 24);
 
+                const citationNumber = "CIT-" + Date.now().toString(36).toUpperCase() + "-" + Math.random().toString(36).slice(2, 6).toUpperCase();
+                doc.setFont(undefined, "bold");
+                doc.text("Citation No:", 14, 30);
+                doc.setFont(undefined, "normal");
+                doc.text(citationNumber, 55, 30);
+                doc.line(14, 33, 196, 33);
+
                 const fields = [
-                    ["Officer", (officerRank ? officerRank + " " : "") + officerName],
+                    ["Officer", (officerRank ? officerRank + " " : "") + officerName + (officerCallsign ? " (Call sign: " + officerCallsign + ")" : "")],
+                    ["Officer ID", officerId],
                     ["Date", new Date().toLocaleString()],
                     ["Civilian ID", getText("citationCivilianId")],
                     ["Civilian Name", getText("citationCivilianName")],
+                    ["Statute / Code", getText("citationStatute")],
                     ["Violation", getText("citationReason")],
                     ["Location", getText("citationLocation")],
+                    ["Fine Amount", (function(){ const v = getText("citationFine"); return v ? "$" + Number(v).toFixed(2) : "N/A"; })()],
+                    ["Vehicle Make", getText("citationVehicleMake")],
+                    ["Vehicle Model", getText("citationVehicleModel")],
+                    ["License Plate", getText("citationVehiclePlate")],
+                    ["Court Date", getText("citationCourtDate")],
                     ["Notes", getText("citationNotes")]
                 ];
 
-                let y = 30;
+                let y = 38;
                 const lineHeight = 7;
                 const labelX = 14;
                 const fieldX = 60;
@@ -3994,7 +4063,7 @@ tbody.innerHTML = currentRow + otherRows;
                     }
                 });
 
-                doc.save("citation-" + Date.now() + ".pdf");
+                doc.save("citation-" + citationNumber + ".pdf");
             } catch (err) {
                 alert("Failed to generate PDF.");
                 console.error(err);
