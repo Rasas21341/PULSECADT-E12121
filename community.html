@@ -1990,6 +1990,19 @@
                                         <div id="rolesList"><div class="empty">No roles yet. Click "Create Role" to get started.</div></div>
                                     </div>
                                 </div>
+                                <div class="rosters-view" id="rostersView">
+                                    <div class="members-view-header">
+                                        <div class="members-view-title">Rosters</div>
+                                        <button type="button" class="add-department-btn" id="openRosterPageBtn">
+                                            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                                            Open Roster Manager
+                                        </button>
+                                        <button type="button" class="members-view-close" id="rostersViewClose" aria-label="Close">×</</button>
+                                    </div>
+                                    <div class="view-body">
+                                        <div id="rostersList"></div>
+                                    </div>
+                                </div>
                                 <div class="licences-view" id="licencesView">
                                     <div class="members-view-header">
                                         <div class="members-view-title">Licences</div>
@@ -2634,6 +2647,20 @@ const rolesView = document.getElementById("rolesView");
                                     closeAllPages();
                                     rolesView.classList.add("open");
                                     loadRoles();
+                                }
+                            });
+                        }
+
+                        const rostersBtn = document.getElementById("rostersBtn");
+                        if (rostersBtn) {
+                            rostersBtn.addEventListener("click", (e) => {
+                                e.stopPropagation();
+                                if (rostersView.classList.contains("open")) {
+                                    rostersView.classList.remove("open");
+                                } else {
+                                    closeAllPages();
+                                    rostersView.classList.add("open");
+                                    loadRosters();
                                 }
                             });
                         }
