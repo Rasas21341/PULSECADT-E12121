@@ -430,44 +430,14 @@
                 .order("created_at", { ascending: true });
         }
 
-        // Every community gets exactly ROSTER_SLOTS rosters, created on first open.
-        async function ensureRosterSlots(communityIdParam) {
-            let { data, error } = await fetchRosterRows(communityIdParam);
+        async function loadRostersList(communityIdParam) {
+            const { data, error } = await fetchRosterRows(communityIdParam);
             if (error) throw new Error(error.message);
-
-            let rows = Array.isArray(data) ? data : [];
-            if (rows.length >= ROSTER_SLOTS) return rows.slice(0, ROSTER_SLOTS);
-
-            const missing = [];
-            for (let i = rows.length; i < ROSTER_SLOTS; i++) {
-                missing.push({
-                    community_id: communityIdParam,
-                    name: "Roster " + (i + 1),
-                    created_at: new Date().toISOString()
-                });
-            }
-
-            const { error: insertError } = await localSupabase.from("rosters").insert(missing);
-            if (insertError) {
-                showStatus("Could not create the remaining rosters: " + insertError.message, "error");
-                return rows;
-            }
-
-            const recheck = await fetchRosterRows(communityIdParam);
-            if (!recheck.error && Array.isArray(recheck.data)) {
-                rows = recheck.data;
-            } else {
-                rows = rows.concat(missing.map((m, i) => ({
-                    id: "pending-" + (rows.length + i),
-                    name: m.name,
-                    community_id: communityIdParam
-                })));
-            }
-            return rows.slice(0, ROSTER_SLOTS);
+            return Array.isArray(data) ? data : [];
         }
 
         async function loadAll() {
-            rosters = await ensureRosterSlots(communityId);
+            rosters = await loadRostersList(communityId);
 
             const { data: membersData } = await localSupabase
                 .from("members")
