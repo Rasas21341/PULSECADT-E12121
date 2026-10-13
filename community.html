@@ -3025,10 +3025,8 @@ if (openAddRoleBtn) {
                                     return;
                                 }
                                 try {
-                                    const hasRostersPermission = editRoleRostersPermission ? editRoleRostersPermission.checked : false;
                                     const hasCloseCallPermission = editRoleCloseCallPermission ? editRoleCloseCallPermission.checked : false;
                                     const perms = [];
-                                    if (hasRostersPermission) perms.push("rosters");
                                     if (hasCloseCallPermission) perms.push("close_call");
                                     const newPermissions = perms.join(",");
 
