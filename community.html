@@ -2876,17 +2876,29 @@ async function loadRosters() {
                                             <button type="button" class="btn sm" data-action="view" data-roster-id="${r.id}" data-roster-name="${r.name || 'Roster'}">
                                                 View
                                             </button>
+                                            <button type="button" class="btn sm" data-action="edit" data-roster-id="${r.id}" data-roster-name="${r.name || 'Roster'}">
+                                                Edit
+                                            </button>
                                         </div>
                                     </div>
                                 `).join('');
                                 
-                                // Add event listeners for view buttons
+                                // Add event listeners for view and edit buttons
                                 rostersList.querySelectorAll('[data-action="view"]').forEach(btn => {
                                     btn.addEventListener('click', () => {
                                         const rosterId = btn.getAttribute('data-roster-id');
                                         const rosterName = btn.getAttribute('data-roster-name');
                                         // Open the roster in the Roster Manager
                                         window.open(`/roster.html?communityId=${encodeURIComponent(id)}&rosterId=${encodeURIComponent(rosterId)}`, '_blank');
+                                    });
+                                });
+                                
+                                rostersList.querySelectorAll('[data-action="edit"]').forEach(btn => {
+                                    btn.addEventListener('click', () => {
+                                        const rosterId = btn.getAttribute('data-roster-id');
+                                        const rosterName = btn.getAttribute('data-roster-name');
+                                        // Open the roster editor
+                                        window.open(`/roster.html?communityId=${encodeURIComponent(id)}&rosterId=${encodeURIComponent(rosterId)}&edit=true`, '_blank');
                                     });
                                 });
                             } catch (err) {
