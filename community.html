@@ -3953,12 +3953,11 @@ async function loadPenalCodes() {
                         }
 
                         async function loadApplications() {
-                            if (!applicationsList || !localSupabase || !currentCommunityId) return;
+                            if (!applicationsList || !localSupabase) return;
                             try {
                                 const { data, error } = await localSupabase
                                     .from("application_submissions")
                                     .select("*")
-                                    .eq("community_id", currentCommunityId)
                                     .order("created_at", { ascending: false });
                                 if (error) {
                                     applicationsList.innerHTML = '<div class="empty">Failed to load applications.</div>';
@@ -3987,12 +3986,11 @@ async function loadPenalCodes() {
                         }
 
                         async function loadRequests() {
-                            if (!requestsList || !requestsStatus || !localSupabase || !currentCommunityId) return;
+                            if (!requestsList || !requestsStatus || !localSupabase) return;
                             try {
                                 const { data, error } = await localSupabase
                                     .from("application_submissions")
                                     .select("*")
-                                    .eq("community_id", currentCommunityId)
                                     .order("created_at", { ascending: false });
                                 if (error) {
                                     requestsList.innerHTML = '<div class="empty">Failed to load requests.</div>';
