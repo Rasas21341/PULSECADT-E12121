@@ -177,6 +177,23 @@
             line-height: 1.5;
         }
 
+        .departments-box {
+            margin-top: 20px;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            background: #ffffff;
+            overflow: hidden;
+        }
+
+        .departments-box-header {
+            padding: 14px 16px;
+            border-bottom: 1px solid #e2e8f0;
+            background: #f8fafc;
+            font-size: 15px;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
         .modal-overlay {
             position: fixed;
             inset: 0;
@@ -4234,7 +4251,10 @@ async function loadPenalCodes() {
                 contentEl.innerHTML = `
                     ${data.banner ? `<img src="${data.banner}" class="community-banner" alt="${name} banner" />` : ""}
                     <button type="button" class="role-btn" data-role="Civilian">Civilian</button>
-                    <div id="communityDepartments"></div>
+                    <div class="departments-box">
+                        <div class="departments-box-header">Departments</div>
+                        <div id="communityDepartments"></div>
+                    </div>
                 `;
 
                 const communityDepartments = document.getElementById("communityDepartments");
