@@ -480,6 +480,17 @@
             display: flex;
         }
 
+        .roster-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 4px;
+        }
+
+        .roster-actions .btn {
+            padding: 4px 8px;
+            font-size: 12px;
+        }
+
         .licences-view {
             position: fixed;
             top: 0;
@@ -2829,7 +2840,7 @@ const rolesView = document.getElementById("rolesView");
                             });
                         }
 
-                        async function loadRosters() {
+async function loadRosters() {
                             if (!rostersList || !localSupabase) return;
                             try {
                                 const { data, error } = await localSupabase
@@ -2860,6 +2871,67 @@ const rolesView = document.getElementById("rolesView");
                                     <div class="request-item">
                                         <div>
                                             <strong>${(i + 1) + '. ' + (r.name || 'Roster').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</strong>
+                                        </div>
+                                        <div class="roster-actions">
+                                            <button type="button" class="btn sm" data-action="view" data-roster-id="${r.id}" data-roster-name="${r.name || 'Roster'}">
+                                                View
+                                            </button>
+                                            <button type="button" class="btn sm" data-action="edit" data-roster-id="${r.id}" data-roster-name="${r.name || 'Roster'}">
+                                                Edit
+                                            </button>
+                                        </div>
+                                    </div>
+                                `).join('');
+                                
+                                // Add event listeners for view and edit buttons
+                                rostersList.querySelectorAll('[data-action="view"]').forEach(btn => {
+                                    btn.addEventListener('click', () => {
+                                        const rosterId = btn.getAttribute('data-roster-id');
+                                        const rosterName = btn.getAttribute('data-roster-name');
+                                        // Open the roster in the Roster Manager
+                                        window.open(`/roster.html?communityId=${encodeURIComponent(id)}&rosterId=${encodeURIComponent(rosterId)}`, '_blank');
+                                    });
+                                });
+                                
+                                rostersList.querySelectorAll('[data-action="edit"]').forEach(btn => {
+                                    btn.addEventListener('click', () => {
+                                        const rosterId = btn.getAttribute('data-roster-id');
+                                        const rosterName = btn.getAttribute('data-roster-name');
+                                        // Open the roster editor
+                                        window.open(`/roster.html?communityId=${encodeURIComponent(id)}&rosterId=${encodeURIComponent(rosterId)}&edit=true`, '_blank');
+                                    });
+                                });
+                            } catch (err) {
+                                rostersList.innerHTML = '<div class="empty">Failed to load rosters.</div>';
+                                console.error(err);
+                            }
+                        }
+
+                                if (!Array.isArray(data) || data.length === 0) {
+                                    rostersList.innerHTML = '<div class="empty">No rosters yet. Open the Roster Manager to create them.</div>';
+                                    return;
+                                }
+
+                                const excludeNames = ['test', 'Roster 2', 'Roster 3', 'Roster 4', 'Roster 5'];
+                                const filteredData = data.filter(r => !excludeNames.includes(r.name));
+
+                                if (filteredData.length === 0) {
+                                    rostersList.innerHTML = '<div class="empty">No rosters yet. Open the Roster Manager to create them.</div>';
+                                    return;
+                                }
+
+                                rostersList.innerHTML = filteredData.map((r, i) => `
+                                    <div class="request-item">
+                                        <div>
+                                            <strong>${(i + 1) + '. ' + (r.name || 'Roster').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</strong>
+                                        </div>
+                                        <div class="roster-actions">
+                                            <button type="button" class="btn sm" data-action="view" data-roster-id="${r.id}" data-roster-name="${r.name || 'Roster'}">
+                                                View
+                                            </button>
+                                            <button type="button" class="btn sm" data-action="edit" data-roster-id="${r.id}" data-roster-name="${r.name || 'Roster'}">
+                                                Edit
+                                            </button>
                                         </div>
                                     </div>
                                 `).join('');
