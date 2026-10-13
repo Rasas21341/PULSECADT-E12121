@@ -393,6 +393,14 @@
                     .maybeSingle();
                 if (community && community.creator_email === user.email) return true;
 
+                // Check if user has Management department
+                const { data: userData } = await localSupabase
+                    .from("users")
+                    .select("department")
+                    .eq("id", user.id)
+                    .maybeSingle();
+                if (userData && userData.department === "Management") return true;
+
                 const { data: roleAssignments } = await localSupabase
                     .from("member_roles")
                     .select("role_id")
