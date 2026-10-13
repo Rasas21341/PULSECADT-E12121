@@ -2855,7 +2855,7 @@ async function loadRosters() {
                                 }
 
                                 if (!Array.isArray(data) || data.length === 0) {
-                                    rostersList.innerHTML = '<div class="empty">No rosters yet. Open the Roster Manager to create them.</div>';
+                                    rostersList.innerHTML = '';
                                     return;
                                 }
 
@@ -2863,7 +2863,7 @@ async function loadRosters() {
                                 const filteredData = data.filter(r => !excludeNames.includes(r.name));
 
                                 if (filteredData.length === 0) {
-                                    rostersList.innerHTML = '<div class="empty">No rosters yet. Open the Roster Manager to create them.</div>';
+                                    rostersList.innerHTML = '';
                                     return;
                                 }
 
