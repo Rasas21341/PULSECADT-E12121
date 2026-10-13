@@ -2733,6 +2733,102 @@ const rolesView = document.getElementById("rolesView");
                             });
                         }
 
+                        // Create Roster Modal
+                        const createRosterBtn = document.getElementById("createRosterBtn");
+                        const newRosterModal = document.getElementById("newRosterModal");
+                        const newRosterModalClose = document.getElementById("newRosterModalClose");
+                        const newRosterSubmitBtn = document.getElementById("newRosterSubmitBtn");
+                        const newRosterNameInput = document.getElementById("newRosterName");
+                        const newRosterError = document.getElementById("newRosterError");
+
+                        function openNewRosterModal() {
+                            if (newRosterModal) {
+                                newRosterModal.classList.add("open");
+                                if (newRosterNameInput) {
+                                    newRosterNameInput.value = "";
+                                    setTimeout(() => newRosterNameInput.focus(), 100);
+                                }
+                                if (newRosterError) newRosterError.style.display = "none";
+                            }
+                        }
+
+                        function closeNewRosterModal() {
+                            if (newRosterModal) newRosterModal.classList.remove("open");
+                        }
+
+                        if (createRosterBtn) {
+                            createRosterBtn.addEventListener("click", (e) => {
+                                e.stopPropagation();
+                                openNewRosterModal();
+                            });
+                        }
+
+                        if (newRosterModalClose) {
+                            newRosterModalClose.addEventListener("click", closeNewRosterModal);
+                        }
+
+                        if (newRosterModal) {
+                            newRosterModal.addEventListener("click", (e) => {
+                                if (e.target === newRosterModal) closeNewRosterModal();
+                            });
+                        }
+
+                        if (newRosterSubmitBtn) {
+                            newRosterSubmitBtn.addEventListener("click", async () => {
+                                const name = newRosterNameInput ? newRosterNameInput.value.trim() : "";
+                                if (!name) {
+                                    if (newRosterError) {
+                                        newRosterError.textContent = "Roster name cannot be empty.";
+                                        newRosterError.style.display = "block";
+                                    }
+                                    return;
+                                }
+
+                                if (newRosterSubmitBtn) {
+                                    newRosterSubmitBtn.disabled = true;
+                                    newRosterSubmitBtn.textContent = "Creating...";
+                                }
+                                if (newRosterError) newRosterError.style.display = "none";
+
+                                try {
+                                    const { error } = await localSupabase
+                                        .from("rosters")
+                                        .insert({
+                                            community_id: id,
+                                            name: name,
+                                            created_at: new Date().toISOString(),
+                                            updated_at: new Date().toISOString()
+                                        });
+
+                                    if (error) {
+                                        if (newRosterError) {
+                                            newRosterError.textContent = "Failed to create roster: " + error.message;
+                                            newRosterError.style.display = "block";
+                                        }
+                                        if (newRosterSubmitBtn) {
+                                            newRosterSubmitBtn.disabled = false;
+                                            newRosterSubmitBtn.textContent = "Create Roster";
+                                        }
+                                        return;
+                                    }
+
+                                    closeNewRosterModal();
+                                    loadRosters();
+                                } catch (err) {
+                                    if (newRosterError) {
+                                        newRosterError.textContent = "An unexpected error occurred.";
+                                        newRosterError.style.display = "block";
+                                    }
+                                    console.error(err);
+                                } finally {
+                                    if (newRosterSubmitBtn) {
+                                        newRosterSubmitBtn.disabled = false;
+                                        newRosterSubmitBtn.textContent = "Create Roster";
+                                    }
+                                }
+                            });
+                        }
+
                         async function loadRosters() {
                             if (!rostersList || !localSupabase) return;
                             try {
