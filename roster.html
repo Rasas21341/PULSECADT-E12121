@@ -438,6 +438,10 @@
 
         async function loadAll() {
             rosters = await loadRostersList(communityId);
+            
+            // Filter out test rosters: test, Roster 1, Roster 2, Roster 3, Roster 4, Roster 5
+            const excludeNames = ['test', 'Roster 1', 'Roster 2', 'Roster 3', 'Roster 4', 'Roster 5'];
+            rosters = rosters.filter(r => !excludeNames.includes(r.name));
 
             const { data: membersData } = await localSupabase
                 .from("members")
