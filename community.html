@@ -2733,7 +2733,15 @@ const rolesView = document.getElementById("rolesView");
                                     return;
                                 }
 
-                                rostersList.innerHTML = data.map((r, i) => `
+                                const excludeNames = ['test', 'Roster 2', 'Roster 3', 'Roster 4', 'Roster 5'];
+                                const filteredData = data.filter(r => !excludeNames.includes(r.name));
+
+                                if (filteredData.length === 0) {
+                                    rostersList.innerHTML = '<div class="empty">No rosters yet. Open the Roster Manager to create them.</div>';
+                                    return;
+                                }
+
+                                rostersList.innerHTML = filteredData.map((r, i) => `
                                     <div class="request-item">
                                         <div>
                                             <strong>${(i + 1) + '. ' + (r.name || 'Roster').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</strong>
