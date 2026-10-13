@@ -2970,7 +2970,6 @@ if (openAddRoleBtn) {
                         const editRoleModal = document.getElementById("editRoleModal");
                         const editRoleModalClose = document.getElementById("editRoleModalClose");
                         const editRoleName = document.getElementById("editRoleName");
-                        const editRoleRostersPermission = document.getElementById("editRoleRostersPermission");
                         const editRoleCloseCallPermission = document.getElementById("editRoleCloseCallPermission");
                         const editRoleSubmitBtn = document.getElementById("editRoleSubmitBtn");
                         const editRoleError = document.getElementById("editRoleError");
@@ -3000,7 +2999,7 @@ if (openAddRoleBtn) {
                         }
 
                         async function loadRolePermissions(roleId) {
-                            if (!editRoleRostersPermission || !localSupabase) return;
+                            if (!editRoleCloseCallPermission || !localSupabase) return;
                             try {
                                 const { data: roleData, error: roleError } = await localSupabase
                                     .from("roles")
@@ -3009,9 +3008,6 @@ if (openAddRoleBtn) {
                                     .maybeSingle();
                                 if (roleError) throw roleError;
                                 const perms = (roleData && roleData.permissions) ? roleData.permissions : "";
-                                if (editRoleRostersPermission) {
-                                    editRoleRostersPermission.checked = perms.split(",").map(p => p.trim()).includes("rosters");
-                                }
                                 if (editRoleCloseCallPermission) {
                                     editRoleCloseCallPermission.checked = perms.split(",").map(p => p.trim()).includes("close_call");
                                 }
