@@ -439,8 +439,8 @@
         async function loadAll() {
             rosters = await loadRostersList(communityId);
             
-            // Filter out test rosters: test, Roster 1, Roster 2, Roster 3, Roster 4, Roster 5
-            const excludeNames = ['test', 'Roster 1', 'Roster 2', 'Roster 3', 'Roster 4', 'Roster 5'];
+            // Filter out test rosters: test, Roster 1, Roster 2, Roster 3, Roster 4, Roster 5, ! Morning
+            const excludeNames = ['test', 'Roster 1', 'Roster 2', 'Roster 3', 'Roster 4', 'Roster 5', '! Morning'];
             rosters = rosters.filter(r => !excludeNames.includes(r.name));
 
             const { data: membersData } = await localSupabase
@@ -481,9 +481,7 @@
 
             rostRosterCards.innerHTML = rosters.map((r, index) => {
                 const selected = selectedFor(r.id);
-                const list = members.length === 0
-                    ? '<div class="rost-empty">This community has no members yet.</div>'
-                    : members.map((m) => `
+                const list = members.length === 0 ? '' : members.map((m) => `
                         <label class="rost-member">
                             <input type="checkbox" class="rost-member-checkbox" data-roster-id="${escapeHtml(r.id)}" data-member-id="${escapeHtml(m.id)}" ${selected.has(m.id) ? "checked" : ""} />
                             <span class="rost-member-email">${escapeHtml(m.email || "Unknown")}</span>

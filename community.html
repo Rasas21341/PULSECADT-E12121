@@ -2859,7 +2859,7 @@ async function loadRosters() {
                                     return;
                                 }
 
-                                const excludeNames = ['test', 'Roster 1', 'Roster 2', 'Roster 3', 'Roster 4', 'Roster 5'];
+                                const excludeNames = ['test', 'Roster 1', 'Roster 2', 'Roster 3', 'Roster 4', 'Roster 5', '! Morning'];
                                 const filteredData = data.filter(r => !excludeNames.includes(r.name));
 
                                 if (filteredData.length === 0) {
