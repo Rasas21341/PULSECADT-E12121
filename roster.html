@@ -82,6 +82,7 @@
         .rost-card-head {
             display: flex;
             align-items: center;
+            justify-content: center;
             gap: 10px;
             margin-bottom: 0;
         }
@@ -103,6 +104,7 @@
         .rost-name-input {
             flex: 1;
             min-width: 0;
+            max-width: 320px;
             font-size: 18px;
             font-weight: 700;
             color: #0f172a;
@@ -111,8 +113,20 @@
             background: transparent;
             padding: 0;
             outline: none;
+            box-shadow: none;
+            appearance: none;
+            -webkit-appearance: none;
             font-family: inherit;
+            text-align: center;
             margin-top: -2px;
+        }
+
+        .rost-name-input:focus,
+        .rost-name-input:hover {
+            border: none;
+            box-shadow: none;
+            background: transparent;
+            outline: none;
         }
 
         .rost-name-input:hover,
