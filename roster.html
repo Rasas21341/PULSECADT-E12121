@@ -62,25 +62,28 @@
         .rost-main {
             max-width: 900px;
             margin: 0 auto;
-            padding: 24px 32px 80px;
+            padding: 6px 32px 80px;
             display: flex;
             flex-direction: column;
             gap: 18px;
+            align-items: flex-start;
         }
 
         .rost-card {
-            background: #ffffff;
-            border: 1px solid #e2e8f0;
-            border-radius: 16px;
-            padding: 18px 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.04);
+            background: transparent;
+            border: none;
+            border-radius: 0;
+            padding: 0;
+            box-shadow: none;
+            width: 100%;
+            margin-top: -8px;
         }
 
         .rost-card-head {
             display: flex;
             align-items: center;
             gap: 10px;
-            margin-bottom: 12px;
+            margin-bottom: 0;
         }
 
         .rost-slot {
@@ -100,15 +103,16 @@
         .rost-name-input {
             flex: 1;
             min-width: 0;
-            font-size: 17px;
+            font-size: 18px;
             font-weight: 700;
             color: #0f172a;
             border: none;
             border-radius: 0;
             background: transparent;
-            padding: 5px 8px;
+            padding: 0;
             outline: none;
             font-family: inherit;
+            margin-top: -2px;
         }
 
         .rost-name-input:hover,
