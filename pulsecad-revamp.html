@@ -3585,8 +3585,7 @@ if (action === "leave") {
         if (moderationBtn) {
             moderationBtn.addEventListener("click", (e) => {
                 e.stopPropagation();
-                const staffDashboardCard = document.getElementById("staffDashboardCard");
-                if (staffDashboardCard) staffDashboardCard.classList.toggle("open");
+                window.location.href = "staff.html";
             });
         }
 
