@@ -3550,28 +3550,7 @@ if (action === "leave") {
 
         if (createCommunityCenteredBtn) {
             createCommunityCenteredBtn.addEventListener("click", async () => {
-                const name = prompt("Enter community name:");
-                if (!name || !name.trim()) return;
-                let passcode = (prompt("Enter community passcode (leave blank to auto-generate one):") || "").trim();
-                if (!passcode) passcode = generatePasscode();
-                const membersOnly = confirm("Make this community members-only? (Only members can see it)");
-                if (!localSupabase) {
-                    alert("Service unavailable.");
-                    return;
-                }
-                const count = await getUserRedeemedCount();
-                if (count <= 0) {
-                    alert("You need to redeem a premium key before creating a community.");
-                    return;
-                }
-                const consumed = await consumeRedeemedKey();
-                if (!consumed) {
-                    alert("Failed to apply credit. Please try again.");
-                    return;
-                }
-                await saveCommunity(name.trim(), "", passcode, membersOnly);
-                alert("Your community passcode is: " + passcode + "\n\nShare this with your members to let them join.");
-                updatePremiumUI();
+
             });
         }
 

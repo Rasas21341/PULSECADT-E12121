@@ -1601,6 +1601,10 @@
                 <label for="newAppMember">Have you been a member before? If so, for how long?</label>
                 <input type="text" id="newAppMember" placeholder="Prior membership details" />
             </div>
+            <div class="field">
+                <label for="newAppQuestion">Question</label>
+                <textarea id="newAppQuestion" placeholder="Anything else you'd like to add?"></textarea>
+            </div>
             <button type="button" class="submit-btn" id="newAppSubmitBtn">Create Application</button>
             <div class="modal-error" id="newAppError"></div>
         </div>
@@ -4028,6 +4032,7 @@ async function loadPenalCodes() {
                         const newAppTimezone = document.getElementById("newAppTimezone");
                         const newAppActive = document.getElementById("newAppActive");
                         const newAppMember = document.getElementById("newAppMember");
+                        const newAppQuestion = document.getElementById("newAppQuestion");
                         const newAppSubmitBtn = document.getElementById("newAppSubmitBtn");
                         const newAppModalClose = document.getElementById("newAppModalClose");
                         const newAppError = document.getElementById("newAppError");
@@ -4041,6 +4046,7 @@ async function loadPenalCodes() {
                             if (newAppTimezone) newAppTimezone.value = "";
                             if (newAppActive) newAppActive.value = "";
                             if (newAppMember) newAppMember.value = "";
+                            if (newAppQuestion) newAppQuestion.value = "";
                             if (newAppError) { newAppError.textContent = ""; newAppError.style.display = "none"; }
                             newApplicationModal.classList.add("open");
                         }
