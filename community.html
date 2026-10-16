@@ -491,23 +491,6 @@
             font-size: 12px;
         }
 
-        .licences-view {
-            position: fixed;
-            top: 0;
-            left: 280px;
-            right: 0;
-            bottom: 0;
-            background: #ffffff;
-            z-index: 550;
-            display: none;
-            flex-direction: column;
-            padding: 24px;
-        }
-
-        .licences-view.open {
-            display: flex;
-        }
-
         .vehicles-view {
             position: fixed;
             top: 0;
@@ -580,32 +563,6 @@
         }
 
         .vehicles-btn:active {
-            background: rgba(37, 99, 235, 0.08);
-            border-color: #2563eb;
-        }
-
-        .licences-btn {
-            width: 100%;
-            padding: 10px 12px;
-            border-radius: 8px;
-            border: 1px solid transparent;
-            background: transparent;
-            color: #0f172a;
-            font-size: 14px;
-            font-weight: 700;
-            cursor: pointer;
-            text-align: left;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .licences-btn:hover {
-            background: rgba(15, 23, 42, 0.04);
-            border-color: #cbd5e1;
-        }
-
-        .licences-btn:active {
             background: rgba(37, 99, 235, 0.08);
             border-color: #2563eb;
         }
@@ -1867,12 +1824,6 @@
                                         </button>
                                     </div>
                                     <div class="btn-dropdown-wrap">
-                                        <button type="button" class="licences-btn" id="licencesBtn">
-                                            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2" ry="2"/><line x1="7" y1="9" x2="17" y2="9"/><line x1="7" y1="13" x2="17" y2="13"/><line x1="7" y1="17" x2="12" y2="17"/></svg>
-                                            Licences
-                                        </button>
-                                    </div>
-                                    <div class="btn-dropdown-wrap">
                                         <button type="button" class="documents-btn" id="documentsBtn">
                                             <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
                                             Documents
@@ -2043,15 +1994,6 @@
                                         <div id="rostersList"></div>
                                     </div>
                                 </div>
-                                <div class="licences-view" id="licencesView">
-                                    <div class="members-view-header">
-                                        <div class="members-view-title">Licences</div>
-                                        <button type="button" class="members-view-close" id="licencesViewClose" aria-label="Close">×</</button>
-                                    </div>
-                                    <div class="view-body">
-                                        <div class="members-view-list" id="licencesViewList"></div>
-                                    </div>
-                                </div>
                                 <div class="vehicles-view" id="vehiclesView">
                                     <div class="members-view-header">
                                         <div class="members-view-title">Vehicles</div>
@@ -2086,12 +2028,8 @@
                          const vehiclesBtn = document.getElementById("vehiclesBtn");
                          const vehiclesView = document.getElementById("vehiclesView");
                          const vehiclesViewList = document.getElementById("vehiclesViewList");
-                         const vehiclesViewClose = document.getElementById("vehiclesViewClose");
-                         const licencesBtn = document.getElementById("licencesBtn");
-                         const licencesView = document.getElementById("licencesView");
-                         const licencesViewList = document.getElementById("licencesViewList");
-                         const licencesViewClose = document.getElementById("licencesViewClose");
-                         const requestsDropdownToggle = document.getElementById("requestsDropdownToggle");
+                          const vehiclesViewClose = document.getElementById("vehiclesViewClose");
+                          const requestsDropdownToggle = document.getElementById("requestsDropdownToggle");
                          const requestsDropdownMenu = document.getElementById("requestsDropdownMenu");
                          const requestsStatus = document.getElementById("requestsStatus");
                          const requestsList = document.getElementById("requestsList");
@@ -2119,14 +2057,26 @@ const supervisorInput = document.getElementById("supervisorInput");
                             });
                         }
 
-                         if (settingsViewClose && settingsView) {
-                             settingsViewClose.addEventListener("click", () => {
-                                 settingsView.classList.remove("open");
-                             });
-                         }
+if (applicationsBtn && applicationsView) {
+                                applicationsBtn.addEventListener("click", (e) => {
+                                    e.stopPropagation();
+                                    if (applicationsView.classList.contains("open")) {
+                                        applicationsView.classList.remove("open");
+                                    } else {
+                                        closeAllPages();
+                                        applicationsView.classList.add("open");
+                                    }
+                                });
+                            }
+
+                            if (applicationsViewClose && applicationsView) {
+                                applicationsViewClose.addEventListener("click", () => {
+                                    applicationsView.classList.remove("open");
+                                });
+                            }
 
 function closeAllPages() {
-                              const allViews = contentEl.querySelectorAll('.members-view, .departments-view, .documents-view, .settings-view, .rosters-view, .roster-editor-view, .roles-view, .licences-view, .vehicles-view, .applications-view, .penal-codes-view');
+                              const allViews = contentEl.querySelectorAll('.members-view, .departments-view, .documents-view, .settings-view, .rosters-view, .roster-editor-view, .roles-view, .vehicles-view, .applications-view, .penal-codes-view');
                               allViews.forEach((v) => { v.classList.remove("open"); });
                           }
 
@@ -3094,6 +3044,15 @@ async function createRole(name) {
                                 alert("Database unavailable.");
                                 return;
                             }
+                            // limit to 20 roles per community
+                            const { count } = await localSupabase
+                                .from("roles")
+                                .select("*", { count: "exact", head: true })
+                                .eq("community_id", id);
+                            if ((count || 0) >= 20) {
+                                alert("You can only have 20 roles per community.");
+                                return;
+                            }
                             try {
                                 const nextOrder = await fetchMaxDisplayOrder();
                                 const { error } = await localSupabase
@@ -3514,9 +3473,10 @@ async function loadPenalCodes() {
                             if (!penalCodesList || !localSupabase) return;
                             penalCodesList.innerHTML = '<div class="penal-codes-empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/><path d="M9 12l2 2 4-4"/></svg><p>No penal codes yet</p><small>Click "Add Penal Code" to create your first statute</small></div>';
                             try {
-                                const { data, error } = await localSupabase
+                                 const { data, error } = await localSupabase
                                     .from("penal_codes")
                                     .select("*")
+                                    .eq("community_id", id)
                                     .order("created_at", { ascending: false });
 
                                 if (error) throw error;
