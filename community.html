@@ -1582,10 +1582,6 @@
                 <input type="email" id="newAppEmail" placeholder="you@example.com" />
             </div>
             <div class="field">
-                <label for="newAppDiscord">Discord Username and ID</label>
-                <input type="text" id="newAppDiscord" placeholder="username#0000" />
-            </div>
-            <div class="field">
                 <label for="newAppAge">Age</label>
                 <input type="text" id="newAppAge" placeholder="Age" />
             </div>
@@ -1602,8 +1598,8 @@
                 <input type="text" id="newAppMember" placeholder="Prior membership details" />
             </div>
             <div class="field">
-                <label for="newAppQuestion">Question</label>
-                <textarea id="newAppQuestion" placeholder="Anything else you'd like to add?"></textarea>
+                <button type="button" class="submit-btn" id="addQuestionBtn">Add Question</button>
+                <textarea id="newAppQuestion" placeholder="Type your question..." style="display:none; margin-top:8px; width:100%; padding:10px 12px; border-radius:10px; border:1px solid #cbd5e1; font-size:14px; font-family:inherit;"></textarea>
             </div>
             <button type="button" class="submit-btn" id="newAppSubmitBtn">Create Application</button>
             <div class="modal-error" id="newAppError"></div>
@@ -4027,12 +4023,12 @@ async function loadPenalCodes() {
                         const newApplicationModal = document.getElementById("newApplicationModal");
                         const newAppName = document.getElementById("newAppName");
                         const newAppEmail = document.getElementById("newAppEmail");
-                        const newAppDiscord = document.getElementById("newAppDiscord");
                         const newAppAge = document.getElementById("newAppAge");
                         const newAppTimezone = document.getElementById("newAppTimezone");
                         const newAppActive = document.getElementById("newAppActive");
                         const newAppMember = document.getElementById("newAppMember");
                         const newAppQuestion = document.getElementById("newAppQuestion");
+                        const addQuestionBtn = document.getElementById("addQuestionBtn");
                         const newAppSubmitBtn = document.getElementById("newAppSubmitBtn");
                         const newAppModalClose = document.getElementById("newAppModalClose");
                         const newAppError = document.getElementById("newAppError");
@@ -4041,14 +4037,27 @@ async function loadPenalCodes() {
                             if (!newApplicationModal) return;
                             if (newAppName) newAppName.value = "";
                             if (newAppEmail) newAppEmail.value = "";
-                            if (newAppDiscord) newAppDiscord.value = "";
                             if (newAppAge) newAppAge.value = "";
                             if (newAppTimezone) newAppTimezone.value = "";
                             if (newAppActive) newAppActive.value = "";
                             if (newAppMember) newAppMember.value = "";
-                            if (newAppQuestion) newAppQuestion.value = "";
+                            if (newAppQuestion) { newAppQuestion.value = ""; newAppQuestion.style.display = "none"; }
                             if (newAppError) { newAppError.textContent = ""; newAppError.style.display = "none"; }
                             newApplicationModal.classList.add("open");
+                        }
+
+                        if (addQuestionBtn && newAppQuestion) {
+                            addQuestionBtn.addEventListener("click", () => {
+                                if (newAppQuestion.style.display === "none") {
+                                    newAppQuestion.style.display = "block";
+                                    newAppQuestion.focus();
+                                    addQuestionBtn.textContent = "Hide Question";
+                                } else {
+                                    newAppQuestion.style.display = "none";
+                                    newAppQuestion.value = "";
+                                    addQuestionBtn.textContent = "Add Question";
+                                }
+                            });
                         }
 
                         function closeNewApplicationModal() {
@@ -4070,7 +4079,6 @@ async function loadPenalCodes() {
                             newAppSubmitBtn.onclick = async () => {
                                 const name = newAppName ? newAppName.value.trim() : "";
                                 const email = newAppEmail ? newAppEmail.value.trim() : "";
-                                const discord = newAppDiscord ? newAppDiscord.value.trim() : "";
                                 const age = newAppAge ? newAppAge.value.trim() : "";
                                 const timezone = newAppTimezone ? newAppTimezone.value.trim() : "";
                                 const active = newAppActive ? newAppActive.value.trim() : "";
@@ -4081,16 +4089,15 @@ async function loadPenalCodes() {
                                     return;
                                 }
                                 closeNewApplicationModal();
-                                await addApplication({ name, email, discord, age, timezone, active, member, question });
+                                await addApplication({ name, email, age, timezone, active, member, question });
                             };
                         }
 
-                        async function addApplication({ name, email, discord, age, timezone, active, member, question }) {
+                        async function addApplication({ name, email, age, timezone, active, member, question }) {
                             if (!localSupabase) return;
                             try {
                                 const payload = {
                                     email: email || "",
-                                    discord: discord || "",
                                     age: age || "",
                                     timezone: timezone || "",
                                     active: active || "",
