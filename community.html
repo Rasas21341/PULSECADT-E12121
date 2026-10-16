@@ -1570,18 +1570,13 @@
     <div class="modal-overlay" id="newApplicationModal">
         <div class="modal">
             <div class="modal-header">
-                <div class="modal-title">New Application</div>
+                <div class="modal-title" style="font-size:15px;">New Question</div>
                 <button class="modal-close" id="newAppModalClose" type="button" aria-label="Close">×</</button>
             </div>
             <div class="field">
-                <label for="newAppName">Name</label>
-                <input type="text" id="newAppName" placeholder="Full name" />
+                <textarea id="newAppQuestion" placeholder="Type your question..." style="width:100%; padding:10px 12px; border-radius:10px; border:1px solid #cbd5e1; font-size:14px; font-family:inherit;"></textarea>
             </div>
-            <div class="field">
-                <button type="button" class="submit-btn" id="addQuestionBtn">Add Question</button>
-                <textarea id="newAppQuestion" placeholder="Type your question..." style="display:none; margin-top:8px; width:100%; padding:10px 12px; border-radius:10px; border:1px solid #cbd5e1; font-size:14px; font-family:inherit;"></textarea>
-            </div>
-            <button type="button" class="submit-btn" id="newAppSubmitBtn">Create Application</button>
+            <button type="button" class="submit-btn" id="newAppSubmitBtn">Submit</button>
             <div class="modal-error" id="newAppError"></div>
         </div>
     </div>
@@ -4001,33 +3996,16 @@ async function loadPenalCodes() {
 
                         const openAddApplicationBtn = document.getElementById("openAddApplicationBtn");
                         const newApplicationModal = document.getElementById("newApplicationModal");
-                        const newAppName = document.getElementById("newAppName");
                         const newAppQuestion = document.getElementById("newAppQuestion");
-                        const addQuestionBtn = document.getElementById("addQuestionBtn");
                         const newAppSubmitBtn = document.getElementById("newAppSubmitBtn");
                         const newAppModalClose = document.getElementById("newAppModalClose");
                         const newAppError = document.getElementById("newAppError");
 
                         function openNewApplicationModal() {
                             if (!newApplicationModal) return;
-                            if (newAppName) newAppName.value = "";
-                            if (newAppQuestion) { newAppQuestion.value = ""; newAppQuestion.style.display = "none"; }
+                            if (newAppQuestion) newAppQuestion.value = "";
                             if (newAppError) { newAppError.textContent = ""; newAppError.style.display = "none"; }
                             newApplicationModal.classList.add("open");
-                        }
-
-                        if (addQuestionBtn && newAppQuestion) {
-                            addQuestionBtn.addEventListener("click", () => {
-                                if (newAppQuestion.style.display === "none") {
-                                    newAppQuestion.style.display = "block";
-                                    newAppQuestion.focus();
-                                    addQuestionBtn.textContent = "Hide Question";
-                                } else {
-                                    newAppQuestion.style.display = "none";
-                                    newAppQuestion.value = "";
-                                    addQuestionBtn.textContent = "Add Question";
-                                }
-                            });
                         }
 
                         function closeNewApplicationModal() {
@@ -4047,22 +4025,20 @@ async function loadPenalCodes() {
                         }
                         if (newAppSubmitBtn) {
                             newAppSubmitBtn.onclick = async () => {
-                                const name = newAppName ? newAppName.value.trim() : "";
                                 const question = newAppQuestion ? newAppQuestion.value.trim() : "";
-                                if (!name) {
-                                    if (newAppError) { newAppError.textContent = "Name is required."; newAppError.style.display = "block"; }
+                                if (!question) {
+                                    if (newAppError) { newAppError.textContent = "Question is required."; newAppError.style.display = "block"; }
                                     return;
                                 }
                                 closeNewApplicationModal();
-                                await addApplication({ name, question });
+                                await addApplication({ question });
                             };
                         }
 
-                        async function addApplication({ name, question }) {
+                        async function addApplication({ question }) {
                             if (!localSupabase) return;
                             try {
                                 const payload = {
-                                    name: name || "",
                                     question: question || "",
                                     community_id: currentCommunityId || null
                                 };
@@ -4101,8 +4077,7 @@ async function loadPenalCodes() {
                                     const created = row.created_at ? new Date(row.created_at).toLocaleString() : "";
                                     const question = esc(row.question || "");
                                     html += `<div class="members-item">
-                                        <div class="members-item-name">${esc(row.name || "Unnamed")}</div>
-                                        ${question ? `<div style="font-size:12px; color:#64748b; margin-top:2px;">Q: ${question}</div>` : ""}
+                                        ${question ? `<div class="members-item-name">Q: ${question}</div>` : `<div class="members-item-name">No question</div>`}
                                         <div style="font-size:12px; color:#64748b; margin-top:2px;">${esc(created)}</div>
                                     </div>`;
                                 });
