@@ -4011,11 +4011,6 @@ async function loadPenalCodes() {
                         function openNewApplicationModal() {
                             if (!newApplicationModal) return;
                             if (newAppName) newAppName.value = "";
-                            if (newAppEmail) newAppEmail.value = "";
-                            if (newAppAge) newAppAge.value = "";
-                            if (newAppTimezone) newAppTimezone.value = "";
-                            if (newAppActive) newAppActive.value = "";
-                            if (newAppMember) newAppMember.value = "";
                             if (newAppQuestion) { newAppQuestion.value = ""; newAppQuestion.style.display = "none"; }
                             if (newAppError) { newAppError.textContent = ""; newAppError.style.display = "none"; }
                             newApplicationModal.classList.add("open");
@@ -4053,30 +4048,21 @@ async function loadPenalCodes() {
                         if (newAppSubmitBtn) {
                             newAppSubmitBtn.onclick = async () => {
                                 const name = newAppName ? newAppName.value.trim() : "";
-                                const email = newAppEmail ? newAppEmail.value.trim() : "";
-                                const age = newAppAge ? newAppAge.value.trim() : "";
-                                const timezone = newAppTimezone ? newAppTimezone.value.trim() : "";
-                                const active = newAppActive ? newAppActive.value.trim() : "";
-                                const member = newAppMember ? newAppMember.value.trim() : "";
                                 const question = newAppQuestion ? newAppQuestion.value.trim() : "";
                                 if (!name) {
                                     if (newAppError) { newAppError.textContent = "Name is required."; newAppError.style.display = "block"; }
                                     return;
                                 }
                                 closeNewApplicationModal();
-                                await addApplication({ name, email, age, timezone, active, member, question });
+                                await addApplication({ name, question });
                             };
                         }
 
-                        async function addApplication({ name, email, age, timezone, active, member, question }) {
+                        async function addApplication({ name, question }) {
                             if (!localSupabase) return;
                             try {
                                 const payload = {
-                                    email: email || "",
-                                    age: age || "",
-                                    timezone: timezone || "",
-                                    active: active || "",
-                                    member: member || "",
+                                    name: name || "",
                                     question: question || "",
                                     community_id: currentCommunityId || null
                                 };
