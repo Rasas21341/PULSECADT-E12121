@@ -1984,10 +1984,10 @@
                                          <button type="button" class="members-view-close" id="applicationsViewClose" aria-label="Close">×</</button>
                                      </div>
                                      <div class="view-body">
-                                         <button type="button" class="add-department-btn" id="openAddApplicationBtn">
-                                             <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                                             Create Application
-                                         </button>
+                                          <button type="button" class="add-department-btn" id="openAddApplicationBtn">
+                                              <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                                              New Question
+                                          </button>
                                          <div id="applicationsList"></div>
                                      </div>
                                  </div>
@@ -4110,8 +4110,7 @@ async function loadPenalCodes() {
                                     const created = row.created_at ? new Date(row.created_at).toLocaleString() : "";
                                     const question = esc(row.question || "");
                                     html += `<div class="members-item">
-                                        <div class="members-item-name">${esc(row.name || "Unnamed")}</div>
-                                        ${question ? `<div style="font-size:12px; color:#64748b; margin-top:2px;">Q: ${question}</div>` : ""}
+                                        ${question ? `<div class="members-item-name">Q: ${question}</div>` : `<div class="members-item-name">No question</div>`}
                                         <div style="font-size:12px; color:#64748b; margin-top:2px;">${esc(created)}</div>
                                         <div style="margin-top:6px;">
                                             <button type="button" class="submit-btn approve-req-btn" data-id="${esc(row.id)}" style="padding:4px 10px; font-size:12px;">Approve</button>
