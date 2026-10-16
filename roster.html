@@ -106,39 +106,16 @@
             justify-content: center;
         }
 
-        .rost-name-input {
+        .rost-name {
             flex: 1;
             min-width: 0;
             max-width: 320px;
             font-size: 18px;
             font-weight: 700;
             color: #0f172a;
-            border: none;
-            border-radius: 0;
-            background: transparent;
-            padding: 0;
-            outline: none;
-            box-shadow: none;
-            appearance: none;
-            -webkit-appearance: none;
             font-family: inherit;
             text-align: center;
             margin-top: -2px;
-        }
-
-        .rost-name-input:focus,
-        .rost-name-input:hover {
-            border: none;
-            box-shadow: none;
-            background: transparent;
-            outline: none;
-        }
-
-        .rost-name-input:hover,
-        .rost-name-input:focus {
-            border: none;
-            background: transparent;
-            box-shadow: none;
         }
 
         .rost-count {
@@ -484,7 +461,7 @@
                 return `
                     <div class="rost-card">
                         <div class="rost-card-head">
-                            <input type="text" class="rost-name-input" data-roster-id="${escapeHtml(r.id)}" value="${escapeHtml(r.name || "")}" aria-label="Roster ${index + 1} name" maxlength="60" />
+                        <span class="rost-name">${escapeHtml(r.name || "")}</span>
                         </div>
                         <div class="rost-members">${list}</div>
                     </div>
