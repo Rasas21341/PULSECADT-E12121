@@ -451,6 +451,7 @@
 
             rostRosterCards.innerHTML = rosters.map((r, index) => {
                 const selected = selectedFor(r.id);
+                const rosterName = String(r.name || "").trim();
                 const list = members.length === 0 ? '' : members.map((m) => `
                         <label class="rost-member">
                             <input type="checkbox" class="rost-member-checkbox" data-roster-id="${escapeHtml(r.id)}" data-member-id="${escapeHtml(m.id)}" ${selected.has(m.id) ? "checked" : ""} />
@@ -461,7 +462,7 @@
                 return `
                     <div class="rost-card">
                         <div class="rost-card-head">
-                        <span class="rost-name">${escapeHtml(r.name || "")}</span>
+                            <span class="rost-name">${rosterName === "l" ? "" : escapeHtml(rosterName)}</span>
                         </div>
                         <div class="rost-members">${list}</div>
                     </div>
