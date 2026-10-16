@@ -4075,16 +4075,17 @@ async function loadPenalCodes() {
                                 const timezone = newAppTimezone ? newAppTimezone.value.trim() : "";
                                 const active = newAppActive ? newAppActive.value.trim() : "";
                                 const member = newAppMember ? newAppMember.value.trim() : "";
+                                const question = newAppQuestion ? newAppQuestion.value.trim() : "";
                                 if (!name) {
                                     if (newAppError) { newAppError.textContent = "Name is required."; newAppError.style.display = "block"; }
                                     return;
                                 }
                                 closeNewApplicationModal();
-                                await addApplication({ name, email, discord, age, timezone, active, member });
+                                await addApplication({ name, email, discord, age, timezone, active, member, question });
                             };
                         }
 
-                        async function addApplication({ name, email, discord, age, timezone, active, member }) {
+                        async function addApplication({ name, email, discord, age, timezone, active, member, question }) {
                             if (!localSupabase) return;
                             try {
                                 const payload = {
@@ -4094,6 +4095,7 @@ async function loadPenalCodes() {
                                     timezone: timezone || "",
                                     active: active || "",
                                     member: member || "",
+                                    question: question || "",
                                     community_id: currentCommunityId || null
                                 };
                                 const { error } = await localSupabase
@@ -4129,9 +4131,11 @@ async function loadPenalCodes() {
                                 data.forEach((row) => {
                                     const esc = (v) => (v == null ? "" : String(v).replace(/</g, "&lt;").replace(/>/g, "&gt;"));
                                     const created = row.created_at ? new Date(row.created_at).toLocaleString() : "";
+                                    const question = esc(row.question || "");
                                     html += `<div class="members-item">
                                         <div class="members-item-name">${esc(row.name || "Unnamed")}</div>
                                         <div class="members-item-role">${esc(row.email || "")}</div>
+                                        ${question ? `<div style="font-size:12px; color:#64748b; margin-top:2px;">Q: ${question}</div>` : ""}
                                         <div style="font-size:12px; color:#64748b; margin-top:2px;">${esc(created)}</div>
                                     </div>`;
                                 });
@@ -4162,9 +4166,11 @@ async function loadPenalCodes() {
                                 let html = '<div class="members-view-list">';
                                 data.forEach((row) => {
                                     const created = row.created_at ? new Date(row.created_at).toLocaleString() : "";
+                                    const question = esc(row.question || "");
                                     html += `<div class="members-item">
                                         <div class="members-item-name">${esc(row.email || "Unnamed")}</div>
                                         <div class="members-item-role">Discord: ${esc(row.discord || "")} | Age: ${esc(row.age || "")} | TZ: ${esc(row.timezone || "")}</div>
+                                        ${question ? `<div style="font-size:12px; color:#64748b; margin-top:2px;">Q: ${question}</div>` : ""}
                                         <div style="font-size:12px; color:#64748b; margin-top:2px;">${esc(created)}</div>
                                         <div style="margin-top:6px;">
                                             <button type="button" class="submit-btn approve-req-btn" data-id="${esc(row.id)}" style="padding:4px 10px; font-size:12px;">Approve</button>
