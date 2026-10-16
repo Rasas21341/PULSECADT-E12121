@@ -463,7 +463,9 @@
                     <div class="rost-card">
                         <div class="rost-card-head">
                             <span class="rost-name">${rosterName === "l" ? "" : escapeHtml(rosterName)}</span>
-                            <button type="button" class="btn primary sm rost-roster-btn">Roster</button>
+                        </div>
+                        <div class="rost-roster-box" style="display:flex;justify-content:center;padding:8px 0;">
+                            <button type="button" class="btn primary rost-roster-btn">Roster</button>
                         </div>
                         <div class="rost-members">${list}</div>
                     </div>
