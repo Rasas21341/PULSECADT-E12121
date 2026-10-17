@@ -1511,12 +1511,71 @@
          </div>
      </div>
 
-    <div class="modal-overlay" id="newDocumentModal">
+<div class="modal-overlay" id="newDocumentModal">
         <div class="modal">
             <div class="modal-header">
                 <div class="modal-title">New Document</div>
-                <button class="modal-close" id="newDocModalClose" type="button" aria-label="Close">×</</button>
+                <button class="modal-close" id="newDocModalClose" type="button" aria-label="Close">×</button>
             </div>
+            <div class="field">
+                <label for="newDocTitle">Document Title</label>
+                <input type="text" id="newDocTitle" placeholder="Document title" />
+            </div>
+            <div class="field">
+                <label>Assign Departments</label>
+                <div id="newDocDeptCheckboxes"><div class="empty">Loading departments...</div></div>
+            </div>
+            <button type="button" class="submit-btn" id="newDocSubmitBtn">Create Document</button>
+            <div class="modal-error" id="newDocError"></div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="newTrainingModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">Add Staff Training</div>
+                <button class="modal-close" id="newTrainingModalClose" type="button" aria-label="Close">×</button>
+            </div>
+            <div class="field">
+                <label for="newTrainingTitle">Title</label>
+                <input type="text" id="newTrainingTitle" placeholder="e.g., Officer Safety Refresher" />
+            </div>
+            <div class="field">
+                <label for="newTrainingDescription">Description (optional)</label>
+                <textarea id="newTrainingDescription" placeholder="Brief description or notes..."></textarea>
+            </div>
+            <div class="field">
+                <label for="newTrainingUrl">Document / Link URL</label>
+                <input type="text" id="newTrainingUrl" placeholder="https://..." />
+            </div>
+            <button type="button" class="submit-btn" id="newTrainingSubmitBtn">Add Training</button>
+            <div class="modal-error" id="newTrainingError"></div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="editTrainingModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">Edit Staff Training</div>
+                <button class="modal-close" id="editTrainingModalClose" type="button" aria-label="Close">×</button>
+            </div>
+            <input type="hidden" id="editTrainingId" />
+            <div class="field">
+                <label for="editTrainingTitle">Title</label>
+                <input type="text" id="editTrainingTitle" placeholder="e.g., Officer Safety Refresher" />
+            </div>
+            <div class="field">
+                <label for="editTrainingDescription">Description (optional)</label>
+                <textarea id="editTrainingDescription" placeholder="Brief description or notes..."></textarea>
+            </div>
+            <div class="field">
+                <label for="editTrainingUrl">Document / Link URL</label>
+                <input type="text" id="editTrainingUrl" placeholder="https://..." />
+            </div>
+            <button type="button" class="submit-btn" id="editTrainingSubmitBtn">Save Changes</button>
+            <div class="modal-error" id="editTrainingError"></div>
+        </div>
+    </div>
             <div class="field">
                 <label for="newDocTitle">Document Title</label>
                 <input type="text" id="newDocTitle" placeholder="Document title" />
@@ -1919,6 +1978,21 @@
                                         </div>
                                     </div>
                                 </div>
+                                <div class="training-view" id="trainingView">
+                                    <div class="members-view-header">
+                                        <div class="members-view-title">Staff Training</div>
+                                        <button type="button" class="add-department-btn" id="openAddTrainingBtn">
+                                            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                                            Add Training
+                                        </button>
+                                        <button type="button" class="members-view-close" id="trainingViewClose" aria-label="Close">×</button>
+                                    </div>
+                                    <div class="view-body">
+                                        <div id="trainingList">
+                                            <div class="empty">Loading training materials...</div>
+                                        </div>
+                                    </div>
+                                </div>
                                 <div class="members-view" id="membersView">
                                     <div class="members-view-header">
                                         <div class="members-view-title">Members</div>
@@ -2049,18 +2123,41 @@
                          const applicationsViewClose = document.getElementById("applicationsViewClose");
                          const applicationsList = document.getElementById("applicationsList");
 const supervisorInput = document.getElementById("supervisorInput");
+                          const trainingBtn = document.getElementById("trainingBtn");
+                          const trainingView = document.getElementById("trainingView");
+                          const trainingViewClose = document.getElementById("trainingViewClose");
+                          const trainingList = document.getElementById("trainingList");
 
-                         if (settingsBtn && settingsView) {
-                            settingsBtn.addEventListener("click", (e) => {
-                                e.stopPropagation();
-                                if (settingsView.classList.contains("open")) {
-                                    settingsView.classList.remove("open");
-                                } else {
-                                    closeAllPages();
-                                    settingsView.classList.add("open");
-                                }
-                            });
-                        }
+                          if (settingsBtn && settingsView) {
+                             settingsBtn.addEventListener("click", (e) => {
+                                 e.stopPropagation();
+                                 if (settingsView.classList.contains("open")) {
+                                     settingsView.classList.remove("open");
+                                 } else {
+                                     closeAllPages();
+                                     settingsView.classList.add("open");
+                                 }
+                             });
+                         }
+
+                         if (trainingBtn && trainingView) {
+                             trainingBtn.addEventListener("click", (e) => {
+                                 e.stopPropagation();
+                                 if (trainingView.classList.contains("open")) {
+                                     trainingView.classList.remove("open");
+                                 } else {
+                                     closeAllPages();
+                                     trainingView.classList.add("open");
+                                     loadTrainingMaterials();
+                                 }
+                             });
+                         }
+
+                         if (trainingViewClose && trainingView) {
+                             trainingViewClose.addEventListener("click", () => {
+                                 trainingView.classList.remove("open");
+                             });
+                         }
 
 if (applicationsBtn && applicationsView) {
                                 applicationsBtn.addEventListener("click", (e) => {
@@ -2081,9 +2178,9 @@ if (applicationsBtn && applicationsView) {
                             }
 
 function closeAllPages() {
-                              const allViews = contentEl.querySelectorAll('.members-view, .departments-view, .documents-view, .settings-view, .rosters-view, .roster-editor-view, .roles-view, .vehicles-view, .applications-view, .penal-codes-view');
-                              allViews.forEach((v) => { v.classList.remove("open"); });
-                          }
+                               const allViews = contentEl.querySelectorAll('.members-view, .departments-view, .documents-view, .settings-view, .rosters-view, .roster-editor-view, .roles-view, .vehicles-view, .applications-view, .penal-codes-view, .training-view');
+                               allViews.forEach((v) => { v.classList.remove("open"); });
+                           }
 
                          if (membersBtn && membersView && membersViewList) {
                              membersBtn.addEventListener("click", (e) => {
@@ -3471,6 +3568,103 @@ async function addDepartment(name, passcode, banner, type) {
                                 });
                             } catch (err) {
                                 documentsList.innerHTML = '<div class="empty">Failed to load documents.</div>';
+                            }
+                        }
+
+                        async function loadTrainingMaterials() {
+                            if (!trainingList || !localSupabase) return;
+                            trainingList.innerHTML = '<div class="empty">Loading training materials...</div>';
+                            try {
+                                const { data, error } = await localSupabase
+                                    .from("training_materials")
+                                    .select("*")
+                                    .eq("community_id", id)
+                                    .order("created_at", { ascending: false });
+                                if (error) {
+                                    trainingList.innerHTML = '<div class="empty">Failed to load training materials.</div>';
+                                    return;
+                                }
+                                const items = Array.isArray(data) ? data : [];
+                                if (items.length === 0) {
+                                    trainingList.innerHTML = '<div class="empty">No training materials yet. Click "Add Training" to create your first one.</div>';
+                                    return;
+                                }
+                                trainingList.innerHTML = items.map((item) => {
+                                    const title = (item.title || 'Untitled').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                                    const desc = (item.description || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                                    const link = item.url || item.link || '';
+                                    return `
+                                        <div class="request-item" data-training-id="${item.id}">
+                                            <div>
+                                                <span>${title}</span>
+                                                ${desc ? `<div style="margin-top:4px; font-size:12px; color:#64748b;">${desc}</div>` : ''}
+                                            </div>
+                                            <div>
+                                                ${link ? `<button type="button" class="approve" style="background:#eff6ff; border-color:#bfdbfe; color:#1d4ed8;" data-action="open-training" data-training-url="${link.replace(/</g, '&lt;').replace(/>/g, '&gt;')}">Open</button>` : ''}
+                                                <button type="button" class="deny" style="background:#f0fdf4; border-color:#bbf7d0; color:#166534;" data-action="edit-training" data-training-id="${item.id}">Edit</button>
+                                                <button type="button" class="deny" style="background:#fef2f2; border-color:#fecaca; color:#991b1b;" data-action="delete-training" data-training-id="${item.id}">Delete</button>
+                                            </div>
+                                        </div>
+                                    `;
+                                }).join('');
+                                trainingList.querySelectorAll("[data-action='open-training']").forEach((btn) => {
+                                    btn.addEventListener("click", (e) => {
+                                        const url = e.target.closest(".request-item").getAttribute("data-training-url");
+                                        if (url) window.open(url, "_blank");
+                                    });
+                                });
+                                trainingList.querySelectorAll("[data-action='edit-training']").forEach((btn) => {
+                                    btn.addEventListener("click", (e) => {
+                                        const trainingId = e.target.closest(".request-item").getAttribute("data-training-id");
+                                        openEditTrainingModal(trainingId);
+                                    });
+                                });
+                                trainingList.querySelectorAll("[data-action='delete-training']").forEach((btn) => {
+                                    btn.addEventListener("click", (e) => {
+                                        const trainingId = e.target.closest(".request-item").getAttribute("data-training-id");
+                                        deleteTrainingMaterial(trainingId);
+                                    });
+                                });
+                            } catch (err) {
+                                trainingList.innerHTML = '<div class="empty">Failed to load training materials.</div>';
+                            }
+                        }
+
+                        async function addTrainingMaterial(title, description, url) {
+                            if (!title || !localSupabase) return;
+                            try {
+                                await localSupabase
+                                    .from("training_materials")
+                                    .insert([{ community_id: id, title: title.trim(), description: (description || '').trim(), url: (url || '').trim() }]);
+                                loadTrainingMaterials();
+                            } catch (err) {
+                                alert("Failed to create training material.");
+                            }
+                        }
+
+                        async function updateTrainingMaterial(trainingId, title, description, url) {
+                            if (!trainingId || !localSupabase) return;
+                            try {
+                                await localSupabase
+                                    .from("training_materials")
+                                    .update({ title: title.trim(), description: (description || '').trim(), url: (url || '').trim() })
+                                    .eq("id", trainingId);
+                                loadTrainingMaterials();
+                            } catch (err) {
+                                alert("Failed to update training material.");
+                            }
+                        }
+
+                        async function deleteTrainingMaterial(trainingId) {
+                            if (!confirm("Delete this training material?")) return;
+                            try {
+                                await localSupabase
+                                    .from("training_materials")
+                                    .delete()
+                                    .eq("id", trainingId);
+                                loadTrainingMaterials();
+                            } catch (err) {
+                                alert("Failed to delete training material.");
                             }
                         }
 
