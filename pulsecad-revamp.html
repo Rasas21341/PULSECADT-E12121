@@ -1943,10 +1943,23 @@ enable-ga="false"
              </div>
             <div class="logged-in-actions">
            </div>
-         <div class="panels-manage-card open" id="panelsManageCard">
-             <div class="panels-manage-title">Panels you manage</div>
-             <div class="logged-in-communities" id="loggedInCommunities"></div>
-         </div>
+<div class="panels-manage-card open" id="panelsManageCard">
+              <div class="panels-manage-title">Panels you manage</div>
+              <div class="logged-in-communities" id="loggedInCommunities"></div>
+              <div class="community-list-card" id="staffTrainingCard" style="margin-top:14px;">
+                  <div class="community-banner-container"><img src="" class="community-card-banner" alt="Staff Training banner" style="display:none;" /></div>
+                  <div class="community-list-info">
+                      <div class="community-list-name">Staff Training</div>
+                      <div class="community-list-meta">Training materials &amp; resources for staff</div>
+                  </div>
+                  <div class="community-list-actions">
+                      <button type="button" class="panel-btn panel-open-mdt" id="staffTrainingOpenBtn">
+                          <svg class="panel-icon" viewBox="0 0 24 24" width="14" height="14"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-9 8v-4h4v4h-4zm0 6v-4H8v4h2zm6 0v-4h2v4h-2zm0-6v-4h2v4h-2z"/></svg>
+                          Open Training
+                      </button>
+                  </div>
+              </div>
+          </div>
         <div class="staff-dashboard-card" id="staffDashboardCard">
             <div class="staff-dashboard-title">Staff Dashboard</div>
             <div id="staffDashboardContent"></div>
@@ -3586,6 +3599,14 @@ if (action === "leave") {
             moderationBtn.addEventListener("click", (e) => {
                 e.stopPropagation();
                 window.location.href = "staff.html";
+            });
+        }
+
+        const staffTrainingOpenBtn = document.getElementById("staffTrainingOpenBtn");
+        if (staffTrainingOpenBtn) {
+            staffTrainingOpenBtn.addEventListener("click", (e) => {
+                e.stopPropagation();
+                window.location.href = "training.html";
             });
         }
 
