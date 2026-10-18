@@ -2966,38 +2966,27 @@ enable-ga="false"
                     loggedInCommunities.innerHTML = "";
                     return;
                 }
-                localSupabase
-                    .from("communities")
-                    .select("*")
-                    .order("created_at", { ascending: false })
-                    .then(async ({ data, error }) => {
-                        if (error) {
-                            alert("Failed to load communities: " + error.message);
-                            return;
+                Promise.all([
+                    localSupabase.from("communities").select("*").order("created_at", { ascending: false }),
+                    localSupabase.from("users").select("department").eq("id", userId).maybeSingle(),
+                    localSupabase.from("user_communities").select("community_id").eq("user_id", userId)
+                ]).then(async ([commRes, userRes, joinedRes]) => {
+                    const { data, error } = commRes;
+                    if (error) {
+                        alert("Failed to load communities: " + error.message);
+                        return;
+                    }
+                    const isManagement = !!(userRes.data && (userRes.data.department || "").trim() === "Management");
+                    const joinedIds = new Set((joinedRes.data || []).map((r) => r.community_id));
+                    if (Array.isArray(data)) {
+                        for (const row of data) {
+                            const isCreator = row.creator_email === userEmail;
+                            const joined = isCreator || joinedIds.has(row.id);
+                            if (!isCreator && !joined && !isManagement) continue;
+                            addCommunityCard(row.name, row.description || "Community", joined, row.id, isCreator, !!row.verification_requested, !!row.suspended, !!row.members_only, row.banner, !!row.partner, isManagement);
                         }
-                        if (Array.isArray(data)) {
-                            // Management can manage any community, so show them all.
-                            let isManagement = false;
-                            if (userId) {
-                                try {
-                                    const { data: u } = await localSupabase
-                                        .from("users")
-                                        .select("department")
-                                        .eq("id", userId)
-                                        .maybeSingle();
-                                    isManagement = !!(u && (u.department || "").trim() === "Management");
-                                } catch (e) {}
-                            }
-                            for (const row of data) {
-                                const isCreator = row.creator_email === userEmail;
-                                const joined = isCreator || await checkUserJoined(userId, row.id);
-                                // Show the card if the user created it, joined it, or is Management.
-                                if (!isCreator && !joined && !isManagement) continue;
-                                addCommunityCard(row.name, row.description || "Community", joined, row.id, isCreator, !!row.verification_requested, !!row.suspended, !!row.members_only, row.banner, !!row.partner, isManagement);
-                            }
-                        }
-                    })
-                    .catch((err) => alert("Failed to load communities: " + (err.message || err)));
+                    }
+                }).catch((err) => alert("Failed to load communities: " + (err.message || err)));
             }).catch((err) => {
                 console.error("Auth error in loadCommunities:", err);
             });
