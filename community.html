@@ -2557,26 +2557,40 @@ if (membersViewClose && membersView) {
                                         alert("You cannot kick yourself.");
                                         return;
                                     }
-                                    if (confirm("Kick this member?")) {
-                                        try {
-                                            const res = await fetch("/api/kick", {
-                                                method: "POST",
-                                                headers: { "Content-Type": "application/json" },
-                                                body: JSON.stringify({ communityId: id, userId, action: "kick", webhook: communityData && communityData.discord_webhook, username: "PulseCAD" })
-                                            });
-                                            const status = res.status;
-                                            let respText = "";
-                                            try { respText = await res.text(); } catch (err) { respText = "unreadable"; }
-                                            if (!res.ok) {
-                                                let respJson = {};
-                                                try { respJson = JSON.parse(respText); } catch (err) {}
-                                                throw new Error((respJson && respJson.error) ? respJson.error : ("Kick failed (status " + status + ")"));
-                                            }
-                                            loadMembersInto(membersViewList, { loadingText: "Loading members...", openDropdown: false });
-                                        } catch (err) {
-                                            alert("Failed to kick member: " + (err.message || err));
-                                        }
-                                    }
+                                     if (confirm("Kick this member?")) {
+                                         try {
+                                             let apiOk = false;
+                                             try {
+                                                 const res = await fetch("/api/kick", {
+                                                     method: "POST",
+                                                     headers: { "Content-Type": "application/json" },
+                                                     body: JSON.stringify({ communityId: id, userId, action: "kick", webhook: communityData && communityData.discord_webhook, username: "PulseCAD" })
+                                                 });
+                                                 const status = res.status;
+                                                 let respText = "";
+                                                 try { respText = await res.text(); } catch (err) { respText = "unreadable"; }
+                                                 if (res.ok) {
+                                                     apiOk = true;
+                                                 } else {
+                                                     let respJson = {};
+                                                     try { respJson = JSON.parse(respText); } catch (err) {}
+                                                     throw new Error((respJson && respJson.error) ? respJson.error : ("Kick failed (status " + status + ")"));
+                                                 }
+                                             } catch (apiErr) {
+                                                 if (apiOk) return;
+                                                 console.warn("Kick API failed, trying direct Supabase delete:", apiErr);
+                                                 const { error: directError } = await localSupabase
+                                                     .from("user_communities")
+                                                     .delete()
+                                                     .eq("user_id", userId)
+                                                     .eq("community_id", id);
+                                                 if (directError) throw apiErr;
+                                             }
+                                             loadMembersInto(membersViewList, { loadingText: "Loading members...", openDropdown: false });
+                                         } catch (err) {
+                                             alert("Failed to kick member: " + (err.message || err));
+                                         }
+                                     }
                                 }
                                 if (banBtn) {
                                     const userId = banBtn.getAttribute("data-user-id");
