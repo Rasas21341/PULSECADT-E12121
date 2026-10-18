@@ -2687,7 +2687,6 @@ async function loadUnitsBar() {
             tbody.innerHTML = '<tr><td colspan="7" class="calls-empty">Loading calls...</td></tr>';
             try {
                 let callsQuery = localSupabase.from("calls").select("*").order("created_at", { ascending: false }).limit(20);
-                if (communityId) callsQuery = callsQuery.eq("community_id", communityId);
                 const { data, error } = await callsQuery;
 
                 if (error) throw error;
