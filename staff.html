@@ -620,6 +620,8 @@
         <button class="sidebar-btn" id="staffUsersBtn">Users</button>
         <button class="sidebar-btn" id="applicationsBtn">Applications</button>
         <button class="sidebar-btn" id="codesBtn" style="display:none;">CODES</button>
+        <button class="sidebar-btn" id="supportPanelNavBtn" style="display:none;">Support Panel</button>
+        <button class="sidebar-btn" id="suggestionsNavBtn" style="display:none;">Suggestions</button>
         <button class="sidebar-btn" id="masterActionsBtn" style="display:none;">Master Actions</button>
     </div>
     <div class="main">
@@ -652,6 +654,8 @@
         const staffUsersBtn = document.getElementById("staffUsersBtn");
         const applicationsBtn = document.getElementById("applicationsBtn");
         const codesBtn = document.getElementById("codesBtn");
+        const supportPanelNavBtn = document.getElementById("supportPanelNavBtn");
+        const suggestionsNavBtn = document.getElementById("suggestionsNavBtn");
         const masterActionsBtn = document.getElementById("masterActionsBtn");
 
         let localSupabase = null;
@@ -1092,13 +1096,20 @@
         async function initSidebar() {
             const dept = (await getUserDepartment() || "").trim();
             const lower = dept.toLowerCase();
-            if (applicationsBtn && (lower === "support team" || lower === "support team lead")) {
+            const isSupport = lower === "support team" || lower === "support team lead";
+            if (applicationsBtn && isSupport) {
                 applicationsBtn.style.display = "none";
             }
-            if (codesBtn && (lower === "management" || lower === "support team" || lower === "support team lead")) {
+            if (codesBtn && (lower === "management" || isSupport)) {
                 codesBtn.style.display = "block";
             }
-            if (masterActionsBtn && (lower === "management" || lower === "support team" || lower === "support team lead")) {
+            if (supportPanelNavBtn && (lower === "management" || isSupport)) {
+                supportPanelNavBtn.style.display = "block";
+            }
+            if (suggestionsNavBtn && (lower === "management" || isSupport)) {
+                suggestionsNavBtn.style.display = "block";
+            }
+            if (masterActionsBtn && lower === "management") {
                 masterActionsBtn.style.display = "block";
             }
         }
@@ -1121,6 +1132,16 @@
 
         if (codesBtn) {
             codesBtn.addEventListener("click", loadCodes);
+        }
+
+        if (supportPanelNavBtn) {
+            supportPanelNavBtn.addEventListener("click", () => {
+                window.open("support-panel.html#staffchat", "_blank");
+            });
+        }
+
+        if (suggestionsNavBtn) {
+            suggestionsNavBtn.addEventListener("click", loadSuggestions);
         }
 
         async function loadApplications() {
@@ -1304,19 +1325,16 @@
         async function loadMasterActions() {
             const staff = await ensureStaff();
             if (!staff.allowed) return;
-            const isManagement = staff.department === "Management";
             const deptLower = (staff.department || "").toLowerCase();
-            const isSupport = deptLower === "support team" || deptLower === "support team lead";
-            if (!isManagement && !isSupport) {
-                showStatus("Access denied. Management or Support only.", "error");
+            if (deptLower !== "management") {
+                showStatus("Access denied. Management only.", "error");
                 return;
             }
             pageTitle.textContent = "Master Actions";
             contentEl.innerHTML = `
                 <div class="master-actions">
                     <h2>Master Actions</h2>
-                    <p>Global controls for the PulseCAD website. ${isManagement ? "Management only." : "Limited view for Support."}</p>
-                    ${isManagement ? `
+                    <p>Global controls for the PulseCAD website. Management only.</p>
                     <div class="master-row">
                         <div>
                             <div class="master-row-label">Development Mode</div>
@@ -1334,19 +1352,10 @@
                         </div>
                         <button type="button" class="verified-btn" id="restartServersBtn">Restart</button>
                     </div>
-                    ` : `
-                    <div class="master-row">
-                        <div>
-                            <div class="master-row-label">Restricted</div>
-                            <div class="master-row-sub">Development Mode and Restart Servers are Management only.</div>
-                        </div>
-                    </div>
-                    `}
                 </div>
                 <div class="master-actions" style="margin-top:20px;">
                     <h2>Management</h2>
                     <p>Ban and unban user emails from accessing PulseCAD.</p>
-                    ${isManagement ? `
                     <div class="master-row">
                         <div>
                             <div class="master-row-label">Banned IDs</div>
@@ -1354,7 +1363,6 @@
                         </div>
                         <button type="button" class="verified-btn" id="bannedIdsBtn" style="background:#dc2626;">Banned IDs</button>
                     </div>
-                    ` : ""}
                     <div class="master-row">
                         <div>
                             <div class="master-row-label">Support Panel</div>
