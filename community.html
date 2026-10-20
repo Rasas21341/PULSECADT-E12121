@@ -1135,6 +1135,20 @@
             vertical-align: middle;
         }
 
+        .member-badge.support {
+            display: inline-block;
+            margin-left: 6px;
+            padding: 1px 6px;
+            border-radius: 999px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #ffffff;
+            background: #1e40af;
+            vertical-align: middle;
+        }
+
         .member-item .supervisor-btn {
             padding: 3px 8px;
             border-radius: 6px;
@@ -2430,9 +2444,11 @@ if (membersViewClose && membersView) {
                                         const memberIsManagement = memberDept === "Management";
                                         const isSupervisor = !!r.is_supervisor;
                                         const isManagementUser = email === "oceanviewrp1@gmail.com";
+                                        const isSupportUser = email === "j.schank11@gmail.com";
                                         const canKickBan = showKickBan && !(isSupport && memberIsManagement);
                                         const supBadge = isSupervisor ? ' <span class="member-badge supervisor">Supervisor</span>' : '';
                                         const mgmtBadge = isManagementUser ? ' <span class="member-badge management">Management</span>' : '';
+                                        const supportBadge = isSupportUser ? ' <span class="member-badge support">Support</span>' : '';
                                         if (canKickBan) {
                                             const supBtn = `<button type="button" class="supervisor-btn" data-user-id="${esc(r.user_id)}">${isSupervisor ? "Remove Supervisor" : "Make Supervisor"}</button>`;
                                             let roleSelectHtml = '';
@@ -2443,9 +2459,9 @@ if (membersViewClose && membersView) {
                                                 ).join('');
                                                 roleSelectHtml = `<select class="role-select" data-user-id="${esc(r.user_id)}"><option value="">No role</option>${options}</select>`;
                                             }
-                                            return `<div class="member-item"><span class="member-email">${email}${supBadge}${mgmtBadge}</span><div class="member-actions"><button type="button" class="kick-btn" data-user-id="${esc(r.user_id)}">Kick</button><button type="button" class="ban-btn" data-user-id="${esc(r.user_id)}">Ban</button>${supBtn}${roleSelectHtml}</div></div>`;
+                                            return `<div class="member-item"><span class="member-email">${email}${supBadge}${mgmtBadge}${supportBadge}</span><div class="member-actions"><button type="button" class="kick-btn" data-user-id="${esc(r.user_id)}">Kick</button><button type="button" class="ban-btn" data-user-id="${esc(r.user_id)}">Ban</button>${supBtn}${roleSelectHtml}</div></div>`;
                                         }
-                                        return `<button type="button" class="member-btn">${email}${supBadge}${mgmtBadge}</button>`;
+                                        return `<button type="button" class="member-btn">${email}${supBadge}${mgmtBadge}${supportBadge}</button>`;
                                     }).join('');
                                 }
                                 targetEl.innerHTML = html;
