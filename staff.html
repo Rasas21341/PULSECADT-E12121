@@ -1448,7 +1448,7 @@
             const staff = await ensureStaff();
             if (!staff.allowed) return;
             const dept = (staff.department || "").toLowerCase();
-                if (dept !== "management" && dept !== "support team" && dept !== "support team lead") {
+            if (dept !== "management" && dept !== "support team" && dept !== "support team lead") {
                 showStatus("Access denied. Management or Support only.", "error");
                 return;
             }
@@ -1464,6 +1464,7 @@
                             <option value="reviewed">Reviewed</option>
                             <option value="closed">Closed</option>
                         </select>
+                        <button type="button" class="verified-btn" id="openSuggestionFormFromListBtn">Open Form</button>
                     </div>
                     <div class="codes-count" id="sugCount"></div>
                     <table class="codes-list-table">
@@ -1476,6 +1477,12 @@
             const filterSelect = document.getElementById("sugFilterSelect");
             const sugListBody = document.getElementById("sugListBody");
             const sugCount = document.getElementById("sugCount");
+            const openSuggestionFormFromListBtn = document.getElementById("openSuggestionFormFromListBtn");
+            if (openSuggestionFormFromListBtn) {
+                openSuggestionFormFromListBtn.addEventListener("click", () => {
+                    window.open("/suggestionmake.html", "_blank");
+                });
+            }
 
             async function renderSuggestions(filter = "") {
                 if (!sugListBody || !localSupabase) return;
