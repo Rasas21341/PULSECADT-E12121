@@ -2232,6 +2232,7 @@ enable-ga="false"
             const btn = document.getElementById("moderationBtn");
             if (!btn) return;
             let isManagement = false;
+            let isSupport = false;
             if (localSupabase) {
                 try {
                     const { data: { user } } = await localSupabase.auth.getUser();
@@ -2243,12 +2244,14 @@ enable-ga="false"
                                 .select("department")
                                 .eq("email", user.email)
                                 .maybeSingle();
-                            isManagement = !!(data && (data.department || "").trim() === "Management");
+                            const dept = (data?.department || "").trim();
+                            isManagement = dept === "Management";
+                            isSupport = dept === "Support Team" || dept === "Support Team Lead";
                         }
                     }
                 } catch (e) {}
             }
-            if (isManagement) btn.classList.add("visible");
+            if (isManagement || isSupport) btn.classList.add("visible");
             else btn.classList.remove("visible");
         }
 
