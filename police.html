@@ -2493,7 +2493,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-    <script>
+     <script>
+function formatMilitaryExpanded(d){const x=new Date(d);const pad=n=>String(n).padStart(2,'0');return `${x.getFullYear()}-${pad(x.getMonth()+1)}-${pad(x.getDate())} ${pad(x.getHours())}:${pad(x.getMinutes())}:${pad(x.getSeconds())}`;}
         const SUPABASE_URL = "https://zwdogalwbczdtvxvhrfd.supabase.co";
         const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp3ZG9nYWx3YmN6ZHR2eHZocmZkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM2NTA2MjQsImV4cCI6MjA5OTIyNjYyNH0.baPVVTtW0d3FDC2pTd1P3d5aoIc2FZkaD-6bBvDPFWw";
 
@@ -3385,7 +3386,7 @@ async function loadUnitsBar() {
                 }
 
 civilianRecordsList.innerHTML = records.map((record) => {
-                    const date = record.row.created_at ? new Date(record.row.created_at).toLocaleString() : '';
+                    const date = record.row.created_at ? formatMilitaryExpanded(record.row.created_at) : '';
                     const citationNo = record.row.citation_number ? " #" + record.row.citation_number : "";
                     const fine = record.row.fine != null && record.row.fine !== "" ? " ($" + Number(record.row.fine).toFixed(2) + ")" : "";
                     const details = [record.row.reason, record.row.charges, record.row.location, record.row.notes].filter(Boolean).join(' | ');
@@ -4012,7 +4013,7 @@ civilianRecordsList.innerHTML = records.map((record) => {
 
                 const fields = [
                     ["Officer", (officerRank ? officerRank + " " : "") + officerName],
-                    ["Date", new Date().toLocaleString()],
+                    ["Date", formatMilitaryExpanded(new Date())],
                     ["Civilian ID", getText("tsCivilianId")],
                     ["Civilian Name", getText("tsCivilianName")],
                     ["Reason for Stop", getText("tsReason")],
@@ -4073,7 +4074,7 @@ civilianRecordsList.innerHTML = records.map((record) => {
                 const fields = [
                     ["Officer", (officerRank ? officerRank + " " : "") + officerName + (officerCallsign ? " (Call sign: " + officerCallsign + ")" : "")],
                     ["Officer ID", officerId],
-                    ["Date", new Date().toLocaleString()],
+                    ["Date", formatMilitaryExpanded(new Date())],
                     ["Civilian ID", getText("citationCivilianId")],
                     ["Civilian Name", getText("citationCivilianName")],
                     ["Statute / Code", getText("citationStatute")],
@@ -4132,7 +4133,7 @@ civilianRecordsList.innerHTML = records.map((record) => {
 
                 const fields = [
                     ["Officer", (officerRank ? officerRank + " " : "") + officerName],
-                    ["Date", new Date().toLocaleString()],
+                    ["Date", formatMilitaryExpanded(new Date())],
                     ["Civilian ID", getText("arrestCivilianId")],
                     ["Civilian Name", getText("arrestCivilianName")],
                     ["Charges", getText("arrestCharges")],
@@ -4421,7 +4422,7 @@ civilianRecordsList.innerHTML = records.map((record) => {
 
                 const esc = (t) => (t || "").replace(/</g, "&lt;").replace(/>/g, "&gt;");
                 unitsCitationsList.innerHTML = data.map((c) => {
-                    const date = c.created_at ? new Date(c.created_at).toLocaleString() : "";
+                    const date = c.created_at ? formatMilitaryExpanded(c.created_at) : "";
                     const citationNo = c.citation_number ? " #" + esc(c.citation_number) : "";
                     const fine = c.fine != null && c.fine !== "" ? " ($" + Number(c.fine).toFixed(2) + ")" : "";
                     const vehicle = [c.vehicle_make, c.vehicle_model, c.vehicle_plate].filter(Boolean).join(" ");
