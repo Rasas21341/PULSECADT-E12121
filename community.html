@@ -177,6 +177,23 @@
             line-height: 1.5;
         }
 
+        .departments-box {
+            margin-top: 20px;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            background: #ffffff;
+            overflow: hidden;
+        }
+
+        .departments-box-header {
+            padding: 14px 16px;
+            border-bottom: 1px solid #e2e8f0;
+            background: #f8fafc;
+            font-size: 15px;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
         .modal-overlay {
             position: fixed;
             inset: 0;
@@ -463,21 +480,15 @@
             display: flex;
         }
 
-        .licences-view {
-            position: fixed;
-            top: 0;
-            left: 280px;
-            right: 0;
-            bottom: 0;
-            background: #ffffff;
-            z-index: 550;
-            display: none;
-            flex-direction: column;
-            padding: 24px;
+        .roster-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 4px;
         }
 
-        .licences-view.open {
-            display: flex;
+        .roster-actions .btn {
+            padding: 4px 8px;
+            font-size: 12px;
         }
 
         .vehicles-view {
@@ -556,32 +567,6 @@
             border-color: #2563eb;
         }
 
-        .licences-btn {
-            width: 100%;
-            padding: 10px 12px;
-            border-radius: 8px;
-            border: 1px solid transparent;
-            background: transparent;
-            color: #0f172a;
-            font-size: 14px;
-            font-weight: 700;
-            cursor: pointer;
-            text-align: left;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .licences-btn:hover {
-            background: rgba(15, 23, 42, 0.04);
-            border-color: #cbd5e1;
-        }
-
-        .licences-btn:active {
-            background: rgba(37, 99, 235, 0.08);
-            border-color: #2563eb;
-        }
-
         .departments-btn {
             width: 100%;
             padding: 10px 12px;
@@ -604,6 +589,32 @@
         }
 
         .departments-btn:active {
+            background: rgba(37, 99, 235, 0.08);
+            border-color: #2563eb;
+        }
+
+        .training-btn {
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: 8px;
+            border: 1px solid transparent;
+            background: transparent;
+            color: #0f172a;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            text-align: left;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .training-btn:hover {
+            background: rgba(15, 23, 42, 0.04);
+            border-color: #cbd5e1;
+        }
+
+        .training-btn:active {
             background: rgba(37, 99, 235, 0.08);
             border-color: #2563eb;
         }
@@ -1124,6 +1135,20 @@
             vertical-align: middle;
         }
 
+        .member-badge.support {
+            display: inline-block;
+            margin-left: 6px;
+            padding: 1px 6px;
+            border-radius: 999px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #ffffff;
+            background: #1e40af;
+            vertical-align: middle;
+        }
+
         .member-item .supervisor-btn {
             padding: 3px 8px;
             border-radius: 6px;
@@ -1500,24 +1525,55 @@
          </div>
      </div>
 
-    <div class="modal-overlay" id="newDocumentModal">
+
+
+    <div class="modal-overlay" id="newTrainingModal">
         <div class="modal">
             <div class="modal-header">
-                <div class="modal-title">New Document</div>
-                <button class="modal-close" id="newDocModalClose" type="button" aria-label="Close">×</</button>
+                <div class="modal-title">Add Staff Training</div>
+                <button class="modal-close" id="newTrainingModalClose" type="button" aria-label="Close">×</button>
             </div>
             <div class="field">
-                <label for="newDocTitle">Document Title</label>
-                <input type="text" id="newDocTitle" placeholder="Document title" />
+                <label for="newTrainingTitle">Title</label>
+                <input type="text" id="newTrainingTitle" placeholder="e.g., Officer Safety Refresher" />
             </div>
             <div class="field">
-                <label>Assign Departments</label>
-                <div id="newDocDeptCheckboxes"><div class="empty">Loading departments...</div></div>
+                <label for="newTrainingDescription">Description (optional)</label>
+                <textarea id="newTrainingDescription" placeholder="Brief description or notes..."></textarea>
             </div>
-            <button type="button" class="submit-btn" id="newDocSubmitBtn">Create Document</button>
-            <div class="modal-error" id="newDocError"></div>
+            <div class="field">
+                <label for="newTrainingUrl">Document / Link URL</label>
+                <input type="text" id="newTrainingUrl" placeholder="https://..." />
+            </div>
+            <button type="button" class="submit-btn" id="newTrainingSubmitBtn">Add Training</button>
+            <div class="modal-error" id="newTrainingError"></div>
         </div>
     </div>
+
+    <div class="modal-overlay" id="editTrainingModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">Edit Staff Training</div>
+                <button class="modal-close" id="editTrainingModalClose" type="button" aria-label="Close">×</button>
+            </div>
+            <input type="hidden" id="editTrainingId" />
+            <div class="field">
+                <label for="editTrainingTitle">Title</label>
+                <input type="text" id="editTrainingTitle" placeholder="e.g., Officer Safety Refresher" />
+            </div>
+            <div class="field">
+                <label for="editTrainingDescription">Description (optional)</label>
+                <textarea id="editTrainingDescription" placeholder="Brief description or notes..."></textarea>
+            </div>
+            <div class="field">
+                <label for="editTrainingUrl">Document / Link URL</label>
+                <input type="text" id="editTrainingUrl" placeholder="https://..." />
+            </div>
+            <button type="button" class="submit-btn" id="editTrainingSubmitBtn">Save Changes</button>
+            <div class="modal-error" id="editTrainingError"></div>
+        </div>
+    </div>
+
 
     <div class="modal-overlay" id="newPenalCodeModal">
         <div class="modal">
@@ -1585,39 +1641,28 @@
     <div class="modal-overlay" id="newApplicationModal">
         <div class="modal">
             <div class="modal-header">
-                <div class="modal-title">New Application</div>
+                <div class="modal-title" style="font-size:15px;">New Question</div>
                 <button class="modal-close" id="newAppModalClose" type="button" aria-label="Close">×</</button>
             </div>
             <div class="field">
-                <label for="newAppName">Name</label>
-                <input type="text" id="newAppName" placeholder="Full name" />
+                <textarea id="newAppQuestion" placeholder="Type your question..." style="width:100%; padding:10px 12px; border-radius:10px; border:1px solid #cbd5e1; font-size:14px; font-family:inherit;"></textarea>
             </div>
-            <div class="field">
-                <label for="newAppEmail">Email</label>
-                <input type="email" id="newAppEmail" placeholder="you@example.com" />
-            </div>
-            <div class="field">
-                <label for="newAppDiscord">Discord Username and ID</label>
-                <input type="text" id="newAppDiscord" placeholder="username#0000" />
-            </div>
-            <div class="field">
-                <label for="newAppAge">Age</label>
-                <input type="text" id="newAppAge" placeholder="Age" />
-            </div>
-            <div class="field">
-                <label for="newAppTimezone">Time Zone</label>
-                <input type="text" id="newAppTimezone" placeholder="Time zone" />
-            </div>
-            <div class="field">
-                <label for="newAppActive">How active can you be each week?</label>
-                <input type="text" id="newAppActive" placeholder="e.g. 10-15 hours" />
-            </div>
-            <div class="field">
-                <label for="newAppMember">Have you been a member before? If so, for how long?</label>
-                <input type="text" id="newAppMember" placeholder="Prior membership details" />
-            </div>
-            <button type="button" class="submit-btn" id="newAppSubmitBtn">Create Application</button>
+            <button type="button" class="submit-btn" id="newAppSubmitBtn">Submit</button>
             <div class="modal-error" id="newAppError"></div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="newRosterModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">Create Roster</div>
+                <button class="modal-close" id="newRosterModalClose" type="button" aria-label="Close">×</</button>
+            </div>
+            <div class="field">
+                <input type="text" id="newRosterName" />
+            </div>
+            <button type="button" class="submit-btn" id="newRosterSubmitBtn">Create Roster</button>
+            <div class="modal-error" id="newRosterError"></div>
         </div>
     </div>
 
@@ -1824,15 +1869,9 @@
                                             Vehicles
                                         </button>
                                     </div>
-                                    <div class="btn-dropdown-wrap">
-                                        <button type="button" class="licences-btn" id="licencesBtn">
-                                            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2" ry="2"/><line x1="7" y1="9" x2="17" y2="9"/><line x1="7" y1="13" x2="17" y2="13"/><line x1="7" y1="17" x2="12" y2="17"/></svg>
-                                            Licences
-                                        </button>
-                                    </div>
-                                    <div class="btn-dropdown-wrap">
+<div class="btn-dropdown-wrap">
                                         <button type="button" class="documents-btn" id="documentsBtn">
-                                            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                                            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
                                             Documents
                                         </button>
                                     </div>
@@ -1849,9 +1888,9 @@
                                         </button>
                                     </div>
                                     <div class="btn-dropdown-wrap">
-                                        <button type="button" class="applications-btn" id="rostersBtn">
+                                        <button type="button" class="applications-btn" id="rostersBtn" disabled style="opacity:0.5;cursor:not-allowed;">
                                             <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-                                            Rosters
+                                            Rosters (Coming Soon)
                                         </button>
                                     </div>
                                     <div class="btn-dropdown-wrap">
@@ -1873,7 +1912,7 @@
                                         <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
                                         Settings
                                     </button>
-                                </div>
+                                 </div>
                                 <div class="settings-view" id="settingsView">
                                     <div class="members-view-header">
                                         <div class="members-view-title">Settings</div>
@@ -1925,6 +1964,7 @@
                                         </div>
                                     </div>
                                 </div>
+
                                 <div class="members-view" id="membersView">
                                     <div class="members-view-header">
                                         <div class="members-view-title">Members</div>
@@ -1944,6 +1984,7 @@
                                         <div id="departmentsList"></div>
                                     </div>
                                 </div>
+<<<<<<< HEAD
                                 <div class="moderation-view" id="moderationView">
                                     <div class="members-view-header">
                                         <div class="members-view-title">Moderation</div>
@@ -1961,6 +2002,9 @@
                                             Add document
                                         </button>
                                     </div>
+=======
+
+>>>>>>> 9d1b1e2697e179761018c3c20efb8d87a833d1dc
                                     <div class="view-body">
                                         <div id="documentsList"></div>
                                     </div>
@@ -2000,6 +2044,10 @@
                                 <div class="rosters-view" id="rostersView">
                                     <div class="members-view-header">
                                         <div class="members-view-title">Rosters</div>
+                                        <button type="button" class="add-department-btn" id="createRosterBtn">
+                                            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                                            Create Roster
+                                        </button>
                                         <button type="button" class="add-department-btn" id="openRosterPageBtn">
                                             <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                                             Open Roster Manager
@@ -2008,15 +2056,6 @@
                                     </div>
                                     <div class="view-body">
                                         <div id="rostersList"></div>
-                                    </div>
-                                </div>
-                                <div class="licences-view" id="licencesView">
-                                    <div class="members-view-header">
-                                        <div class="members-view-title">Licences</div>
-                                        <button type="button" class="members-view-close" id="licencesViewClose" aria-label="Close">×</</button>
-                                    </div>
-                                    <div class="view-body">
-                                        <div class="members-view-list" id="licencesViewList"></div>
                                     </div>
                                 </div>
                                 <div class="vehicles-view" id="vehiclesView">
@@ -2034,10 +2073,10 @@
                                          <button type="button" class="members-view-close" id="applicationsViewClose" aria-label="Close">×</</button>
                                      </div>
                                      <div class="view-body">
-                                         <button type="button" class="add-department-btn" id="openAddApplicationBtn">
-                                             <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                                             Create Application
-                                         </button>
+                                          <button type="button" class="add-department-btn" id="openAddApplicationBtn">
+                                              <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                                              New Question
+                                          </button>
                                          <div id="applicationsList"></div>
                                      </div>
                                  </div>
@@ -2053,12 +2092,8 @@
                          const vehiclesBtn = document.getElementById("vehiclesBtn");
                          const vehiclesView = document.getElementById("vehiclesView");
                          const vehiclesViewList = document.getElementById("vehiclesViewList");
-                         const vehiclesViewClose = document.getElementById("vehiclesViewClose");
-                         const licencesBtn = document.getElementById("licencesBtn");
-                         const licencesView = document.getElementById("licencesView");
-                         const licencesViewList = document.getElementById("licencesViewList");
-                         const licencesViewClose = document.getElementById("licencesViewClose");
-                         const requestsDropdownToggle = document.getElementById("requestsDropdownToggle");
+                          const vehiclesViewClose = document.getElementById("vehiclesViewClose");
+                          const requestsDropdownToggle = document.getElementById("requestsDropdownToggle");
                          const requestsDropdownMenu = document.getElementById("requestsDropdownMenu");
                          const requestsStatus = document.getElementById("requestsStatus");
                          const requestsList = document.getElementById("requestsList");
@@ -2073,29 +2108,91 @@
                          const applicationsViewClose = document.getElementById("applicationsViewClose");
                          const applicationsList = document.getElementById("applicationsList");
 const supervisorInput = document.getElementById("supervisorInput");
+                          const trainingBtn = document.getElementById("trainingBtn");
+                          const trainingView = document.getElementById("trainingView");
+                          const trainingViewClose = document.getElementById("trainingViewClose");
+                          const trainingList = document.getElementById("trainingList");
+                          const moderationBtn = document.getElementById("moderationBtn");
+                          const moderationView = document.getElementById("moderationView");
+                          const moderationViewClose = document.getElementById("moderationViewClose");
 
-                         if (settingsBtn && settingsView) {
-                            settingsBtn.addEventListener("click", (e) => {
-                                e.stopPropagation();
-                                if (settingsView.classList.contains("open")) {
-                                    settingsView.classList.remove("open");
-                                } else {
-                                    closeAllPages();
-                                    settingsView.classList.add("open");
-                                }
-                            });
-                        }
-
-                         if (settingsViewClose && settingsView) {
-                             settingsViewClose.addEventListener("click", () => {
-                                 settingsView.classList.remove("open");
+                          if (settingsBtn && settingsView) {
+                             settingsBtn.addEventListener("click", (e) => {
+                                 e.stopPropagation();
+                                 if (settingsView.classList.contains("open")) {
+                                     settingsView.classList.remove("open");
+                                 } else {
+                                     closeAllPages();
+                                     settingsView.classList.add("open");
+                                 }
                              });
                          }
 
+                         if (trainingBtn && trainingView) {
+                             trainingBtn.addEventListener("click", (e) => {
+                                 e.stopPropagation();
+                                 if (trainingView.classList.contains("open")) {
+                                     trainingView.classList.remove("open");
+                                 } else {
+                                     closeAllPages();
+                                     trainingView.classList.add("open");
+                                     loadTrainingMaterials();
+                                 }
+                             });
+                         }
+
+if (trainingViewClose && trainingView) {
+                              trainingViewClose.addEventListener("click", () => {
+                                  trainingView.classList.remove("open");
+                              });
+                          }
+
+                          if (moderationBtn && moderationView) {
+                              moderationBtn.addEventListener("click", (e) => {
+                                  e.stopPropagation();
+                                  if (moderationView.classList.contains("open")) {
+                                      moderationView.classList.remove("open");
+                                  } else {
+                                      closeAllPages();
+                                      moderationView.classList.add("open");
+                                  }
+                              });
+                          }
+
+                          if (moderationViewClose && moderationView) {
+                              moderationViewClose.addEventListener("click", () => {
+                                  moderationView.classList.remove("open");
+                              });
+                          }
+
+if (applicationsBtn && applicationsView) {
+                                applicationsBtn.addEventListener("click", (e) => {
+                                    e.stopPropagation();
+                                    if (applicationsView.classList.contains("open")) {
+                                        applicationsView.classList.remove("open");
+                                    } else {
+                                        closeAllPages();
+                                        applicationsView.classList.add("open");
+                                    }
+                                });
+                            }
+
+                            if (applicationsViewClose && applicationsView) {
+                                applicationsViewClose.addEventListener("click", () => {
+                                    applicationsView.classList.remove("open");
+                                });
+                            }
+
 function closeAllPages() {
+<<<<<<< HEAD
                               const allViews = contentEl.querySelectorAll('.members-view, .departments-view, .documents-view, .settings-view, .rosters-view, .roster-editor-view, .roles-view, .licences-view, .vehicles-view, .applications-view, .penal-codes-view, .moderation-view');
                               allViews.forEach((v) => { v.classList.remove("open"); });
                           }
+=======
+                               const allViews = contentEl.querySelectorAll('.members-view, .departments-view, .documents-view, .settings-view, .rosters-view, .roster-editor-view, .roles-view, .vehicles-view, .applications-view, .penal-codes-view, .training-view');
+                               allViews.forEach((v) => { v.classList.remove("open"); });
+                           }
+>>>>>>> 9d1b1e2697e179761018c3c20efb8d87a833d1dc
 
                          if (membersBtn && membersView && membersViewList) {
                              membersBtn.addEventListener("click", (e) => {
@@ -2398,9 +2495,11 @@ if (membersViewClose && membersView) {
                                         const memberIsManagement = memberDept === "Management";
                                         const isSupervisor = !!r.is_supervisor;
                                         const isManagementUser = email === "oceanviewrp1@gmail.com";
+                                        const isSupportUser = email === "j.schank11@gmail.com";
                                         const canKickBan = showKickBan && !(isSupport && memberIsManagement);
                                         const supBadge = isSupervisor ? ' <span class="member-badge supervisor">Supervisor</span>' : '';
                                         const mgmtBadge = isManagementUser ? ' <span class="member-badge management">Management</span>' : '';
+                                        const supportBadge = isSupportUser ? ' <span class="member-badge support">Support</span>' : '';
                                         if (canKickBan) {
                                             const supBtn = `<button type="button" class="supervisor-btn" data-user-id="${esc(r.user_id)}">${isSupervisor ? "Remove Supervisor" : "Make Supervisor"}</button>`;
                                             let roleSelectHtml = '';
@@ -2411,9 +2510,9 @@ if (membersViewClose && membersView) {
                                                 ).join('');
                                                 roleSelectHtml = `<select class="role-select" data-user-id="${esc(r.user_id)}"><option value="">No role</option>${options}</select>`;
                                             }
-                                            return `<div class="member-item"><span class="member-email">${email}${supBadge}${mgmtBadge}</span><div class="member-actions"><button type="button" class="kick-btn" data-user-id="${esc(r.user_id)}">Kick</button><button type="button" class="ban-btn" data-user-id="${esc(r.user_id)}">Ban</button>${supBtn}${roleSelectHtml}</div></div>`;
+                                            return `<div class="member-item"><span class="member-email">${email}${supBadge}${mgmtBadge}${supportBadge}</span><div class="member-actions"><button type="button" class="kick-btn" data-user-id="${esc(r.user_id)}">Kick</button><button type="button" class="ban-btn" data-user-id="${esc(r.user_id)}">Ban</button>${supBtn}${roleSelectHtml}</div></div>`;
                                         }
-                                        return `<button type="button" class="member-btn">${email}${supBadge}${mgmtBadge}</button>`;
+                                        return `<button type="button" class="member-btn">${email}${supBadge}${mgmtBadge}${supportBadge}</button>`;
                                     }).join('');
                                 }
                                 targetEl.innerHTML = html;
@@ -2490,26 +2589,40 @@ if (membersViewClose && membersView) {
                                         alert("You cannot kick yourself.");
                                         return;
                                     }
-                                    if (confirm("Kick this member?")) {
-                                        try {
-                                            const res = await fetch("/api/kick", {
-                                                method: "POST",
-                                                headers: { "Content-Type": "application/json" },
-                                                body: JSON.stringify({ communityId: id, userId, action: "kick", webhook: communityData && communityData.discord_webhook, username: "PulseCAD" })
-                                            });
-                                            const status = res.status;
-                                            let respText = "";
-                                            try { respText = await res.text(); } catch (err) { respText = "unreadable"; }
-                                            if (!res.ok) {
-                                                let respJson = {};
-                                                try { respJson = JSON.parse(respText); } catch (err) {}
-                                                throw new Error((respJson && respJson.error) ? respJson.error : ("Kick failed (status " + status + ")"));
-                                            }
-                                            loadMembersInto(membersViewList, { loadingText: "Loading members...", openDropdown: false });
-                                        } catch (err) {
-                                            alert("Failed to kick member: " + (err.message || err));
-                                        }
-                                    }
+                                     if (confirm("Kick this member?")) {
+                                         try {
+                                             let apiOk = false;
+                                             try {
+                                                 const res = await fetch("/api/kick", {
+                                                     method: "POST",
+                                                     headers: { "Content-Type": "application/json" },
+                                                     body: JSON.stringify({ communityId: id, userId, action: "kick", webhook: communityData && communityData.discord_webhook, username: "PulseCAD" })
+                                                 });
+                                                 const status = res.status;
+                                                 let respText = "";
+                                                 try { respText = await res.text(); } catch (err) { respText = "unreadable"; }
+                                                 if (res.ok) {
+                                                     apiOk = true;
+                                                 } else {
+                                                     let respJson = {};
+                                                     try { respJson = JSON.parse(respText); } catch (err) {}
+                                                     throw new Error((respJson && respJson.error) ? respJson.error : ("Kick failed (status " + status + ")"));
+                                                 }
+                                             } catch (apiErr) {
+                                                 if (apiOk) return;
+                                                 console.warn("Kick API failed, trying direct Supabase delete:", apiErr);
+                                                 const { error: directError } = await localSupabase
+                                                     .from("user_communities")
+                                                     .delete()
+                                                     .eq("user_id", userId)
+                                                     .eq("community_id", id);
+                                                 if (directError) throw apiErr;
+                                             }
+                                             loadMembersInto(membersViewList, { loadingText: "Loading members...", openDropdown: false });
+                                         } catch (err) {
+                                             alert("Failed to kick member: " + (err.message || err));
+                                         }
+                                     }
                                 }
                                 if (banBtn) {
                                     const userId = banBtn.getAttribute("data-user-id");
@@ -2710,7 +2823,103 @@ const rolesView = document.getElementById("rolesView");
                             });
                         }
 
-                        async function loadRosters() {
+                        // Create Roster Modal
+                        const createRosterBtn = document.getElementById("createRosterBtn");
+                        const newRosterModal = document.getElementById("newRosterModal");
+                        const newRosterModalClose = document.getElementById("newRosterModalClose");
+                        const newRosterSubmitBtn = document.getElementById("newRosterSubmitBtn");
+                        const newRosterNameInput = document.getElementById("newRosterName");
+                        const newRosterError = document.getElementById("newRosterError");
+
+                        function openNewRosterModal() {
+                            if (newRosterModal) {
+                                newRosterModal.classList.add("open");
+                                if (newRosterNameInput) {
+                                    newRosterNameInput.value = "";
+                                    setTimeout(() => newRosterNameInput.focus(), 100);
+                                }
+                                if (newRosterError) newRosterError.style.display = "none";
+                            }
+                        }
+
+                        function closeNewRosterModal() {
+                            if (newRosterModal) newRosterModal.classList.remove("open");
+                        }
+
+                        if (createRosterBtn) {
+                            createRosterBtn.addEventListener("click", (e) => {
+                                e.stopPropagation();
+                                openNewRosterModal();
+                            });
+                        }
+
+                        if (newRosterModalClose) {
+                            newRosterModalClose.addEventListener("click", closeNewRosterModal);
+                        }
+
+                        if (newRosterModal) {
+                            newRosterModal.addEventListener("click", (e) => {
+                                if (e.target === newRosterModal) closeNewRosterModal();
+                            });
+                        }
+
+                        if (newRosterSubmitBtn) {
+                            newRosterSubmitBtn.addEventListener("click", async () => {
+                                const name = newRosterNameInput ? newRosterNameInput.value.trim() : "";
+                                if (!name) {
+                                    if (newRosterError) {
+                                        newRosterError.textContent = "Roster name cannot be empty.";
+                                        newRosterError.style.display = "block";
+                                    }
+                                    return;
+                                }
+
+                                if (newRosterSubmitBtn) {
+                                    newRosterSubmitBtn.disabled = true;
+                                    newRosterSubmitBtn.textContent = "Creating...";
+                                }
+                                if (newRosterError) newRosterError.style.display = "none";
+
+                                try {
+                                    const { error } = await localSupabase
+                                        .from("rosters")
+                                        .insert({
+                                            community_id: id,
+                                            name: name,
+                                            created_at: new Date().toISOString(),
+                                            updated_at: new Date().toISOString()
+                                        });
+
+                                    if (error) {
+                                        if (newRosterError) {
+                                            newRosterError.textContent = "Failed to create roster: " + error.message;
+                                            newRosterError.style.display = "block";
+                                        }
+                                        if (newRosterSubmitBtn) {
+                                            newRosterSubmitBtn.disabled = false;
+                                            newRosterSubmitBtn.textContent = "Create Roster";
+                                        }
+                                        return;
+                                    }
+
+                                    closeNewRosterModal();
+                                    loadRosters();
+                                } catch (err) {
+                                    if (newRosterError) {
+                                        newRosterError.textContent = "An unexpected error occurred.";
+                                        newRosterError.style.display = "block";
+                                    }
+                                    console.error(err);
+                                } finally {
+                                    if (newRosterSubmitBtn) {
+                                        newRosterSubmitBtn.disabled = false;
+                                        newRosterSubmitBtn.textContent = "Create Roster";
+                                    }
+                                }
+                            });
+                        }
+
+async function loadRosters() {
                             if (!rostersList || !localSupabase) return;
                             try {
                                 const { data, error } = await localSupabase
@@ -2725,17 +2934,52 @@ const rolesView = document.getElementById("rolesView");
                                 }
 
                                 if (!Array.isArray(data) || data.length === 0) {
-                                    rostersList.innerHTML = '<div class="empty">No rosters yet. Open the Roster Manager to create them.</div>';
+                                    rostersList.innerHTML = '';
                                     return;
                                 }
 
-                                rostersList.innerHTML = data.map((r, i) => `
+                                const excludeNames = ['test', 'Roster 1', 'Roster 2', 'Roster 3', 'Roster 4', 'Roster 5', '! Morning'];
+                                const filteredData = data.filter(r => !excludeNames.includes(r.name));
+
+                                if (filteredData.length === 0) {
+                                    rostersList.innerHTML = '';
+                                    return;
+                                }
+
+                                rostersList.innerHTML = filteredData.map((r, i) => `
                                     <div class="request-item">
                                         <div>
                                             <strong>${(i + 1) + '. ' + (r.name || 'Roster').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</strong>
                                         </div>
+                                        <div class="roster-actions">
+                                            <button type="button" class="btn sm" data-action="view" data-roster-id="${r.id}" data-roster-name="${r.name || 'Roster'}">
+                                                View
+                                            </button>
+                                            <button type="button" class="btn sm" data-action="edit" data-roster-id="${r.id}" data-roster-name="${r.name || 'Roster'}">
+                                                Edit
+                                            </button>
+                                        </div>
                                     </div>
                                 `).join('');
+                                
+                                // Add event listeners for view and edit buttons
+                                rostersList.querySelectorAll('[data-action="view"]').forEach(btn => {
+                                    btn.addEventListener('click', () => {
+                                        const rosterId = btn.getAttribute('data-roster-id');
+                                        const rosterName = btn.getAttribute('data-roster-name');
+                                        // Open the roster in the Roster Manager
+                                        window.open(`/roster.html?communityId=${encodeURIComponent(id)}&rosterId=${encodeURIComponent(rosterId)}`, '_blank');
+                                    });
+                                });
+                                
+                                rostersList.querySelectorAll('[data-action="edit"]').forEach(btn => {
+                                    btn.addEventListener('click', () => {
+                                        const rosterId = btn.getAttribute('data-roster-id');
+                                        const rosterName = btn.getAttribute('data-roster-name');
+                                        // Open the roster editor
+                                        window.open(`/roster.html?communityId=${encodeURIComponent(id)}&rosterId=${encodeURIComponent(rosterId)}&edit=true`, '_blank');
+                                    });
+                                });
                             } catch (err) {
                                 rostersList.innerHTML = '<div class="empty">Failed to load rosters.</div>';
                                 console.error(err);
@@ -2928,6 +3172,15 @@ async function saveRoleOrder() {
 async function createRole(name) {
                             if (!localSupabase) {
                                 alert("Database unavailable.");
+                                return;
+                            }
+                            // limit to 20 roles per community
+                            const { count } = await localSupabase
+                                .from("roles")
+                                .select("*", { count: "exact", head: true })
+                                .eq("community_id", id);
+                            if ((count || 0) >= 20) {
+                                alert("You can only have 20 roles per community.");
                                 return;
                             }
                             try {
@@ -3346,13 +3599,111 @@ async function addDepartment(name, passcode, banner, type) {
                             }
                         }
 
+                        async function loadTrainingMaterials() {
+                            if (!trainingList || !localSupabase) return;
+                            trainingList.innerHTML = '<div class="empty">Loading training materials...</div>';
+                            try {
+                                const { data, error } = await localSupabase
+                                    .from("training_materials")
+                                    .select("*")
+                                    .eq("community_id", id)
+                                    .order("created_at", { ascending: false });
+                                if (error) {
+                                    trainingList.innerHTML = '<div class="empty">Failed to load training materials.</div>';
+                                    return;
+                                }
+                                const items = Array.isArray(data) ? data : [];
+                                if (items.length === 0) {
+                                    trainingList.innerHTML = '<div class="empty">No training materials yet. Click "Add Training" to create your first one.</div>';
+                                    return;
+                                }
+                                trainingList.innerHTML = items.map((item) => {
+                                    const title = (item.title || 'Untitled').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                                    const desc = (item.description || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                                    const link = item.url || item.link || '';
+                                    return `
+                                        <div class="request-item" data-training-id="${item.id}">
+                                            <div>
+                                                <span>${title}</span>
+                                                ${desc ? `<div style="margin-top:4px; font-size:12px; color:#64748b;">${desc}</div>` : ''}
+                                            </div>
+                                            <div>
+                                                ${link ? `<button type="button" class="approve" style="background:#eff6ff; border-color:#bfdbfe; color:#1d4ed8;" data-action="open-training" data-training-url="${link.replace(/</g, '&lt;').replace(/>/g, '&gt;')}">Open</button>` : ''}
+                                                <button type="button" class="deny" style="background:#f0fdf4; border-color:#bbf7d0; color:#166534;" data-action="edit-training" data-training-id="${item.id}">Edit</button>
+                                                <button type="button" class="deny" style="background:#fef2f2; border-color:#fecaca; color:#991b1b;" data-action="delete-training" data-training-id="${item.id}">Delete</button>
+                                            </div>
+                                        </div>
+                                    `;
+                                }).join('');
+                                trainingList.querySelectorAll("[data-action='open-training']").forEach((btn) => {
+                                    btn.addEventListener("click", (e) => {
+                                        const url = e.target.closest(".request-item").getAttribute("data-training-url");
+                                        if (url) window.open(url, "_blank");
+                                    });
+                                });
+                                trainingList.querySelectorAll("[data-action='edit-training']").forEach((btn) => {
+                                    btn.addEventListener("click", (e) => {
+                                        const trainingId = e.target.closest(".request-item").getAttribute("data-training-id");
+                                        openEditTrainingModal(trainingId);
+                                    });
+                                });
+                                trainingList.querySelectorAll("[data-action='delete-training']").forEach((btn) => {
+                                    btn.addEventListener("click", (e) => {
+                                        const trainingId = e.target.closest(".request-item").getAttribute("data-training-id");
+                                        deleteTrainingMaterial(trainingId);
+                                    });
+                                });
+                            } catch (err) {
+                                trainingList.innerHTML = '<div class="empty">Failed to load training materials.</div>';
+                            }
+                        }
+
+                        async function addTrainingMaterial(title, description, url) {
+                            if (!title || !localSupabase) return;
+                            try {
+                                await localSupabase
+                                    .from("training_materials")
+                                    .insert([{ community_id: id, title: title.trim(), description: (description || '').trim(), url: (url || '').trim() }]);
+                                loadTrainingMaterials();
+                            } catch (err) {
+                                alert("Failed to create training material.");
+                            }
+                        }
+
+                        async function updateTrainingMaterial(trainingId, title, description, url) {
+                            if (!trainingId || !localSupabase) return;
+                            try {
+                                await localSupabase
+                                    .from("training_materials")
+                                    .update({ title: title.trim(), description: (description || '').trim(), url: (url || '').trim() })
+                                    .eq("id", trainingId);
+                                loadTrainingMaterials();
+                            } catch (err) {
+                                alert("Failed to update training material.");
+                            }
+                        }
+
+                        async function deleteTrainingMaterial(trainingId) {
+                            if (!confirm("Delete this training material?")) return;
+                            try {
+                                await localSupabase
+                                    .from("training_materials")
+                                    .delete()
+                                    .eq("id", trainingId);
+                                loadTrainingMaterials();
+                            } catch (err) {
+                                alert("Failed to delete training material.");
+                            }
+                        }
+
 async function loadPenalCodes() {
                             if (!penalCodesList || !localSupabase) return;
                             penalCodesList.innerHTML = '<div class="penal-codes-empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/><path d="M9 12l2 2 4-4"/></svg><p>No penal codes yet</p><small>Click "Add Penal Code" to create your first statute</small></div>';
                             try {
-                                const { data, error } = await localSupabase
+                                 const { data, error } = await localSupabase
                                     .from("penal_codes")
                                     .select("*")
+                                    .eq("community_id", id)
                                     .order("created_at", { ascending: false });
 
                                 if (error) throw error;
@@ -3897,26 +4248,14 @@ async function loadPenalCodes() {
 
                         const openAddApplicationBtn = document.getElementById("openAddApplicationBtn");
                         const newApplicationModal = document.getElementById("newApplicationModal");
-                        const newAppName = document.getElementById("newAppName");
-                        const newAppEmail = document.getElementById("newAppEmail");
-                        const newAppDiscord = document.getElementById("newAppDiscord");
-                        const newAppAge = document.getElementById("newAppAge");
-                        const newAppTimezone = document.getElementById("newAppTimezone");
-                        const newAppActive = document.getElementById("newAppActive");
-                        const newAppMember = document.getElementById("newAppMember");
+                        const newAppQuestion = document.getElementById("newAppQuestion");
                         const newAppSubmitBtn = document.getElementById("newAppSubmitBtn");
                         const newAppModalClose = document.getElementById("newAppModalClose");
                         const newAppError = document.getElementById("newAppError");
 
                         function openNewApplicationModal() {
                             if (!newApplicationModal) return;
-                            if (newAppName) newAppName.value = "";
-                            if (newAppEmail) newAppEmail.value = "";
-                            if (newAppDiscord) newAppDiscord.value = "";
-                            if (newAppAge) newAppAge.value = "";
-                            if (newAppTimezone) newAppTimezone.value = "";
-                            if (newAppActive) newAppActive.value = "";
-                            if (newAppMember) newAppMember.value = "";
+                            if (newAppQuestion) newAppQuestion.value = "";
                             if (newAppError) { newAppError.textContent = ""; newAppError.style.display = "none"; }
                             newApplicationModal.classList.add("open");
                         }
@@ -3938,32 +4277,21 @@ async function loadPenalCodes() {
                         }
                         if (newAppSubmitBtn) {
                             newAppSubmitBtn.onclick = async () => {
-                                const name = newAppName ? newAppName.value.trim() : "";
-                                const email = newAppEmail ? newAppEmail.value.trim() : "";
-                                const discord = newAppDiscord ? newAppDiscord.value.trim() : "";
-                                const age = newAppAge ? newAppAge.value.trim() : "";
-                                const timezone = newAppTimezone ? newAppTimezone.value.trim() : "";
-                                const active = newAppActive ? newAppActive.value.trim() : "";
-                                const member = newAppMember ? newAppMember.value.trim() : "";
-                                if (!name) {
-                                    if (newAppError) { newAppError.textContent = "Name is required."; newAppError.style.display = "block"; }
+                                const question = newAppQuestion ? newAppQuestion.value.trim() : "";
+                                if (!question) {
+                                    if (newAppError) { newAppError.textContent = "Question is required."; newAppError.style.display = "block"; }
                                     return;
                                 }
                                 closeNewApplicationModal();
-                                await addApplication({ name, email, discord, age, timezone, active, member });
+                                await addApplication({ question });
                             };
                         }
 
-                        async function addApplication({ name, email, discord, age, timezone, active, member }) {
+                        async function addApplication({ question }) {
                             if (!localSupabase) return;
                             try {
                                 const payload = {
-                                    email: email || "",
-                                    discord: discord || "",
-                                    age: age || "",
-                                    timezone: timezone || "",
-                                    active: active || "",
-                                    member: member || "",
+                                    question: question || "",
                                     community_id: currentCommunityId || null
                                 };
                                 const { error } = await localSupabase
@@ -3999,9 +4327,9 @@ async function loadPenalCodes() {
                                 data.forEach((row) => {
                                     const esc = (v) => (v == null ? "" : String(v).replace(/</g, "&lt;").replace(/>/g, "&gt;"));
                                     const created = row.created_at ? new Date(row.created_at).toLocaleString() : "";
+                                    const question = esc(row.question || "");
                                     html += `<div class="members-item">
-                                        <div class="members-item-name">${esc(row.name || "Unnamed")}</div>
-                                        <div class="members-item-role">${esc(row.email || "")}</div>
+                                        ${question ? `<div class="members-item-name">Q: ${question}</div>` : `<div class="members-item-name">No question</div>`}
                                         <div style="font-size:12px; color:#64748b; margin-top:2px;">${esc(created)}</div>
                                     </div>`;
                                 });
@@ -4032,9 +4360,9 @@ async function loadPenalCodes() {
                                 let html = '<div class="members-view-list">';
                                 data.forEach((row) => {
                                     const created = row.created_at ? new Date(row.created_at).toLocaleString() : "";
+                                    const question = esc(row.question || "");
                                     html += `<div class="members-item">
-                                        <div class="members-item-name">${esc(row.email || "Unnamed")}</div>
-                                        <div class="members-item-role">Discord: ${esc(row.discord || "")} | Age: ${esc(row.age || "")} | TZ: ${esc(row.timezone || "")}</div>
+                                        ${question ? `<div class="members-item-name">Q: ${question}</div>` : `<div class="members-item-name">No question</div>`}
                                         <div style="font-size:12px; color:#64748b; margin-top:2px;">${esc(created)}</div>
                                         <div style="margin-top:6px;">
                                             <button type="button" class="submit-btn approve-req-btn" data-id="${esc(row.id)}" style="padding:4px 10px; font-size:12px;">Approve</button>
@@ -4050,7 +4378,6 @@ async function loadPenalCodes() {
                                         const id = btn.getAttribute("data-id");
                                         if (!id) return;
                                         const row = (data || []).find((r) => r.id === id);
-                                        const email = row ? row.email : null;
                                         try {
                                             // 1. Look up the user by email
                                             let userId = null;
@@ -4247,7 +4574,10 @@ async function loadPenalCodes() {
                 contentEl.innerHTML = `
                     ${data.banner ? `<img src="${data.banner}" class="community-banner" alt="${name} banner" />` : ""}
                     <button type="button" class="role-btn" data-role="Civilian">Civilian</button>
-                    <div id="communityDepartments"></div>
+                    <div class="departments-box">
+                        <div class="departments-box-header">Departments</div>
+                        <div id="communityDepartments"></div>
+                    </div>
                 `;
 
                 const communityDepartments = document.getElementById("communityDepartments");
@@ -4424,7 +4754,8 @@ async function loadPenalCodes() {
                         console.warn("Could not publish officer to DB:", dbErr);
                     }
                 } catch (e) {}
-                window.open("/police.html?" + params.toString(), "_blank");
+const targetPage = (pendingDepartment && pendingDepartment.type === "Dispatch") ? "/dispatch.html" : "/police.html";
+                window.open(targetPage + "?" + params.toString(), "_blank");
                 if (policeModal) policeModal.classList.remove("open");
                 pendingDepartment = null;
             });

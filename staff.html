@@ -620,6 +620,8 @@
         <button class="sidebar-btn" id="staffUsersBtn">Users</button>
         <button class="sidebar-btn" id="applicationsBtn">Applications</button>
         <button class="sidebar-btn" id="codesBtn" style="display:none;">CODES</button>
+        <button class="sidebar-btn" id="supportPanelNavBtn" style="display:none;">Support Panel</button>
+        <button class="sidebar-btn" id="suggestionsNavBtn" style="display:none;">Suggestions</button>
         <button class="sidebar-btn" id="masterActionsBtn" style="display:none;">Master Actions</button>
     </div>
     <div class="main">
@@ -652,6 +654,8 @@
         const staffUsersBtn = document.getElementById("staffUsersBtn");
         const applicationsBtn = document.getElementById("applicationsBtn");
         const codesBtn = document.getElementById("codesBtn");
+        const supportPanelNavBtn = document.getElementById("supportPanelNavBtn");
+        const suggestionsNavBtn = document.getElementById("suggestionsNavBtn");
         const masterActionsBtn = document.getElementById("masterActionsBtn");
 
         let localSupabase = null;
@@ -768,21 +772,21 @@
                         : `<span style="color:#94a3b8;font-size:12px;font-weight:600;">Public</span>`;
                     const suspendBtn = canSuspend
                         ? `<button class="verified-btn suspend-server-btn" data-id="${row.id}" data-suspended="${suspended}">${suspended ? "Unsuspend" : "Suspend"}</button>`
-                        : `<span style="color:#94a3b8;font-size:12px;font-weight:600;">No Permission</span>`;
+                        : "";
                     const deleteBtn = canDelete
                         ? `<button class="verified-btn delete-server-btn" data-id="${row.id}">Delete</button>`
-                        : `<span style="color:#94a3b8;font-size:12px;font-weight:600;">No Permission</span>`;
+                        : "";
                     const pro = !!row.pro;
                     const proCell = pro
                         ? `<span style="color:#16a34a;font-size:11px;font-weight:600;">Pro</span>`
                         : `<span style="color:#94a3b8;font-size:11px;font-weight:600;">No</span>`;
                     const proToggleBtn = canPro
                         ? `<button class="pro-server-btn" data-id="${row.id}" data-pro="${pro}" style="padding:4px 10px;border-radius:999px;font-size:11px;font-weight:700;cursor:pointer;border:1px solid #16a34a;background:#f0fdf4;color:#166534;">${pro ? "Remove Pro" : "Give Pro"}</button>`
-                        : `<span style="color:#94a3b8;font-size:12px;font-weight:600;">No Permission</span>`;
+                        : "";
                     const partner = !!row.partner;
                     const partnerToggleBtn = canPartner
                         ? `<button class="partner-server-btn" data-id="${row.id}" data-partner="${partner}" style="padding:4px 10px;border-radius:999px;font-size:11px;font-weight:700;cursor:pointer;border:1px solid #f59e0b;background:#fef3c7;color:#92400e;">${partner ? "Remove Partner" : "Give Partner"}</button>`
-                        : `<span style="color:#94a3b8;font-size:12px;font-weight:600;">No Permission</span>`;
+                        : "";
                     html += `<tr><td>${name}</td><td>${owner}</td><td>${created}</td><td>${statusCell}</td><td>${membersOnlyCell}</td><td>${proCell}<br/>${proToggleBtn}</td><td>${partnerToggleBtn}</td><td><div style="display:flex;gap:8px;flex-wrap:wrap;">${suspendBtn} ${deleteBtn}</div></td></tr>`;
                 });
                 html += "</table>";
@@ -921,7 +925,7 @@
                     const created = row.created_at ? new Date(row.created_at).toLocaleString() : "";
                     const currentDept = row.department || "";
                     const ipCell = (isManagement || isSupportLead) ? `<td>${(row.ip || "N/A").replace(/</g, "&lt;").replace(/>/g, "&gt;")}</td>` : "";
-                    const keyActions = (isManagement || isSupportLead) ? `<div class="key-row-actions"><button type="button" class="view-key-btn" data-user-id="${row.id}" data-email="${email.replace(/"/g, '&quot;')}">View</button><button type="button" class="give-key-btn" data-user-id="${row.id}" data-email="${email.replace(/"/g, '&quot;')}">Give Key</button></div>` : `<span style="color:#94a3b8;font-size:12px;font-weight:600;">No Permission</span>`;
+                    const keyActions = (isManagement || isSupportLead) ? `<div class="key-row-actions"><button type="button" class="view-key-btn" data-user-id="${row.id}" data-email="${email.replace(/"/g, '&quot;')}">View</button><button type="button" class="give-key-btn" data-user-id="${row.id}" data-email="${email.replace(/"/g, '&quot;')}">Give Key</button></div>` : "";
                     let deptDisabled = "";
                     let deptOptions = `<option value="">Unassigned</option><option value="Management" ${currentDept === 'Management' ? 'selected' : ''}>Management</option><option value="Support Team Lead" ${currentDept === 'Support Team Lead' ? 'selected' : ''}>Support Team Lead</option><option value="Support Team" ${currentDept === 'Support Team' ? 'selected' : ''}>Support Team</option><option value="Development Team" ${currentDept === 'Development Team' ? 'selected' : ''}>Development Team</option>`;
                     if (!isManagement && !isSupportLead) {
@@ -1092,13 +1096,20 @@
         async function initSidebar() {
             const dept = (await getUserDepartment() || "").trim();
             const lower = dept.toLowerCase();
-            if (applicationsBtn && (lower === "support team" || lower === "support team lead")) {
+            const isSupport = lower === "support team" || lower === "support team lead";
+            if (applicationsBtn && isSupport) {
                 applicationsBtn.style.display = "none";
             }
-            if (codesBtn && (lower === "management" || lower === "support team" || lower === "support team lead")) {
+            if (codesBtn && (lower === "management" || isSupport)) {
                 codesBtn.style.display = "block";
             }
-            if (masterActionsBtn && (lower === "management" || lower === "support team" || lower === "support team lead")) {
+            if (supportPanelNavBtn && (lower === "management" || isSupport)) {
+                supportPanelNavBtn.style.display = "block";
+            }
+            if (suggestionsNavBtn && (lower === "management" || isSupport)) {
+                suggestionsNavBtn.style.display = "block";
+            }
+            if (masterActionsBtn && lower === "management") {
                 masterActionsBtn.style.display = "block";
             }
         }
@@ -1121,6 +1132,16 @@
 
         if (codesBtn) {
             codesBtn.addEventListener("click", loadCodes);
+        }
+
+        if (supportPanelNavBtn) {
+            supportPanelNavBtn.addEventListener("click", () => {
+                window.open("support-panel.html#staffchat", "_blank");
+            });
+        }
+
+        if (suggestionsNavBtn) {
+            suggestionsNavBtn.addEventListener("click", loadSuggestions);
         }
 
         async function loadApplications() {
@@ -1304,19 +1325,16 @@
         async function loadMasterActions() {
             const staff = await ensureStaff();
             if (!staff.allowed) return;
-            const isManagement = staff.department === "Management";
             const deptLower = (staff.department || "").toLowerCase();
-            const isSupport = deptLower === "support team" || deptLower === "support team lead";
-            if (!isManagement && !isSupport) {
-                showStatus("Access denied. Management or Support only.", "error");
+            if (deptLower !== "management") {
+                showStatus("Access denied. Management only.", "error");
                 return;
             }
             pageTitle.textContent = "Master Actions";
             contentEl.innerHTML = `
                 <div class="master-actions">
                     <h2>Master Actions</h2>
-                    <p>Global controls for the PulseCAD website. ${isManagement ? "Management only." : "Limited view for Support."}</p>
-                    ${isManagement ? `
+                    <p>Global controls for the PulseCAD website. Management only.</p>
                     <div class="master-row">
                         <div>
                             <div class="master-row-label">Development Mode</div>
@@ -1334,19 +1352,10 @@
                         </div>
                         <button type="button" class="verified-btn" id="restartServersBtn">Restart</button>
                     </div>
-                    ` : `
-                    <div class="master-row">
-                        <div>
-                            <div class="master-row-label">Restricted</div>
-                            <div class="master-row-sub">Development Mode and Restart Servers are Management only.</div>
-                        </div>
-                    </div>
-                    `}
                 </div>
                 <div class="master-actions" style="margin-top:20px;">
                     <h2>Management</h2>
                     <p>Ban and unban user emails from accessing PulseCAD.</p>
-                    ${isManagement ? `
                     <div class="master-row">
                         <div>
                             <div class="master-row-label">Banned IDs</div>
@@ -1354,7 +1363,6 @@
                         </div>
                         <button type="button" class="verified-btn" id="bannedIdsBtn" style="background:#dc2626;">Banned IDs</button>
                     </div>
-                    ` : ""}
                     <div class="master-row">
                         <div>
                             <div class="master-row-label">Support Panel</div>
@@ -1440,7 +1448,7 @@
             const staff = await ensureStaff();
             if (!staff.allowed) return;
             const dept = (staff.department || "").toLowerCase();
-                if (dept !== "management" && dept !== "support team" && dept !== "support team lead") {
+            if (dept !== "management" && dept !== "support team" && dept !== "support team lead") {
                 showStatus("Access denied. Management or Support only.", "error");
                 return;
             }
@@ -1456,6 +1464,7 @@
                             <option value="reviewed">Reviewed</option>
                             <option value="closed">Closed</option>
                         </select>
+                        <button type="button" class="verified-btn" id="openSuggestionFormFromListBtn">Open Form</button>
                     </div>
                     <div class="codes-count" id="sugCount"></div>
                     <table class="codes-list-table">
@@ -1468,6 +1477,12 @@
             const filterSelect = document.getElementById("sugFilterSelect");
             const sugListBody = document.getElementById("sugListBody");
             const sugCount = document.getElementById("sugCount");
+            const openSuggestionFormFromListBtn = document.getElementById("openSuggestionFormFromListBtn");
+            if (openSuggestionFormFromListBtn) {
+                openSuggestionFormFromListBtn.addEventListener("click", () => {
+                    window.open("/suggestionmake.html", "_blank");
+                });
+            }
 
             async function renderSuggestions(filter = "") {
                 if (!sugListBody || !localSupabase) return;

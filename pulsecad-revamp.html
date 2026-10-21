@@ -1930,6 +1930,7 @@ enable-ga="false"
       <div class="logged-in-screen" id="loggedInScreen">
             <div class="top-actions">
                 <button type="button" class="create-community-centered-btn" id="createCommunityCenteredBtn">+ Create</button>
+                <button type="button" class="moderation-btn" id="moderationBtn">Moderation</button>
                  <button type="button" class="join-community-centered-btn" id="joinCommunityCenteredBtn">
                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px; vertical-align:middle;">
                          <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
@@ -1942,10 +1943,10 @@ enable-ga="false"
              </div>
             <div class="logged-in-actions">
            </div>
-         <div class="panels-manage-card open" id="panelsManageCard">
-             <div class="panels-manage-title">Panels you manage</div>
-             <div class="logged-in-communities" id="loggedInCommunities"></div>
-         </div>
+<div class="panels-manage-card open" id="panelsManageCard">
+              <div class="panels-manage-title">Panels you manage</div>
+              <div class="logged-in-communities" id="loggedInCommunities"></div>
+          </div>
         <div class="staff-dashboard-card" id="staffDashboardCard">
             <div class="staff-dashboard-title">Staff Dashboard</div>
             <div id="staffDashboardContent"></div>
@@ -2225,6 +2226,33 @@ enable-ga="false"
                     premiumCountDisplay.style.display = "none";
                 }
             }
+        }
+
+        async function updateModerationBtn() {
+            const btn = document.getElementById("moderationBtn");
+            if (!btn) return;
+            let isManagement = false;
+            let isSupport = false;
+            if (localSupabase) {
+                try {
+                    const { data: { user } } = await localSupabase.auth.getUser();
+                    if (user) {
+                        if (user.email === "oceanviewrp1@gmail.com") isManagement = true;
+                        else {
+                            const { data } = await localSupabase
+                                .from("users")
+                                .select("department")
+                                .eq("email", user.email)
+                                .maybeSingle();
+                            const dept = (data?.department || "").trim();
+                            isManagement = dept === "Management";
+                            isSupport = dept === "Support Team" || dept === "Support Team Lead";
+                        }
+                    }
+                } catch (e) {}
+            }
+            if (isManagement || isSupport) btn.classList.add("visible");
+            else btn.classList.remove("visible");
         }
 
         async function refreshLockdown() {
@@ -2941,38 +2969,27 @@ enable-ga="false"
                     loggedInCommunities.innerHTML = "";
                     return;
                 }
-                localSupabase
-                    .from("communities")
-                    .select("*")
-                    .order("created_at", { ascending: false })
-                    .then(async ({ data, error }) => {
-                        if (error) {
-                            alert("Failed to load communities: " + error.message);
-                            return;
+                Promise.all([
+                    localSupabase.from("communities").select("*").order("created_at", { ascending: false }),
+                    localSupabase.from("users").select("department").eq("id", userId).maybeSingle(),
+                    localSupabase.from("user_communities").select("community_id").eq("user_id", userId)
+                ]).then(async ([commRes, userRes, joinedRes]) => {
+                    const { data, error } = commRes;
+                    if (error) {
+                        alert("Failed to load communities: " + error.message);
+                        return;
+                    }
+                    const isManagement = !!(userRes.data && (userRes.data.department || "").trim() === "Management");
+                    const joinedIds = new Set((joinedRes.data || []).map((r) => r.community_id));
+                    if (Array.isArray(data)) {
+                        for (const row of data) {
+                            const isCreator = row.creator_email === userEmail;
+                            const joined = isCreator || joinedIds.has(row.id);
+                            if (!isCreator && !joined && !isManagement) continue;
+                            addCommunityCard(row.name, row.description || "Community", joined, row.id, isCreator, !!row.verification_requested, !!row.suspended, !!row.members_only, row.banner, !!row.partner, isManagement);
                         }
-                        if (Array.isArray(data)) {
-                            // Management can manage any community, so show them all.
-                            let isManagement = false;
-                            if (userId) {
-                                try {
-                                    const { data: u } = await localSupabase
-                                        .from("users")
-                                        .select("department")
-                                        .eq("id", userId)
-                                        .maybeSingle();
-                                    isManagement = !!(u && (u.department || "").trim() === "Management");
-                                } catch (e) {}
-                            }
-                            for (const row of data) {
-                                const isCreator = row.creator_email === userEmail;
-                                const joined = isCreator || await checkUserJoined(userId, row.id);
-                                // Show the card if the user created it, joined it, or is Management.
-                                if (!isCreator && !joined && !isManagement) continue;
-                                addCommunityCard(row.name, row.description || "Community", joined, row.id, isCreator, !!row.verification_requested, !!row.suspended, !!row.members_only, row.banner, !!row.partner, isManagement);
-                            }
-                        }
-                    })
-                    .catch((err) => alert("Failed to load communities: " + (err.message || err)));
+                    }
+                }).catch((err) => alert("Failed to load communities: " + (err.message || err)));
             }).catch((err) => {
                 console.error("Auth error in loadCommunities:", err);
             });
@@ -3281,6 +3298,7 @@ if (topLeftLogo) topLeftLogo.classList.remove("visible");
                 } else {
                     applyLoggedOutUI();
                 }
+                await updateModerationBtn();
             } catch (err) {
                 console.error("Restore session failed:", err);
             }
@@ -3296,6 +3314,7 @@ if (topLeftLogo) topLeftLogo.classList.remove("visible");
                 loadCommunities();
                 refreshLockdown();
                 updatePremiumUI();
+                updateModerationBtn();
             });
         }
 
@@ -3550,28 +3569,15 @@ if (action === "leave") {
 
         if (createCommunityCenteredBtn) {
             createCommunityCenteredBtn.addEventListener("click", async () => {
-                const name = prompt("Enter community name:");
-                if (!name || !name.trim()) return;
-                let passcode = (prompt("Enter community passcode (leave blank to auto-generate one):") || "").trim();
-                if (!passcode) passcode = generatePasscode();
-                const membersOnly = confirm("Make this community members-only? (Only members can see it)");
-                if (!localSupabase) {
-                    alert("Service unavailable.");
-                    return;
-                }
-                const count = await getUserRedeemedCount();
-                if (count <= 0) {
-                    alert("You need to redeem a premium key before creating a community.");
-                    return;
-                }
-                const consumed = await consumeRedeemedKey();
-                if (!consumed) {
-                    alert("Failed to apply credit. Please try again.");
-                    return;
-                }
-                await saveCommunity(name.trim(), "", passcode, membersOnly);
-                alert("Your community passcode is: " + passcode + "\n\nShare this with your members to let them join.");
-                updatePremiumUI();
+
+            });
+        }
+
+        const moderationBtn = document.getElementById("moderationBtn");
+        if (moderationBtn) {
+            moderationBtn.addEventListener("click", (e) => {
+                e.stopPropagation();
+                window.location.href = "staff.html";
             });
         }
 

@@ -18,34 +18,6 @@
             min-height: 100vh;
         }
 
-        .rost-status {
-            position: fixed;
-            top: 16px;
-            left: 50%;
-            transform: translateX(-50%);
-            padding: 12px 16px;
-            border-radius: 12px;
-            font-size: 14px;
-            font-weight: 600;
-            display: none;
-            z-index: 1000;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.12);
-        }
-
-        .rost-status.error {
-            background: #fef2f2;
-            color: #991b1b;
-            border: 1px solid #fecaca;
-            display: block;
-        }
-
-        .rost-status.success {
-            background: #f0fdf4;
-            color: #166534;
-            border: 1px solid #bbf7d0;
-            display: block;
-        }
-
         .rost-toolbar {
             position: sticky;
             top: 0;
@@ -90,25 +62,34 @@
         .rost-main {
             max-width: 900px;
             margin: 0 auto;
-            padding: 24px 32px 80px;
+            padding: 6px 32px 80px;
             display: flex;
             flex-direction: column;
             gap: 18px;
+            align-items: flex-start;
         }
 
         .rost-card {
-            background: #ffffff;
-            border: 1px solid #e2e8f0;
-            border-radius: 16px;
-            padding: 18px 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.04);
+            background: transparent;
+            border: none;
+            border-radius: 0;
+            padding: 0;
+            box-shadow: none;
+            width: 100%;
+            margin-top: -8px;
         }
 
         .rost-card-head {
             display: flex;
             align-items: center;
+            justify-content: center;
             gap: 10px;
-            margin-bottom: 12px;
+            margin-bottom: 0;
+        }
+
+        .rost-members,
+        .rost-card-foot {
+            display: none !important;
         }
 
         .rost-slot {
@@ -125,25 +106,16 @@
             justify-content: center;
         }
 
-        .rost-name-input {
+        .rost-name {
             flex: 1;
             min-width: 0;
-            font-size: 17px;
+            max-width: 320px;
+            font-size: 18px;
             font-weight: 700;
             color: #0f172a;
-            border: 1px solid transparent;
-            border-radius: 10px;
-            padding: 5px 8px;
-            outline: none;
             font-family: inherit;
-        }
-
-        .rost-name-input:hover { border-color: #e2e8f0; }
-
-        .rost-name-input:focus {
-            border-color: #2563eb;
-            background: #f8fafc;
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+            text-align: center;
+            margin-top: -2px;
         }
 
         .rost-count {
@@ -250,8 +222,7 @@
         }
     </style>
 </head>
-<body>
-    <div class="rost-status" id="rostStatus"></div>
+    <body>
 
     <div id="fullscreenMsg" class="rost-fullscreen-msg" style="display:none;">
         <div id="fullscreenText"></div>
@@ -288,7 +259,6 @@
         let communityId = params.get("communityId");
         const rosterIdParam = params.get("id");
 
-        const statusEl = document.getElementById("rostStatus");
         const layoutToolbar = document.getElementById("rostToolbar");
         const layoutMain = document.getElementById("rostMain");
         const fullscreenMsg = document.getElementById("fullscreenMsg");
@@ -438,6 +408,10 @@
 
         async function loadAll() {
             rosters = await loadRostersList(communityId);
+            
+            // Filter out test rosters: test, Roster 1, Roster 2, Roster 3, Roster 4, Roster 5, ! Morning
+            const excludeNames = ['test', 'Roster 1', 'Roster 2', 'Roster 3', 'Roster 4', 'Roster 5', '! Morning'];
+            rosters = rosters.filter(r => !excludeNames.includes(r.name));
 
             const { data: membersData } = await localSupabase
                 .from("members")
@@ -471,15 +445,14 @@
             if (!rostRosterCards) return;
 
             if (rosters.length === 0) {
-                rostRosterCards.innerHTML = '<div class="rost-card"><div class="rost-empty">No rosters yet.</div></div>';
+                rostRosterCards.innerHTML = '';
                 return;
             }
 
             rostRosterCards.innerHTML = rosters.map((r, index) => {
                 const selected = selectedFor(r.id);
-                const list = members.length === 0
-                    ? '<div class="rost-empty">This community has no members yet.</div>'
-                    : members.map((m) => `
+                const rosterName = String(r.name || "").trim();
+                const list = members.length === 0 ? '' : members.map((m) => `
                         <label class="rost-member">
                             <input type="checkbox" class="rost-member-checkbox" data-roster-id="${escapeHtml(r.id)}" data-member-id="${escapeHtml(m.id)}" ${selected.has(m.id) ? "checked" : ""} />
                             <span class="rost-member-email">${escapeHtml(m.email || "Unknown")}</span>
@@ -489,14 +462,13 @@
                 return `
                     <div class="rost-card">
                         <div class="rost-card-head">
-                            <div class="rost-slot">${index + 1}</div>
-                            <input type="text" class="rost-name-input" data-roster-id="${escapeHtml(r.id)}" value="${escapeHtml(r.name || "")}" placeholder="Roster name" aria-label="Roster ${index + 1} name" maxlength="60" />
-                            <div class="rost-count">${selected.size} of ${members.length}</div>
+                            <span class="rost-name">${rosterName === "l" ? "" : escapeHtml(rosterName)}</span>
+                        </div>
+                        <div class="rost-roster-box" style="display:flex;justify-content:center;gap:8px;padding:8px 0;">
+                            <button type="button" class="btn primary rost-roster-btn">Roster</button>
+                            <button type="button" class="btn rost-settings-btn">Settings</button>
                         </div>
                         <div class="rost-members">${list}</div>
-                        <div class="rost-card-foot">
-                            <button type="button" class="btn primary sm" data-save-roster="${escapeHtml(r.id)}">Save Roster ${index + 1}</button>
-                        </div>
                     </div>
                 `;
             }).join("");
@@ -509,75 +481,8 @@
                     const set = selectedFor(rosterId);
                     if (cb.checked) set.add(memberId);
                     else set.delete(memberId);
-                    updateCount(rosterId);
                 });
             });
-
-            rostRosterCards.querySelectorAll("[data-save-roster]").forEach((btn) => {
-                btn.addEventListener("click", () => saveRoster(btn.getAttribute("data-save-roster"), btn));
-            });
-        }
-
-        function updateCount(rosterId) {
-            const card = document.querySelector('.rost-name-input[data-roster-id="' + rosterId + '"]');
-            if (!card) return;
-            const countEl = card.parentElement ? card.parentElement.querySelector(".rost-count") : null;
-            if (countEl) {
-                countEl.textContent = selectedFor(rosterId).size + " of " + members.length;
-            }
-        }
-
-        // ---------- save ----------
-
-        async function saveRoster(rosterId, btn) {
-            const nameInput = rostRosterCards.querySelector('.rost-name-input[data-roster-id="' + rosterId + '"]');
-            const newName = nameInput ? nameInput.value.trim() : "";
-            if (!newName) {
-                showStatus("Roster name cannot be empty.", "error");
-                return;
-            }
-
-            if (btn) { btn.disabled = true; btn.textContent = "Saving..."; }
-
-            const { error: nameError } = await localSupabase
-                .from("rosters")
-                .update({ name: newName, updated_at: new Date().toISOString() })
-                .eq("id", rosterId);
-            if (nameError) {
-                if (btn) { btn.disabled = false; btn.textContent = "Save"; }
-                showStatus("Failed to rename roster: " + nameError.message, "error");
-                return;
-            }
-
-            const { error: clearError } = await localSupabase
-                .from("roster_members")
-                .delete()
-                .eq("roster_id", rosterId);
-            if (clearError) {
-                if (btn) { btn.disabled = false; btn.textContent = "Save"; }
-                showStatus("Failed to update members: " + clearError.message, "error");
-                return;
-            }
-
-            const memberIds = Array.from(selectedFor(rosterId));
-            if (memberIds.length > 0) {
-                const { error: insertError } = await localSupabase
-                    .from("roster_members")
-                    .insert(memberIds.map((memberId) => ({
-                        roster_id: rosterId,
-                        member_id: memberId
-                    })));
-                if (insertError) {
-                    if (btn) { btn.disabled = false; btn.textContent = "Save"; }
-                    showStatus("Failed to update members: " + insertError.message, "error");
-                    return;
-                }
-            }
-
-            const local = rosters.find((r) => r.id === rosterId);
-            if (local) local.name = newName;
-            if (btn) { btn.disabled = false; btn.textContent = "Save"; }
-            showStatus("Roster saved.", "success");
         }
 
         // ---------- community picker ----------

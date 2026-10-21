@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dispatch</title>
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        background: #ffffff;
+        color: #1a202c;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .container {
+        flex: 1;
+        padding: 40px 32px;
+        max-width: 960px;
+        margin: 0 auto;
+        width: 100%;
+    }
+
+    h1 {
+        font-size: 32px;
+        font-weight: 700;
+        color: #0f172a;
+        margin-bottom: 16px;
+    }
+
+    .footer {
+        position: fixed;
+        bottom: 16px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-family: monospace;
+        font-size: 14px;
+        font-weight: 600;
+        color: #475569;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        padding: 6px 14px;
+        border-radius: 999px;
+        z-index: 500;
+        pointer-events: none;
+    }
+</style>
+</head>
+<body>
+<h1>Dispatch</h1>
+
+<div class="footer" id="dispatchClock"></div>
+
+<script>
+    function formatMilitaryExpanded(d) {
+        const x = new Date(d);
+        const pad = n => String(n).padStart(2, '0');
+        return `${x.getFullYear()}-${pad(x.getMonth() + 1)}-${pad(x.getDate())} ${pad(x.getHours())}:${pad(x.getMinutes())}:${pad(x.getSeconds())}`;
+    }
+
+    (function () {
+        var el = document.getElementById('dispatchClock');
+        function tick() {
+            if (el) el.textContent = formatMilitaryExpanded(new Date());
+        }
+        tick();
+        setInterval(tick, 1000);
+    })();
+</script>
+</body>
+</html>
