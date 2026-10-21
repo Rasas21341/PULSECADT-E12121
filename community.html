@@ -1984,12 +1984,27 @@
                                         <div id="departmentsList"></div>
                                     </div>
                                 </div>
-<<<<<<< HEAD
                                 <div class="moderation-view" id="moderationView">
                                     <div class="members-view-header">
                                         <div class="members-view-title">Moderation</div>
-                                        <button type="button" class="members-view-close" id="moderationViewClose" aria-label="Close">×</</button>
+                                        <button type="button" class="members-view-close" id="moderationViewClose" aria-label="Close">×</button>
                                     </div>
+                                    <div class="view-body">
+                                        <div class="empty">Moderation panel coming soon.</div>
+                                    </div>
+                                </div>
+                                <div class="documents-view" id="documentsView">
+                                    <div class="members-view-header">
+                                        <div class="members-view-title">Documents</div>
+                                        <button type="button" class="add-department-btn" id="openAddDocumentBtn">
+                                            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                                            Add document
+                                        </button>
+                                    </div>
+                                    <div class="view-body">
+                                        <div id="documentsList"></div>
+                                    </div>
+                                </div>
                                     <div class="view-body">
                                         <div class="empty">Moderation panel coming soon.</div>
                                     </div>
@@ -2184,15 +2199,9 @@ if (applicationsBtn && applicationsView) {
                             }
 
 function closeAllPages() {
-<<<<<<< HEAD
-                              const allViews = contentEl.querySelectorAll('.members-view, .departments-view, .documents-view, .settings-view, .rosters-view, .roster-editor-view, .roles-view, .licences-view, .vehicles-view, .applications-view, .penal-codes-view, .moderation-view');
-                              allViews.forEach((v) => { v.classList.remove("open"); });
-                          }
-=======
-                               const allViews = contentEl.querySelectorAll('.members-view, .departments-view, .documents-view, .settings-view, .rosters-view, .roster-editor-view, .roles-view, .vehicles-view, .applications-view, .penal-codes-view, .training-view');
+                               const allViews = contentEl.querySelectorAll('.members-view, .departments-view, .documents-view, .settings-view, .rosters-view, .roster-editor-view, .roles-view, .licences-view, .vehicles-view, .applications-view, .penal-codes-view, .moderation-view, .training-view');
                                allViews.forEach((v) => { v.classList.remove("open"); });
                            }
->>>>>>> 9d1b1e2697e179761018c3c20efb8d87a833d1dc
 
                          if (membersBtn && membersView && membersViewList) {
                              membersBtn.addEventListener("click", (e) => {
