@@ -1864,6 +1864,10 @@
                                         <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M3 10h18M5 6l7-3 7 3M4 10v11M20 10v11M8 14v3M12 14v3M16 14v3"/></svg>
                                         Departments
                                     </button>
+                                    <button type="button" class="moderation-btn" id="moderationBtn">
+                                        <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1L3 5v6c0 5.6 5.6 9.4 9 9.4s9-3.8 9-9.4V5L12 1z"/></svg>
+                                        Moderation
+                                    </button>
                                     <div class="server-admin-badge">Server Admin</div>
                                     <button type="button" class="settings-btn" id="settingsBtn">
                                         <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
@@ -1940,7 +1944,16 @@
                                         <div id="departmentsList"></div>
                                     </div>
                                 </div>
-<div class="documents-view" id="documentsView">
+                                <div class="moderation-view" id="moderationView">
+                                    <div class="members-view-header">
+                                        <div class="members-view-title">Moderation</div>
+                                        <button type="button" class="members-view-close" id="moderationViewClose" aria-label="Close">×</</button>
+                                    </div>
+                                    <div class="view-body">
+                                        <div class="empty">Moderation panel coming soon.</div>
+                                    </div>
+                                </div>
+                                <div class="documents-view" id="documentsView">
                                     <div class="members-view-header">
                                         <div class="members-view-title">Documents</div>
                                         <button type="button" class="add-department-btn" id="openAddDocumentBtn">
@@ -2080,7 +2093,7 @@ const supervisorInput = document.getElementById("supervisorInput");
                          }
 
 function closeAllPages() {
-                              const allViews = contentEl.querySelectorAll('.members-view, .departments-view, .documents-view, .settings-view, .rosters-view, .roster-editor-view, .roles-view, .licences-view, .vehicles-view, .applications-view, .penal-codes-view');
+                              const allViews = contentEl.querySelectorAll('.members-view, .departments-view, .documents-view, .settings-view, .rosters-view, .roster-editor-view, .roles-view, .licences-view, .vehicles-view, .applications-view, .penal-codes-view, .moderation-view');
                               allViews.forEach((v) => { v.classList.remove("open"); });
                           }
 
