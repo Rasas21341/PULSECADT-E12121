@@ -9,48 +9,115 @@
         body {
             margin: 0;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background: #f1f5f9;
-            color: #0f172a;
+            background: #090a0c;
+            color: #f4f4f5;
         }
         .topbar {
             display: flex;
             align-items: center;
             justify-content: space-between;
             padding: 14px 24px;
-            background: #ffffff;
-            border-bottom: 1px solid #e2e8f0;
+            background: #101114;
+            border-bottom: 1px solid #25262a;
         }
         .topbar-title { display: flex; flex-direction: column; gap: 2px; }
-.topbar-server-name { font-size: 14px; font-weight: 700; color: #334155; }
-.topbar-subtitle { font-size: 12px; font-weight: 600; color: #64748b; }
+        .topbar-server-name { font-size: 14px; font-weight: 700; color: #f4f4f5; }
+        .topbar-subtitle { font-size: 12px; font-weight: 600; color: #92939a; }
         .back-btn {
-            border: 1px solid #cbd5e1;
-            background: #ffffff;
-            color: #0f172a;
+            border: 1px solid #34353a;
+            background: #191a1e;
+            color: #f4f4f5;
             padding: 8px 14px;
             border-radius: 8px;
             font-weight: 700;
             cursor: pointer;
         }
-        .container { max-width: 720px; margin: 0 auto; padding: 24px; }
+        .container { max-width: 520px; margin: 0 auto; padding: 24px; }
         .card {
-            background: #ffffff;
-            border: 1px solid #e2e8f0;
-            border-radius: 12px;
-            padding: 20px;
+            background: #101114;
+            border: 1px solid #25262a;
+            border-radius: 14px;
+            padding: 16px;
             margin-bottom: 16px;
         }
-        .card h2 { margin: 0 0 4px; font-size: 20px; }
-        .card h3 { margin: 0 0 12px; font-size: 16px; }
-        .meta { font-size: 13px; color: #64748b; }
+        .card h2 { margin: 0 0 4px; font-size: 20px; color: #f4f4f5; }
+        .card h3 { margin: 0 0 12px; font-size: 16px; color: #f4f4f5; }
+        .meta { font-size: 13px; color: #92939a; }
+        .shift-card { padding: 16px; }
+        .shift-heading {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 12px;
+        }
+        .shift-name { font-size: 14px; font-weight: 750; color: #f4f4f5; }
+        .shift-role { margin-top: 3px; font-size: 12px; color: #92939a; }
+        .shift-time { padding-top: 1px; color: #c8c8cc; font-size: 13px; font-weight: 700; font-variant-numeric: tabular-nums; }
+        .shift-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            margin-top: 12px;
+            padding: 5px 9px;
+            border-radius: 999px;
+            background: #102820;
+            color: #63d9ad;
+            font-size: 11px;
+            font-weight: 700;
+        }
+        .shift-status::before {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: currentColor;
+            content: "";
+        }
+        .shift-status.off-duty { background: #242529; color: #a1a1aa; }
+        .shift-status.on-break { background: #302514; color: #f4bb65; }
+        .shift-controls { display: flex; gap: 8px; margin-top: 11px; }
+        .shift-btn {
+            flex: 1;
+            min-height: 36px;
+            padding: 8px 10px;
+            border: 1px solid #292a2f;
+            border-radius: 9px;
+            background: #111216;
+            color: #dedee2;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        .shift-btn:hover:not(:disabled) { background: #1c1d21; }
+        .shift-btn:disabled { opacity: 0.55; cursor: default; }
+        .shift-btn.end-shift {
+            border-color: #493034;
+            background: #241719;
+            color: #f09a9a;
+        }
+        .shift-btn.end-shift:hover:not(:disabled) { background: #321d20; }
+        .shift-note { margin: 8px 0 0; color: #777980; font-size: 11px; line-height: 1.45; }
+        .shift-footer {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 12px;
+            padding-top: 10px;
+            border-top: 1px solid #25262a;
+            color: #a1a1aa;
+            font-size: 11px;
+        }
+        .shift-footer-dot { width: 7px; height: 7px; border-radius: 50%; background: #55565d; }
+        .shift-footer-dot.active { background: #35c995; }
         .field { margin-top: 6px; }
-        .field label { display: block; font-size: 13px; font-weight: 700; margin-bottom: 6px; }
+        .field label { display: block; font-size: 13px; font-weight: 700; margin-bottom: 6px; color: #dedee2; }
         .erlc-input {
             width: 100%;
             padding: 10px 12px;
-            border: 1px solid #cbd5e1;
+            border: 1px solid #34353a;
             border-radius: 8px;
             font-size: 14px;
+            background: #111216;
+            color: #f4f4f5;
         }
         .send-btn {
             margin-top: 12px;
@@ -63,37 +130,52 @@
             cursor: pointer;
         }
         .send-btn:disabled { opacity: 0.6; cursor: default; }
-        .status { font-size: 13px; margin-top: 10px; color: #64748b; }
-        .status.error { color: #dc2626; font-weight: 700; }
-        .status.ok { color: #16a34a; font-weight: 700; }
+        .status { font-size: 13px; margin-top: 10px; color: #92939a; }
+        .status.error { color: #f87171; font-weight: 700; }
+        .status.ok { color: #63d9ad; font-weight: 700; }
         .hidden { display: none; }
+        @media (max-width: 520px) {
+            .container { padding: 16px; }
+            .topbar { padding: 12px 16px; }
+        }
     </style>
 </head>
 <body>
-<div class="topbar">
-    <div class="topbar-title">
-        <div class="topbar-server-name" id="topbarServerName">Loading...</div>
-        <div class="topbar-subtitle">Moderation Panel</div>
+    <div class="topbar">
+        <div class="topbar-title">
+            <div class="topbar-server-name" id="topbarServerName">Loading...</div>
+            <div class="topbar-subtitle">Moderation Panel</div>
+        </div>
+        <button class="back-btn" id="backBtn">← Back</button>
     </div>
-    <button class="back-btn" id="backBtn">← Back</button>
-</div>
     <div class="container" id="container">
         <div class="card">
             <h2 id="communityName">Loading community...</h2>
             <div class="meta" id="communityMeta"></div>
         </div>
-<div class="card">
-    <h3>Shift</h3>
-    <div class="meta" id="shiftUsername">Username: Loading...</div>
-    <div style="display:flex; gap:8px; margin-top:10px;">
-        <button type="button" class="send-btn" id="startShiftBtn">Start Shift</button>
-        <button type="button" class="send-btn" id="breakShiftBtn" style="background:#f59e0b;" disabled>Break</button>
-        <button type="button" class="send-btn" id="endShiftBtn" style="background:#dc2626;" disabled>End Shift</button>
-    </div>
-    <div class="status" id="shiftStatus"></div>
-</div>
-<div class="card">
-    <h3>ER:LC Server Messages</h3>
+        <section class="card shift-card" aria-label="Shift status">
+            <div class="shift-heading">
+                <div>
+                    <div class="shift-name" id="shiftName">Hey there!</div>
+                    <div class="shift-role">Community Moderator</div>
+                </div>
+                <div class="shift-time" id="shiftTime" aria-label="Shift duration">00:00:00</div>
+            </div>
+            <div class="shift-status off-duty" id="shiftBadge">Off duty</div>
+            <div class="shift-controls">
+                <button type="button" class="shift-btn" id="startShiftBtn">Start shift</button>
+                <button type="button" class="shift-btn hidden" id="breakShiftBtn">Ⅱ &nbsp; Break</button>
+                <button type="button" class="shift-btn end-shift hidden" id="endShiftBtn">□ &nbsp; End shift</button>
+            </div>
+            <p class="shift-note">Your shift timer runs while you are on duty.</p>
+            <div class="shift-footer">
+                <span class="shift-footer-dot" id="shiftFooterDot"></span>
+                <span id="shiftFooterText">You are not on duty</span>
+            </div>
+            <div class="status hidden" id="shiftStatus" role="status"></div>
+        </section>
+        <div class="card">
+            <h3>ER:LC Server Messages</h3>
             <div id="erlcStatus" class="status"></div>
             <div id="erlcSender" class="hidden">
                 <div class="field">
@@ -131,52 +213,54 @@ const startShiftBtn = document.getElementById("startShiftBtn");
 const breakShiftBtn = document.getElementById("breakShiftBtn");
 const endShiftBtn = document.getElementById("endShiftBtn");
 const shiftStatusEl = document.getElementById("shiftStatus");
-const shiftUsernameEl = document.getElementById("shiftUsername");
+const shiftTimeEl = document.getElementById("shiftTime");
+const shiftBadgeEl = document.getElementById("shiftBadge");
+const shiftNameEl = document.getElementById("shiftName");
+const shiftFooterDotEl = document.getElementById("shiftFooterDot");
+const shiftFooterTextEl = document.getElementById("shiftFooterText");
+let shiftStartedAt = null;
+let shiftOnBreak = false;
 
-// Load username
-(async () => {
-    try {
-        const { data: { user } } = await localSupabase.auth.getUser();
-        if (user && shiftUsernameEl) {
-            shiftUsernameEl.textContent = "Username: " + (user.email || "Unknown");
-        }
-    } catch (e) {}
-})();
-
-if (startShiftBtn) {
-    startShiftBtn.addEventListener("click", () => {
-        if (shiftStatusEl) {
-            shiftStatusEl.textContent = "Shift started at " + new Date().toLocaleTimeString();
-            shiftStatusEl.className = "status ok";
-        }
-        startShiftBtn.disabled = true;
-        startShiftBtn.textContent = "On Shift";
-        if (breakShiftBtn) breakShiftBtn.disabled = false;
-        if (endShiftBtn) endShiftBtn.disabled = false;
-    });
+function renderShift() {
+    const onDuty = shiftStartedAt !== null;
+    startShiftBtn.classList.toggle("hidden", onDuty);
+    breakShiftBtn.classList.toggle("hidden", !onDuty);
+    endShiftBtn.classList.toggle("hidden", !onDuty);
+    shiftBadgeEl.textContent = !onDuty ? "Off duty" : shiftOnBreak ? "On break" : "On duty";
+    shiftBadgeEl.className = "shift-status" + (!onDuty ? " off-duty" : shiftOnBreak ? " on-break" : "");
+    shiftFooterDotEl.classList.toggle("active", onDuty);
+    shiftFooterTextEl.textContent = onDuty ? "You are on duty" : "You are not on duty";
+    breakShiftBtn.textContent = shiftOnBreak ? "▶  Resume" : "Ⅱ  Break";
+    if (shiftTimeEl) {
+        const seconds = onDuty ? Math.floor((Date.now() - shiftStartedAt) / 1000) : 0;
+        const hours = String(Math.floor(seconds / 3600)).padStart(2, "0");
+        const minutes = String(Math.floor((seconds % 3600) / 60)).padStart(2, "0");
+        const remainder = String(seconds % 60).padStart(2, "0");
+        shiftTimeEl.textContent = hours + ":" + minutes + ":" + remainder;
+    }
 }
 
-if (breakShiftBtn) {
-    breakShiftBtn.addEventListener("click", () => {
-        if (shiftStatusEl) {
-            shiftStatusEl.textContent = "On break since " + new Date().toLocaleTimeString();
-            shiftStatusEl.className = "status";
-        }
-    });
-}
+startShiftBtn.addEventListener("click", () => {
+    shiftStartedAt = Date.now();
+    shiftOnBreak = false;
+    shiftStatusEl.textContent = "";
+    renderShift();
+});
 
-if (endShiftBtn) {
-    endShiftBtn.addEventListener("click", () => {
-        if (shiftStatusEl) {
-            shiftStatusEl.textContent = "Shift ended at " + new Date().toLocaleTimeString();
-            shiftStatusEl.className = "status";
-        }
-        startShiftBtn.disabled = false;
-        startShiftBtn.textContent = "Start Shift";
-        breakShiftBtn.disabled = true;
-        endShiftBtn.disabled = true;
-    });
-}
+breakShiftBtn.addEventListener("click", () => {
+    shiftOnBreak = !shiftOnBreak;
+    renderShift();
+});
+
+endShiftBtn.addEventListener("click", () => {
+    shiftStartedAt = null;
+    shiftOnBreak = false;
+    shiftStatusEl.textContent = "";
+    renderShift();
+});
+
+renderShift();
+window.setInterval(renderShift, 1000);
 
         let erlcApiKey = "";
 
@@ -196,6 +280,10 @@ if (endShiftBtn) {
                 if (!user) {
                     communityNameEl.textContent = "You must be logged in to access the Mod Panel.";
                     return;
+                }
+                const displayName = (user.email || "").split("@")[0].split(/[._-]/)[0];
+                if (displayName) {
+                    shiftNameEl.textContent = "Hey, " + displayName.charAt(0).toUpperCase() + displayName.slice(1) + "!";
                 }
                 const { data, error } = await localSupabase
                     .from("communities")
