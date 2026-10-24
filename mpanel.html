@@ -181,8 +181,9 @@
                     communityNameEl.textContent = "Access denied. You do not have permission to manage this community.";
                     return;
                 }
-                communityNameEl.textContent = data.name || "Community";
-                communityMetaEl.textContent = data.description || "";
+communityNameEl.textContent = data.name || "Community";
+communityMetaEl.textContent = data.description || "";
+document.querySelector(".topbar-title").textContent = (data.name || "Community") + " - Mod Panel";
 
                 erlcApiKey = data.erlc_api_key || "";
                 if (!erlcApiKey) {
