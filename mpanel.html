@@ -108,6 +108,7 @@
         }
         .shift-footer-dot { width: 7px; height: 7px; border-radius: 50%; background: #55565d; }
         .shift-footer-dot.active { background: #35c995; }
+        .shift-footer-dot.on-break { background: #f4bb65; }
         .field { margin-top: 6px; }
         .field label { display: block; font-size: 13px; font-weight: 700; margin-bottom: 6px; color: #dedee2; }
         .erlc-input {
@@ -167,7 +168,7 @@
                 <button type="button" class="shift-btn hidden" id="breakShiftBtn">Ⅱ &nbsp; Break</button>
                 <button type="button" class="shift-btn end-shift hidden" id="endShiftBtn">□ &nbsp; End shift</button>
             </div>
-            <p class="shift-note">Your shift timer runs while you are on duty.</p>
+            <p class="shift-note">Your timer tracks total time since you started your shift.</p>
             <div class="shift-footer">
                 <span class="shift-footer-dot" id="shiftFooterDot"></span>
                 <span id="shiftFooterText">You are not on duty</span>
@@ -228,8 +229,9 @@ function renderShift() {
     endShiftBtn.classList.toggle("hidden", !onDuty);
     shiftBadgeEl.textContent = !onDuty ? "Off duty" : shiftOnBreak ? "On break" : "On duty";
     shiftBadgeEl.className = "shift-status" + (!onDuty ? " off-duty" : shiftOnBreak ? " on-break" : "");
-    shiftFooterDotEl.classList.toggle("active", onDuty);
-    shiftFooterTextEl.textContent = onDuty ? "You are on duty" : "You are not on duty";
+    shiftFooterDotEl.classList.toggle("active", onDuty && !shiftOnBreak);
+    shiftFooterDotEl.classList.toggle("on-break", onDuty && shiftOnBreak);
+    shiftFooterTextEl.textContent = !onDuty ? "You are not on duty" : shiftOnBreak ? "You are on break" : "You are on duty";
     breakShiftBtn.textContent = shiftOnBreak ? "▶  Resume" : "Ⅱ  Break";
     if (shiftTimeEl) {
         const seconds = onDuty ? Math.floor((Date.now() - shiftStartedAt) / 1000) : 0;
