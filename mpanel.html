@@ -20,7 +20,9 @@
             background: #ffffff;
             border-bottom: 1px solid #e2e8f0;
         }
-        .topbar-title { font-size: 18px; font-weight: 800; }
+        .topbar-title { display: flex; flex-direction: column; gap: 2px; }
+.topbar-server-name { font-size: 14px; font-weight: 700; color: #334155; }
+.topbar-subtitle { font-size: 12px; font-weight: 600; color: #64748b; }
         .back-btn {
             border: 1px solid #cbd5e1;
             background: #ffffff;
@@ -68,10 +70,13 @@
     </style>
 </head>
 <body>
-    <div class="topbar">
-        <div class="topbar-title">Mod Panel</div>
-        <button class="back-btn" id="backBtn">← Back</button>
+<div class="topbar">
+    <div class="topbar-title">
+        <div class="topbar-server-name" id="topbarServerName">Loading...</div>
+        <div class="topbar-subtitle">Moderation Panel</div>
     </div>
+    <button class="back-btn" id="backBtn">← Back</button>
+</div>
     <div class="container" id="container">
         <div class="card">
             <h2 id="communityName">Loading community...</h2>
@@ -183,7 +188,8 @@
                 }
 communityNameEl.textContent = data.name || "Community";
 communityMetaEl.textContent = data.description || "";
-document.querySelector(".topbar-title").textContent = (data.name || "Community") + " - Mod Panel";
+const topbarServerName = document.getElementById("topbarServerName");
+if (topbarServerName) topbarServerName.textContent = data.name || "Community";
 
                 erlcApiKey = data.erlc_api_key || "";
                 if (!erlcApiKey) {
