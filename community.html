@@ -1575,6 +1575,24 @@
     </div>
 
 
+    <div class="modal-overlay" id="newDocumentModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">Add Document</div>
+                <button class="modal-close" id="newDocModalClose" type="button" aria-label="Close">×</button>
+            </div>
+            <div class="field">
+                <label for="newDocTitle">Document Title</label>
+                <input type="text" id="newDocTitle" placeholder="e.g., SOP, Policy, Guidelines" />
+            </div>
+            <div class="field">
+                <label>Departments</label>
+                <div id="newDocDeptCheckboxes"></div>
+            </div>
+            <button type="button" class="submit-btn" id="newDocSubmitBtn">Add Document</button>
+            <div class="modal-error" id="newDocError"></div>
+        </div>
+    </div>
     <div class="modal-overlay" id="newPenalCodeModal">
         <div class="modal">
             <div class="modal-header">
