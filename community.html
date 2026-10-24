@@ -3557,9 +3557,10 @@ async function addDepartment(name, passcode, banner, type) {
                                                 ${chips ? `<div style="margin-top:4px; display:flex; flex-wrap:wrap; gap:4px;">${chips}</div>` : ''}
                                             </div>
                                             <div>
-                                                <button type="button" class="approve" style="background:#eff6ff; border-color:#bfdbfe; color:#1d4ed8;" data-action="open-doc" data-document-id="${doc.id}">Open</button>
-                                                <button type="button" class="approve" style="background:#f0fdf4; border-color:#bbf7d0; color:#166534;" data-action="copy-doc" data-document-id="${doc.id}">Copy Link</button>
-                                                <button type="button" class="deny" style="background:#fef2f2; border-color:#fecaca; color:#991b1b;" data-action="delete-doc" data-document-id="${doc.id}">Delete</button>
+                                            <button type="button" class="approve" style="background:#eff6ff; border-color:#bfdbfe; color:#1d4ed8;" data-action="open-doc" data-document-id="${doc.id}">Open</button>
+                                            <button type="button" class="approve" style="background:#fef3c7; border-color:#fde68a; color:#854d0e;" data-action="edit-doc" data-document-id="${doc.id}">Edit</button>
+                                            <button type="button" class="approve" style="background:#f0fdf4; border-color:#bbf7d0; color:#166534;" data-action="copy-doc" data-document-id="${doc.id}">Copy Link</button>
+                                            <button type="button" class="deny" style="background:#fef2f2; border-color:#fecaca; color:#991b1b;" data-action="delete-doc" data-document-id="${doc.id}">Delete</button>
                                             </div>
                                         </div>
                                     `;
@@ -3574,6 +3575,29 @@ async function addDepartment(name, passcode, banner, type) {
                                     btn.addEventListener("click", (e) => {
                                         const documentId = e.target.closest(".request-item").getAttribute("data-document-id");
                                         window.open("/document.html?id=" + encodeURIComponent(documentId), "_blank");
+                                    });
+                                });
+                                documentsList.querySelectorAll("[data-action='edit-doc']").forEach((btn) => {
+                                    btn.addEventListener("click", async (e) => {
+                                        const item = e.target.closest(".request-item");
+                                        const documentId = item.getAttribute("data-document-id");
+                                        const currentTitle = (item.querySelector("span")?.textContent || "").trim();
+                                        const newTitle = prompt("Edit document title:", currentTitle);
+                                        if (newTitle === null) return;
+                                        const trimmed = newTitle.trim();
+                                        if (!trimmed) {
+                                            alert("Document title cannot be empty.");
+                                            return;
+                                        }
+                                        const { error } = await localSupabase
+                                            .from("documents")
+                                            .update({ title: trimmed })
+                                            .eq("id", documentId);
+                                        if (error) {
+                                            alert("Failed to update document: " + error.message);
+                                            return;
+                                        }
+                                        loadDocuments();
                                     });
                                 });
                                 documentsList.querySelectorAll("[data-action='copy-doc']").forEach((btn) => {
@@ -3807,17 +3831,21 @@ async function loadPenalCodes() {
                             }
                         }
 
-                        async function addDocument(title, departments) {
-                            if (!title || !localSupabase) return;
-                            try {
-                                await localSupabase
-                                    .from("documents")
-                                    .insert([{ community_id: id, title: title.trim(), departments: departments }]);
-                                loadDocuments();
-                            } catch (err) {
-                                alert("Failed to create document.");
-                            }
-                        }
+async function addDocument(title, departments) {
+    if (!title || !localSupabase) return;
+    try {
+        const { error } = await localSupabase
+            .from("documents")
+            .insert([{ community_id: id, title: title.trim(), departments: departments }]);
+        if (error) {
+            alert("Failed to create document: " + error.message);
+            return;
+        }
+        loadDocuments();
+    } catch (err) {
+        alert("Failed to create document: " + (err.message || err));
+    }
+}
 
                         async function deleteDocument(documentId) {
                             if (!confirm("Delete this document?")) return;
