@@ -82,8 +82,13 @@
             <h2 id="communityName">Loading community...</h2>
             <div class="meta" id="communityMeta"></div>
         </div>
-        <div class="card">
-            <h3>ER:LC Server Messages</h3>
+<div class="card">
+    <h3>Shift</h3>
+    <button type="button" class="send-btn" id="startShiftBtn">Start Shift</button>
+    <div class="status" id="shiftStatus"></div>
+</div>
+<div class="card">
+    <h3>ER:LC Server Messages</h3>
             <div id="erlcStatus" class="status"></div>
             <div id="erlcSender" class="hidden">
                 <div class="field">
@@ -116,6 +121,19 @@
         const erlcSendBtn = document.getElementById("erlcSendBtn");
 
         document.getElementById("backBtn").addEventListener("click", () => window.close());
+
+const startShiftBtn = document.getElementById("startShiftBtn");
+const shiftStatusEl = document.getElementById("shiftStatus");
+if (startShiftBtn) {
+    startShiftBtn.addEventListener("click", () => {
+        if (shiftStatusEl) {
+            shiftStatusEl.textContent = "Shift started at " + new Date().toLocaleTimeString();
+            shiftStatusEl.className = "status ok";
+        }
+        startShiftBtn.disabled = true;
+        startShiftBtn.textContent = "On Shift";
+    });
+}
 
         let erlcApiKey = "";
 
