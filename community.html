@@ -1922,12 +1922,18 @@
                                         Departments
                                     </button>
 
-                                    <div class="server-admin-badge">Server Admin</div>
+<div class="server-admin-badge">Server Admin</div>
                                     <button type="button" class="settings-btn" id="settingsBtn">
                                         <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
                                         Settings
                                     </button>
-                                 </div>
+                                  </div>
+                                  <div class="btn-dropdown-wrap">
+                                    <button type="button" class="moderation-btn" id="moderationPanelBtn">
+                                        <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                                        Moderation Panel
+                                    </button>
+                                  </div>
                                 <div class="settings-view" id="settingsView">
                                     <div class="members-view-header">
                                         <div class="members-view-title">Settings</div>
@@ -1953,10 +1959,17 @@
                                              <label>ERLC API Key</label>
                                              <input type="text" id="erlcApiKeyInput" placeholder="ERLC API key" value="${initialErkKey.replace(/</g, '&lt;').replace(/>/g, '&gt;')}" />
                                          </div>
-                                         <div class="field">
-                                              <label>Supervisor Password</label>
-                                              <input type="text" id="supervisorInput" placeholder="Supervisor password" value="${(communityData.supervisor || '').replace(/</g, '&lt;').replace(/>/g, '&gt;')}" />
-                                          </div>
+<div class="field">
+                                               <label>Supervisor Password</label>
+                                               <input type="text" id="supervisorInput" placeholder="Supervisor password" value="${(communityData.supervisor || '').replace(/</g, '&lt;').replace(/>/g, '&gt;')}" />
+                                           </div>
+                                           <div class="field">
+                                               <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:14px; font-weight:600; color:#334155;">
+                                                   <input type="checkbox" id="modToolsOffDutyToggle" style="cursor:pointer; width:18px; height:18px;" ${communityData.mod_tools_off_duty ? 'checked' : ''} />
+                                                   <span>Toggle toolboxes while off duty</span>
+                                               </label>
+                                               <p style="font-size:12px; color:#64748b; margin-top:6px; line-height:1.5;">This being turned on will allow the user to use moderation tools while being off duty.</p>
+                                           </div>
                                           <div class="community-banner-upload-wrap">
                                               <label class="community-banner-upload-label">Community Banner</label>
                                               <input type="file" id="communityBannerInput" accept="image/*" class="community-banner-upload-input" />
@@ -2304,20 +2317,43 @@ if (membersViewClose && membersView) {
                              });
                          }
 
-                         if (supervisorInput) {
-                             supervisorInput.addEventListener("blur", async () => {
-                                 const val = supervisorInput.value.trim();
-                                 try {
-                                     const { error } = await localSupabase
-                                         .from("communities")
-                                         .update({ supervisor: val || null })
-                                         .eq("id", id);
-                                     if (error) console.warn("DB save of supervisor failed:", error.message);
-                                 } catch (err) {
-                                     console.error("Failed to save supervisor:", err);
-                                 }
-                              });
-                          }
+if (supervisorInput) {
+                              supervisorInput.addEventListener("blur", async () => {
+                                  const val = supervisorInput.value.trim();
+                                  try {
+                                      const { error } = await localSupabase
+                                          .from("communities")
+                                          .update({ supervisor: val || null })
+                                          .eq("id", id);
+                                      if (error) console.warn("DB save of supervisor failed:", error.message);
+                                  } catch (err) {
+                                      console.error("Failed to save supervisor:", err);
+                                  }
+                               });
+                           }
+
+                           const modToolsOffDutyToggle = document.getElementById("modToolsOffDutyToggle");
+                           if (modToolsOffDutyToggle) {
+                               modToolsOffDutyToggle.addEventListener("change", async () => {
+                                   const val = modToolsOffDutyToggle.checked;
+                                   try {
+                                       const { error } = await localSupabase
+                                           .from("communities")
+                                           .update({ mod_tools_off_duty: val })
+                                           .eq("id", id);
+                                       if (error) console.warn("DB save of mod_tools_off_duty failed:", error.message);
+                                   } catch (err) {
+                                       console.error("Failed to save mod_tools_off_duty:", err);
+                                   }
+                               });
+                           }
+
+                           const moderationPanelBtn = document.getElementById("moderationPanelBtn");
+                           if (moderationPanelBtn) {
+                               moderationPanelBtn.addEventListener("click", () => {
+                                   window.location.href = "mpanel.html?id=" + encodeURIComponent(id);
+                               });
+                           }
 
                           const communityBannerInput = document.getElementById("communityBannerInput");
                           const communityBannerPreview = document.getElementById("communityBannerPreview");
