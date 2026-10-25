@@ -157,6 +157,43 @@
             margin-top: 6px;
         }
         .toolbox-btn:hover { background: #1c1d21; }
+        .toolbox-dropdown {
+            display: none;
+            margin-top: 8px;
+            padding: 12px;
+            background: #0b0c0e;
+            border: 1px solid #25262a;
+            border-radius: 10px;
+        }
+        .toolbox-dropdown.open { display: block; }
+        .toolbox-field { margin-bottom: 10px; }
+        .toolbox-field label { display: block; font-size: 12px; font-weight: 700; margin-bottom: 6px; color: #dedee2; }
+        .toolbox-input {
+            width: 100%;
+            padding: 8px 10px;
+            border: 1px solid #34353a;
+            border-radius: 8px;
+            font-size: 13px;
+            background: #111216;
+            color: #f4f4f5;
+            outline: none;
+        }
+        .toolbox-input:focus { border-color: #2563eb; }
+        .toolbox-send {
+            width: 100%;
+            padding: 8px 12px;
+            border: none;
+            border-radius: 8px;
+            background: #2563eb;
+            color: #ffffff;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        .toolbox-send:disabled { opacity: 0.6; cursor: default; }
+        .toolbox-status { font-size: 12px; margin-top: 8px; color: #92939a; }
+        .toolbox-status.error { color: #f87171; font-weight: 700; }
+        .toolbox-status.ok { color: #63d9ad; font-weight: 700; }
         .field { margin-top: 6px; }
         .field label { display: block; font-size: 13px; font-weight: 700; margin-bottom: 6px; color: #dedee2; }
         .erlc-input {
@@ -220,6 +257,14 @@
             <p class="shift-note">Your timer tracks total time since you started your shift.</p>
 <div class="toolbox-label">Toolbox</div>
                 <button type="button" class="toolbox-btn" id="toolboxBtn">Toolbox</button>
+                <div class="toolbox-dropdown" id="toolboxDropdown">
+                    <div class="toolbox-field">
+                        <label for="toolboxMsgInput">Send a :m message to the server</label>
+                        <input type="text" id="toolboxMsgInput" class="toolbox-input" placeholder="Type your message..." />
+                    </div>
+                    <button type="button" class="toolbox-send" id="toolboxSendBtn">Send :m</button>
+                    <div class="toolbox-status" id="toolboxStatus"></div>
+                </div>
                 <div class="shift-footer">
                 <span class="shift-footer-dot" id="shiftFooterDot"></span>
                 <span id="shiftFooterText">You are not on duty</span>
@@ -257,7 +302,19 @@
         const erlcMsgInput = document.getElementById("erlcMsgInput");
         const erlcSendBtn = document.getElementById("erlcSendBtn");
 
+        const toolboxBtn = document.getElementById("toolboxBtn");
+        const toolboxDropdown = document.getElementById("toolboxDropdown");
+        const toolboxMsgInput = document.getElementById("toolboxMsgInput");
+        const toolboxSendBtn = document.getElementById("toolboxSendBtn");
+        const toolboxStatusEl = document.getElementById("toolboxStatus");
+
         document.getElementById("backBtn").addEventListener("click", () => window.close());
+
+        if (toolboxBtn) {
+            toolboxBtn.addEventListener("click", () => {
+                toolboxDropdown.classList.toggle("open");
+            });
+        }
 
 const startShiftBtn = document.getElementById("startShiftBtn");
 const breakShiftBtn = document.getElementById("breakShiftBtn");
@@ -459,12 +516,53 @@ async function loadCommunity() {
             });
         }
 
-        erlcMsgInput && erlcMsgInput.addEventListener("keydown", (e) => {
+        if (toolboxSendBtn) {
+            toolboxSendBtn.addEventListener("click", async () => {
+                const message = toolboxMsgInput ? toolboxMsgInput.value.trim() : "";
+                if (!message) {
+                    toolboxStatusEl.textContent = "Type a message first.";
+                    toolboxStatusEl.className = "toolbox-status error";
+                    return;
+                }
+                if (!erlcApiKey) {
+                    toolboxStatusEl.textContent = "No ERLC API key set.";
+                    toolboxStatusEl.className = "toolbox-status error";
+                    return;
+                }
+                toolboxSendBtn.disabled = true;
+                toolboxSendBtn.textContent = "Sending...";
+                toolboxStatusEl.textContent = "";
+                toolboxStatusEl.className = "toolbox-status";
+                try {
+                    const result = await sendErkMessage(message);
+                    toolboxStatusEl.textContent = (result && result.message) ? result.message : "Message sent.";
+                    toolboxStatusEl.className = "toolbox-status ok";
+                    if (toolboxMsgInput) toolboxMsgInput.value = "";
+                } catch (err) {
+                    toolboxStatusEl.textContent = "Failed to send: " + err.message;
+                    toolboxStatusEl.className = "toolbox-status error";
+                    console.error("Toolbox ERLC command failed:", err);
+                } finally {
+                    toolboxSendBtn.disabled = false;
+                    toolboxSendBtn.textContent = "Send :m";
+                }
+            });
+        }
+
+        toolboxMsgInput && toolboxMsgInput.addEventListener("keydown", (e) => {
             if (e.key === "Enter") {
                 e.preventDefault();
-                erlcSendBtn && erlcSendBtn.click();
+                toolboxSendBtn && toolboxSendBtn.click();
             }
         });
+
+        if (toolboxBtn) {
+            document.addEventListener("click", (e) => {
+                if (!toolboxBtn.contains(e.target) && !toolboxDropdown.contains(e.target)) {
+                    toolboxDropdown.classList.remove("open");
+                }
+            });
+        }
 
         loadCommunity();
     </script>
