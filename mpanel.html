@@ -150,9 +150,6 @@
         <button class="back-btn" id="backBtn">← Back</button>
     </div>
     <div class="container" id="container">
-        <div class="card">
-            <div class="meta" id="communityMeta"></div>
-        </div>
         <section class="card shift-card" aria-label="Shift status">
             <div class="shift-heading">
                 <div>
@@ -199,7 +196,6 @@
         const params = new URLSearchParams(window.location.search);
         const communityId = params.get("id");
 
-        const communityMetaEl = document.getElementById("communityMeta");
         const erlcStatusEl = document.getElementById("erlcStatus");
         const erlcSenderEl = document.getElementById("erlcSender");
         const erlcNoteEl = document.getElementById("erlcNote");
@@ -330,7 +326,6 @@ async function loadCommunity() {
                 if (!isCreator && !isManagement && !hasModRole) {
                     return;
                 }
-                communityMetaEl.textContent = data.description || "";
                 const topbarServerName = document.getElementById("topbarServerName");
                 if (topbarServerName) topbarServerName.textContent = data.name || "Community";
 
