@@ -144,6 +144,19 @@
             margin-top: 10px;
             text-align: center;
         }
+        .toolbox-btn {
+            width: 100%;
+            padding: 8px 10px;
+            border: 1px solid #292a2f;
+            border-radius: 9px;
+            background: #111216;
+            color: #dedee2;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 6px;
+        }
+        .toolbox-btn:hover { background: #1c1d21; }
         .field { margin-top: 6px; }
         .field label { display: block; font-size: 13px; font-weight: 700; margin-bottom: 6px; color: #dedee2; }
         .erlc-input {
@@ -205,8 +218,9 @@
                 <button type="button" class="shift-btn end-shift hidden" id="endShiftBtn">□ &nbsp; End shift</button>
             </div>
             <p class="shift-note">Your timer tracks total time since you started your shift.</p>
-            <div class="toolbox-label">Toolbox</div>
-            <div class="shift-footer">
+<div class="toolbox-label">Toolbox</div>
+                <button type="button" class="toolbox-btn" id="toolboxBtn">Toolbox</button>
+                <div class="shift-footer">
                 <span class="shift-footer-dot" id="shiftFooterDot"></span>
                 <span id="shiftFooterText">You are not on duty</span>
             </div>
