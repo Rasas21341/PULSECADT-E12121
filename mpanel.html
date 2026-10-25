@@ -151,7 +151,6 @@
     </div>
     <div class="container" id="container">
         <div class="card">
-            <h2 id="communityName">Loading community...</h2>
             <div class="meta" id="communityMeta"></div>
         </div>
         <section class="card shift-card" aria-label="Shift status">
@@ -200,7 +199,6 @@
         const params = new URLSearchParams(window.location.search);
         const communityId = params.get("id");
 
-        const communityNameEl = document.getElementById("communityName");
         const communityMetaEl = document.getElementById("communityMeta");
         const erlcStatusEl = document.getElementById("erlcStatus");
         const erlcSenderEl = document.getElementById("erlcSender");
@@ -272,15 +270,13 @@ window.setInterval(renderShift, 1000);
             erlcStatusEl.className = "status" + (kind ? " " + kind : "");
         }
 
-        async function loadCommunity() {
+async function loadCommunity() {
             if (!communityId) {
-                communityNameEl.textContent = "No community specified.";
                 return;
             }
             try {
                 const { data: { user } } = await localSupabase.auth.getUser();
                 if (!user) {
-                    communityNameEl.textContent = "You must be logged in to access the Mod Panel.";
                     return;
                 }
                 const displayName = (user.email || "").split("@")[0].split(/[._-]/)[0];
@@ -293,11 +289,9 @@ window.setInterval(renderShift, 1000);
                     .eq("id", communityId)
                     .maybeSingle();
                 if (error) {
-                    communityNameEl.textContent = "Failed to load community.";
                     return;
                 }
                 if (!data) {
-                    communityNameEl.textContent = "Community not found.";
                     return;
                 }
                 const isCreator = data.creator_email === user.email;
@@ -334,13 +328,11 @@ window.setInterval(renderShift, 1000);
                     } catch (e) {}
                 }
                 if (!isCreator && !isManagement && !hasModRole) {
-                    communityNameEl.textContent = "Access denied. You do not have permission to manage this community.";
                     return;
                 }
-communityNameEl.textContent = data.name || "Community";
-communityMetaEl.textContent = data.description || "";
-const topbarServerName = document.getElementById("topbarServerName");
-if (topbarServerName) topbarServerName.textContent = data.name || "Community";
+                communityMetaEl.textContent = data.description || "";
+                const topbarServerName = document.getElementById("topbarServerName");
+                if (topbarServerName) topbarServerName.textContent = data.name || "Community";
 
                 erlcApiKey = data.erlc_api_key || "";
                 if (!erlcApiKey) {
@@ -357,7 +349,6 @@ if (topbarServerName) topbarServerName.textContent = data.name || "Community";
                     setStatus("");
                 }
             } catch (err) {
-                communityNameEl.textContent = "An unexpected error occurred.";
                 console.error(err);
             }
         }
