@@ -378,9 +378,16 @@
         const toolboxBtn = document.getElementById("toolboxBtn");
         const toolboxModal = document.getElementById("toolboxModal");
         const toolboxModalClose = document.getElementById("toolboxModalClose");
+        const toolboxModalTitle = document.getElementById("toolboxModalTitle");
+        const toolboxPanelM = document.getElementById("toolboxPanelM");
+        const toolboxPanelH = document.getElementById("toolboxPanelH");
+        const toolboxSideArrow = document.getElementById("toolboxSideArrow");
         const toolboxMsgInput = document.getElementById("toolboxMsgInput");
         const toolboxSendBtn = document.getElementById("toolboxSendBtn");
         const toolboxStatusEl = document.getElementById("toolboxStatus");
+        const toolboxHInput = document.getElementById("toolboxHInput");
+        const toolboxHSendBtn = document.getElementById("toolboxHSendBtn");
+        const toolboxHStatusEl = document.getElementById("toolboxHStatus");
 
         document.getElementById("backBtn").addEventListener("click", () => window.close());
 
@@ -389,6 +396,14 @@
         }
         function closeToolboxModal() {
             if (toolboxModal) toolboxModal.classList.remove("open");
+        }
+
+        function switchToolboxPanel(panel) {
+            const isH = panel === "h";
+            toolboxPanelM.classList.toggle("active", !isH);
+            toolboxPanelH.classList.toggle("active", isH);
+            toolboxSideArrow.textContent = isH ? "‹" : "›";
+            toolboxModalTitle.textContent = isH ? "Toolbox - :h" : "Toolbox";
         }
 
         if (toolboxBtn) {
@@ -400,6 +415,12 @@
         if (toolboxModal) {
             toolboxModal.addEventListener("click", (e) => {
                 if (e.target === toolboxModal) closeToolboxModal();
+            });
+        }
+        if (toolboxSideArrow) {
+            toolboxSideArrow.addEventListener("click", () => {
+                const showingH = toolboxPanelH.classList.contains("active");
+                switchToolboxPanel(showingH ? "m" : "h");
             });
         }
 
@@ -556,6 +577,35 @@ async function loadCommunity() {
                     "Accept": "application/json"
                 },
                 body: JSON.stringify({ command: ":m " + message })
+            });
+            const text = await res.text().catch(() => "");
+            if (!res.ok) {
+                let detail = "HTTP " + res.status + (text ? " " + text : "");
+                try {
+                    const j = JSON.parse(text);
+                    if (j && j.debug) {
+                        detail = "HTTP " + (j.erlcStatus || res.status) +
+                            " | method=" + j.debug.method +
+                            " | target=" + j.debug.target +
+                            " | bodyLen=" + j.debug.bodyLength +
+                            " | keySent=" + j.debug.hasServerKey +
+                            " | erlcSays=" + (j.erlcBody || "(empty)");
+                    }
+                } catch (e) {}
+                throw new Error(detail);
+            }
+            try { return JSON.parse(text); } catch (e) { return {}; }
+        }
+
+        async function sendErkHMessage(message) {
+            const res = await fetch("/api/erlc/v2/server/command", {
+                method: "POST",
+                headers: {
+                    "server-key": erlcApiKey,
+                    "Content-Type": "application/json",
+                    "Accept": "application/json"
+                },
+                body: JSON.stringify({ command: ":h " + message })
             });
             const text = await res.text().catch(() => "");
             if (!res.ok) {
