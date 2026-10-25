@@ -156,7 +156,8 @@
             cursor: pointer;
             margin-top: 6px;
         }
-        .toolbox-btn:hover { background: #1c1d21; }
+        .toolbox-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .toolbox-btn:disabled:hover { background: #111216; }
         .toolbox-modal {
             position: fixed;
             inset: 0;
@@ -434,27 +435,31 @@ const shiftNameEl = document.getElementById("shiftName");
 const shiftFooterDotEl = document.getElementById("shiftFooterDot");
 const shiftFooterTextEl = document.getElementById("shiftFooterText");
 let shiftStartedAt = null;
-let shiftOnBreak = false;
+        let shiftOnBreak = false;
+        let modToolsOffDutyEnabled = false;
 
-function renderShift() {
-    const onDuty = shiftStartedAt !== null;
-    startShiftBtn.classList.toggle("hidden", onDuty);
-    breakShiftBtn.classList.toggle("hidden", !onDuty);
-    endShiftBtn.classList.toggle("hidden", !onDuty);
-    shiftBadgeEl.textContent = !onDuty ? "Off duty" : shiftOnBreak ? "On break" : "On duty";
-    shiftBadgeEl.className = "shift-status" + (!onDuty ? " off-duty" : shiftOnBreak ? " on-break" : "");
-    shiftFooterDotEl.classList.toggle("active", onDuty && !shiftOnBreak);
-    shiftFooterDotEl.classList.toggle("on-break", onDuty && shiftOnBreak);
-    shiftFooterTextEl.textContent = !onDuty ? "You are not on duty" : shiftOnBreak ? "You are on break" : "You are on duty";
-    breakShiftBtn.textContent = shiftOnBreak ? "▶  Resume" : "Ⅱ  Break";
-    if (shiftTimeEl) {
-        const seconds = onDuty ? Math.floor((Date.now() - shiftStartedAt) / 1000) : 0;
-        const hours = String(Math.floor(seconds / 3600)).padStart(2, "0");
-        const minutes = String(Math.floor((seconds % 3600) / 60)).padStart(2, "0");
-        const remainder = String(seconds % 60).padStart(2, "0");
-        shiftTimeEl.textContent = hours + ":" + minutes + ":" + remainder;
-    }
-}
+        function renderShift() {
+            const onDuty = shiftStartedAt !== null;
+            startShiftBtn.classList.toggle("hidden", onDuty);
+            breakShiftBtn.classList.toggle("hidden", !onDuty);
+            endShiftBtn.classList.toggle("hidden", !onDuty);
+            shiftBadgeEl.textContent = !onDuty ? "Off duty" : shiftOnBreak ? "On break" : "On duty";
+            shiftBadgeEl.className = "shift-status" + (!onDuty ? " off-duty" : shiftOnBreak ? " on-break" : "");
+            shiftFooterDotEl.classList.toggle("active", onDuty && !shiftOnBreak);
+            shiftFooterDotEl.classList.toggle("on-break", onDuty && shiftOnBreak);
+            shiftFooterTextEl.textContent = !onDuty ? "You are not on duty" : shiftOnBreak ? "You are on break" : "You are on duty";
+            breakShiftBtn.textContent = shiftOnBreak ? "▶  Resume" : "Ⅱ  Break";
+            if (shiftTimeEl) {
+                const seconds = onDuty ? Math.floor((Date.now() - shiftStartedAt) / 1000) : 0;
+                const hours = String(Math.floor(seconds / 3600)).padStart(2, "0");
+                const minutes = String(Math.floor((seconds % 3600) / 60)).padStart(2, "0");
+                const remainder = String(seconds % 60).padStart(2, "0");
+                shiftTimeEl.textContent = hours + ":" + minutes + ":" + remainder;
+            }
+            const toolboxDisabled = !onDuty && !modToolsOffDutyEnabled;
+            if (toolboxBtn) toolboxBtn.disabled = toolboxDisabled;
+            if (toolboxBtn) toolboxBtn.title = toolboxDisabled ? "Start your shift to use the toolbox" : "";
+        }
 
 startShiftBtn.addEventListener("click", () => {
     shiftStartedAt = Date.now();
@@ -546,6 +551,7 @@ async function loadCommunity() {
                 if (!isCreator && !isManagement && !hasModRole) {
                     return;
                 }
+                modToolsOffDutyEnabled = !!(data.mod_tools_off_duty);
                 const topbarServerName = document.getElementById("topbarServerName");
                 if (topbarServerName) topbarServerName.textContent = data.name || "Community";
 
