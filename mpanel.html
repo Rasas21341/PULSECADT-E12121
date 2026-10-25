@@ -157,23 +157,56 @@
             margin-top: 6px;
         }
         .toolbox-btn:hover { background: #1c1d21; }
-        .toolbox-dropdown {
+        .toolbox-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 700;
             display: none;
-            margin-top: 8px;
-            padding: 12px;
-            background: #0b0c0e;
-            border: 1px solid #25262a;
-            border-radius: 10px;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
         }
-        .toolbox-dropdown.open { display: block; }
-        .toolbox-field { margin-bottom: 10px; }
-        .toolbox-field label { display: block; font-size: 12px; font-weight: 700; margin-bottom: 6px; color: #dedee2; }
+        .toolbox-modal.open { display: flex; }
+        .toolbox-modal-card {
+            width: 100%;
+            max-width: 420px;
+            background: #101114;
+            border: 1px solid #25262a;
+            border-radius: 14px;
+            padding: 18px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+        }
+        .toolbox-modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 14px;
+        }
+        .toolbox-modal-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #f4f4f5;
+        }
+        .toolbox-modal-close {
+            border: none;
+            background: transparent;
+            color: #92939a;
+            font-size: 22px;
+            cursor: pointer;
+            line-height: 1;
+            padding: 2px 6px;
+            border-radius: 6px;
+        }
+        .toolbox-modal-close:hover { background: #1c1d21; color: #f4f4f5; }
+        .toolbox-field { margin-bottom: 14px; }
+        .toolbox-field label { display: block; font-size: 13px; font-weight: 700; margin-bottom: 8px; color: #dedee2; }
         .toolbox-input {
             width: 100%;
-            padding: 8px 10px;
+            padding: 10px 12px;
             border: 1px solid #34353a;
-            border-radius: 8px;
-            font-size: 13px;
+            border-radius: 9px;
+            font-size: 14px;
             background: #111216;
             color: #f4f4f5;
             outline: none;
@@ -181,17 +214,17 @@
         .toolbox-input:focus { border-color: #2563eb; }
         .toolbox-send {
             width: 100%;
-            padding: 8px 12px;
+            padding: 10px 14px;
             border: none;
-            border-radius: 8px;
+            border-radius: 9px;
             background: #2563eb;
             color: #ffffff;
-            font-size: 13px;
+            font-size: 14px;
             font-weight: 700;
             cursor: pointer;
         }
         .toolbox-send:disabled { opacity: 0.6; cursor: default; }
-        .toolbox-status { font-size: 12px; margin-top: 8px; color: #92939a; }
+        .toolbox-status { font-size: 13px; margin-top: 10px; color: #92939a; text-align: center; }
         .toolbox-status.error { color: #f87171; font-weight: 700; }
         .toolbox-status.ok { color: #63d9ad; font-weight: 700; }
         .field { margin-top: 6px; }
@@ -257,20 +290,26 @@
             <p class="shift-note">Your timer tracks total time since you started your shift.</p>
 <div class="toolbox-label">Toolbox</div>
                 <button type="button" class="toolbox-btn" id="toolboxBtn">Toolbox</button>
-                <div class="toolbox-dropdown" id="toolboxDropdown">
-                    <div class="toolbox-field">
-                        <label for="toolboxMsgInput">Send a :m message to the server</label>
-                        <input type="text" id="toolboxMsgInput" class="toolbox-input" placeholder="Type your message..." />
-                    </div>
-                    <button type="button" class="toolbox-send" id="toolboxSendBtn">Send :m</button>
-                    <div class="toolbox-status" id="toolboxStatus"></div>
-                </div>
                 <div class="shift-footer">
                 <span class="shift-footer-dot" id="shiftFooterDot"></span>
                 <span id="shiftFooterText">You are not on duty</span>
             </div>
             <div class="status hidden" id="shiftStatus" role="status"></div>
         </section>
+        <div class="toolbox-modal" id="toolboxModal">
+            <div class="toolbox-modal-card">
+                <div class="toolbox-modal-header">
+                    <span class="toolbox-modal-title">Toolbox</span>
+                    <button type="button" class="toolbox-modal-close" id="toolboxModalClose" aria-label="Close">×</button>
+                </div>
+                <div class="toolbox-field">
+                    <label for="toolboxMsgInput">Send a :m message to the server</label>
+                    <input type="text" id="toolboxMsgInput" class="toolbox-input" placeholder="Type your message..." />
+                </div>
+                <button type="button" class="toolbox-send" id="toolboxSendBtn">Send :m</button>
+                <div class="toolbox-status" id="toolboxStatus"></div>
+            </div>
+        </div>
         <div class="card">
             <h3>ER:LC Server Messages</h3>
             <div id="erlcStatus" class="status"></div>
@@ -303,16 +342,30 @@
         const erlcSendBtn = document.getElementById("erlcSendBtn");
 
         const toolboxBtn = document.getElementById("toolboxBtn");
-        const toolboxDropdown = document.getElementById("toolboxDropdown");
+        const toolboxModal = document.getElementById("toolboxModal");
+        const toolboxModalClose = document.getElementById("toolboxModalClose");
         const toolboxMsgInput = document.getElementById("toolboxMsgInput");
         const toolboxSendBtn = document.getElementById("toolboxSendBtn");
         const toolboxStatusEl = document.getElementById("toolboxStatus");
 
         document.getElementById("backBtn").addEventListener("click", () => window.close());
 
+        function openToolboxModal() {
+            if (toolboxModal) toolboxModal.classList.add("open");
+        }
+        function closeToolboxModal() {
+            if (toolboxModal) toolboxModal.classList.remove("open");
+        }
+
         if (toolboxBtn) {
-            toolboxBtn.addEventListener("click", () => {
-                toolboxDropdown.classList.toggle("open");
+            toolboxBtn.addEventListener("click", openToolboxModal);
+        }
+        if (toolboxModalClose) {
+            toolboxModalClose.addEventListener("click", closeToolboxModal);
+        }
+        if (toolboxModal) {
+            toolboxModal.addEventListener("click", (e) => {
+                if (e.target === toolboxModal) closeToolboxModal();
             });
         }
 
@@ -556,13 +609,11 @@ async function loadCommunity() {
             }
         });
 
-        if (toolboxBtn) {
-            document.addEventListener("click", (e) => {
-                if (!toolboxBtn.contains(e.target) && !toolboxDropdown.contains(e.target)) {
-                    toolboxDropdown.classList.remove("open");
-                }
-            });
-        }
+        document.addEventListener("keydown", (e) => {
+            if (e.key === "Escape" && toolboxModal && toolboxModal.classList.contains("open")) {
+                closeToolboxModal();
+            }
+        });
 
         loadCommunity();
     </script>
