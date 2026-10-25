@@ -52,6 +52,18 @@
             max-width: calc(100% - 32px);
             padding: 16px;
         }
+        .shift-backdrop {
+            position: fixed;
+            top: 100px;
+            left: 16px;
+            z-index: 599;
+            width: 300px;
+            max-width: calc(100% - 32px);
+            background: #101114;
+            border: 1px solid #25262a;
+            border-radius: 14px;
+            box-shadow: 0 18px 42px rgba(0,0,0,0.2);
+        }
         .shift-heading {
             display: flex;
             align-items: flex-start;
@@ -123,6 +135,15 @@
         .shift-footer-dot { width: 7px; height: 7px; border-radius: 50%; background: #55565d; }
         .shift-footer-dot.active { background: #35c995; }
         .shift-footer-dot.on-break { background: #f4bb65; }
+        .toolbox-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 10px;
+            text-align: center;
+        }
         .field { margin-top: 6px; }
         .field label { display: block; font-size: 13px; font-weight: 700; margin-bottom: 6px; color: #dedee2; }
         .erlc-input {
@@ -165,6 +186,7 @@
         <button class="back-btn" id="backBtn">← Back</button>
     </div>
     <div class="container" id="container">
+        <div class="shift-backdrop"></div>
         <section class="card shift-card" aria-label="Shift status">
             <div class="shift-heading">
                 <div>
@@ -183,6 +205,7 @@
                 <button type="button" class="shift-btn end-shift hidden" id="endShiftBtn">□ &nbsp; End shift</button>
             </div>
             <p class="shift-note">Your timer tracks total time since you started your shift.</p>
+            <div class="toolbox-label">Toolbox</div>
             <div class="shift-footer">
                 <span class="shift-footer-dot" id="shiftFooterDot"></span>
                 <span id="shiftFooterText">You are not on duty</span>
