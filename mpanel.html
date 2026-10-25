@@ -43,7 +43,15 @@
         .card h2 { margin: 0 0 4px; font-size: 20px; color: #f4f4f5; }
         .card h3 { margin: 0 0 12px; font-size: 16px; color: #f4f4f5; }
         .meta { font-size: 13px; color: #92939a; }
-        .shift-card { padding: 16px; }
+        .shift-card {
+            position: fixed;
+            top: 16px;
+            left: 16px;
+            z-index: 600;
+            width: 300px;
+            max-width: calc(100% - 32px);
+            padding: 16px;
+        }
         .shift-heading {
             display: flex;
             align-items: flex-start;
@@ -89,6 +97,12 @@
         }
         .shift-btn:hover:not(:disabled) { background: #1c1d21; }
         .shift-btn:disabled { opacity: 0.55; cursor: default; }
+        .shift-btn.start {
+            background: #ffffff;
+            color: #090a0c;
+            border-color: #ffffff;
+        }
+        .shift-btn.start:hover:not(:disabled) { background: #e5e5e5; border-color: #e5e5e5; }
         .shift-btn.end-shift {
             border-color: #493034;
             background: #241719;
@@ -138,6 +152,7 @@
         @media (max-width: 520px) {
             .container { padding: 16px; }
             .topbar { padding: 12px 16px; }
+            .shift-card { top: 60px; left: 12px; }
         }
     </style>
 </head>
