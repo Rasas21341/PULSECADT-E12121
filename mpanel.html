@@ -693,6 +693,46 @@ async function loadCommunity() {
             }
         });
 
+        if (toolboxHSendBtn) {
+            toolboxHSendBtn.addEventListener("click", async () => {
+                const message = toolboxHInput ? toolboxHInput.value.trim() : "";
+                if (!message) {
+                    toolboxHStatusEl.textContent = "Type a message first.";
+                    toolboxHStatusEl.className = "toolbox-status error";
+                    return;
+                }
+                if (!erlcApiKey) {
+                    toolboxHStatusEl.textContent = "No ERLC API key set.";
+                    toolboxHStatusEl.className = "toolbox-status error";
+                    return;
+                }
+                toolboxHSendBtn.disabled = true;
+                toolboxHSendBtn.textContent = "Sending...";
+                toolboxHStatusEl.textContent = "";
+                toolboxHStatusEl.className = "toolbox-status";
+                try {
+                    const result = await sendErkHMessage(message);
+                    toolboxHStatusEl.textContent = (result && result.message) ? result.message : "Message sent.";
+                    toolboxHStatusEl.className = "toolbox-status ok";
+                    if (toolboxHInput) toolboxHInput.value = "";
+                } catch (err) {
+                    toolboxHStatusEl.textContent = "Failed to send: " + err.message;
+                    toolboxHStatusEl.className = "toolbox-status error";
+                    console.error("Toolbox :h command failed:", err);
+                } finally {
+                    toolboxHSendBtn.disabled = false;
+                    toolboxHSendBtn.textContent = "Send :h";
+                }
+            });
+        }
+
+        toolboxHInput && toolboxHInput.addEventListener("keydown", (e) => {
+            if (e.key === "Enter") {
+                e.preventDefault();
+                toolboxHSendBtn && toolboxHSendBtn.click();
+            }
+        });
+
         document.addEventListener("keydown", (e) => {
             if (e.key === "Escape" && toolboxModal && toolboxModal.classList.contains("open")) {
                 closeToolboxModal();
