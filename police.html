@@ -2207,6 +2207,7 @@
             <div class="modal-tabs">
                 <button type="button" class="modal-tab active" data-tab="plate" data-target="lookupPlatePanel">Plate</button>
                 <button type="button" class="modal-tab" data-tab="civilian" data-target="lookupCivilianPanel">Civilian</button>
+                    <button type="button" class="modal-tab" data-tab="licence" data-target="lookupLicencePanel">Licence</button>
             </div>
             <div class="modal-tab-panel active" id="lookupPlatePanel">
                 <div class="lookup-field">
@@ -2248,10 +2249,15 @@
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
-
-    <div class="modal-overlay" id="trafficStopModal">
+            <div class="modal-tab-panel" id="lookupLicencePanel">
+                <div class="lookup-field">
+                    <label for="licenceInput">Licence ID / Number</label>
+                    <input type="text" id="licenceInput" placeholder="e.g. DL-12345" />
+                </div>
+                <button type="button" class="lookup-submit" id="licenceSubmitBtn">Search</button>
+                <div class="lookup-error" id="licenceError"></div>
+                <div class="lookup-result" id="licenceResult"></div>
+            </div>
         <div class="modal">
             <div class="modal-header">
                 <div class="modal-title">Traffic Stop Report</div>
@@ -3114,8 +3120,12 @@ async function loadUnitsBar() {
         const lookupModalClose = document.getElementById("lookupModalClose");
         const plateInput = document.getElementById("plateInput");
         const plateSubmitBtn = document.getElementById("plateSubmitBtn");
+        const licenceInput = document.getElementById("licenceInput");
+        const licenceSubmitBtn = document.getElementById("licenceSubmitBtn");
         const plateError = document.getElementById("plateError");
         const plateResult = document.getElementById("plateResult");
+        const licenceError = document.getElementById("licenceError");
+        const licenceResult = document.getElementById("licenceResult");
         const civilianInput = document.getElementById("civilianInput");
         const civilianSubmitBtn = document.getElementById("civilianSubmitBtn");
         const civilianError = document.getElementById("civilianError");
@@ -3224,6 +3234,59 @@ async function loadUnitsBar() {
                     }
                 } catch (err) {
                     if (plateError) { plateError.textContent = "Lookup failed."; plateError.style.display = "block"; }
+                    console.error(err);
+                }
+            });
+        }
+
+if (licenceSubmitBtn) {
+            licenceSubmitBtn.addEventListener("click", async () => {
+                const query = licenceInput ? licenceInput.value.trim() : "";
+                if (!query) {
+                    if (licenceError) { licenceError.textContent = "Enter a licence ID."; licenceError.style.display = "block"; }
+                    return;
+                }
+                if (!localSupabase) {
+                    if (licenceError) { licenceError.textContent = "Database unavailable."; licenceError.style.display = "block"; }
+                    return;
+                }
+                if (licenceError) { licenceError.textContent = ""; licenceError.style.display = "none"; }
+                if (licenceResult) { licenceResult.textContent = ""; licenceResult.style.display = "none"; }
+
+                try {
+                    const { data, error } = await localSupabase
+                        .from("licenses")
+                        .select("*")
+                        .ilike("license_number", query)
+                        .limit(5);
+
+                    if (error) {
+                        if (licenceResult) {
+                            licenceResult.style.display = "block";
+                            licenceResult.textContent = "Result not found.";
+                        }
+                        return;
+                    }
+
+                    if (!Array.isArray(data) || data.length === 0) {
+                        if (licenceResult) {
+                            licenceResult.style.display = "block";
+                            licenceResult.textContent = "No records found.";
+                        }
+                        return;
+                    }
+
+                    const rows = data.map((row) => {
+                        const info = [row.license_number, row.license_type, row.suspended ? "SUSPENDED" : "ACTIVE"].filter(Boolean).join(" | ");
+                        return info || "Record";
+                    });
+
+                    if (licenceResult) {
+                        licenceResult.style.display = "block";
+                        licenceResult.textContent = rows.join("\n");
+                    }
+                } catch (err) {
+                    if (licenceError) { licenceError.textContent = "Lookup failed."; licenceError.style.display = "block"; }
                     console.error(err);
                 }
             });
