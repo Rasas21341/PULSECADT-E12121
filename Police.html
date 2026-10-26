@@ -3126,7 +3126,8 @@ async function loadUnitsBar() {
         const plateResult = document.getElementById("plateResult");
         const licenceError = document.getElementById("licenceError");
         const licenceResult = document.getElementById("licenceResult");
-        const civilianInput = document.getElementById("civilianInput");
+        const civilianDetails = document.getElementById("civilianDetails");
+        if (civilianDetails) civilianDetails.style.display = "none";
         const civilianSubmitBtn = document.getElementById("civilianSubmitBtn");
         const civilianError = document.getElementById("civilianError");
         const civilianResult = document.getElementById("civilianResult");
@@ -3166,6 +3167,7 @@ async function loadUnitsBar() {
                 if (plateInput) plateInput.value = "";
                 if (plateError) { plateError.textContent = ""; plateError.style.display = "none"; }
                 if (plateResult) { plateResult.textContent = ""; plateResult.style.display = "none"; }
+                if (civilianDetails) civilianDetails.style.display = "none";
                 lookupModal.classList.add("open");
                 const plateTab = document.querySelector('.modal-tab[data-tab="plate"]');
                 switchLookupTab(plateTab);
@@ -3179,6 +3181,7 @@ async function loadUnitsBar() {
                 if (civilianInput) civilianInput.value = "";
                 if (civilianError) { civilianError.textContent = ""; civilianError.style.display = "none"; }
                 if (civilianResult) { civilianResult.textContent = ""; civilianResult.style.display = "none"; }
+                if (civilianDetails) civilianDetails.style.display = "none";
                 lookupModal.classList.add("open");
                 const civilianTab = document.querySelector('.modal-tab[data-tab="civilian"]');
                 switchLookupTab(civilianTab);
