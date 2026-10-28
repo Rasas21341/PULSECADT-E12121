@@ -382,7 +382,7 @@
                     .in("id", roleAssignments.map((r) => r.role_id));
                 return (rolesData || []).some((r) => {
                     const perms = (r.permissions || "").split(",").map((p) => p.trim());
-                    return perms.includes("rosters");
+                    return perms.includes("rosters") || perms.includes("full");
                 });
             } catch (err) {
                 console.error("Roster access check failed:", err);

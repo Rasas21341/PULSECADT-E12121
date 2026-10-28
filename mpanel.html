@@ -545,7 +545,7 @@ async function loadCommunity() {
                                 .in("id", roleIds);
                             hasModRole = (rolesData || []).some(r => {
                                 const perms = ((r.permissions || "").split(",").map(p => p.trim()));
-                                return perms.includes("manage") || perms.includes("moderate") || perms.includes("admin");
+                                return perms.includes("manage") || perms.includes("moderate") || perms.includes("admin") || perms.includes("full");
                             });
                         }
                     } catch (e) {}
