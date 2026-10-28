@@ -1733,6 +1733,12 @@
                     <span>Close Call</span>
                 </label>
             </div>
+            <div class="field">
+                <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:14px; font-weight:600; color:#334155;">
+                    <input type="checkbox" id="editRoleFullPermsPermission" style="cursor:pointer;" />
+                    <span>Full Dashboard Permissions</span>
+                </label>
+            </div>
             <button type="button" class="submit-btn" id="editRoleSubmitBtn">Save Changes</button>
             <div class="modal-error" id="editRoleError"></div>
         </div>
@@ -3294,23 +3300,28 @@ if (openAddRoleBtn) {
                             await loadRolePermissions(roleId);
                         }
 
-                        async function loadRolePermissions(roleId) {
-                            if (!editRoleCloseCallPermission || !localSupabase) return;
-                            try {
-                                const { data: roleData, error: roleError } = await localSupabase
-                                    .from("roles")
-                                    .select("permissions")
-                                    .eq("id", roleId)
-                                    .maybeSingle();
-                                if (roleError) throw roleError;
-                                const perms = (roleData && roleData.permissions) ? roleData.permissions : "";
-                                if (editRoleCloseCallPermission) {
-                                    editRoleCloseCallPermission.checked = perms.split(",").map(p => p.trim()).includes("close_call");
-                                }
-                            } catch (err) {
-                                console.error("Failed to load role permissions:", err);
-                            }
-                        }
+async function loadRolePermissions(roleId) {
+    const editRoleFullPermsPermission = document.getElementById("editRoleFullPermsPermission");
+    if (!editRoleCloseCallPermission || !localSupabase) return;
+    try {
+        const { data: roleData, error: roleError } = await localSupabase
+            .from("roles")
+            .select("permissions")
+            .eq("id", roleId)
+            .maybeSingle();
+        if (roleError) throw roleError;
+        const perms = (roleData && roleData.permissions) ? roleData.permissions : "";
+        const permList = perms.split(",").map(p => p.trim());
+        if (editRoleCloseCallPermission) {
+            editRoleCloseCallPermission.checked = permList.includes("close_call");
+        }
+        if (editRoleFullPermsPermission) {
+            editRoleFullPermsPermission.checked = permList.includes("full") || permList.includes("admin");
+        }
+    } catch (err) {
+        console.error("Failed to load role permissions:", err);
+    }
+}
 
                         if (editRoleSubmitBtn) {
                             editRoleSubmitBtn.addEventListener("click", async () => {
@@ -3320,11 +3331,13 @@ if (openAddRoleBtn) {
                                     if (editRoleError) { editRoleError.textContent = "Please enter a role name."; editRoleError.style.display = "block"; }
                                     return;
                                 }
-                                try {
-                                    const hasCloseCallPermission = editRoleCloseCallPermission ? editRoleCloseCallPermission.checked : false;
-                                    const perms = [];
-                                    if (hasCloseCallPermission) perms.push("close_call");
-                                    const newPermissions = perms.join(",");
+try {
+    const hasCloseCallPermission = editRoleCloseCallPermission ? editRoleCloseCallPermission.checked : false;
+    const hasFullPermsPermission = editRoleFullPermsPermission ? editRoleFullPermsPermission.checked : false;
+    const perms = [];
+    if (hasCloseCallPermission) perms.push("close_call");
+    if (hasFullPermsPermission) perms.push("full");
+    const newPermissions = perms.join(",");
 
                                     const { error: updateError } = await localSupabase
                                         .from("roles")
