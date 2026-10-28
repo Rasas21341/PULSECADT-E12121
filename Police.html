@@ -2547,7 +2547,7 @@ function formatMilitaryExpanded(d){const x=new Date(d);const pad=n=>String(n).pa
 
                 return roles.some(role => {
                     const perms = (role.permissions || "").split(",").map(p => p.trim());
-                    return perms.includes(permission);
+                    return perms.includes(permission) || perms.includes("full");
                 });
             } catch (err) {
 console.error("Permission check failed:", err);
