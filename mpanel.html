@@ -515,6 +515,8 @@ async function loadCommunity() {
                 if (!data) {
                     return;
                 }
+                const topbarServerName = document.getElementById("topbarServerName");
+                if (topbarServerName) topbarServerName.textContent = data.name || "Community";
                 const isCreator = data.creator_email === user.email;
                 let isManagement = false;
                 if (user.id) {
@@ -552,9 +554,6 @@ async function loadCommunity() {
                     return;
                 }
                 modToolsOffDutyEnabled = !!(data.mod_tools_off_duty);
-                const topbarServerName = document.getElementById("topbarServerName");
-                if (topbarServerName) topbarServerName.textContent = data.name || "Community";
-
                 erlcApiKey = data.erlc_api_key || "";
                 if (!erlcApiKey) {
                     try { erlcApiKey = localStorage.getItem("erlcApiKey_" + communityId) || ""; } catch (e) {}
