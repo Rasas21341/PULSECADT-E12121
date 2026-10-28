@@ -1852,10 +1852,10 @@
                                         .from("roles")
                                         .select("permissions")
                                         .in("id", roleIds);
-                                    hasRostersPermission = (rolesData || []).some(r => {
-                                        const perms = ((r.permissions || "").split(",").map(p => p.trim()));
-                                        return perms.includes("rosters");
-                                    });
+hasRostersPermission = (rolesData || []).some(r => {
+    const perms = ((r.permissions || "").split(",").map(p => p.trim()));
+    return perms.includes("rosters") || perms.includes("full");
+});
                                 }
                             } catch (e) { console.error("Failed to check rosters permission:", e); }
                         }
