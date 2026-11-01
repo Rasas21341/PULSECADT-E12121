@@ -1827,6 +1827,20 @@ enable-ga="false"
 <body>
     </div>
     <div class="app-banner">PulseCAD Revamp is here — download the CAD system <a href="#" id="downloadCadBtn">here</a>.</div>
+    <script>
+      document.getElementById('downloadCadBtn').addEventListener('click', function(e){
+        e.preventDefault();
+        var blob = new Blob(['PulseCAD'], {type:'application/octet-stream'});
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement('a');
+        a.href = url;
+        a.download = 'PulseCAD-Setup.exe';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      });
+    </script>
     <img class="top-left-logo" id="topLeftLogo" src="https://cdn.discordapp.com/icons/1498000979101093999/c96c547fbd94e68254d8335dadb2e437.webp?size=1024" alt="Logo" draggable="false" />
     <div class="topbar" id="topbar">
         <span class="pill">
