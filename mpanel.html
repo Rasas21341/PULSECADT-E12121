@@ -463,10 +463,20 @@ const shiftTimeEl = document.getElementById("shiftTime");
 const shiftBadgeEl = document.getElementById("shiftBadge");
 const shiftNameEl = document.getElementById("shiftName");
 const shiftFooterDotEl = document.getElementById("shiftFooterDot");
-const shiftFooterTextEl = document.getElementById("shiftFooterText");
-let shiftStartedAt = null;
+        const shiftFooterTextEl = document.getElementById("shiftFooterText");
+        const activeStaffListEl = document.getElementById("activeStaffList");
+        let shiftStartedAt = null;
         let shiftOnBreak = false;
         let modToolsOffDutyEnabled = false;
+        let currentUser = null;
+
+        function fmtDuration(startedAt) {
+            const seconds = Math.floor((Date.now() - startedAt) / 1000);
+            const h = String(Math.floor(seconds / 3600)).padStart(2, "0");
+            const m = String(Math.floor((seconds % 3600) / 60)).padStart(2, "0");
+            const s = String(seconds % 60).padStart(2, "0");
+            return h + ":" + m + ":" + s;
+        }
 
         function renderShift() {
             const onDuty = shiftStartedAt !== null;
@@ -480,37 +490,123 @@ let shiftStartedAt = null;
             shiftFooterTextEl.textContent = !onDuty ? "You are not on duty" : shiftOnBreak ? "You are on break" : "You are on duty";
             breakShiftBtn.textContent = shiftOnBreak ? "▶  Resume" : "Ⅱ  Break";
             if (shiftTimeEl) {
-                const seconds = onDuty ? Math.floor((Date.now() - shiftStartedAt) / 1000) : 0;
-                const hours = String(Math.floor(seconds / 3600)).padStart(2, "0");
-                const minutes = String(Math.floor((seconds % 3600) / 60)).padStart(2, "0");
-                const remainder = String(seconds % 60).padStart(2, "0");
-                shiftTimeEl.textContent = hours + ":" + minutes + ":" + remainder;
+                shiftTimeEl.textContent = onDuty ? fmtDuration(shiftStartedAt) : "00:00:00";
             }
             const toolboxDisabled = !onDuty && !modToolsOffDutyEnabled;
             if (toolboxBtn) toolboxBtn.disabled = toolboxDisabled;
             if (toolboxBtn) toolboxBtn.title = toolboxDisabled ? "Start your shift to use the toolbox" : "";
         }
 
-startShiftBtn.addEventListener("click", () => {
-    shiftStartedAt = Date.now();
-    shiftOnBreak = false;
-    shiftStatusEl.textContent = "";
-    renderShift();
-});
+        async function startShift() {
+            if (!currentUser || !communityId) return;
+            const { data, error } = await localSupabase
+                .from("staff_shifts")
+                .insert({
+                    community_id: communityId,
+                    user_id: currentUser.id,
+                    user_email: currentUser.email || "",
+                    started_at: new Date().toISOString(),
+                    on_break: false
+                })
+                .select()
+                .maybeSingle();
+            if (error) {
+                shiftStatusEl.textContent = "Failed to start shift: " + error.message;
+                shiftStatusEl.className = "status error";
+                return;
+            }
+            shiftStartedAt = new Date(data.started_at).getTime();
+            shiftOnBreak = false;
+            shiftStatusEl.textContent = "";
+            renderShift();
+            loadActiveStaff();
+        }
 
-breakShiftBtn.addEventListener("click", () => {
-    shiftOnBreak = !shiftOnBreak;
-    renderShift();
-});
+        async function toggleBreak() {
+            if (!currentUser || !communityId) return;
+            const nextBreak = !shiftOnBreak;
+            const { error } = await localSupabase
+                .from("staff_shifts")
+                .update({ on_break: nextBreak })
+                .eq("community_id", communityId)
+                .eq("user_id", currentUser.id)
+                .is("ended_at", null)
+                .order("started_at", { ascending: false })
+                .limit(1);
+            if (error) {
+                shiftStatusEl.textContent = "Failed to update break: " + error.message;
+                shiftStatusEl.className = "status error";
+                return;
+            }
+            shiftOnBreak = nextBreak;
+            renderShift();
+            loadActiveStaff();
+        }
 
-endShiftBtn.addEventListener("click", () => {
-    shiftStartedAt = null;
-    shiftOnBreak = false;
-    shiftStatusEl.textContent = "";
-    renderShift();
-});
+        async function endShift() {
+            if (!currentUser || !communityId) return;
+            const { error } = await localSupabase
+                .from("staff_shifts")
+                .update({ ended_at: new Date().toISOString(), on_break: false })
+                .eq("community_id", communityId)
+                .eq("user_id", currentUser.id)
+                .is("ended_at", null)
+                .order("started_at", { ascending: false })
+                .limit(1);
+            if (error) {
+                shiftStatusEl.textContent = "Failed to end shift: " + error.message;
+                shiftStatusEl.className = "status error";
+                return;
+            }
+            shiftStartedAt = null;
+            shiftOnBreak = false;
+            shiftStatusEl.textContent = "";
+            renderShift();
+            loadActiveStaff();
+        }
 
-renderShift();
+        startShiftBtn.addEventListener("click", startShift);
+        breakShiftBtn.addEventListener("click", toggleBreak);
+        endShiftBtn.addEventListener("click", endShift);
+
+        async function loadActiveStaff() {
+            if (!communityId || !activeStaffListEl) return;
+            activeStaffListEl.innerHTML = '<div class="active-staff-meta">Loading...</div>';
+            try {
+                const { data, error } = await localSupabase
+                    .from("staff_shifts")
+                    .select("*")
+                    .eq("community_id", communityId)
+                    .is("ended_at", null)
+                    .order("started_at", { ascending: false });
+                if (error) {
+                    activeStaffListEl.innerHTML = '<div class="active-staff-meta">Unable to load active staff.</div>';
+                    return;
+                }
+                if (!data || data.length === 0) {
+                    activeStaffListEl.innerHTML = '<div class="active-staff-meta">No active staff.</div>';
+                    return;
+                }
+                activeStaffListEl.innerHTML = data.map((s) => {
+                    const name = (s.user_email || "Staff").split("@")[0];
+                    const badgeClass = s.on_break ? "on-break" : "on-duty";
+                    const badgeText = s.on_break ? "On break" : "On duty";
+                    const started = new Date(s.started_at);
+                    const timeStr = started.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+                    return `<div class="active-staff-item">
+                        <div>
+                            <div class="active-staff-name">${name}</div>
+                            <div class="active-staff-meta">Started ${timeStr}</div>
+                        </div>
+                        <span class="active-staff-badge ${badgeClass}"><span class="active-staff-dot"></span>${badgeText}</span>
+                    </div>`;
+                }).join("");
+            } catch (e) {
+                activeStaffListEl.innerHTML = '<div class="active-staff-meta">Unable to load active staff.</div>';
+            }
+        }
+
+        renderShift();
         window.setInterval(renderShift, 1000);
 
         async function loadCommunity() {
