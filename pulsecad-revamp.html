@@ -3258,8 +3258,6 @@ async function joinCommunity(communityId, passcode) {
 if (topLeftLogo) topLeftLogo.classList.add("visible");
                const trustedFooter = document.getElementById("trustedFooter");
               if (trustedFooter) trustedFooter.style.display = "none";
-              const appBanner = document.getElementById("appBanner");
-              if (appBanner) appBanner.style.display = "none";
               if (topbar) topbar.style.top = "24px";
           }
 
@@ -3280,8 +3278,6 @@ if (topLeftLogo) topLeftLogo.classList.add("visible");
 if (topLeftLogo) topLeftLogo.classList.remove("visible");
                const trustedFooter = document.getElementById("trustedFooter");
               if (trustedFooter) trustedFooter.style.display = "block";
-              const appBanner = document.getElementById("appBanner");
-              if (appBanner) appBanner.style.display = "inline-flex";
          }
 
         async function restoreSession() {
