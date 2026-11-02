@@ -2922,10 +2922,12 @@ if (loggedInScreen) loggedInScreen.classList.remove("open");
                  if (topbar) topbar.style.display = "block";
                  if (userDropdown) userDropdown.style.display = "none";
                  if (dropdownMenu) dropdownMenu.classList.remove("open");
-                 if (loggedInScreen) loggedInScreen.classList.remove("open");
-                 if (settingsScreen) settingsScreen.classList.remove("open");
-                 if (container) container.style.display = "block";
-                 notifyDiscordLogout(logoutEmail);
+if (loggedInScreen) loggedInScreen.classList.remove("open");
+                    if (settingsScreen) settingsScreen.classList.remove("open");
+                    if (container) container.style.display = "block";
+                    const pumpkin = document.getElementById("pumpkin");
+                    if (pumpkin) pumpkin.classList.remove("show");
+                    notifyDiscordLogout(logoutEmail);
              });
          }
 
