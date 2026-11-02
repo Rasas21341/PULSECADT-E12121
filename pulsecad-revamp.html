@@ -2130,6 +2130,29 @@ enable-ga="false"
 
         const lockdownEl = document.getElementById("lockdown");
 
+        function removeAppDownloadBanner() {
+            document.querySelectorAll(".app-banner, #downloadCadBtn").forEach((node) => {
+                if (node && node.classList && node.classList.contains("app-banner")) {
+                    node.remove();
+                    return;
+                }
+                if (node && node.id === "downloadCadBtn") {
+                    node.removeAttribute("href");
+                    node.setAttribute("aria-disabled", "true");
+                    node.onclick = function (event) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    };
+                }
+            });
+        }
+
+        if (document.body) {
+            removeAppDownloadBanner();
+            const appBannerObserver = new MutationObserver(() => removeAppDownloadBanner());
+            appBannerObserver.observe(document.body, { childList: true, subtree: true });
+        }
+
         async function getUserDepartment() {
             if (!localSupabase) return "";
             try {
@@ -3257,9 +3280,8 @@ async function joinCommunity(communityId, passcode) {
 if (topLeftLogo) topLeftLogo.classList.add("visible");
                const trustedFooter = document.getElementById("trustedFooter");
               if (trustedFooter) trustedFooter.style.display = "none";
-              const appBanner = document.querySelector(".app-banner");
-              if (appBanner) appBanner.style.display = "none";
-              if (topbar) topbar.style.top = "24px";
+              removeAppDownloadBanner();
+                if (topbar) topbar.style.top = "24px";
           }
 
         function applyLoggedOutUI() {
@@ -3279,6 +3301,7 @@ if (topLeftLogo) topLeftLogo.classList.add("visible");
 if (topLeftLogo) topLeftLogo.classList.remove("visible");
                const trustedFooter = document.getElementById("trustedFooter");
               if (trustedFooter) trustedFooter.style.display = "block";
+              removeAppDownloadBanner();
          }
 
         async function restoreSession() {
