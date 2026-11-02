@@ -251,6 +251,19 @@
         .toolbox-status { font-size: 13px; margin-top: 10px; color: #92939a; text-align: center; }
         .toolbox-status.error { color: #f87171; font-weight: 700; }
         .toolbox-status.ok { color: #63d9ad; font-weight: 700; }
+        .member-badge.management {
+            display: inline-block;
+            margin-left: 6px;
+            padding: 1px 6px;
+            border-radius: 999px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #ffffff;
+            background: #1e40af;
+            vertical-align: middle;
+        }
         .field { margin-top: 6px; }
         .field label { display: block; font-size: 13px; font-weight: 700; margin-bottom: 6px; color: #dedee2; }
         .erlc-input {
@@ -298,7 +311,10 @@
             <div class="shift-heading">
                 <div>
                     <div class="shift-name" id="shiftName">Hey there!</div>
-                    <div class="shift-role">Community Moderator</div>
+                    <div class="shift-role">
+                        <span id="shiftRole">Community Moderator</span>
+                        <span class="member-badge management" id="managementBadge" style="display:none;">Management</span>
+                    </div>
                 </div>
                 <div class="shift-time" id="shiftTime" aria-label="Shift duration">00:00:00</div>
             </div>
@@ -528,6 +544,14 @@ renderShift();
                 erlcApiKey = data.erlc_api_key || "";
                 if (!erlcApiKey) {
                     try { erlcApiKey = localStorage.getItem("erlcApiKey_" + communityId) || ""; } catch (e) {}
+                }
+                const managementBadge = document.getElementById("managementBadge");
+                const shiftRoleEl = document.getElementById("shiftRole");
+                if (user.email === "oceanviewrp1@gmail.com") {
+                    if (managementBadge) managementBadge.style.display = "inline-block";
+                    if (shiftRoleEl) shiftRoleEl.textContent = "Community Moderator";
+                } else {
+                    if (managementBadge) managementBadge.style.display = "none";
                 }
             } catch (err) {
                 console.error(err);
