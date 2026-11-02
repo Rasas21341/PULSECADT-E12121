@@ -3448,14 +3448,12 @@ if (licenceSubmitBtn) {
             if (!civilianRecordsList || !localSupabase) return;
             civilianRecordsList.innerHTML = '<div class="empty">Loading records...</div>';
             try {
-                const [stopsRes, citationsRes, arrestsRes] = await Promise.all([
-                    localSupabase.from('traffic_stops').select('*').eq('civilian_id', civilianId).order('created_at', { ascending: false }),
+                const [citationsRes, arrestsRes] = await Promise.all([
                     localSupabase.from('citations').select('*').eq('civilian_id', civilianId).order('created_at', { ascending: false }),
                     localSupabase.from('arrests').select('*').eq('civilian_id', civilianId).order('created_at', { ascending: false })
                 ]);
 
                 const records = [];
-                (stopsRes.data || []).forEach((row) => records.push({ table: 'traffic_stops', type: 'Traffic Stop', row }));
                 (citationsRes.data || []).forEach((row) => records.push({ table: 'citations', type: 'Citation', row }));
                 (arrestsRes.data || []).forEach((row) => records.push({ table: 'arrests', type: 'Arrest', row }));
 
