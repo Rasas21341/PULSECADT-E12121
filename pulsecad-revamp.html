@@ -925,6 +925,23 @@
             display: block;
         }
 
+        .pumpkin {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            font-size: 64px;
+            z-index: 900;
+            opacity: 0;
+            transform: scale(0.5);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+            pointer-events: none;
+        }
+
+        .pumpkin.show {
+            opacity: 1;
+            transform: scale(1);
+        }
+
         .top-left-logo {
             position: fixed;
             top: 24px;
@@ -1923,8 +1940,9 @@ enable-ga="false"
         <p>We are actively working on the PulseCAD Revamp. Updates are in progress.</p>
         <span class="status"><span class="status-dot"></span>In Progress</span>
     </div>
-      <div class="logged-in-screen" id="loggedInScreen">
-            <div class="top-actions">
+<div class="logged-in-screen" id="loggedInScreen">
+        <div class="pumpkin" id="pumpkin">🎃</div>
+        <div class="top-actions">
                 <button type="button" class="create-community-centered-btn" id="createCommunityCenteredBtn">+ Create</button>
                 <button type="button" class="moderation-btn" id="moderationBtn">Moderation</button>
                  <button type="button" class="join-community-centered-btn" id="joinCommunityCenteredBtn">
@@ -2622,6 +2640,8 @@ enable-ga="false"
                     if (container) container.style.display = "none";
                     if (authModal) authModal.classList.remove("open");
                     updatePremiumUI();
+                    const pumpkin = document.getElementById("pumpkin");
+                    if (pumpkin) pumpkin.classList.add("show");
                 } catch (err) {
                     if (loginError) { loginError.textContent = "An unexpected error occurred."; loginError.style.display = "block"; }
                     console.error(err);
