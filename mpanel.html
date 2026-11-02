@@ -284,6 +284,40 @@
             opacity: 0.6;
         }
         .active-staff-resize:hover { opacity: 1; }
+        .active-players-card {
+            position: fixed;
+            top: 120px;
+            right: 16px;
+            z-index: 540;
+            width: 300px;
+            max-width: calc(100% - 32px);
+            box-shadow: 0 18px 42px rgba(0,0,0,0.2);
+        }
+        .active-players-list { display: flex; flex-direction: column; gap: 6px; max-height: 280px; overflow-y: auto; }
+        .active-player-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            padding: 8px 10px;
+            background: #111216;
+            border: 1px solid #25262a;
+            border-radius: 9px;
+            font-size: 13px;
+        }
+        .active-player-name { font-weight: 700; color: #f4f4f5; }
+        .active-player-meta { color: #92939a; font-size: 11px; }
+        .active-player-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 2px 7px;
+            border-radius: 999px;
+            font-size: 9px;
+            font-weight: 700;
+        }
+        .active-player-badge.staff { background: #102820; color: #63d9ad; }
+        .active-player-badge.civilian { background: #242529; color: #a1a1aa; }
         .active-staff-list { display: flex; flex-direction: column; gap: 8px; }
         .toolbox-label {
             font-size: 11px;
@@ -495,6 +529,12 @@
                 <div class="active-staff-meta">Loading...</div>
             </div>
             <div class="active-staff-resize" id="activeStaffResize"></div>
+        </div>
+        <div class="card active-players-card">
+            <h3>Active Players</h3>
+            <div id="activePlayersList" class="active-players-list">
+                <div class="active-player-meta">Loading...</div>
+            </div>
         </div>
         <div class="toolbox-modal" id="toolboxModal">
             <div class="toolbox-modal-card">
