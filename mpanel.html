@@ -574,6 +574,11 @@ const shiftFooterDotEl = document.getElementById("shiftFooterDot");
             if (!communityId || !activeStaffListEl) return;
             activeStaffListEl.innerHTML = '<div class="active-staff-meta">Loading...</div>';
             try {
+                const { data: mgmtUsers } = await localSupabase
+                    .from("users")
+                    .select("email")
+                    .eq("department", "Management");
+                const mgmtEmails = new Set((mgmtUsers || []).map(u => (u.email || "").toLowerCase()));
                 const { data, error } = await localSupabase
                     .from("staff_shifts")
                     .select("*")
@@ -592,11 +597,13 @@ const shiftFooterDotEl = document.getElementById("shiftFooterDot");
                     const name = (s.user_email || "Staff").split("@")[0];
                     const badgeClass = s.on_break ? "on-break" : "on-duty";
                     const badgeText = s.on_break ? "On break" : "On duty";
+                    const mgmtBadge = mgmtEmails.has((s.user_email || "").toLowerCase())
+                        ? ' <span class="member-badge management">Management</span>' : '';
                     const started = new Date(s.started_at);
                     const timeStr = started.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
                     return `<div class="active-staff-item">
                         <div>
-                            <div class="active-staff-name">${name}</div>
+                            <div class="active-staff-name">${name}${mgmtBadge}</div>
                             <div class="active-staff-meta">Started ${timeStr}</div>
                         </div>
                         <span class="active-staff-badge ${badgeClass}"><span class="active-staff-dot"></span>${badgeText}</span>
