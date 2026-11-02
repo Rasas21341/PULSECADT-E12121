@@ -671,6 +671,7 @@ const shiftFooterDotEl = document.getElementById("shiftFooterDot");
                 if (!isCreator && !isManagement && !hasModRole) {
                     return;
                 }
+                currentUser = user;
                 modToolsOffDutyEnabled = !!(data.mod_tools_off_duty);
                 erlcApiKey = data.erlc_api_key || "";
                 if (!erlcApiKey) {
@@ -684,6 +685,23 @@ const shiftFooterDotEl = document.getElementById("shiftFooterDot");
                 } else {
                     if (managementBadge) managementBadge.style.display = "none";
                 }
+                try {
+                    const { data: activeShift } = await localSupabase
+                        .from("staff_shifts")
+                        .select("*")
+                        .eq("community_id", communityId)
+                        .eq("user_id", user.id)
+                        .is("ended_at", null)
+                        .order("started_at", { ascending: false })
+                        .limit(1)
+                        .maybeSingle();
+                    if (activeShift) {
+                        shiftStartedAt = new Date(activeShift.started_at).getTime();
+                        shiftOnBreak = !!activeShift.on_break;
+                    }
+                } catch (e) {}
+                renderShift();
+                loadActiveStaff();
             } catch (err) {
                 console.error(err);
             }
