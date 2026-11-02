@@ -943,6 +943,55 @@ const shiftFooterDotEl = document.getElementById("shiftFooterDot");
             });
         })();
 
+        const activePlayersListEl = document.getElementById("activePlayersList");
+
+        async function loadActivePlayers() {
+            if (!activePlayersListEl) return;
+            activePlayersListEl.innerHTML = '<div class="active-player-meta">Loading...</div>';
+            try {
+                const urls = ["/api/erlc/v2/server?Players=true&Staff=true", "https://api.erlc.gg/v2/server?Players=true&Staff=true"];
+                let lastErr = "";
+                let data = null;
+                for (const url of urls) {
+                    try {
+                        const headers = { "accept": "application/json" };
+                        if (erlcApiKey) headers["server-key"] = erlcApiKey;
+                        const resp = await fetch(url, { headers });
+                        if (resp.ok) {
+                            data = await resp.json();
+                            break;
+                        }
+                        lastErr = "HTTP " + resp.status;
+                    } catch (e) {
+                        lastErr = e.message;
+                    }
+                }
+                if (!data) {
+                    activePlayersListEl.innerHTML = '<div class="active-player-meta">Unable to load players (' + lastErr + ').</div>';
+                    return;
+                }
+                const players = data.Player || data.players || [];
+                if (!Array.isArray(players) || players.length === 0) {
+                    activePlayersListEl.innerHTML = '<div class="active-player-meta">No players online.</div>';
+                    return;
+                }
+                activePlayersListEl.innerHTML = players.map((p) => {
+                    const name = (p.Player || p.Name || "Player").split(":")[0];
+                    const isStaff = !!(p.Staff || p.IsStaff);
+                    const badgeClass = isStaff ? "staff" : "civilian";
+                    const badgeText = isStaff ? "Staff" : "Civilian";
+                    return `<div class="active-player-item">
+                        <div>
+                            <div class="active-player-name">${name}</div>
+                        </div>
+                        <span class="active-player-badge ${badgeClass}">${badgeText}</span>
+                    </div>`;
+                }).join("");
+            } catch (e) {
+                activePlayersListEl.innerHTML = '<div class="active-player-meta">Unable to load players.</div>';
+            }
+        }
+
         async function loadActiveStaff() {
             if (!communityId || !activeStaffListEl) return;
             activeStaffListEl.innerHTML = '<div class="active-staff-meta">Loading...</div>';
@@ -994,6 +1043,7 @@ const shiftFooterDotEl = document.getElementById("shiftFooterDot");
         renderShift();
         window.setInterval(renderShift, 1000);
         window.setInterval(loadActiveStaff, 5000);
+        window.setInterval(loadActivePlayers, 5000);
 
         async function loadCommunity() {
             if (!communityId) {
@@ -1094,6 +1144,7 @@ const shiftFooterDotEl = document.getElementById("shiftFooterDot");
                 console.error(err);
             }
             loadActiveStaff();
+            loadActivePlayers();
         }
 
         async function sendErkMessage(message) {
