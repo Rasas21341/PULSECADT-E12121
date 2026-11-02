@@ -701,10 +701,10 @@ const shiftFooterDotEl = document.getElementById("shiftFooterDot");
                     }
                 } catch (e) {}
                 renderShift();
-                loadActiveStaff();
             } catch (err) {
                 console.error(err);
             }
+            loadActiveStaff();
         }
 
         async function sendErkMessage(message) {
