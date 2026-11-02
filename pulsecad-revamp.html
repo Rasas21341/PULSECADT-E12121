@@ -1950,13 +1950,60 @@ enable-ga="false"
         <span class="status"><span class="status-dot"></span>In Progress</span>
 </div>
     <div class="pumpkin" id="pumpkin" aria-hidden="true">
-        <span class="pumpkin-stem"></span>
-        <span class="pumpkin-body">
-            <span class="pumpkin-eye left"></span>
-            <span class="pumpkin-eye right"></span>
-            <span class="pumpkin-nose"></span>
-            <span class="pumpkin-mouth"></span>
-        </span>
+        <svg viewBox="0 0 260 260" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Pumpkin">
+            <defs>
+                <radialGradient id="pumpkinOuter" cx="35%" cy="25%" r="75%">
+                    <stop offset="0%" stop-color="#ffca6a" />
+                    <stop offset="28%" stop-color="#f39d26" />
+                    <stop offset="58%" stop-color="#d96a10" />
+                    <stop offset="100%" stop-color="#8d3d08" />
+                </radialGradient>
+                <linearGradient id="pumpkinRidge" x1="0%" x2="100%">
+                    <stop offset="0%" stop-color="rgba(255,255,255,0.35)"/>
+                    <stop offset="100%" stop-color="rgba(76,34,8,0.5)"/>
+                </linearGradient>
+                <filter id="pumpkinGlow" x="-30%" y="-30%" width="160%" height="160%">
+                    <feDropShadow dx="0" dy="0" stdDeviation="8" flood-color="#f6be52" flood-opacity="0.9"/>
+                </filter>
+            </defs>
+
+            <ellipse cx="130" cy="225" rx="86" ry="26" fill="rgba(0,0,0,0.28)"/>
+            <g filter="url(#pumpkinGlow)">
+                <path d="M127 18
+                         C150 10, 182 18, 197 36
+                         C215 58, 222 90, 219 124
+                         C216 150, 222 180, 213 204
+                         C203 229, 176 244, 146 246
+                         C110 249, 77 238, 58 210
+                         C38 182, 39 142, 42 106
+                         C46 67, 60 44, 80 30
+                         C96 19, 111 12, 127 18 Z"
+                      fill="url(#pumpkinOuter)"
+                      stroke="rgba(89,34,8,0.9)"
+                      stroke-width="8"/>
+                <path d="M88 36 C96 62, 89 100, 88 130 C88 154, 83 178, 70 198" fill="none" stroke="rgba(108,47,14,0.7)" stroke-width="10" stroke-linecap="round"/>
+                <path d="M128 27 C138 57, 140 106, 140 136 C140 160, 146 188, 160 209" fill="none" stroke="rgba(108,47,14,0.7)" stroke-width="10" stroke-linecap="round"/>
+                <path d="M167 42 C180 66, 184 96, 183 130 C182 164, 190 191, 203 204" fill="none" stroke="rgba(108,47,14,0.7)" stroke-width="10" stroke-linecap="round"/>
+                <path d="M110 28 C109 47, 103 67, 110 85 C119 104, 106 122, 87 136" fill="none" stroke="rgba(255,210,121,0.26)" stroke-width="7" stroke-linecap="round"/>
+                <path d="M149 31 C155 52, 165 76, 157 96 C149 116, 170 133, 182 146" fill="none" stroke="rgba(255,210,121,0.24)" stroke-width="7" stroke-linecap="round"/>
+            </g>
+
+            <path d="M133 6 C152 4, 170 12, 176 20 C182 29, 180 42, 170 48 C158 55, 144 53, 133 51 C122 50, 111 50, 103 42 C96 35, 96 23, 104 17 C111 11, 121 8, 133 6 Z" fill="#4c2b12"/>
+            <path d="M120 39 C132 14, 145 12, 158 39" fill="none" stroke="rgba(86,42,16,0.7)" stroke-width="5" stroke-linecap="round"/>
+
+            <g>
+                <path d="M71 87 C80 71, 90 66, 104 73 C118 79, 111 99, 101 106 C88 115, 72 109, 71 87 Z" fill="#130603" opacity="0.96"/>
+                <path d="M125 123 C135 109, 148 108, 156 117 C166 128, 160 144, 147 150 C131 157, 119 143, 125 123 Z" fill="#140805" opacity="0.96"/>
+                <path d="M167 85 C177 71, 193 73, 200 86 C208 100, 203 116, 189 119 C175 123, 165 105, 167 85 Z" fill="#130603" opacity="0.96"/>
+                <path d="M103 156 C117 145, 130 142, 143 146 C149 149, 147 158, 140 165 C129 176, 112 180, 99 174 C92 170, 94 162, 103 156 Z" fill="#140805" opacity="0.96"/>
+                <path d="M86 172 C102 187, 112 196, 127 198 C140 199, 151 193, 165 181 C176 172, 181 163, 183 154 C169 171, 149 181, 125 185 C111 187, 96 182, 86 172 Z" fill="#120803" opacity="0.96"/>
+            </g>
+
+            <g filter="url(#pumpkinGlow)">
+                <path d="M55 92 C66 76, 82 70, 96 78" fill="none" stroke="rgba(255,234,180,0.64)" stroke-width="5" stroke-linecap="round"/>
+                <path d="M161 90 C176 80, 192 81, 206 95" fill="none" stroke="rgba(255,234,180,0.64)" stroke-width="5" stroke-linecap="round"/>
+            </g>
+        </svg>
     </div>
     <div class="logged-in-screen" id="loggedInScreen">
         <div class="top-actions">
