@@ -172,6 +172,18 @@
         .active-staff-badge.on-duty { background: #102820; color: #63d9ad; }
         .active-staff-badge.on-break { background: #302514; color: #f4bb65; }
         .active-staff-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+        .active-staff-resize {
+            position: absolute;
+            bottom: 6px;
+            right: 6px;
+            width: 14px;
+            height: 14px;
+            cursor: nwse-resize;
+            background: linear-gradient(135deg, transparent 50%, #92939a 50%);
+            border-radius: 0 0 14px 0;
+            opacity: 0.6;
+        }
+        .active-staff-resize:hover { opacity: 1; }
         .active-staff-list { display: flex; flex-direction: column; gap: 8px; }
         .toolbox-label {
             font-size: 11px;
@@ -379,6 +391,7 @@
             <div id="activeStaffList" class="active-staff-list">
                 <div class="active-staff-meta">Loading...</div>
             </div>
+            <div class="active-staff-resize" id="activeStaffResize"></div>
         </div>
         <div class="toolbox-modal" id="toolboxModal">
             <div class="toolbox-modal-card">
