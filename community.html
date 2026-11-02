@@ -2697,59 +2697,9 @@ if (supervisorInput) {
                                                      try { respJson = JSON.parse(respText); } catch (err) {}
                                                      throw new Error((respJson && respJson.error) ? respJson.error : ("Kick failed (status " + status + ")"));
 }
-                          }
+                           }
 
-                          const erlcTestKeyBtn = document.getElementById("erlcTestKeyBtn");
-                          const erlcKeyStatus = document.getElementById("erlcKeyStatus");
-                          if (erlcTestKeyBtn) {
-                              erlcTestKeyBtn.addEventListener("click", async () => {
-                                  const key = (erlcApiKeyInput ? erlcApiKeyInput.value.trim() : "");
-                                  if (!key) {
-                                      if (erlcKeyStatus) {
-                                          erlcKeyStatus.textContent = "Enter an API key first.";
-                                          erlcKeyStatus.style.color = "#f87171";
-                                      }
-                                      return;
-                                  }
-                                  if (erlcKeyStatus) {
-                                      erlcKeyStatus.textContent = "Testing...";
-                                      erlcKeyStatus.style.color = "#92939a";
-                                  }
-                                  erlcTestKeyBtn.disabled = true;
-                                  try {
-                                      const resp = await fetch("https://api.erlc.gg/v2/server", {
-                                          headers: { "server-key": key, "accept": "application/json" }
-                                      });
-                                      const text = await resp.text().catch(() => "");
-                                      let detail = "";
-                                      try {
-                                          const j = JSON.parse(text);
-                                          if (j && (j.Name || j.name)) {
-                                              detail = "Server: " + (j.Name || j.name);
-                                          }
-                                      } catch (e) {}
-                                      if (resp.ok) {
-                                          if (erlcKeyStatus) {
-                                              erlcKeyStatus.textContent = detail || "Key valid.";
-                                              erlcKeyStatus.style.color = "#63d9ad";
-                                          }
-                                      } else {
-                                          if (erlcKeyStatus) {
-                                              erlcKeyStatus.textContent = "Invalid key (HTTP " + resp.status + ").";
-                                              erlcKeyStatus.style.color = "#f87171";
-                                          }
-                                      }
-                                  } catch (e) {
-                                      if (erlcKeyStatus) {
-                                          erlcKeyStatus.textContent = "Request failed: " + e.message;
-                                          erlcKeyStatus.style.color = "#f87171";
-                                      }
-                                  } finally {
-                                      erlcTestKeyBtn.disabled = false;
-                                  }
-                              });
-                          }
-                                             } catch (apiErr) {
+                                              } catch (apiErr) {
                                                  if (apiOk) return;
                                                  console.warn("Kick API failed, trying direct Supabase delete:", apiErr);
                                                  const { error: directError } = await localSupabase
