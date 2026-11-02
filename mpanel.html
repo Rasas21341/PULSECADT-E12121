@@ -32,6 +32,106 @@
             font-weight: 700;
             cursor: pointer;
         }
+        .my-messages-btn {
+            border: 1px solid #34353a;
+            background: #191a1e;
+            color: #f4f4f5;
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 13px;
+        }
+        .my-messages-btn:hover { background: #1c1d21; }
+        .my-messages-btn.primary { background: #2563eb; border-color: #2563eb; color: #fff; }
+        .my-messages-btn.primary:hover { background: #1d4ed8; }
+        .pm-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 800;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+        .pm-modal.open { display: flex; }
+        .pm-modal-card {
+            position: relative;
+            width: 100%;
+            max-width: 460px;
+            background: #101114;
+            border: 1px solid #25262a;
+            border-radius: 14px;
+            padding: 22px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        .pm-modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 14px;
+        }
+        .pm-modal-title { font-size: 16px; font-weight: 700; color: #f4f4f5; }
+        .pm-modal-close {
+            border: none;
+            background: transparent;
+            color: #92939a;
+            font-size: 22px;
+            cursor: pointer;
+            line-height: 1;
+            padding: 2px 6px;
+            border-radius: 6px;
+        }
+        .pm-modal-close:hover { background: #1c1d21; color: #f4f4f5; }
+        .pm-thread { display: flex; flex-direction: column; gap: 8px; }
+        .pm-thread-empty { color: #92939a; font-size: 13px; text-align: center; padding: 20px 0; }
+        .pm-thread-item {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            padding: 8px 10px;
+            border-radius: 9px;
+            background: #111216;
+            border: 1px solid #25262a;
+            font-size: 13px;
+        }
+        .pm-thread-item .pm-sender { font-weight: 700; color: #63d9ad; font-size: 11px; }
+        .pm-thread-item .pm-text { color: #f4f4f5; }
+        .pm-thread-item .pm-time { color: #777980; font-size: 10px; }
+        .pm-thread-item.mine { background: #16223a; border-color: #2563eb; }
+        .pm-thread-item.mine .pm-sender { color: #93c5fd; }
+        .pm-compose { margin-top: 14px; display: flex; flex-direction: column; gap: 8px; }
+        .pm-compose textarea {
+            width: 100%;
+            min-height: 70px;
+            padding: 10px 12px;
+            border: 1px solid #34353a;
+            border-radius: 9px;
+            font-size: 14px;
+            background: #111216;
+            color: #f4f4f5;
+            outline: none;
+            resize: vertical;
+            font-family: inherit;
+        }
+        .pm-compose textarea:focus { border-color: #2563eb; }
+        .pm-send-btn {
+            padding: 10px 14px;
+            border: none;
+            border-radius: 9px;
+            background: #2563eb;
+            color: #ffffff;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        .pm-send-btn:disabled { opacity: 0.6; cursor: default; }
+        .pm-status { font-size: 13px; margin-top: 10px; color: #92939a; text-align: center; }
+        .pm-status.error { color: #f87171; font-weight: 700; }
+        .pm-status.ok { color: #63d9ad; font-weight: 700; }
         .container { max-width: 520px; margin: 0 auto; padding: 24px; }
         .card {
             background: #101114;
@@ -353,7 +453,10 @@
             <div class="topbar-server-name" id="topbarServerName">Loading...</div>
             <div class="topbar-subtitle">Moderation Panel</div>
         </div>
-        <button class="back-btn" id="backBtn">← Back</button>
+        <div class="topbar-actions">
+            <button class="my-messages-btn primary" id="myMessagesBtn">My Messages</button>
+            <button class="back-btn" id="backBtn">← Back</button>
+        </div>
     </div>
     <div class="container" id="container">
         <div class="shift-backdrop"></div>
@@ -418,6 +521,22 @@
                 <button type="button" class="toolbox-side-arrow" id="toolboxSideArrow" aria-label="More">›</button>
             </div>
         </div>
+        <div class="pm-modal" id="pmModal">
+            <div class="pm-modal-card">
+                <div class="pm-modal-header">
+                    <span class="pm-modal-title" id="pmModalTitle">My Messages</span>
+                    <button type="button" class="pm-modal-close" id="pmModalClose" aria-label="Close">×</button>
+                </div>
+                <div class="pm-thread" id="pmThread">
+                    <div class="pm-thread-empty">No messages yet.</div>
+                </div>
+                <div class="pm-compose">
+                    <textarea id="pmComposeInput" placeholder="Type your message..." rows="3"></textarea>
+                    <button type="button" class="pm-send-btn" id="pmSendBtn">Send</button>
+                    <div class="pm-status" id="pmStatus"></div>
+                </div>
+            </div>
+        </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
@@ -442,7 +561,127 @@
         const toolboxHSendBtn = document.getElementById("toolboxHSendBtn");
         const toolboxHStatusEl = document.getElementById("toolboxHStatus");
 
+        const myMessagesBtn = document.getElementById("myMessagesBtn");
+        const pmModal = document.getElementById("pmModal");
+        const pmModalClose = document.getElementById("pmModalClose");
+        const pmModalTitle = document.getElementById("pmModalTitle");
+        const pmThread = document.getElementById("pmThread");
+        const pmComposeInput = document.getElementById("pmComposeInput");
+        const pmSendBtn = document.getElementById("pmSendBtn");
+        const pmStatus = document.getElementById("pmStatus");
+
+        let currentPmPartner = null;
+
         document.getElementById("backBtn").addEventListener("click", () => window.close());
+
+        function openPmModal() {
+            if (!currentPmPartner) return;
+            pmModalTitle.textContent = "Messages - " + currentPmPartner.name;
+            pmModal.classList.add("open");
+            loadPmThread();
+        }
+        function closePmModal() {
+            pmModal.classList.remove("open");
+            currentPmPartner = null;
+        }
+
+        if (myMessagesBtn) {
+            myMessagesBtn.addEventListener("click", () => {
+                if (!currentUser) return;
+                currentPmPartner = { name: "All Staff", email: null, id: null };
+                openPmModal();
+            });
+        }
+        if (pmModalClose) {
+            pmModalClose.addEventListener("click", closePmModal);
+        }
+        if (pmModal) {
+            pmModal.addEventListener("click", (e) => {
+                if (e.target === pmModal) closePmModal();
+            });
+        }
+        document.addEventListener("keydown", (e) => {
+            if (e.key === "Escape" && pmModal && pmModal.classList.contains("open")) {
+                closePmModal();
+            }
+        });
+
+        async function loadPmThread() {
+            if (!communityId || !pmThread) return;
+            pmThread.innerHTML = '<div class="pm-thread-empty">Loading...</div>';
+            try {
+                let query = localSupabase
+                    .from("staff_pm")
+                    .select("*")
+                    .eq("community_id", communityId)
+                    .order("created_at", { ascending: true });
+                if (currentPmPartner.id) {
+                    query = query.or(`sender_id.eq.${currentPmPartner.id},receiver_id.eq.${currentPmPartner.id}`);
+                } else {
+                    query = query.eq("receiver_id", currentUser.id);
+                }
+                const { data, error } = await query;
+                if (error) throw error;
+                if (!data || data.length === 0) {
+                    pmThread.innerHTML = '<div class="pm-thread-empty">No messages yet.</div>';
+                    return;
+                }
+                pmThread.innerHTML = data.map((m) => {
+                    const isMine = m.sender_id === currentUser.id;
+                    const cls = isMine ? "pm-thread-item mine" : "pm-thread-item";
+                    const sender = isMine ? "You" : (m.sender_name || "Staff");
+                    const time = new Date(m.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+                    return `<div class="${cls}">
+                        <div class="pm-sender">${sender}</div>
+                        <div class="pm-text">${m.text}</div>
+                        <div class="pm-time">${time}</div>
+                    </div>`;
+                }).join("");
+                pmThread.scrollTop = pmThread.scrollHeight;
+            } catch (e) {
+                pmThread.innerHTML = '<div class="pm-thread-empty">Unable to load messages.</div>';
+            }
+        }
+
+        if (pmSendBtn) {
+            pmSendBtn.addEventListener("click", async () => {
+                const text = pmComposeInput ? pmComposeInput.value.trim() : "";
+                if (!text) return;
+                if (!communityId || !currentUser) return;
+                pmSendBtn.disabled = true;
+                pmStatus.textContent = "";
+                pmStatus.className = "pm-status";
+                try {
+                    const { error } = await localSupabase
+                        .from("staff_pm")
+                        .insert({
+                            community_id: communityId,
+                            sender_id: currentUser.id,
+                            sender_name: currentUser.email || "Staff",
+                            receiver_id: currentPmPartner.id || currentUser.id,
+                            receiver_name: currentPmPartner.name,
+                            text: text
+                        });
+                    if (error) throw error;
+                    if (pmComposeInput) pmComposeInput.value = "";
+                    loadPmThread();
+                } catch (err) {
+                    pmStatus.textContent = "Failed to send: " + err.message;
+                    pmStatus.className = "pm-status error";
+                } finally {
+                    pmSendBtn.disabled = false;
+                }
+            });
+        }
+
+        if (pmComposeInput) {
+            pmComposeInput.addEventListener("keydown", (e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                    e.preventDefault();
+                    pmSendBtn && pmSendBtn.click();
+                }
+            });
+        }
 
         function openToolboxModal() {
             if (toolboxModal) toolboxModal.classList.add("open");
