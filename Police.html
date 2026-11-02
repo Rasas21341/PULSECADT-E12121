@@ -2000,6 +2000,22 @@
             cursor: pointer;
             line-height: 1;
         }
+.police-footer {
+            position: fixed;
+            bottom: 16px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-family: monospace;
+            font-size: 14px;
+            font-weight: 600;
+            color: #475569;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            padding: 6px 14px;
+            border-radius: 999px;
+            z-index: 500;
+            pointer-events: none;
+        }
     </style>
 </head>
 <body>
@@ -2077,7 +2093,7 @@
         </button>
     </div>
 
-    <span id="policeClock" style="font-family:monospace;font-size:14px;color:#fff;margin-left:8px;"></span>
+    <div class="police-footer" id="policeClock"></div>
     <script>(function(){var el=document.getElementById('policeClock');function tick(){if(el)el.textContent=formatMilitaryExpanded(new Date());}tick();setInterval(tick,1000);})();</script>
     <button class="back-btn" id="backBtn">← Back</button>
     <button type="button" class="status-top-btn" id="notesBtn">
