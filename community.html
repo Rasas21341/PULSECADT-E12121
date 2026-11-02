@@ -2644,9 +2644,9 @@ if (kickBtn) {
                                                  } else {
                                                      let respJson = {};
                                                      try { respJson = JSON.parse(respText); } catch (err) {}
-                                                     throw new Error((respJson && respJson.error) ? respJson.error : ("Kick failed (status " + status + ")"));
-                                                 }
-                                             } catch (apiErr) {
+throw new Error((respJson && respJson.error) ? respJson.error : ("Kick failed (status " + status + ")"));
+                                                  }
+                                               } catch (apiErr) {
                                                  if (apiOk) return;
                                                  console.warn("Kick API failed, trying direct Supabase delete:", apiErr);
                                                  const { error: directError } = await localSupabase
