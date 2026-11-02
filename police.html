@@ -733,6 +733,11 @@
             background: #eff6ff;
         }
 
+        .live-map-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
         .bodycam-btn {
             position: fixed;
             right: 648px;
@@ -2136,7 +2141,7 @@
         <span class="bodycam-btn-label">Body Cam</span>
     </button>
 
-    <button type="button" class="live-map-btn" id="liveMapBtn" aria-label="Live Map">
+    <button type="button" class="live-map-btn" id="liveMapBtn" aria-label="Live Map" disabled>
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <polygon points="3 11 22 2 13 21 11 13 3 11"></polygon>
         </svg>
