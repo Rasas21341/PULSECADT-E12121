@@ -357,6 +357,7 @@
                 <button type="button" class="shift-btn end-shift hidden" id="endShiftBtn">□ &nbsp; End shift</button>
             </div>
             <p class="shift-note">Your timer tracks total time since you started your shift.</p>
+                <div id="shiftPermissionNote" class="status hidden" style="margin-top:8px;"></div>
 <div class="toolbox-label">Toolbox</div>
                 <button type="button" class="toolbox-btn" id="toolboxBtn">Toolbox</button>
                 <div class="shift-footer">
@@ -623,6 +624,7 @@ const shiftFooterDotEl = document.getElementById("shiftFooterDot");
                 if (!user) {
                     return;
                 }
+                currentUser = user;
                 const displayName = (user.email || "").split("@")[0].split(/[._-]/)[0];
                 if (displayName) {
                     shiftNameEl.textContent = "Hey, " + displayName.charAt(0).toUpperCase() + displayName.slice(1) + "!";
@@ -673,10 +675,23 @@ const shiftFooterDotEl = document.getElementById("shiftFooterDot");
                         }
                     } catch (e) {}
                 }
-                if (!isCreator && !isManagement && !hasModRole) {
+                const isAllowed = isCreator || isManagement || hasModRole;
+                const shiftPermissionNote = document.getElementById("shiftPermissionNote");
+                if (!isAllowed) {
+                    if (shiftPermissionNote) {
+                        shiftPermissionNote.textContent = "You need a moderator+ role to start a shift.";
+                        shiftPermissionNote.className = "status error";
+                        shiftPermissionNote.classList.remove("hidden");
+                    }
+                    renderShift();
+                    loadActiveStaff();
                     return;
                 }
-                currentUser = user;
+                if (shiftPermissionNote) {
+                    shiftPermissionNote.textContent = "";
+                    shiftPermissionNote.className = "status";
+                    shiftPermissionNote.classList.add("hidden");
+                }
                 modToolsOffDutyEnabled = !!(data.mod_tools_off_duty);
                 erlcApiKey = data.erlc_api_key || "";
                 if (!erlcApiKey) {
