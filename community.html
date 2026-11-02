@@ -4804,7 +4804,14 @@ async function addDocument(title, departments) {
                         console.warn("Could not publish officer to DB:", dbErr);
                     }
                 } catch (e) {}
-const targetPage = (pendingDepartment && pendingDepartment.type === "Dispatch") ? "/dispatch.html" : "/police.html";
+let targetPage = "/police.html";
+                    if (pendingDepartment && pendingDepartment.type === "Dispatch") {
+                        targetPage = "/dispatch.html";
+                    } else if (pendingDepartment && pendingDepartment.type === "Court") {
+                        targetPage = "/courts.html";
+                    } else {
+                        targetPage = "/police.html";
+                    }
                 window.open(targetPage + "?" + params.toString(), "_blank");
                 if (policeModal) policeModal.classList.remove("open");
                 pendingDepartment = null;

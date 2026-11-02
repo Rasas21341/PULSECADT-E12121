@@ -3470,7 +3470,7 @@ civilianRecordsList.innerHTML = records.map((record) => {
                     const date = record.row.created_at ? formatMilitaryExpanded(record.row.created_at) : '';
                     const citationNo = record.row.citation_number ? " #" + record.row.citation_number : "";
                     const fine = record.row.fine != null && record.row.fine !== "" ? " ($" + Number(record.row.fine).toFixed(2) + ")" : "";
-                    const details = [record.row.reason, record.row.charges, record.row.location, record.row.notes].filter(Boolean).join(' | ');
+                    const details = [record.row.reason, record.row.charges, record.row.location, record.row.court_date ? "Court: " + record.row.court_date : "", record.row.notes].filter(Boolean).join(' | ');
                     return `<div class="record-item">
                         <div class="record-text">
                             <strong>${record.type}${citationNo}${fine} - ${date}</strong>
@@ -4506,8 +4506,8 @@ civilianRecordsList.innerHTML = records.map((record) => {
                     const date = c.created_at ? formatMilitaryExpanded(c.created_at) : "";
                     const citationNo = c.citation_number ? " #" + esc(c.citation_number) : "";
                     const fine = c.fine != null && c.fine !== "" ? " ($" + Number(c.fine).toFixed(2) + ")" : "";
-                    const vehicle = [c.vehicle_make, c.vehicle_model, c.vehicle_plate].filter(Boolean).join(" ");
-                    const details = [c.reason, c.location, vehicle, c.notes].filter(Boolean).join(" | ");
+                    const court = c.court_date ? "Court: " + c.court_date : "";
+                    const details = [c.reason, c.location, vehicle, court, c.notes].filter(Boolean).join(" | ");
                     return `
                         <div class="citation-record-item" data-citation-id="${c.id}">
                             <div class="citation-record-text">
