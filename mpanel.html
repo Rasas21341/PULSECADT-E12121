@@ -606,8 +606,13 @@ const shiftFooterDotEl = document.getElementById("shiftFooterDot");
             }
         }
 
+        if (!communityId && activeStaffListEl) {
+            activeStaffListEl.innerHTML = '<div class="active-staff-meta">No community selected.</div>';
+        }
+
         renderShift();
         window.setInterval(renderShift, 1000);
+        window.setInterval(loadActiveStaff, 5000);
 
         async function loadCommunity() {
             if (!communityId) {
