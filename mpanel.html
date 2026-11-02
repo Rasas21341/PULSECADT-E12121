@@ -463,17 +463,9 @@ endShiftBtn.addEventListener("click", () => {
 });
 
 renderShift();
-window.setInterval(renderShift, 1000);
+        window.setInterval(renderShift, 1000);
 
-        let erlcApiKey = "";
-
-        function setStatus(text, kind) {
-            if (!erlcStatusEl) return;
-            erlcStatusEl.textContent = text || "";
-            erlcStatusEl.className = "status" + (kind ? " " + kind : "");
-        }
-
-async function loadCommunity() {
+        async function loadCommunity() {
             if (!communityId) {
                 return;
             }
@@ -539,16 +531,6 @@ async function loadCommunity() {
                 erlcApiKey = data.erlc_api_key || "";
                 if (!erlcApiKey) {
                     try { erlcApiKey = localStorage.getItem("erlcApiKey_" + communityId) || ""; } catch (e) {}
-                }
-
-                if (erlcApiKey) {
-                    if (erlcSenderEl) erlcSenderEl.classList.remove("hidden");
-                    if (erlcNoteEl) erlcNoteEl.classList.add("hidden");
-                    setStatus("ERLC API key loaded. You can send :m messages.", "ok");
-                } else {
-                    if (erlcSenderEl) erlcSenderEl.classList.add("hidden");
-                    if (erlcNoteEl) erlcNoteEl.classList.remove("hidden");
-                    setStatus("");
                 }
             } catch (err) {
                 console.error(err);
