@@ -346,18 +346,6 @@
             </div>
         </div>
         <div class="card">
-            <h3>ER:LC Server Messages</h3>
-            <div id="erlcStatus" class="status"></div>
-            <div id="erlcSender" class="hidden">
-                <div class="field">
-                    <label for="erlcMsgInput">Send a :m message to the server</label>
-                    <input type="text" id="erlcMsgInput" class="erlc-input" placeholder="Type your message..." />
-                </div>
-                <button type="button" class="send-btn" id="erlcSendBtn">Send :m</button>
-            </div>
-            <div id="erlcNote" class="status hidden">
-                No ERLC API key set. Add it in the community dashboard (General &rarr; ERLC API Key) to send server messages.
-            </div>
         </div>
     </div>
 
@@ -369,12 +357,6 @@
         const localSupabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         const params = new URLSearchParams(window.location.search);
         const communityId = params.get("id");
-
-        const erlcStatusEl = document.getElementById("erlcStatus");
-        const erlcSenderEl = document.getElementById("erlcSender");
-        const erlcNoteEl = document.getElementById("erlcNote");
-        const erlcMsgInput = document.getElementById("erlcMsgInput");
-        const erlcSendBtn = document.getElementById("erlcSendBtn");
 
         const toolboxBtn = document.getElementById("toolboxBtn");
         const toolboxModal = document.getElementById("toolboxModal");

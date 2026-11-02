@@ -2487,10 +2487,8 @@ enable-ga="false"
             if (topbar) topbar.style.display = "none";
             if (userDropdown) userDropdown.style.display = "inline-flex";
             if (container) container.style.display = "none";
-            if (loggedInScreen) loggedInScreen.classList.add("open");
+if (loggedInScreen) loggedInScreen.classList.add("open");
             if (authModal) authModal.classList.remove("open");
-            const pumpkin = document.getElementById("pumpkin");
-            if (pumpkin) pumpkin.classList.add("show");
 
             const loginSuccess = document.getElementById("loginSuccess");
             if (loginSuccess) {
@@ -2627,8 +2625,6 @@ enable-ga="false"
                     if (container) container.style.display = "none";
                     if (authModal) authModal.classList.remove("open");
                     updatePremiumUI();
-                    const pumpkin = document.getElementById("pumpkin");
-                    if (pumpkin) pumpkin.classList.add("show");
                 } catch (err) {
                     if (loginError) { loginError.textContent = "An unexpected error occurred."; loginError.style.display = "block"; }
                     console.error(err);
@@ -2721,13 +2717,11 @@ enable-ga="false"
                         const loggedInScreen = document.getElementById("loggedInScreen");
                         const container = document.querySelector(".container");
                         const authModal = document.getElementById("authModal");
-                         if (loggedInScreen) loggedInScreen.classList.add("open");
-                         if (container) container.style.display = "none";
-                         if (authModal) authModal.classList.remove("open");
-                         const pumpkin = document.getElementById("pumpkin");
-                         if (pumpkin) pumpkin.classList.add("show");
-                         updatePremiumUI();
-                         return;
+if (loggedInScreen) loggedInScreen.classList.add("open");
+                          if (container) container.style.display = "none";
+                          if (authModal) authModal.classList.remove("open");
+                          updatePremiumUI();
+                          return;
                     }
 
                     if (signupSuccess) { signupSuccess.textContent = "Check your email to confirm your account, then log in."; signupSuccess.style.display = "block"; }
@@ -2765,8 +2759,7 @@ enable-ga="false"
                          if (userDropdown) userDropdown.style.display = "none";
 if (loggedInScreen) loggedInScreen.classList.remove("open");
                         if (container) container.style.display = "block";
-                        const pumpkin = document.getElementById("pumpkin");
-                        if (pumpkin) pumpkin.classList.remove("show");
+                        
                          let logoutEmail = "";
                          try { const { data: { user } } = await localSupabase.auth.getUser(); logoutEmail = user?.email || ""; } catch (_) {}
                          notifyDiscordLogout(logoutEmail);
@@ -2912,8 +2905,6 @@ if (loggedInScreen) loggedInScreen.classList.remove("open");
 if (loggedInScreen) loggedInScreen.classList.remove("open");
                     if (settingsScreen) settingsScreen.classList.remove("open");
                     if (container) container.style.display = "block";
-                    const pumpkin = document.getElementById("pumpkin");
-                    if (pumpkin) pumpkin.classList.remove("show");
                     notifyDiscordLogout(logoutEmail);
              });
          }
@@ -3267,8 +3258,6 @@ async function joinCommunity(communityId, passcode) {
             if (container) container.style.display = "none";
 if (loggedInScreen) loggedInScreen.classList.add("open");
             if (authModal) authModal.classList.remove("open");
-            const pumpkin = document.getElementById("pumpkin");
-            if (pumpkin) pumpkin.classList.add("show");
             if (topLeftLogo) topLeftLogo.classList.add("visible");
                const trustedFooter = document.getElementById("trustedFooter");
               if (trustedFooter) trustedFooter.style.display = "none";
@@ -3289,8 +3278,6 @@ if (loggedInScreen) loggedInScreen.classList.add("open");
 if (loggedInScreen) loggedInScreen.classList.remove("open");
             if (settingsScreen) settingsScreen.classList.remove("open");
             if (container) container.style.display = "block";
-            const pumpkin = document.getElementById("pumpkin");
-            if (pumpkin) pumpkin.classList.remove("show");
             if (topLeftLogo) topLeftLogo.classList.remove("visible");
                const trustedFooter = document.getElementById("trustedFooter");
               if (trustedFooter) trustedFooter.style.display = "block";
