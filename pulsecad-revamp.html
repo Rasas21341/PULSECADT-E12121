@@ -1939,9 +1939,9 @@ enable-ga="false"
         <h1>PulseCAD Revamp</h1>
         <p>We are actively working on the PulseCAD Revamp. Updates are in progress.</p>
         <span class="status"><span class="status-dot"></span>In Progress</span>
-    </div>
-<div class="logged-in-screen" id="loggedInScreen">
-        <div class="pumpkin" id="pumpkin">🎃</div>
+</div>
+    <div class="pumpkin" id="pumpkin">🎃</div>
+    <div class="logged-in-screen" id="loggedInScreen">
         <div class="top-actions">
                 <button type="button" class="create-community-centered-btn" id="createCommunityCenteredBtn">+ Create</button>
                 <button type="button" class="moderation-btn" id="moderationBtn">Moderation</button>
@@ -2504,6 +2504,8 @@ enable-ga="false"
             if (container) container.style.display = "none";
             if (loggedInScreen) loggedInScreen.classList.add("open");
             if (authModal) authModal.classList.remove("open");
+            const pumpkin = document.getElementById("pumpkin");
+            if (pumpkin) pumpkin.classList.add("show");
 
             const loginSuccess = document.getElementById("loginSuccess");
             if (loginSuccess) {
@@ -3278,9 +3280,11 @@ async function joinCommunity(communityId, passcode) {
             if (userDropdown) userDropdown.style.display = "inline-flex";
             if (userEmailDisplay && email) userEmailDisplay.textContent = email;
             if (container) container.style.display = "none";
-            if (loggedInScreen) loggedInScreen.classList.add("open");
+if (loggedInScreen) loggedInScreen.classList.add("open");
             if (authModal) authModal.classList.remove("open");
-if (topLeftLogo) topLeftLogo.classList.add("visible");
+            const pumpkin = document.getElementById("pumpkin");
+            if (pumpkin) pumpkin.classList.add("show");
+            if (topLeftLogo) topLeftLogo.classList.add("visible");
                const trustedFooter = document.getElementById("trustedFooter");
               if (trustedFooter) trustedFooter.style.display = "none";
               if (topbar) topbar.style.top = "24px";
@@ -3297,10 +3301,12 @@ if (topLeftLogo) topLeftLogo.classList.add("visible");
              if (topbar) { topbar.style.display = "block"; topbar.style.top = "60px"; }
              if (topbarLoginBtn) topbarLoginBtn.textContent = "Login";
              if (userDropdown) userDropdown.style.display = "none";
-             if (loggedInScreen) loggedInScreen.classList.remove("open");
-             if (settingsScreen) settingsScreen.classList.remove("open");
-             if (container) container.style.display = "block";
-if (topLeftLogo) topLeftLogo.classList.remove("visible");
+if (loggedInScreen) loggedInScreen.classList.remove("open");
+            if (settingsScreen) settingsScreen.classList.remove("open");
+            if (container) container.style.display = "block";
+            const pumpkin = document.getElementById("pumpkin");
+            if (pumpkin) pumpkin.classList.remove("show");
+            if (topLeftLogo) topLeftLogo.classList.remove("visible");
                const trustedFooter = document.getElementById("trustedFooter");
               if (trustedFooter) trustedFooter.style.display = "block";
          }
