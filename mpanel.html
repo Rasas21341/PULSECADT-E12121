@@ -135,6 +135,35 @@
         .shift-footer-dot { width: 7px; height: 7px; border-radius: 50%; background: #55565d; }
         .shift-footer-dot.active { background: #35c995; }
         .shift-footer-dot.on-break { background: #f4bb65; }
+        .active-staff-card {
+            margin-top: 16px;
+        }
+        .active-staff-list { display: flex; flex-direction: column; gap: 8px; }
+        .active-staff-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 10px 12px;
+            background: #111216;
+            border: 1px solid #25262a;
+            border-radius: 9px;
+            font-size: 13px;
+        }
+        .active-staff-name { font-weight: 700; color: #f4f4f5; }
+        .active-staff-meta { color: #92939a; font-size: 12px; }
+        .active-staff-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 2px 8px;
+            border-radius: 999px;
+            font-size: 10px;
+            font-weight: 700;
+        }
+        .active-staff-badge.on-duty { background: #102820; color: #63d9ad; }
+        .active-staff-badge.on-break { background: #302514; color: #f4bb65; }
+        .active-staff-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
         .toolbox-label {
             font-size: 11px;
             font-weight: 700;
@@ -336,6 +365,12 @@
             </div>
             <div class="status hidden" id="shiftStatus" role="status"></div>
         </section>
+        <div class="card active-staff-card">
+            <h3>Active Staff</h3>
+            <div id="activeStaffList" class="active-staff-list">
+                <div class="active-staff-meta">Loading...</div>
+            </div>
+        </div>
         <div class="toolbox-modal" id="toolboxModal">
             <div class="toolbox-modal-card">
                 <div class="toolbox-modal-header">
