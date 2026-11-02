@@ -2621,12 +2621,12 @@ if (erlcApiKeyInput) {
                             membersViewList.addEventListener("click", async (e) => {
                                 const kickBtn = e.target.closest(".kick-btn");
                                 const banBtn = e.target.closest(".ban-btn");
-                                if (kickBtn) {
-                                    const userId = kickBtn.getAttribute("data-user-id");
-                                    if (userId === currentEmail) {
-                                        alert("You cannot kick yourself.");
-                                        return;
-                                    }
+if (kickBtn) {
+                                     const userId = kickBtn.getAttribute("data-user-id");
+                                     if (userId === currentEmail) {
+                                         alert("You cannot kick yourself.");
+                                         return;
+                                     }
                                      if (confirm("Kick this member?")) {
                                          try {
                                              let apiOk = false;
@@ -2645,9 +2645,8 @@ if (erlcApiKeyInput) {
                                                      let respJson = {};
                                                      try { respJson = JSON.parse(respText); } catch (err) {}
                                                      throw new Error((respJson && respJson.error) ? respJson.error : ("Kick failed (status " + status + ")"));
-}
-                                                  }
-                                               } catch (apiErr) {
+                                                 }
+                                             } catch (apiErr) {
                                                  if (apiOk) return;
                                                  console.warn("Kick API failed, trying direct Supabase delete:", apiErr);
                                                  const { error: directError } = await localSupabase
@@ -2662,7 +2661,7 @@ if (erlcApiKeyInput) {
                                              alert("Failed to kick member: " + (err.message || err));
                                          }
                                      }
-                                }
+                                 }
                                 if (banBtn) {
                                     const userId = banBtn.getAttribute("data-user-id");
                                     if (userId === currentEmail) {
