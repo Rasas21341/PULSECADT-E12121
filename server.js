@@ -149,10 +149,10 @@ const server = http.createServer(async (req, res) => {
      if (req.url.startsWith("/api/erlc/")) {
          const rest = req.url.slice("/api/erlc/".length);
          const target = ERLC_BASE + "/" + rest;
-         const headers = {};
-         ["server-key", "content-type", "accept"].forEach((h) => {
-             if (req.headers[h]) headers[h] = req.headers[h];
-         });
+const headers = {};
+            ["server-key", "content-type", "accept"].forEach((h) => {
+                if (req.headers[h]) headers[h] = req.headers[h];
+            });
          const options = { method: req.method, headers };
          console.log(`[proxy] ${req.method} /api/erlc/${rest} -> ${target}`);
          const proxyReq = https.request(target, options, (proxyRes) => {

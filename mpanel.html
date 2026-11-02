@@ -948,28 +948,19 @@ const shiftFooterDotEl = document.getElementById("shiftFooterDot");
         async function loadActivePlayers() {
             if (!activePlayersListEl) return;
             activePlayersListEl.innerHTML = '<div class="active-player-meta">Loading...</div>';
+            let apiKey = erlcApiKey;
+            if (!apiKey && communityId) {
+                try { apiKey = localStorage.getItem("erlcApiKey_" + communityId) || ""; } catch (e) {}
+            }
             try {
-                const urls = ["/api/erlc/v2/server?Players=true&Staff=true", "https://api.erlc.gg/v2/server?Players=true&Staff=true"];
-                let lastErr = "";
-                let data = null;
-                for (const url of urls) {
-                    try {
-                        const headers = { "accept": "application/json" };
-                        if (erlcApiKey) headers["server-key"] = erlcApiKey;
-                        const resp = await fetch(url, { headers });
-                        if (resp.ok) {
-                            data = await resp.json();
-                            break;
-                        }
-                        lastErr = "HTTP " + resp.status;
-                    } catch (e) {
-                        lastErr = e.message;
-                    }
-                }
-                if (!data) {
-                    activePlayersListEl.innerHTML = '<div class="active-player-meta">Unable to load players (' + lastErr + ').</div>';
+                const headers = { "accept": "application/json" };
+                if (apiKey) headers["server-key"] = apiKey;
+                const resp = await fetch("/api/erlc/v2/server?Players=true&Staff=true", { headers });
+                if (!resp.ok) {
+                    activePlayersListEl.innerHTML = '<div class="active-player-meta">ERLC API error (HTTP ' + resp.status + '). Check API key.</div>';
                     return;
                 }
+                const data = await resp.json();
                 const players = data.Player || data.players || [];
                 if (!Array.isArray(players) || players.length === 0) {
                     activePlayersListEl.innerHTML = '<div class="active-player-meta">No players online.</div>';
@@ -988,7 +979,7 @@ const shiftFooterDotEl = document.getElementById("shiftFooterDot");
                     </div>`;
                 }).join("");
             } catch (e) {
-                activePlayersListEl.innerHTML = '<div class="active-player-meta">Unable to load players.</div>';
+                activePlayersListEl.innerHTML = '<div class="active-player-meta">Unable to load players: ' + e.message + '.</div>';
             }
         }
 
