@@ -345,9 +345,6 @@
                 <button type="button" class="toolbox-side-arrow" id="toolboxSideArrow" aria-label="More">›</button>
             </div>
         </div>
-        <div class="card">
-        </div>
-    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
@@ -593,33 +590,6 @@ renderShift();
                 throw new Error(detail);
             }
             try { return JSON.parse(text); } catch (e) { return {}; }
-        }
-
-        if (erlcSendBtn) {
-            erlcSendBtn.addEventListener("click", async () => {
-                const message = erlcMsgInput ? erlcMsgInput.value.trim() : "";
-                if (!message) {
-                    setStatus("Type a message first.", "error");
-                    return;
-                }
-                if (!erlcApiKey) {
-                    setStatus("No ERLC API key set.", "error");
-                    return;
-                }
-                erlcSendBtn.disabled = true;
-                erlcSendBtn.textContent = "Sending...";
-                try {
-                    const result = await sendErkMessage(message);
-                    setStatus((result && result.message) ? (result.message) : "Message sent.", "ok");
-                    if (erlcMsgInput) erlcMsgInput.value = "";
-                } catch (err) {
-                    setStatus("Failed to send: " + err.message + " — check API key / browser CORS", "error");
-                    console.error("ERLC command failed:", err);
-                } finally {
-                    erlcSendBtn.disabled = false;
-                    erlcSendBtn.textContent = "Send :m";
-                }
-            });
         }
 
         if (toolboxSendBtn) {
