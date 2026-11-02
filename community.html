@@ -1961,12 +1961,10 @@ hasRostersPermission = (rolesData || []).some(r => {
                                             <label>Community Passcode</label>
                                             <input type="text" id="communityPasscodeInput" placeholder="Leave blank for no passcode" value="${(communityData.passcode || '').replace(/</g, '&lt;').replace(/>/g, '&gt;')}" />
                                         </div>
-<div class="field" style="display:flex; align-items:center; gap:8px;">
-    <label style="margin-bottom:0; flex: 0 0 auto;">ERLC API Key</label>
-    <input type="text" id="erlcApiKeyInput" placeholder="ERLC API key" value="${initialErkKey.replace(/</g, '&lt;').replace(/>/g, '&gt;')}" style="flex:1; min-width:0;" />
-    <button type="button" id="erlcTestKeyBtn" style="padding:8px 12px; border-radius:8px; border:1px solid #34353a; background:#191a1e; color:#f4f4f5; font-weight:700; cursor:pointer; white-space:nowrap;">Test</button>
+<div class="field">
+    <label>ERLC API Key</label>
+    <input type="text" id="erlcApiKeyInput" placeholder="ERLC API key" value="${initialErkKey.replace(/</g, '&lt;').replace(/>/g, '&gt;')}" />
 </div>
-<div id="erlcKeyStatus" style="margin:6px 0 14px 0; font-size:13px; color:#92939a;"></div>
 <div class="field">
                                                <label>Supervisor Password</label>
                                                <input type="text" id="supervisorInput" placeholder="Supervisor password" value="${(communityData.supervisor || '').replace(/</g, '&lt;').replace(/>/g, '&gt;')}" />
