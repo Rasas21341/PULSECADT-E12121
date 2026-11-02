@@ -3259,6 +3259,8 @@ async function joinCommunity(communityId, passcode) {
 if (topLeftLogo) topLeftLogo.classList.add("visible");
                const trustedFooter = document.getElementById("trustedFooter");
               if (trustedFooter) trustedFooter.style.display = "none";
+              const appBanner = document.querySelector(".app-banner");
+              if (appBanner) appBanner.style.display = "none";
               if (topbar) topbar.style.top = "24px";
           }
 
