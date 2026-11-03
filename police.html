@@ -3810,11 +3810,44 @@ civilianRecordsList.innerHTML = records.map((record) => {
                 alert("No active warrants to announce.");
                 return;
             }
+
+            // Build a short, officer-style announcement from the warrant text.
+            const name = selectedCivilian && selectedCivilian.name ? selectedCivilian.name : "the subject";
+            const lines = text.split('\n').map(s => s.trim()).filter(Boolean);
+            const warrantLine = lines.find(l => l.toLowerCase().includes('warrant')) || lines[0] || "";
+            const chargesLine = lines.find(l => l.toLowerCase().includes('charges')) || "";
+            const statusLine = lines.find(l => l.toLowerCase().includes('active') || l.toLowerCase().includes('completed') || l.toLowerCase().includes('cancelled') || l.toLowerCase().includes('expired')) || "";
+            const extraditableLine = lines.find(l => l.toLowerCase().includes('extraditable')) || "";
+
+            let announcement = "Active warrant for " + name + ". ";
+            if (warrantLine) announcement += warrantLine + ". ";
+            if (chargesLine) announcement += "Charges: " + chargesLine + ". ";
+            if (statusLine) announcement += "Status: " + statusLine + ". ";
+            if (extraditableLine) announcement += extraditableLine + ". ";
+            announcement += "This is a warrant announcement.";
+
             try {
                 window.speechSynthesis.cancel();
-                const utter = new SpeechSynthesisUtterance(text);
-                utter.rate = 0.95;
-                utter.pitch = 1;
+                const utter = new SpeechSynthesisUtterance(announcement);
+
+                // Prefer a natural, non-AI sounding desktop voice (Google US English / native male/female).
+                const voices = window.speechSynthesis.getVoices();
+                const preferLang = ['en-US'];
+                let chosen = null;
+                for (const lang of preferLang) {
+                    chosen = voices.find(v => v.lang === lang && /google|native|male|female|david|zira|mark|susan|jenny|george|fred|alice/i.test(v.name))
+                        || voices.find(v => v.lang === lang && /google|native|samantha|tom|alex|fred|josh|julia/i.test(v.name))
+                        || voices.find(v => v.lang === lang);
+                    if (chosen) break;
+                }
+                if (chosen) {
+                    utter.voice = chosen;
+                    utter.lang = chosen.lang;
+                }
+
+                // Natural cadence: slightly slower, neutral pitch.
+                utter.rate = 0.9;
+                utter.pitch = 1.0;
                 window.speechSynthesis.speak(utter);
             } catch (err) {
                 console.error("Speech failed:", err);
@@ -3824,6 +3857,15 @@ civilianRecordsList.innerHTML = records.map((record) => {
         const speakWarrantsBtn = document.getElementById("speakWarrantsBtn");
         if (speakWarrantsBtn) {
             speakWarrantsBtn.addEventListener("click", speakWarrants);
+        }
+
+        // Some browsers load voices asynchronously; retry once if empty.
+        if ('speechSynthesis' in window) {
+            if (window.speechSynthesis.getVoices().length === 0) {
+                window.speechSynthesis.onvoiceschanged = () => {
+                    try { window.speechSynthesis.getVoices(); } catch (e) {}
+                };
+            }
         }
 
         const insuranceCard = document.getElementById("insuranceCard");
