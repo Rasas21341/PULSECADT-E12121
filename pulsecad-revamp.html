@@ -4395,6 +4395,23 @@ await joinCommunity(data.id, passcode.trim());
                 openTosModal();
             });
         }
+
+        const tosSectionDropdown = document.getElementById("tosSectionDropdown");
+        if (tosSectionDropdown) {
+            tosSectionDropdown.addEventListener("change", () => {
+                const idx = parseInt(tosSectionDropdown.value, 10);
+                if (isNaN(idx) || idx < 1) return;
+                const target = document.getElementById("tosSection-" + idx);
+                const scrollContainer = target ? target.closest("div[style*='overflow-y:auto']") : null;
+                if (target) {
+                    if (scrollContainer) {
+                        scrollContainer.scrollTo({ top: target.offsetTop - 8, behavior: "smooth" });
+                    } else {
+                        target.scrollIntoView({ behavior: "smooth" });
+                    }
+                }
+            });
+        }
         if (tosModalClose) tosModalClose.addEventListener("click", closeTosModal);
         if (tosModalClose2) tosModalClose2.addEventListener("click", closeTosModal);
         if (tosModal) {
