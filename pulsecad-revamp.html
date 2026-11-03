@@ -4103,35 +4103,6 @@ await joinCommunity(data.id, passcode.trim());
             });
         }
 
-        // Terms of Service (visible while logged out, on the topbar)
-        const topbarTosBtn = document.getElementById("topbarTosBtn");
-        const tosModal = document.getElementById("tosModal");
-        const tosModalClose = document.getElementById("tosModalClose");
-        const tosModalClose2 = document.getElementById("tosModalClose2");
-
-        function openTosModal() {
-            if (!tosModal) return;
-            if (dropdownMenu) dropdownMenu.classList.remove("open");
-            tosModal.classList.add("open");
-        }
-        function closeTosModal() {
-            if (tosModal) tosModal.classList.remove("open");
-        }
-
-        if (topbarTosBtn) {
-            topbarTosBtn.addEventListener("click", (e) => {
-                e.stopPropagation();
-                openTosModal();
-            });
-        }
-        if (tosModalClose) tosModalClose.addEventListener("click", closeTosModal);
-        if (tosModalClose2) tosModalClose2.addEventListener("click", closeTosModal);
-        if (tosModal) {
-            tosModal.addEventListener("click", (e) => {
-                if (e.target === tosModal) closeTosModal();
-            });
-        }
-
         if (supportForm) {
             supportForm.addEventListener("submit", async (e) => {
                 e.preventDefault();
