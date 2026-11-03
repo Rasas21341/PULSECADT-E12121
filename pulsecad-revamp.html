@@ -4343,28 +4343,38 @@ await joinCommunity(data.id, passcode.trim());
         }
 
         // Terms of Service dropdown (visible while logged out)
-        const topbarTosBtn = document.getElementById("topbarTosBtn");
         const tosDropdown = document.getElementById("tosDropdown");
         const tosDropdownItem = document.getElementById("tosDropdownItem");
+        const tosModal = document.getElementById("tosModal");
+        const tosModalClose = document.getElementById("tosModalClose");
+        const tosModalClose2 = document.getElementById("tosModalClose2");
 
-        if (topbarTosBtn && tosDropdown) {
-            topbarTosBtn.addEventListener("click", (e) => {
-                e.stopPropagation();
-                tosDropdown.classList.toggle("open");
-            });
-            document.addEventListener("click", () => {
-                tosDropdown.classList.remove("open");
-            });
-            tosDropdown.addEventListener("click", (e) => {
-                e.stopPropagation();
-            });
+        function openTosModal() {
+            if (!tosModal) return;
+            if (dropdownMenu) dropdownMenu.classList.remove("open");
+            tosModal.classList.add("open");
+        }
+        function closeTosModal() {
+            if (tosModal) tosModal.classList.remove("open");
         }
 
         if (tosDropdownItem) {
             tosDropdownItem.addEventListener("click", () => {
-                tosDropdown.classList.remove("open");
+                if (tosDropdown) tosDropdown.classList.remove("open");
                 openTosModal();
             });
+        }
+        if (tosModalClose) tosModalClose.addEventListener("click", closeTosModal);
+        if (tosModalClose2) tosModalClose2.addEventListener("click", closeTosModal);
+        if (tosModal) {
+            tosModal.addEventListener("click", (e) => {
+                if (e.target === tosModal) closeTosModal();
+            });
+        }
+
+        function setTosDropdownVisible(visible) {
+            const wrap = document.querySelector(".tos-dropdown-wrap");
+            if (wrap) wrap.style.display = visible ? "" : "none";
         }
 
         const recordsBtn = document.getElementById("recordsBtn");
