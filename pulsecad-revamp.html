@@ -240,6 +240,16 @@
             margin-left: 8px;
         }
 
+        .features-dropdown-desc {
+            display: block;
+            font-size: 11px;
+            font-weight: 400;
+            color: #64748b;
+            margin-top: 4px;
+            margin-left: 0;
+            text-align: left;
+        }
+
         .pro-btn {
             display: inline-block;
             padding: 8px 14px;
@@ -4339,21 +4349,6 @@ await joinCommunity(data.id, passcode.trim());
             });
         }
 
-        // Terms of Service "More" dropdown toggle
-        const topbarTosBtn = document.getElementById("topbarTosBtn");
-        if (topbarTosBtn && tosDropdown) {
-            topbarTosBtn.addEventListener("click", (e) => {
-                e.stopPropagation();
-                tosDropdown.classList.toggle("open");
-            });
-            document.addEventListener("click", () => {
-                tosDropdown.classList.remove("open");
-            });
-            tosDropdown.addEventListener("click", (e) => {
-                e.stopPropagation();
-            });
-        }
-
         if (dispatchSystemBtn) {
             dispatchSystemBtn.addEventListener("click", () => {
                 window.location.href = "police.html";
@@ -4361,6 +4356,7 @@ await joinCommunity(data.id, passcode.trim());
         }
 
         // Terms of Service dropdown (visible while logged out)
+        const topbarTosBtn = document.getElementById("topbarTosBtn");
         const tosDropdown = document.getElementById("tosDropdown");
         const tosDropdownItem = document.getElementById("tosDropdownItem");
         const tosModal = document.getElementById("tosModal");
