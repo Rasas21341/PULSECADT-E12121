@@ -4034,6 +4034,73 @@ civilianRecordsList.innerHTML = records.map((record) => {
             }
         }
 
+        const warrantCard = document.getElementById("warrantCard");
+        const warrantCardClose = document.getElementById("warrantCardClose");
+        const warrantCardPrint = document.getElementById("warrantCardPrint");
+
+        function openWarrantCard(w) {
+            if (!warrantCard) return;
+            const fmtDate = (d) => d ? new Date(d).toLocaleDateString() : "—";
+            const chargesArr = Array.isArray(w.charges) ? w.charges : (w.charges ? [w.charges] : []);
+
+            const setVal = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val || "—"; };
+            setVal("wCardWarrantNum", w.warrant_number || "—");
+            setVal("wCardSubject", w.civilian_name || "—");
+            setVal("wCardCivilianId", w.civilian_id || "—");
+            setVal("wCardType", w.type || "—");
+            setVal("wCardAgency", w.issuing_agency || "Liberty County");
+            setVal("wCardJudge", w.judge_name || "—");
+            setVal("wCardIssueDate", fmtDate(w.issue_date));
+            setVal("wCardExpiryDate", fmtDate(w.expiry_date));
+            setVal("wCardCourtDate", fmtDate(w.court_date));
+            setVal("wCardLocation", w.location || "—");
+            setVal("wCardStatus", w.status || "Active");
+            setVal("wCardExtraditable", w.extraditable ? "Yes" : "No");
+            setVal("wCardDescription", w.description || "—");
+            setVal("wCardNotes", w.notes || "—");
+            setVal("wCardSignature", w.judge_name || "—");
+            setVal("wCardSignLabel", "Judge: " + (w.judge_name || "—"));
+
+            const titleEl = document.getElementById("warrantCardTitle");
+            if (titleEl) titleEl.textContent = (w.type || "Warrant").toUpperCase();
+
+            const badgeEl = document.getElementById("wCardBadge");
+            if (badgeEl) {
+                badgeEl.textContent = (w.status || "Active").toUpperCase();
+                badgeEl.className = "warrant-paper-badge " + (w.status || "Active").toLowerCase();
+            }
+
+            const listEl = document.getElementById("wCardChargesList");
+            if (listEl) {
+                if (chargesArr.length) {
+                    listEl.innerHTML = chargesArr.map(c => "<li>" + escapeHtml(c) + "</li>").join("");
+                } else {
+                    listEl.innerHTML = "<li>No charges listed</li>";
+                }
+            }
+
+            warrantCard.classList.add("open");
+        }
+
+        function closeWarrantCard() {
+            if (warrantCard) warrantCard.classList.remove("open");
+        }
+
+        if (warrantCardClose) {
+            warrantCardClose.addEventListener("click", closeWarrantCard);
+        }
+        if (warrantCard) {
+            warrantCard.addEventListener("click", (e) => {
+                if (e.target === warrantCard) closeWarrantCard();
+            });
+        }
+        if (warrantCardPrint) {
+            warrantCardPrint.addEventListener("click", () => {
+                if (!warrantCard) return;
+                window.print();
+            });
+        }
+
         const insuranceCard = document.getElementById("insuranceCard");
         const icCloseBtn = document.getElementById("icCloseBtn");
 
