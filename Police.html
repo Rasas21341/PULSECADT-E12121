@@ -1557,6 +1557,76 @@
             background: #f8fafc;
         }
 
+        /* Real warrant paper styling */
+        .warrant-paper {
+            background: #fffdf5;
+            border: 3px double #1f2937;
+            border-radius: 6px;
+            max-width: 620px;
+            width: 100%;
+            box-shadow: 0 24px 60px rgba(0,0,0,0.35);
+            position: relative;
+            padding: 0;
+        }
+        .warrant-paper::before {
+            content: "";
+            position: absolute;
+            inset: 8px;
+            border: 1px solid #d1d5db;
+            pointer-events: none;
+        }
+        .warrant-paper-top {
+            text-align: center;
+            padding: 18px 28px 10px;
+            border-bottom: 2px solid #1f2937;
+        }
+        .warrant-paper-seal {
+            width: 56px; height: 56px;
+            border-radius: 50%;
+            border: 3px solid #b91c1c;
+            display: inline-flex; align-items: center; justify-content: center;
+            color: #b91c1c; font-weight: 800; font-size: 13px;
+            margin-bottom: 8px;
+            background: repeating-conic-gradient(#fff 0% 25%, #fee2e2 0% 50%) 0/6px 6px;
+        }
+        .warrant-paper-court {
+            font-size: 13px; letter-spacing: 4px; font-weight: 800; color: #1f2937;
+            text-transform: uppercase;
+        }
+        .warrant-paper-title {
+            font-size: 26px; font-weight: 800; color: #b91c1c;
+            letter-spacing: 2px; margin-top: 6px; text-transform: uppercase;
+        }
+        .warrant-paper-body {
+            padding: 22px 30px 18px;
+        }
+        .warrant-paper-row {
+            display: flex; justify-content: space-between; gap: 16px;
+            padding: 7px 0; border-bottom: 1px dashed #cbd5e1; font-size: 14px;
+        }
+        .warrant-paper-row .lbl { font-weight: 700; color: #4b5563; text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px; }
+        .warrant-paper-row .val { font-weight: 700; color: #111827; text-align: right; }
+        .warrant-paper-charges {
+            margin-top: 14px; padding: 12px 14px; background: #fef2f2; border: 1px solid #fecaca; border-radius: 6px;
+        }
+        .warrant-paper-charges .lbl { font-weight: 800; color: #991b1b; text-transform: uppercase; font-size: 12px; letter-spacing: 0.5px; display: block; margin-bottom: 6px; }
+        .warrant-paper-charges ul { margin: 0; padding-left: 20px; color: #111827; font-weight: 700; }
+        .warrant-paper-footer {
+            display: flex; justify-content: space-between; align-items: flex-end;
+            padding: 18px 30px 22px; border-top: 2px solid #1f2937;
+        }
+        .warrant-paper-sig { flex: 1; margin-right: 24px; }
+        .warrant-paper-sig-line { border-bottom: 2px solid #1f2937; height: 34px; }
+        .warrant-paper-sig .lbl { font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; color: #6b7280; font-weight: 700; margin-top: 4px; display: block; }
+        .warrant-paper-badge {
+            padding: 8px 18px; border-radius: 6px; font-size: 14px; font-weight: 800;
+            text-transform: uppercase; letter-spacing: 1px; color: #fff; background: #dc2626;
+            border: 1px solid #b91c1c; box-shadow: 0 2px 6px rgba(220,38,38,0.3);
+        }
+        .warrant-paper-badge.completed { background: #16a34a; border-color: #15803d; box-shadow:0 2px 6px rgba(22,163,74,0.3); }
+        .warrant-paper-badge.cancelled { background: #6b7280; border-color: #4b5563; box-shadow:0 2px 6px rgba(107,114,128,0.3); }
+        .warrant-paper-badge.expired { background: #f59e0b; border-color: #d97706; box-shadow:0 2px 6px rgba(245,158,11,0.3); }
+
         .bodycam-overlay {
             position: fixed;
             inset: 0;
