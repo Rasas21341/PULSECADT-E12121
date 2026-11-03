@@ -2778,10 +2778,11 @@ if (loggedInScreen) loggedInScreen.classList.add("open");
                         const container = document.querySelector(".container");
                         const authModal = document.getElementById("authModal");
 if (loggedInScreen) loggedInScreen.classList.add("open");
-                          if (container) container.style.display = "none";
-                          if (authModal) authModal.classList.remove("open");
-                          updatePremiumUI();
-                          return;
+                           if (container) container.style.display = "none";
+                           if (authModal) authModal.classList.remove("open");
+                           setTosDropdownVisible(false);
+                           updatePremiumUI();
+                           return;
                     }
 
                     if (signupSuccess) { signupSuccess.textContent = "Check your email to confirm your account, then log in."; signupSuccess.style.display = "block"; }
