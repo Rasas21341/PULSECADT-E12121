@@ -2574,29 +2574,66 @@
     </div>
 
     <div class="license-card" id="warrantCard">
-        <div class="license-card-inner" id="warrantCardInner">
-            <div class="license-card-holo"></div>
-            <div class="license-card-header">
-                <div class="license-card-left-title">
-                    <span class="license-card-dept" id="warrantCardDept">LIBERTY COUNTY</span>
-                    <span class="license-card-title" id="warrantCardTitle">ARREST WARRANT</span>
+        <div class="license-card-inner warrant-paper" id="warrantCardInner">
+            <div class="warrant-paper-top">
+                <div class="warrant-paper-seal">LC</div>
+                <div class="warrant-paper-court" id="warrantCardCourt">LIBERTY COUNTY COURT</div>
+                <div class="warrant-paper-title" id="warrantCardTitle">ARREST WARRANT</div>
+            </div>
+            <div class="warrant-paper-body">
+                <div class="warrant-paper-row">
+                    <span class="lbl">Warrant Number</span><span class="val" id="wCardWarrantNum">WR-000000</span>
                 </div>
-                <div class="license-card-emblem" id="warrantCardEmblem">LC</div>
-            </div>
-            <div class="license-card-main">
-                <div id="warrantCardPhotoWrap"></div>
-                <div class="license-card-info" id="warrantCardBody"></div>
-            </div>
-            <div class="license-card-barcode">
-                <div class="license-card-barcode-bars"></div>
-                <div class="license-card-barcode-num" id="warrantCardBarcode">WR-000000</div>
-            </div>
-            <div class="license-card-footer">
-                <div class="license-card-signature">
-                    <div class="license-card-sign-thin" id="warrantCardSignature"></div>
-                    <div class="license-card-sign-label" id="warrantCardSignLabel">Judge Signature</div>
+                <div class="warrant-paper-row">
+                    <span class="lbl">Subject</span><span class="val" id="wCardSubject">—</span>
                 </div>
-                <span class="license-card-badge" id="warrantCardBadge">ACTIVE</span>
+                <div class="warrant-paper-row">
+                    <span class="lbl">Civilian ID</span><span class="val" id="wCardCivilianId">—</span>
+                </div>
+                <div class="warrant-paper-row">
+                    <span class="lbl">Warrant Type</span><span class="val" id="wCardType">—</span>
+                </div>
+                <div class="warrant-paper-row">
+                    <span class="lbl">Issuing Agency</span><span class="val" id="wCardAgency">—</span>
+                </div>
+                <div class="warrant-paper-row">
+                    <span class="lbl">Judge</span><span class="val" id="wCardJudge">—</span>
+                </div>
+                <div class="warrant-paper-row">
+                    <span class="lbl">Issue Date</span><span class="val" id="wCardIssueDate">—</span>
+                </div>
+                <div class="warrant-paper-row">
+                    <span class="lbl">Expiry Date</span><span class="val" id="wCardExpiryDate">—</span>
+                </div>
+                <div class="warrant-paper-row">
+                    <span class="lbl">Court Date</span><span class="val" id="wCardCourtDate">—</span>
+                </div>
+                <div class="warrant-paper-row">
+                    <span class="lbl">Location</span><span class="val" id="wCardLocation">—</span>
+                </div>
+                <div class="warrant-paper-row">
+                    <span class="lbl">Status</span><span class="val" id="wCardStatus">Active</span>
+                </div>
+                <div class="warrant-paper-row">
+                    <span class="lbl">Extraditable</span><span class="val" id="wCardExtraditable">No</span>
+                </div>
+                <div class="warrant-paper-charges">
+                    <span class="lbl">Charges</span>
+                    <ul id="wCardChargesList"></ul>
+                </div>
+                <div class="warrant-paper-row">
+                    <span class="lbl">Description</span><span class="val" id="wCardDescription" style="text-align:left;">—</span>
+                </div>
+                <div class="warrant-paper-row">
+                    <span class="lbl">Notes</span><span class="val" id="wCardNotes" style="text-align:left;">—</span>
+                </div>
+            </div>
+            <div class="warrant-paper-footer">
+                <div class="warrant-paper-sig">
+                    <div class="warrant-paper-sig-line" id="wCardSignature"></div>
+                    <span class="lbl" id="wCardSignLabel">Judge Signature</span>
+                </div>
+                <span class="warrant-paper-badge" id="wCardBadge">ACTIVE</span>
             </div>
         </div>
         <div class="license-card-actions">
@@ -3908,7 +3945,18 @@ civilianRecordsList.innerHTML = records.map((record) => {
                             <span>${details || 'No details'}</span>
                         </div>
                         <span class="license-status-badge ${statusClass}">${escapeHtml(w.status || "Active")}</span>
+                        <button type="button" class="record-action-btn" data-view-warrant="${w.id}" style="background:#fffbeb;border-color:#fde68a;color:#854d0e;">View</button>
                     </div>`;
+                }).join("");
+
+                listEl.querySelectorAll("[data-view-warrant]").forEach((btn) => {
+                    btn.addEventListener("click", (e) => {
+                        e.stopPropagation();
+                        const id = btn.getAttribute("data-view-warrant");
+                        const row = data.find((r) => String(r.id) === String(id));
+                        if (row) openWarrantCard(row);
+                    });
+                });
                 }).join("");
             } catch (err) {
                 listEl.innerHTML = '<div class="empty">Failed to load warrants.</div>';
