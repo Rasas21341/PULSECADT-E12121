@@ -849,6 +849,20 @@
             padding: 16px;
         }
 
+        .warrant-modal {
+            max-height: 88vh;
+            overflow-y: auto;
+        }
+        .warrant-modal-body {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+        .warrant-modal-body .report-field textarea {
+            min-height: 90px;
+            resize: vertical;
+        }
+
         .units-citations-overlay {
             position: fixed;
             inset: 0;
@@ -2403,52 +2417,70 @@
     </div>
 
     <div class="modal-overlay" id="warrantModal">
-        <div class="modal">
+        <div class="modal warrant-modal">
             <div class="modal-header">
-                <div class="modal-title">Create Warrant</div>
+                <div class="modal-title">Warrant</div>
                 <button class="modal-close" id="warrantModalClose" type="button" aria-label="Close">×</button>
             </div>
-            <div class="report-field">
-                <label for="warrantCivilianId">Civilian ID</label>
-                <input type="text" id="warrantCivilianId" readonly />
+            <div class="warrant-modal-body">
+                <div class="report-field">
+                    <label for="warrantCivilianId">Civilian ID</label>
+                    <input type="text" id="warrantCivilianId" readonly />
+                </div>
+                <div class="report-field">
+                    <label for="warrantCivilianName">Civilian Name</label>
+                    <input type="text" id="warrantCivilianName" readonly />
+                </div>
+                <div class="report-field">
+                    <label for="warrantType">Warrant Type</label>
+                    <select id="warrantType" style="width:100%; padding:12px 14px; border-radius:12px; border:1px solid #cbd5e1; font-size:15px; color:#0f172a; outline:none; background:#ffffff;">
+                        <option value="Arrest Warrant">Arrest Warrant</option>
+                        <option value="Bench Warrant">Bench Warrant</option>
+                        <option value="Traffic Warrant">Traffic Warrant</option>
+                        <option value="Search Warrant">Search Warrant</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div class="report-field">
+                    <label for="warrantCharges">Charges <span style="font-weight:400;color:#64748b;">(one per line)</span></label>
+                    <textarea id="warrantCharges" placeholder="Grand Theft Auto&#10;Aggravated Assault&#10;Illegal U-Turn" rows="4"></textarea>
+                </div>
+                <div class="report-field">
+                    <label for="warrantDescription">Description</label>
+                    <textarea id="warrantDescription" placeholder="Details of the warrant..."></textarea>
+                </div>
+                <div class="report-field">
+                    <label for="warrantLocation">Location</label>
+                    <input type="text" id="warrantLocation" placeholder="e.g. Downtown" />
+                </div>
+                <div class="report-field">
+                    <label for="warrantCourtDate">Court Date</label>
+                    <input type="date" id="warrantCourtDate" />
+                </div>
+                <div class="report-field">
+                    <label for="warrantExtraditable">Extraditable</label>
+                    <select id="warrantExtraditable" style="width:100%; padding:12px 14px; border-radius:12px; border:1px solid #cbd5e1; font-size:15px; color:#0f172a; outline:none; background:#ffffff;">
+                        <option value="false">No</option>
+                        <option value="true">Yes</option>
+                    </select>
+                </div>
+                <div class="report-field">
+                    <label for="warrantStatus">Status</label>
+                    <select id="warrantStatus" style="width:100%; padding:12px 14px; border-radius:12px; border:1px solid #cbd5e1; font-size:15px; color:#0f172a; outline:none; background:#ffffff;">
+                        <option value="Active">Active</option>
+                        <option value="Completed">Completed</option>
+                        <option value="Cancelled">Cancelled</option>
+                        <option value="Expired">Expired</option>
+                    </select>
+                </div>
+                <div class="report-field">
+                    <label for="warrantNotes">Notes</label>
+                    <textarea id="warrantNotes" placeholder="Any details..."></textarea>
+                </div>
+                <button type="button" class="report-submit" id="warrantSubmitBtn">Create Warrant</button>
+                <div class="lookup-error" id="warrantError"></div>
+                <div class="lookup-result" id="warrantSuccess"></div>
             </div>
-            <div class="report-field">
-                <label for="warrantCivilianName">Civilian Name</label>
-                <input type="text" id="warrantCivilianName" readonly />
-            </div>
-            <div class="report-field">
-                <label for="warrantType">Warrant Type</label>
-                <select id="warrantType" style="width:100%; padding:12px 14px; border-radius:12px; border:1px solid #cbd5e1; font-size:15px; color:#0f172a; outline:none; background:#ffffff;">
-                    <option value="Arrest Warrant">Arrest Warrant</option>
-                    <option value="Bench Warrant">Bench Warrant</option>
-                    <option value="Traffic Warrant">Traffic Warrant</option>
-                    <option value="Search Warrant">Search Warrant</option>
-                    <option value="Other">Other</option>
-                </select>
-            </div>
-            <div class="report-field">
-                <label for="warrantCharges">Charges</label>
-                <input type="text" id="warrantCharges" placeholder="e.g. Grand Theft Auto" />
-            </div>
-            <div class="report-field">
-                <label for="warrantDescription">Description</label>
-                <textarea id="warrantDescription" placeholder="Details of the warrant..."></textarea>
-            </div>
-            <div class="report-field">
-                <label for="warrantLocation">Location</label>
-                <input type="text" id="warrantLocation" placeholder="e.g. Downtown" />
-            </div>
-            <div class="report-field">
-                <label for="warrantCourtDate">Court Date</label>
-                <input type="date" id="warrantCourtDate" />
-            </div>
-            <div class="report-field">
-                <label for="warrantNotes">Notes</label>
-                <textarea id="warrantNotes" placeholder="Any details..."></textarea>
-            </div>
-            <button type="button" class="report-submit" id="warrantSubmitBtn">Create Warrant</button>
-            <div class="lookup-error" id="warrantError"></div>
-            <div class="lookup-result" id="warrantSuccess"></div>
         </div>
     </div>
 
@@ -3740,12 +3772,15 @@ civilianRecordsList.innerHTML = records.map((record) => {
 
                 listEl.innerHTML = data.map((w) => {
                     const statusClass = (w.status || "Active").toLowerCase();
+                    const chargesArr = Array.isArray(w.charges) ? w.charges : (w.charges ? [w.charges] : []);
+                    const chargesText = chargesArr.map(c => escapeHtml(c)).join('; ');
                     const courtDate = w.court_date ? " | Court: " + w.court_date : "";
-                    const details = [w.charges, w.description, w.location, courtDate, w.notes].filter(Boolean).join(' | ');
+                    const extraditableBadge = w.extraditable ? ' <span class="license-status-badge" style="background:#fef2f2;color:#991b1b;border:1px solid #fecaca;">Extraditable</span>' : '';
+                    const details = [chargesText, w.description, w.location, courtDate, w.notes].filter(Boolean).join(' | ');
                     return `
                     <div class="record-item">
                         <div class="record-text">
-                            <strong>${escapeHtml(w.type || "Warrant")} #${escapeHtml(w.warrant_number || "")} - ${escapeHtml(w.status || "Active")}</strong>
+                            <strong>${escapeHtml(w.type || "Warrant")} #${escapeHtml(w.warrant_number || "")} - ${escapeHtml(w.status || "Active")}${extraditableBadge}</strong>
                             <span>${details || 'No details'}</span>
                         </div>
                         <span class="license-status-badge ${statusClass}">${escapeHtml(w.status || "Active")}</span>
@@ -3931,6 +3966,8 @@ civilianRecordsList.innerHTML = records.map((record) => {
                 const warrantDescription = document.getElementById("warrantDescription");
                 const warrantLocation = document.getElementById("warrantLocation");
                 const warrantCourtDate = document.getElementById("warrantCourtDate");
+                const warrantExtraditable = document.getElementById("warrantExtraditable");
+                const warrantStatus = document.getElementById("warrantStatus");
                 const warrantNotes = document.getElementById("warrantNotes");
                 const warrantError = document.getElementById("warrantError");
                 const warrantSuccess = document.getElementById("warrantSuccess");
@@ -3941,6 +3978,8 @@ civilianRecordsList.innerHTML = records.map((record) => {
                 if (warrantDescription) warrantDescription.value = "";
                 if (warrantLocation) warrantLocation.value = "";
                 if (warrantCourtDate) warrantCourtDate.value = "";
+                if (warrantExtraditable) warrantExtraditable.checked = false;
+                if (warrantStatus) warrantStatus.value = "Active";
                 if (warrantNotes) warrantNotes.value = "";
                 if (warrantError) { warrantError.textContent = ""; warrantError.style.display = "none"; }
                 if (warrantSuccess) { warrantSuccess.textContent = ""; warrantSuccess.style.display = "none"; }
@@ -3966,16 +4005,19 @@ civilianRecordsList.innerHTML = records.map((record) => {
                 const civilianId = document.getElementById("warrantCivilianId")?.value.trim() || "";
                 const civilianName = document.getElementById("warrantCivilianName")?.value.trim() || "";
                 const type = document.getElementById("warrantType")?.value.trim() || "";
-                const charges = document.getElementById("warrantCharges")?.value.trim() || "";
+                const chargesRaw = document.getElementById("warrantCharges")?.value.trim() || "";
+                const charges = chargesRaw.split("\n").map(s => s.trim()).filter(Boolean);
                 const description = document.getElementById("warrantDescription")?.value.trim() || "";
                 const location = document.getElementById("warrantLocation")?.value.trim() || "";
                 const courtDate = document.getElementById("warrantCourtDate")?.value.trim() || "";
+                const extraditable = (document.getElementById("warrantExtraditable")?.value || "false") === "true";
+                const status = document.getElementById("warrantStatus")?.value.trim() || "Active";
                 const notes = document.getElementById("warrantNotes")?.value.trim() || "";
                 const warrantError = document.getElementById("warrantError");
                 const warrantSuccess = document.getElementById("warrantSuccess");
 
-                if (!type || !charges) {
-                    if (warrantError) { warrantError.textContent = "Warrant type and charges are required."; warrantError.style.display = "block"; }
+                if (!type || charges.length === 0) {
+                    if (warrantError) { warrantError.textContent = "Warrant type and at least one charge are required."; warrantError.style.display = "block"; }
                     return;
                 }
 
@@ -4004,7 +4046,8 @@ civilianRecordsList.innerHTML = records.map((record) => {
                             description: description || null,
                             location: location || null,
                             court_date: courtDate || null,
-                            status: "Active",
+                            status,
+                            extraditable,
                             notes: notes || null,
                             created_at: new Date().toISOString()
                         }]);
