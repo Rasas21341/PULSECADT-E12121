@@ -2276,6 +2276,9 @@
                         <div id="civilianInsuranceList"><div class="empty">Loading insurance...</div></div>
                     </div>
                     <div class="tab-panel" id="civilianWarrantsPanel">
+                        <div style="display:flex; justify-content:flex-end; margin-bottom:8px;">
+                            <button type="button" class="record-action-btn" id="speakWarrantsBtn" style="background:#eff6ff; border-color:#bfdbfe; color:#1d4ed8;">Speak</button>
+                        </div>
                         <div id="civilianWarrantsList"><div class="empty">Loading warrants...</div></div>
                     </div>
                 </div>
@@ -3513,7 +3516,10 @@ if (licenceSubmitBtn) {
             loadCivilianLicenseStatus(civilian.id);
             loadCivilianRecords(civilian.id);
             loadCivilianInsurance(civilian.id);
-            loadCivilianWarrants(civilian.id);
+            loadCivilianWarrants(civilian.id).then(() => {
+                // Announce any active warrants out loud after they load.
+                setTimeout(speakWarrants, 250);
+            });
             switchTab(document.querySelector('.tab-btn.active'));
         }
 
@@ -3792,6 +3798,34 @@ civilianRecordsList.innerHTML = records.map((record) => {
             }
         }
 
+        function speakWarrants() {
+            if (!('speechSynthesis' in window)) {
+                alert("Text-to-speech is not supported in this browser.");
+                return;
+            }
+            const listEl = document.getElementById("civilianWarrantsList");
+            if (!listEl) return;
+            const text = listEl.innerText || "";
+            if (!text || text.toLowerCase().includes("no warrants")) {
+                alert("No active warrants to announce.");
+                return;
+            }
+            try {
+                window.speechSynthesis.cancel();
+                const utter = new SpeechSynthesisUtterance(text);
+                utter.rate = 0.95;
+                utter.pitch = 1;
+                window.speechSynthesis.speak(utter);
+            } catch (err) {
+                console.error("Speech failed:", err);
+            }
+        }
+
+        const speakWarrantsBtn = document.getElementById("speakWarrantsBtn");
+        if (speakWarrantsBtn) {
+            speakWarrantsBtn.addEventListener("click", speakWarrants);
+        }
+
         const insuranceCard = document.getElementById("insuranceCard");
         const icCloseBtn = document.getElementById("icCloseBtn");
 
@@ -3978,7 +4012,7 @@ civilianRecordsList.innerHTML = records.map((record) => {
                 if (warrantDescription) warrantDescription.value = "";
                 if (warrantLocation) warrantLocation.value = "";
                 if (warrantCourtDate) warrantCourtDate.value = "";
-                if (warrantExtraditable) warrantExtraditable.checked = false;
+                if (warrantExtraditable) warrantExtraditable.value = "false";
                 if (warrantStatus) warrantStatus.value = "Active";
                 if (warrantNotes) warrantNotes.value = "";
                 if (warrantError) { warrantError.textContent = ""; warrantError.style.display = "none"; }
