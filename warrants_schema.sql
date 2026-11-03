@@ -41,6 +41,10 @@ ALTER TABLE warrants ADD COLUMN IF NOT EXISTS status TEXT DEFAULT 'Active';
 ALTER TABLE warrants ADD COLUMN IF NOT EXISTS extraditable BOOLEAN DEFAULT false;
 ALTER TABLE warrants ADD COLUMN IF NOT EXISTS notes TEXT;
 ALTER TABLE warrants ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ DEFAULT NOW();
+ALTER TABLE warrants ADD COLUMN IF NOT EXISTS judge_name TEXT;
+ALTER TABLE warrants ADD COLUMN IF NOT EXISTS issuing_agency TEXT;
+ALTER TABLE warrants ADD COLUMN IF NOT EXISTS issue_date DATE;
+ALTER TABLE warrants ADD COLUMN IF NOT EXISTS expiry_date DATE;
 
 -- Indexes for faster lookups
 CREATE INDEX IF NOT EXISTS idx_warrants_civilian ON warrants(civilian_id);
