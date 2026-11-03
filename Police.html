@@ -2244,6 +2244,7 @@
                         <button type="button" class="tab-btn active" data-tab="details" data-target="civilianDetailsPanel">Details</button>
                         <button type="button" class="tab-btn" data-tab="records" data-target="civilianRecordsPanel">Records</button>
                         <button type="button" class="tab-btn" data-tab="insurance" data-target="civilianInsurancePanel">Insurance</button>
+                        <button type="button" class="tab-btn" data-tab="warrants" data-target="civilianWarrantsPanel">Warrants</button>
                     </div>
                     <div class="tab-panel active" id="civilianDetailsPanel">
                         <div class="record-item" id="selectedCivilianInfo"></div>
@@ -2251,6 +2252,7 @@
                             <button type="button" class="record-action-btn" id="openTrafficStopBtn">Traffic Stop</button>
                             <button type="button" class="record-action-btn citation" id="openCitationBtn">Citation</button>
                             <button type="button" class="record-action-btn arrest" id="openArrestBtn">Arrest</button>
+                            <button type="button" class="record-action-btn" id="openWarrantBtn" style="background:#fef2f2; border-color:#fecaca; color:#991b1b;">Warrant</button>
                         </div>
                     </div>
                     <div class="tab-panel" id="civilianRecordsPanel">
@@ -2258,6 +2260,9 @@
                     </div>
                     <div class="tab-panel" id="civilianInsurancePanel">
                         <div id="civilianInsuranceList"><div class="empty">Loading insurance...</div></div>
+                    </div>
+                    <div class="tab-panel" id="civilianWarrantsPanel">
+                        <div id="civilianWarrantsList"><div class="empty">Loading warrants...</div></div>
                     </div>
                 </div>
             </div>
@@ -2391,8 +2396,59 @@
             </div>
             <button type="button" class="report-submit" id="arrestSubmitBtn">Make Arrest</button>
             <button type="button" class="report-submit" id="arrestDownloadPdfBtn" style="background:#334155;">Download PDF</button>
-            <div class="lookup-error" id="arrestError"></div>
-            <div class="lookup-result" id="arrestSuccess"></div>
+<div class="lookup-error" id="arrestError"></div>
+                <div class="lookup-result" id="arrestSuccess"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="warrantModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">Create Warrant</div>
+                <button class="modal-close" id="warrantModalClose" type="button" aria-label="Close">×</button>
+            </div>
+            <div class="report-field">
+                <label for="warrantCivilianId">Civilian ID</label>
+                <input type="text" id="warrantCivilianId" readonly />
+            </div>
+            <div class="report-field">
+                <label for="warrantCivilianName">Civilian Name</label>
+                <input type="text" id="warrantCivilianName" readonly />
+            </div>
+            <div class="report-field">
+                <label for="warrantType">Warrant Type</label>
+                <select id="warrantType" style="width:100%; padding:12px 14px; border-radius:12px; border:1px solid #cbd5e1; font-size:15px; color:#0f172a; outline:none; background:#ffffff;">
+                    <option value="Arrest Warrant">Arrest Warrant</option>
+                    <option value="Bench Warrant">Bench Warrant</option>
+                    <option value="Traffic Warrant">Traffic Warrant</option>
+                    <option value="Search Warrant">Search Warrant</option>
+                    <option value="Other">Other</option>
+                </select>
+            </div>
+            <div class="report-field">
+                <label for="warrantCharges">Charges</label>
+                <input type="text" id="warrantCharges" placeholder="e.g. Grand Theft Auto" />
+            </div>
+            <div class="report-field">
+                <label for="warrantDescription">Description</label>
+                <textarea id="warrantDescription" placeholder="Details of the warrant..."></textarea>
+            </div>
+            <div class="report-field">
+                <label for="warrantLocation">Location</label>
+                <input type="text" id="warrantLocation" placeholder="e.g. Downtown" />
+            </div>
+            <div class="report-field">
+                <label for="warrantCourtDate">Court Date</label>
+                <input type="date" id="warrantCourtDate" />
+            </div>
+            <div class="report-field">
+                <label for="warrantNotes">Notes</label>
+                <textarea id="warrantNotes" placeholder="Any details..."></textarea>
+            </div>
+            <button type="button" class="report-submit" id="warrantSubmitBtn">Create Warrant</button>
+            <div class="lookup-error" id="warrantError"></div>
+            <div class="lookup-result" id="warrantSuccess"></div>
         </div>
     </div>
 
@@ -3425,6 +3481,7 @@ if (licenceSubmitBtn) {
             loadCivilianLicenseStatus(civilian.id);
             loadCivilianRecords(civilian.id);
             loadCivilianInsurance(civilian.id);
+            loadCivilianWarrants(civilian.id);
             switchTab(document.querySelector('.tab-btn.active'));
         }
 
@@ -3665,6 +3722,41 @@ civilianRecordsList.innerHTML = records.map((record) => {
             }
         }
 
+        async function loadCivilianWarrants(civilianId) {
+            const listEl = document.getElementById("civilianWarrantsList");
+            if (!listEl || !localSupabase) return;
+            listEl.innerHTML = '<div class="empty">Loading warrants...</div>';
+            try {
+                const { data, error } = await localSupabase
+                    .from("warrants")
+                    .select("*")
+                    .eq("civilian_id", civilianId)
+                    .order("created_at", { ascending: false });
+
+                if (error || !Array.isArray(data) || data.length === 0) {
+                    listEl.innerHTML = '<div class="empty">No warrants on record.</div>';
+                    return;
+                }
+
+                listEl.innerHTML = data.map((w) => {
+                    const statusClass = (w.status || "Active").toLowerCase();
+                    const courtDate = w.court_date ? " | Court: " + w.court_date : "";
+                    const details = [w.charges, w.description, w.location, courtDate, w.notes].filter(Boolean).join(' | ');
+                    return `
+                    <div class="record-item">
+                        <div class="record-text">
+                            <strong>${escapeHtml(w.type || "Warrant")} #${escapeHtml(w.warrant_number || "")} - ${escapeHtml(w.status || "Active")}</strong>
+                            <span>${details || 'No details'}</span>
+                        </div>
+                        <span class="license-status-badge ${statusClass}">${escapeHtml(w.status || "Active")}</span>
+                    </div>`;
+                }).join("");
+            } catch (err) {
+                listEl.innerHTML = '<div class="empty">Failed to load warrants.</div>';
+                console.error("Failed to load warrants:", err);
+            }
+        }
+
         const insuranceCard = document.getElementById("insuranceCard");
         const icCloseBtn = document.getElementById("icCloseBtn");
 
@@ -3821,6 +3913,117 @@ civilianRecordsList.innerHTML = records.map((record) => {
                 if (arrestError) { arrestError.textContent = ""; arrestError.style.display = "none"; }
                 if (arrestSuccess) { arrestSuccess.textContent = ""; arrestSuccess.style.display = "none"; }
                 if (arrestModal) arrestModal.classList.add("open");
+            });
+        }
+
+        const openWarrantBtn = document.getElementById("openWarrantBtn");
+        const warrantModal = document.getElementById("warrantModal");
+        const warrantModalClose = document.getElementById("warrantModalClose");
+        const warrantSubmitBtn = document.getElementById("warrantSubmitBtn");
+
+        if (openWarrantBtn) {
+            openWarrantBtn.addEventListener("click", () => {
+                if (!selectedCivilian) return;
+                const warrantCivilianId = document.getElementById("warrantCivilianId");
+                const warrantCivilianName = document.getElementById("warrantCivilianName");
+                const warrantType = document.getElementById("warrantType");
+                const warrantCharges = document.getElementById("warrantCharges");
+                const warrantDescription = document.getElementById("warrantDescription");
+                const warrantLocation = document.getElementById("warrantLocation");
+                const warrantCourtDate = document.getElementById("warrantCourtDate");
+                const warrantNotes = document.getElementById("warrantNotes");
+                const warrantError = document.getElementById("warrantError");
+                const warrantSuccess = document.getElementById("warrantSuccess");
+                if (warrantCivilianId) warrantCivilianId.value = selectedCivilian.id || "";
+                if (warrantCivilianName) warrantCivilianName.value = selectedCivilian.name || "";
+                if (warrantType) warrantType.value = "Arrest Warrant";
+                if (warrantCharges) warrantCharges.value = "";
+                if (warrantDescription) warrantDescription.value = "";
+                if (warrantLocation) warrantLocation.value = "";
+                if (warrantCourtDate) warrantCourtDate.value = "";
+                if (warrantNotes) warrantNotes.value = "";
+                if (warrantError) { warrantError.textContent = ""; warrantError.style.display = "none"; }
+                if (warrantSuccess) { warrantSuccess.textContent = ""; warrantSuccess.style.display = "none"; }
+                if (warrantModal) warrantModal.classList.add("open");
+            });
+        }
+
+        if (warrantModalClose && warrantModal) {
+            warrantModalClose.addEventListener("click", () => {
+                warrantModal.classList.remove("open");
+            });
+        }
+        if (warrantModal) {
+            warrantModal.addEventListener("click", (e) => {
+                if (e.target === warrantModal) {
+                    warrantModal.classList.remove("open");
+                }
+            });
+        }
+
+        if (warrantSubmitBtn) {
+            warrantSubmitBtn.addEventListener("click", async () => {
+                const civilianId = document.getElementById("warrantCivilianId")?.value.trim() || "";
+                const civilianName = document.getElementById("warrantCivilianName")?.value.trim() || "";
+                const type = document.getElementById("warrantType")?.value.trim() || "";
+                const charges = document.getElementById("warrantCharges")?.value.trim() || "";
+                const description = document.getElementById("warrantDescription")?.value.trim() || "";
+                const location = document.getElementById("warrantLocation")?.value.trim() || "";
+                const courtDate = document.getElementById("warrantCourtDate")?.value.trim() || "";
+                const notes = document.getElementById("warrantNotes")?.value.trim() || "";
+                const warrantError = document.getElementById("warrantError");
+                const warrantSuccess = document.getElementById("warrantSuccess");
+
+                if (!type || !charges) {
+                    if (warrantError) { warrantError.textContent = "Warrant type and charges are required."; warrantError.style.display = "block"; }
+                    return;
+                }
+
+                if (!localSupabase) {
+                    if (warrantError) { warrantError.textContent = "Database unavailable."; warrantError.style.display = "block"; }
+                    return;
+                }
+
+                if (warrantError) { warrantError.textContent = ""; warrantError.style.display = "none"; }
+                if (warrantSuccess) { warrantSuccess.textContent = ""; warrantSuccess.style.display = "none"; }
+
+                try {
+                    const warrantNumber = "WR-" + Date.now().toString(36).toUpperCase() + "-" + Math.random().toString(36).slice(2, 6).toUpperCase();
+                    const { error } = await localSupabase
+                        .from("warrants")
+                        .insert([{
+                            warrant_number: warrantNumber,
+                            civilian_id: civilianId || null,
+                            civilian_name: civilianName || null,
+                            officer_id: officerId,
+                            officer_name: officerName,
+                            officer_rank: officerRank || null,
+                            officer_callsign: officerCallsign || null,
+                            type,
+                            charges,
+                            description: description || null,
+                            location: location || null,
+                            court_date: courtDate || null,
+                            status: "Active",
+                            notes: notes || null,
+                            created_at: new Date().toISOString()
+                        }]);
+
+                    if (error) {
+                        if (warrantError) { warrantError.textContent = error.message || "Failed to create warrant."; warrantError.style.display = "block"; }
+                        return;
+                    }
+
+                    if (warrantSuccess) {
+                        warrantSuccess.textContent = "Warrant " + warrantNumber + " created.";
+                        warrantSuccess.style.display = "block";
+                    }
+                    if (warrantModal) warrantModal.classList.remove("open");
+                    if (selectedCivilian && selectedCivilian.id) loadCivilianWarrants(selectedCivilian.id);
+                } catch (err) {
+                    if (warrantError) { warrantError.textContent = "Failed to create warrant."; warrantError.style.display = "block"; }
+                    console.error("Failed to create warrant:", err);
+                }
             });
         }
         const trafficStopModal = document.getElementById("trafficStopModal");

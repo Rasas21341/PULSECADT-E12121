@@ -1080,15 +1080,17 @@
                     <input type="text" id="bankingId" placeholder="LC-00000" readonly />
                     <button type="button" class="generate-id-btn" id="generateBankingIdBtn">Generate</button>
                 </div>
-                <div class="banking-account-box checking">
+<div class="banking-account-box checking">
                    <label for="checkingBalance">Checking</label>
-                   <input type="text" id="checkingBalance" placeholder="$0.00" readonly />
+                   <input type="text" id="checkingBalance" placeholder="$0.00" />
                </div>
                 <div class="banking-account-box savings">
                     <label for="savingsBalance">Savings</label>
-                    <input type="text" id="savingsBalance" placeholder="$0.00" readonly />
+                    <input type="text" id="savingsBalance" placeholder="$0.00" />
                 </div>
-                <button type="button" class="send-money-btn">Send Money</button>
+                <button type="button" class="send-money-btn" id="saveBankingBtn">Save Banking</button>
+                <div class="form-error" id="bankingError" style="display:none;"></div>
+                <div class="form-success" id="bankingSuccess" style="display:none;"></div>
             </div>
 
              <div class="my-civilians-section" id="myCiviliansSection">
@@ -1475,7 +1477,7 @@
             }
         }
 
-        function selectCivilianCard(civilian, cardElement) {
+function selectCivilianCard(civilian, cardElement) {
             selectedCivilianId = civilian.id;
             currentCivilianId = civilian.id;
 
@@ -1483,6 +1485,9 @@
             if (bankingIdInput) {
                 bankingIdInput.value = civilian.banking_id || "LC-00000";
             }
+
+            // Load balances from the banking_accounts table (matched by banking ID)
+            loadBankingAccounts();
 
             document.querySelectorAll(".civilian-card").forEach((c) => c.classList.remove("selected"));
             if (cardElement) cardElement.classList.add("selected");
@@ -2648,6 +2653,145 @@
 
         const generateBankingIdBtn = document.getElementById("generateBankingIdBtn");
         const bankingIdInput = document.getElementById("bankingId");
+        const checkingBalanceInput = document.getElementById("checkingBalance");
+        const savingsBalanceInput = document.getElementById("savingsBalance");
+        const saveBankingBtn = document.getElementById("saveBankingBtn");
+        const bankingErrorEl = document.getElementById("bankingError");
+        const bankingSuccessEl = document.getElementById("bankingSuccess");
+
+        function parseMoneyInput(value) {
+            if (value === null || value === undefined) return 0;
+            const cleaned = String(value).replace(/[^0-9.\-]/g, "");
+            const n = parseFloat(cleaned);
+            return isNaN(n) ? 0 : n;
+        }
+
+        function formatMoneyInput(value) {
+            const n = Number(value) || 0;
+            return n.toFixed(2);
+        }
+
+        async function loadBankingAccounts() {
+            if (!localSupabase) return;
+            const bankingId = bankingIdInput ? bankingIdInput.value.trim() : "";
+            if (!bankingId || bankingId === "LC-00000") {
+                if (checkingBalanceInput) checkingBalanceInput.value = "$0.00";
+                if (savingsBalanceInput) savingsBalanceInput.value = "$0.00";
+                return;
+            }
+            try {
+                const { data, error } = await localSupabase
+                    .from("banking_accounts")
+                    .select("*")
+                    .eq("banking_id", bankingId)
+                    .limit(1);
+                if (error) {
+                    console.warn("Failed to load banking accounts:", error);
+                    return;
+                }
+                const row = Array.isArray(data) && data.length > 0 ? data[0] : null;
+                if (row) {
+                    if (checkingBalanceInput) checkingBalanceInput.value = "$" + formatMoneyInput(row.checking_balance);
+                    if (savingsBalanceInput) savingsBalanceInput.value = "$" + formatMoneyInput(row.savings_balance);
+                } else {
+                    if (checkingBalanceInput) checkingBalanceInput.value = "$0.00";
+                    if (savingsBalanceInput) savingsBalanceInput.value = "$0.00";
+                }
+            } catch (err) {
+                console.error("Failed to load banking accounts:", err);
+            }
+        }
+
+        async function saveBankingAccounts() {
+            if (!localSupabase) {
+                if (bankingErrorEl) { bankingErrorEl.textContent = "Database unavailable."; bankingErrorEl.style.display = "block"; }
+                return;
+            }
+            const bankingId = bankingIdInput ? bankingIdInput.value.trim() : "";
+            if (!bankingId || bankingId === "LC-00000") {
+                if (bankingErrorEl) { bankingErrorEl.textContent = "Generate a Banking ID first."; bankingErrorEl.style.display = "block"; }
+                return;
+            }
+            const checking = parseMoneyInput(checkingBalanceInput ? checkingBalanceInput.value : "");
+            const savings = parseMoneyInput(savingsBalanceInput ? savingsBalanceInput.value : "");
+
+            if (bankingErrorEl) { bankingErrorEl.textContent = ""; bankingErrorEl.style.display = "none"; }
+            if (bankingSuccessEl) { bankingSuccessEl.style.display = "none"; }
+
+            try {
+                const { data: existing, error: lookupError } = await localSupabase
+                    .from("banking_accounts")
+                    .select("id")
+                    .eq("banking_id", bankingId)
+                    .limit(1);
+
+                if (lookupError) throw lookupError;
+
+                let error = null;
+                if (Array.isArray(existing) && existing.length > 0) {
+                    const { error: updErr } = await localSupabase
+                        .from("banking_accounts")
+                        .update({ checking_balance: checking, savings_balance: savings, updated_at: new Date().toISOString() })
+                        .eq("id", existing[0].id);
+                    error = updErr;
+                } else {
+                    const { error: insErr } = await localSupabase
+                        .from("banking_accounts")
+                        .insert([{ banking_id: bankingId, civilian_id: currentCivilianId || null, checking_balance: checking, savings_balance: savings }]);
+                    error = insErr;
+                }
+
+                if (error) {
+                    if (bankingErrorEl) { bankingErrorEl.textContent = error.message || "Failed to save banking."; bankingErrorEl.style.display = "block"; }
+                    return;
+                }
+
+                if (bankingSuccessEl) {
+                    bankingSuccessEl.textContent = "Banking saved successfully.";
+                    bankingSuccessEl.style.display = "block";
+                }
+            } catch (err) {
+                if (bankingErrorEl) { bankingErrorEl.textContent = "Failed to save banking."; bankingErrorEl.style.display = "block"; }
+                console.error("Failed to save banking:", err);
+            }
+        }
+
+        if (bankingBtn && bankingSection && createCivilianForm) {
+            bankingBtn.addEventListener("click", async () => {
+                if (!selectedCivilianId) {
+                    alert("You need a character on this server to access banking.");
+                    return;
+                }
+                createCivilianForm.style.display = "none";
+                if (pageTitle) pageTitle.style.display = "none";
+                if (myCiviliansSection) myCiviliansSection.style.display = "none";
+                bankingSection.style.display = "block";
+                await loadBankingAccounts();
+            });
+        }
+
+        if (saveBankingBtn) {
+            saveBankingBtn.addEventListener("click", saveBankingAccounts);
+        }
+
+        if (checkingBalanceInput) {
+            checkingBalanceInput.addEventListener("input", () => {
+                let v = checkingBalanceInput.value;
+                const num = parseMoneyInput(v);
+                if (v && !v.startsWith("$")) {
+                    checkingBalanceInput.value = "$" + formatMoneyInput(num);
+                }
+            });
+        }
+        if (savingsBalanceInput) {
+            savingsBalanceInput.addEventListener("input", () => {
+                let v = savingsBalanceInput.value;
+                const num = parseMoneyInput(v);
+                if (v && !v.startsWith("$")) {
+                    savingsBalanceInput.value = "$" + formatMoneyInput(num);
+                }
+            });
+        }
         if (bankingIdInput && pendingBankingId) {
             bankingIdInput.value = pendingBankingId;
         }
@@ -2681,6 +2825,27 @@
                             .from("civilians")
                             .update({ banking_id: newId })
                             .eq("id", currentCivilianId);
+
+                        // Keep the banking_accounts table in sync by banking ID
+                        try {
+                            const { data: existingAcct } = await localSupabase
+                                .from("banking_accounts")
+                                .select("id")
+                                .eq("civilian_id", currentCivilianId)
+                                .limit(1);
+                            if (Array.isArray(existingAcct) && existingAcct.length > 0) {
+                                await localSupabase
+                                    .from("banking_accounts")
+                                    .update({ banking_id: newId, updated_at: new Date().toISOString() })
+                                    .eq("id", existingAcct[0].id);
+                            } else {
+                                await localSupabase
+                                    .from("banking_accounts")
+                                    .insert([{ banking_id: newId, civilian_id: currentCivilianId, checking_balance: 0, savings_balance: 0 }]);
+                            }
+                        } catch (acctErr) {
+                            console.warn("Failed to sync banking_accounts:", acctErr);
+                        }
                     } catch (err) {
                         console.error("Failed to save banking ID to civilian:", err);
                     }
