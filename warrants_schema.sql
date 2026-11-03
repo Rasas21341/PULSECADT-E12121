@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS warrants (
     officer_rank TEXT,
     officer_callsign TEXT,
     type TEXT,                              -- e.g. Arrest Warrant, Bench Warrant, Traffic
-    charges TEXT,
+    charges TEXT[] DEFAULT '{}',            -- array of charge strings
     description TEXT,
     location TEXT,
     court_date DATE,
