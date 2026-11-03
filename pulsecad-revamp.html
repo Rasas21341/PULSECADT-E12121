@@ -2819,8 +2819,8 @@ if (loggedInScreen) loggedInScreen.classList.add("open");
                          const loggedInScreen = document.getElementById("loggedInScreen");
                          if (userDropdown) userDropdown.style.display = "none";
 if (loggedInScreen) loggedInScreen.classList.remove("open");
-                        if (container) container.style.display = "block";
-                        
+                         if (container) container.style.display = "block";
+                         setTosDropdownVisible(true);
                          let logoutEmail = "";
                          try { const { data: { user } } = await localSupabase.auth.getUser(); logoutEmail = user?.email || ""; } catch (_) {}
                          notifyDiscordLogout(logoutEmail);
