@@ -4336,6 +4336,21 @@ await joinCommunity(data.id, passcode.trim());
             });
         }
 
+        // Terms of Service "More" dropdown toggle
+        const topbarTosBtn = document.getElementById("topbarTosBtn");
+        if (topbarTosBtn && tosDropdown) {
+            topbarTosBtn.addEventListener("click", (e) => {
+                e.stopPropagation();
+                tosDropdown.classList.toggle("open");
+            });
+            document.addEventListener("click", () => {
+                tosDropdown.classList.remove("open");
+            });
+            tosDropdown.addEventListener("click", (e) => {
+                e.stopPropagation();
+            });
+        }
+
         if (dispatchSystemBtn) {
             dispatchSystemBtn.addEventListener("click", () => {
                 window.location.href = "police.html";
