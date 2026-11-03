@@ -4275,6 +4275,10 @@ civilianRecordsList.innerHTML = records.map((record) => {
                 const warrantDescription = document.getElementById("warrantDescription");
                 const warrantLocation = document.getElementById("warrantLocation");
                 const warrantCourtDate = document.getElementById("warrantCourtDate");
+                const warrantIssueDate = document.getElementById("warrantIssueDate");
+                const warrantExpiryDate = document.getElementById("warrantExpiryDate");
+                const warrantJudge = document.getElementById("warrantJudge");
+                const warrantIssuingAgency = document.getElementById("warrantIssuingAgency");
                 const warrantExtraditable = document.getElementById("warrantExtraditable");
                 const warrantStatus = document.getElementById("warrantStatus");
                 const warrantNotes = document.getElementById("warrantNotes");
@@ -4287,6 +4291,10 @@ civilianRecordsList.innerHTML = records.map((record) => {
                 if (warrantDescription) warrantDescription.value = "";
                 if (warrantLocation) warrantLocation.value = "";
                 if (warrantCourtDate) warrantCourtDate.value = "";
+                if (warrantIssueDate) warrantIssueDate.value = new Date().toISOString().slice(0, 10);
+                if (warrantExpiryDate) warrantExpiryDate.value = "";
+                if (warrantJudge) warrantJudge.value = "";
+                if (warrantIssuingAgency) warrantIssuingAgency.value = "Liberty County Sheriff";
                 if (warrantExtraditable) warrantExtraditable.value = "false";
                 if (warrantStatus) warrantStatus.value = "Active";
                 if (warrantNotes) warrantNotes.value = "";
@@ -4319,6 +4327,10 @@ civilianRecordsList.innerHTML = records.map((record) => {
                 const description = document.getElementById("warrantDescription")?.value.trim() || "";
                 const location = document.getElementById("warrantLocation")?.value.trim() || "";
                 const courtDate = document.getElementById("warrantCourtDate")?.value.trim() || "";
+                const issueDate = document.getElementById("warrantIssueDate")?.value.trim() || "";
+                const expiryDate = document.getElementById("warrantExpiryDate")?.value.trim() || "";
+                const judgeName = document.getElementById("warrantJudge")?.value.trim() || "";
+                const issuingAgency = document.getElementById("warrantIssuingAgency")?.value.trim() || "";
                 const extraditable = (document.getElementById("warrantExtraditable")?.value || "false") === "true";
                 const status = document.getElementById("warrantStatus")?.value.trim() || "Active";
                 const notes = document.getElementById("warrantNotes")?.value.trim() || "";
@@ -4339,8 +4351,23 @@ civilianRecordsList.innerHTML = records.map((record) => {
                 if (warrantSuccess) { warrantSuccess.textContent = ""; warrantSuccess.style.display = "none"; }
 
                 try {
-                    const warrantNumber = "WR-" + Date.now().toString(36).toUpperCase() + "-" + Math.random().toString(36).slice(2, 6).toUpperCase();
-                    const { error } = await localSupabase
+                    // Sequential warrant number based on the highest existing id.
+                    let nextSeq = 1;
+                    try {
+                        const { data: seqData } = await localSupabase
+                            .from("warrants")
+                            .select("id")
+                            .order("id", { ascending: false })
+                            .limit(1);
+                        if (Array.isArray(seqData) && seqData.length > 0 && seqData[0].id) {
+                            nextSeq = Number(seqData[0].id) + 1;
+                        }
+                    } catch (seqErr) { console.warn("Could not determine next warrant seq:", seqErr); }
+                    const y = new Date().getFullYear();
+                    const pad = (n) => String(n).padStart(3, "0");
+                    const warrantNumber = "WR-" + y + "-" + pad(nextSeq);
+
+                    const { data: inserted, error } = await localSupabase
                         .from("warrants")
                         .insert([{
                             warrant_number: warrantNumber,
@@ -4355,16 +4382,23 @@ civilianRecordsList.innerHTML = records.map((record) => {
                             description: description || null,
                             location: location || null,
                             court_date: courtDate || null,
+                            issue_date: issueDate || null,
+                            expiry_date: expiryDate || null,
+                            judge_name: judgeName || null,
+                            issuing_agency: issuingAgency || null,
                             status,
                             extraditable,
                             notes: notes || null,
                             created_at: new Date().toISOString()
-                        }]);
+                        }])
+                        .select();
 
                     if (error) {
                         if (warrantError) { warrantError.textContent = error.message || "Failed to create warrant."; warrantError.style.display = "block"; }
                         return;
                     }
+
+                    const createdRow = Array.isArray(inserted) && inserted.length > 0 ? inserted[0] : { warrant_number: warrantNumber, status, extraditable };
 
                     if (warrantSuccess) {
                         warrantSuccess.textContent = "Warrant " + warrantNumber + " created.";
@@ -4372,6 +4406,7 @@ civilianRecordsList.innerHTML = records.map((record) => {
                     }
                     if (warrantModal) warrantModal.classList.remove("open");
                     if (selectedCivilian && selectedCivilian.id) loadCivilianWarrants(selectedCivilian.id);
+                    openWarrantCard(createdRow);
                 } catch (err) {
                     if (warrantError) { warrantError.textContent = "Failed to create warrant."; warrantError.style.display = "block"; }
                     console.error("Failed to create warrant:", err);
