@@ -4386,6 +4386,19 @@ await joinCommunity(data.id, passcode.trim());
             });
         }
 
+        if (topbarTosBtn && tosDropdown) {
+            topbarTosBtn.addEventListener("click", (e) => {
+                e.stopPropagation();
+                tosDropdown.classList.toggle("open");
+            });
+            document.addEventListener("click", () => {
+                tosDropdown.classList.remove("open");
+            });
+            tosDropdown.addEventListener("click", (e) => {
+                e.stopPropagation();
+            });
+        }
+
         function setTosDropdownVisible(visible) {
             const wrap = document.querySelector(".tos-dropdown-wrap");
             if (wrap) wrap.style.display = visible ? "" : "none";
