@@ -2625,6 +2625,10 @@
 
         if (bankingBtn && bankingSection && createCivilianForm) {
             bankingBtn.addEventListener("click", () => {
+                if (!selectedCivilianId) {
+                    alert("You need a character on this server to access banking.");
+                    return;
+                }
                 createCivilianForm.style.display = "none";
                 if (pageTitle) pageTitle.style.display = "none";
                 if (myCiviliansSection) myCiviliansSection.style.display = "none";
