@@ -2940,35 +2940,36 @@ if (loggedInScreen) loggedInScreen.classList.remove("open");
             });
         }
 
-         if (dropdownLogoutBtn) {
-             dropdownLogoutBtn.addEventListener("click", async () => {
-                 let logoutEmail = "";
-                 try { const { data: { user } } = await localSupabase.auth.getUser(); logoutEmail = user?.email || ""; } catch (_) {}
-                 if (localSupabase) {
-                     try {
-                         await localSupabase.auth.signOut();
-                     } catch (err) {
-                         console.error("Logout failed:", err);
-                     }
-                 }
-                 clearDiscordSession();
-                 const topbarLoginBtn = document.getElementById("topbarLoginBtn");
-                 const userDropdown = document.getElementById("userDropdown");
-                 const container = document.querySelector(".container");
-                 const loggedInScreen = document.getElementById("loggedInScreen");
-                 const loginSuccess = document.getElementById("loginSuccess");
-                 if (loginSuccess) { loginSuccess.textContent = "You have been logged out."; loginSuccess.style.display = "block"; }
-                 if (topbarLoginBtn) topbarLoginBtn.textContent = "Login";
-                 const topbar = document.getElementById("topbar");
-                 if (topbar) topbar.style.display = "block";
-                 if (userDropdown) userDropdown.style.display = "none";
-                 if (dropdownMenu) dropdownMenu.classList.remove("open");
-if (loggedInScreen) loggedInScreen.classList.remove("open");
-                    if (settingsScreen) settingsScreen.classList.remove("open");
-                    if (container) container.style.display = "block";
-                    notifyDiscordLogout(logoutEmail);
-             });
-         }
+if (dropdownLogoutBtn) {
+            dropdownLogoutBtn.addEventListener("click", async () => {
+                let logoutEmail = "";
+                try { const { data: { user } } = await localSupabase.auth.getUser(); logoutEmail = user?.email || ""; } catch (_) {}
+                if (localSupabase) {
+                    try {
+                        await localSupabase.auth.signOut();
+                    } catch (err) {
+                        console.error("Logout failed:", err);
+                    }
+                }
+                clearDiscordSession();
+                const topbarLoginBtn = document.getElementById("topbarLoginBtn");
+                const userDropdown = document.getElementById("userDropdown");
+                const container = document.querySelector(".container");
+                const loggedInScreen = document.getElementById("loggedInScreen");
+                const loginSuccess = document.getElementById("loginSuccess");
+                if (loginSuccess) { loginSuccess.textContent = "You have been logged out."; loginSuccess.style.display = "block"; }
+                if (topbarLoginBtn) topbarLoginBtn.textContent = "Login";
+                const topbar = document.getElementById("topbar");
+                if (topbar) topbar.style.display = "block";
+                if (userDropdown) userDropdown.style.display = "none";
+                if (dropdownMenu) dropdownMenu.classList.remove("open");
+                setTosDropdownVisible(true);
+                if (loggedInScreen) loggedInScreen.classList.remove("open");
+                if (settingsScreen) settingsScreen.classList.remove("open");
+                if (container) container.style.display = "block";
+                notifyDiscordLogout(logoutEmail);
+            });
+        }
 
         const dropdownJoinCommunityBtn = document.getElementById("dropdownJoinCommunityBtn");
 
