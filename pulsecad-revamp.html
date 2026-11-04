@@ -734,6 +734,66 @@
             display: flex;
         }
 
+        .tos-section {
+            margin: 10px 0;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            background: #f8fafc;
+            overflow: hidden;
+        }
+
+        .tos-section-summary {
+            list-style: none;
+            cursor: pointer;
+            padding: 12px 14px;
+            font-weight: 700;
+            font-size: 15px;
+            color: #0f172a;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #ffffff;
+            border-bottom: 1px solid #e2e8f0;
+            border: none;
+            width: 100%;
+            text-align: left;
+        }
+
+        .tos-section-summary::-webkit-details-marker {
+            display: none;
+        }
+
+        .tos-section[open] .tos-section-summary {
+            background: #eff6ff;
+        }
+
+        .tos-chevron {
+            flex: 0 0 auto;
+            transition: transform 0.2s ease;
+            color: #64748b;
+        }
+
+        .tos-section[open] .tos-chevron {
+            transform: rotate(180deg);
+        }
+
+        .tos-section-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.25s ease;
+            padding: 0 14px;
+        }
+
+        .tos-section[open] .tos-section-content {
+            max-height: 600px;
+            padding: 10px 14px 14px 14px;
+        }
+
+        .tos-section-content p,
+        .tos-section-content h3 {
+            margin: 0;
+        }
+
         .modal {
             background: #ffffff;
             border-radius: 20px;
