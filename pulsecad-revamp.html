@@ -4367,9 +4367,47 @@ await joinCommunity(data.id, passcode.trim());
             if (!tosModal) return;
             if (dropdownMenu) dropdownMenu.classList.remove("open");
             tosModal.classList.add("open");
+            buildTosSections();
         }
         function closeTosModal() {
             if (tosModal) tosModal.classList.remove("open");
+        }
+
+        function buildTosSections() {
+            const body = tosModal ? tosModal.querySelector("div[style*='overflow-y:auto']") : null;
+            if (!body || body.dataset.tosBuilt) return;
+            body.dataset.tosBuilt = "1";
+
+            const nodes = Array.from(body.childNodes);
+            let current = null;
+            nodes.forEach((node) => {
+                if (node.nodeType === 1 && node.tagName === "H3") {
+                    const wrapper = document.createElement("div");
+                    wrapper.className = "tos-section";
+                    const btn = document.createElement("button");
+                    btn.type = "button";
+                    btn.className = "tos-section-summary";
+                    btn.innerHTML = node.innerHTML + '<span class="tos-chevron">▾</span>';
+                    const content = document.createElement("div");
+                    content.className = "tos-section-content";
+                    wrapper.appendChild(btn);
+                    wrapper.appendChild(content);
+                    node.replaceWith(wrapper);
+                    current = content;
+                } else if (current && node.nodeType === 1 && node.tagName === "P") {
+                    current.appendChild(node);
+                } else if (current && node.nodeType === 3 && node.textContent && node.textContent.trim()) {
+                    current.appendChild(node);
+                } else if (current && node.nodeType === 1 && node.tagName !== "H3") {
+                    current.appendChild(node);
+                }
+            });
+
+            body.querySelectorAll(".tos-section-summary").forEach((btn) => {
+                btn.addEventListener("click", () => {
+                    btn.parentElement.classList.toggle("open");
+                });
+            });
         }
 
         if (tosDropdownItem) {
