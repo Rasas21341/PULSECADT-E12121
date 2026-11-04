@@ -2069,62 +2069,95 @@ enable-ga="false"
         </div>
     </div>
     <div class="modal-overlay" id="tosModal">
-        <div class="modal" style="max-width:760px;">
+        <div class="modal" style="max-width:640px;">
             <div class="modal-header">
                 <div class="modal-title">PulseCAD Terms of Service</div>
                 <button class="modal-close" id="tosModalClose" type="button" aria-label="Close">×</button>
             </div>
-            <div style="display:flex; gap:16px; max-height:72vh; overflow-y:auto; padding-right:6px;">
-                <div style="flex:0 0 220px; position:sticky; top:0; align-self:flex-start; max-height:72vh; overflow-y:auto;">
-                    <select id="tosSectionDropdown" style="width:100%; padding:8px 10px; font-size:13px; border:1px solid #e2e8f0; border-radius:8px; background:#ffffff; color:#0f172a; cursor:pointer;">
-                        <option value="0">Select a section…</option>
-                        <option value="1">1. Acceptance of Terms</option>
-                        <option value="2">2. Eligibility</option>
-                        <option value="3">3. Account Registration</option>
-                        <option value="4">4. Acceptable Use</option>
-                        <option value="5">5. User-Generated Content</option>
-                        <option value="6">6. Prohibited and Banned Accounts</option>
-                        <option value="7">7. Disclaimer of Warranties</option>
-                        <option value="8">8. Limitation of Liability</option>
-                        <option value="9">9. Changes to These Terms</option>
-                        <option value="10">10. Contact</option>
-                    </select>
-                </div>
-                <div style="flex:1; font-size:14px; line-height:1.6; color:#334155; padding-right:6px;">
-                    <p><strong>Last updated:</strong> November 2026</p>
+            <div style="max-height:70vh; overflow-y:auto; padding-right:6px; font-size:14px; line-height:1.6; color:#334155;">
+                <p><strong>Last updated:</strong> November 2026</p>
 
-                    <h3 style="margin:18px 0 8px; font-size:16px; color:#0f172a;" id="tosSection-1">1. Acceptance of Terms</h3>
+                <details class="tos-section" open>
+                    <summary class="tos-section-summary">
+                        <span>1. Acceptance of Terms</span>
+                        <span class="tos-chevron">▾</span>
+                    </summary>
                     <p>By accessing or using PulseCAD ("the Service"), you agree to be bound by these Terms of Service ("Terms"). If you do not agree, do not use the Service.</p>
+                </details>
 
-                    <h3 style="margin:18px 0 8px; font-size:16px; color:#0f172a;" id="tosSection-2">2. Eligibility</h3>
+                <details class="tos-section">
+                    <summary class="tos-section-summary">
+                        <span>2. Eligibility</span>
+                        <span class="tos-chevron">▾</span>
+                    </summary>
                     <p>You must be at least 13 years old to use the Service. By using PulseCAD, you represent that you meet this age requirement.</p>
+                </details>
 
-                    <h3 style="margin:18px 0 8px; font-size:16px; color:#0f172a;" id="tosSection-3">3. Account Registration</h3>
+                <details class="tos-section">
+                    <summary class="tos-section-summary">
+                        <span>3. Account Registration</span>
+                        <span class="tos-chevron">▾</span>
+                    </summary>
                     <p>You are responsible for maintaining the confidentiality of your account credentials and for all activity under your account. You must notify us promptly of any unauthorized use.</p>
+                </details>
 
-                    <h3 style="margin:18px 0 8px; font-size:16px; color:#0f172a;" id="tosSection-4">4. Acceptable Use</h3>
+                <details class="tos-section">
+                    <summary class="tos-section-summary">
+                        <span>4. Acceptable Use</span>
+                        <span class="tos-chevron">▾</span>
+                    </summary>
                     <p>You agree not to: (a) violate any applicable law or regulation; (b) infringe the rights of others; (c) attempt to gain unauthorized access to the Service or its systems; (d) interfere with or disrupt the integrity or performance of the Service; or (e) use the Service to impersonate others or provide false information.</p>
+                </details>
 
-                    <h3 style="margin:18px 0 8px; font-size:16px; color:#0f172a;" id="tosSection-5">5. User-Generated Content</h3>
+                <details class="tos-section">
+                    <summary class="tos-section-summary">
+                        <span>5. User-Generated Content</span>
+                        <span class="tos-chevron">▾</span>
+                    </summary>
                     <p>Any content you submit, post, or transmit through the Service is your responsibility. You retain ownership of your content but grant PulseCAD a worldwide, non-exclusive license to use, store, and display it as necessary to operate the Service.</p>
+                </details>
 
-                    <h3 style="margin:18px 0 8px; font-size:16px; color:#0f172a;" id="tosSection-6">6. Prohibited and Banned Accounts</h3>
+                <details class="tos-section">
+                    <summary class="tos-section-summary">
+                        <span>6. Prohibited and Banned Accounts</span>
+                        <span class="tos-chevron">▾</span>
+                    </summary>
                     <p>PulseCAD reserves the right to suspend or terminate any account that violates these Terms, engages in fraudulent or harmful activity, or is reported by staff or the community. Banned users are barred from creating new accounts.</p>
+                </details>
 
-                    <h3 style="margin:18px 0 8px; font-size:16px; color:#0f172a;" id="tosSection-7">7. Disclaimer of Warranties</h3>
+                <details class="tos-section">
+                    <summary class="tos-section-summary">
+                        <span>7. Disclaimer of Warranties</span>
+                        <span class="tos-chevron">▾</span>
+                    </summary>
                     <p>The Service is provided "as is" and "as available" without warranties of any kind, whether express or implied. PulseCAD does not guarantee uninterrupted, secure, or error-free operation.</p>
+                </details>
 
-                    <h3 style="margin:18px 0 8px; font-size:16px; color:#0f172a;" id="tosSection-8">8. Limitation of Liability</h3>
+                <details class="tos-section">
+                    <summary class="tos-section-summary">
+                        <span>8. Limitation of Liability</span>
+                        <span class="tos-chevron">▾</span>
+                    </summary>
                     <p>To the fullest extent permitted by law, PulseCAD and its operators shall not be liable for any indirect, incidental, consequential, or punitive damages arising out of your use of the Service.</p>
+                </details>
 
-                    <h3 style="margin:18px 0 8px; font-size:16px; color:#0f172a;" id="tosSection-9">9. Changes to These Terms</h3>
+                <details class="tos-section">
+                    <summary class="tos-section-summary">
+                        <span>9. Changes to These Terms</span>
+                        <span class="tos-chevron">▾</span>
+                    </summary>
                     <p>We may update these Terms from time to time. Continued use of the Service after changes constitutes acceptance of the updated Terms.</p>
+                </details>
 
-                    <h3 style="margin:18px 0 8px; font-size:16px; color:#0f172a;" id="tosSection-10">10. Contact</h3>
+                <details class="tos-section">
+                    <summary class="tos-section-summary">
+                        <span>10. Contact</span>
+                        <span class="tos-chevron">▾</span>
+                    </summary>
                     <p>For questions about these Terms, contact us through the Support Ticket system on the PulseCAD website.</p>
+                </details>
 
-                    <p style="margin-top:18px; color:#64748b; font-size:13px;">By using PulseCAD, you acknowledge that you have read and agreed to these Terms of Service.</p>
-                </div>
+                <p style="margin-top:18px; color:#64748b; font-size:13px;">By using PulseCAD, you acknowledge that you have read and agreed to these Terms of Service.</p>
             </div>
             <div style="margin-top:18px; text-align:right;">
                 <button type="button" class="auth-submit" id="tosModalClose2" style="width:auto; padding:10px 22px;">Close</button>
@@ -4393,23 +4426,6 @@ await joinCommunity(data.id, passcode.trim());
             tosDropdownItem.addEventListener("click", () => {
                 if (tosDropdown) tosDropdown.classList.remove("open");
                 openTosModal();
-            });
-        }
-
-        const tosSectionDropdown = document.getElementById("tosSectionDropdown");
-        if (tosSectionDropdown) {
-            tosSectionDropdown.addEventListener("change", () => {
-                const idx = parseInt(tosSectionDropdown.value, 10);
-                if (isNaN(idx) || idx < 1) return;
-                const target = document.getElementById("tosSection-" + idx);
-                const scrollContainer = target ? target.closest("div[style*='overflow-y:auto']") : null;
-                if (target) {
-                    if (scrollContainer) {
-                        scrollContainer.scrollTo({ top: target.offsetTop - 8, behavior: "smooth" });
-                    } else {
-                        target.scrollIntoView({ behavior: "smooth" });
-                    }
-                }
             });
         }
         if (tosModalClose) tosModalClose.addEventListener("click", closeTosModal);
