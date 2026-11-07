@@ -4517,6 +4517,8 @@ civilianRecordsList.innerHTML = records.map((record) => {
                 if (warrantExtraditable) warrantExtraditable.value = "false";
                 if (warrantStatus) warrantStatus.value = "Active";
                 if (warrantNotes) warrantNotes.value = "";
+                clearWarrantSignature();
+                setupWarrantSignaturePad();
                 if (warrantError) { warrantError.textContent = ""; warrantError.style.display = "none"; }
                 if (warrantSuccess) { warrantSuccess.textContent = ""; warrantSuccess.style.display = "none"; }
                 if (warrantModal) warrantModal.classList.add("open");
@@ -4553,6 +4555,7 @@ civilianRecordsList.innerHTML = records.map((record) => {
                 const extraditable = (document.getElementById("warrantExtraditable")?.value || "false") === "true";
                 const status = document.getElementById("warrantStatus")?.value.trim() || "Active";
                 const notes = document.getElementById("warrantNotes")?.value.trim() || "";
+                const signature = getWarrantSignatureValue();
                 const warrantError = document.getElementById("warrantError");
                 const warrantSuccess = document.getElementById("warrantSuccess");
 
@@ -4608,6 +4611,7 @@ civilianRecordsList.innerHTML = records.map((record) => {
                             status,
                             extraditable,
                             notes: notes || null,
+                            signature: signature || null,
                             created_at: new Date().toISOString()
                         }])
                         .select();
@@ -4617,7 +4621,7 @@ civilianRecordsList.innerHTML = records.map((record) => {
                         return;
                     }
 
-                    const createdRow = Array.isArray(inserted) && inserted.length > 0 ? inserted[0] : { warrant_number: warrantNumber, status, extraditable };
+                    const createdRow = Array.isArray(inserted) && inserted.length > 0 ? inserted[0] : { warrant_number: warrantNumber, status, extraditable, signature: signature || null, judge_name: judgeName || null, civilian_name: civilianName || null, civilian_id: civilianId || null, type, charges, description, location, court_date: courtDate, issue_date: issueDate, expiry_date: expiryDate, issuing_agency: issuingAgency, notes };
 
                     if (warrantSuccess) {
                         warrantSuccess.textContent = "Warrant " + warrantNumber + " created and sent to courts.";
