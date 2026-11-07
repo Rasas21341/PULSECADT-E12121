@@ -585,104 +585,147 @@
         #citationModal .modal {
             max-width: 980px;
             width: min(980px, calc(100vw - 32px));
-            background: #f3f2ee;
-            border: 2px solid #1f2937;
+            background: #e7e5df;
+            border: 3px solid #1f2937;
             border-radius: 0;
             box-shadow: 0 18px 45px rgba(15, 23, 42, 0.22);
             padding: 0;
             overflow: hidden;
+            font-family: Arial, Helvetica, sans-serif;
         }
 
         .citation-form-header {
-            background: #111827;
-            color: #ffffff;
-            padding: 16px 18px 12px;
+            background: #f1efe9;
+            color: #111827;
+            padding: 10px 18px 8px;
             text-align: center;
             border-bottom: 3px solid #111827;
+            position: relative;
         }
 
         .citation-form-agency {
-            font-size: 18px;
+            font-size: 28px;
             font-weight: 900;
-            letter-spacing: 0.08em;
+            letter-spacing: 0.04em;
             text-transform: uppercase;
+            line-height: 1.1;
         }
 
         .citation-form-title {
-            font-size: 18px;
+            font-size: 26px;
             font-weight: 700;
-            letter-spacing: 0.04em;
+            letter-spacing: 0.02em;
             margin-top: 2px;
-            color: #f8fafc;
-        }
-
-        #citationModal .modal-header {
-            border-bottom: 2px solid #1f2937;
-            padding: 12px 18px;
-            background: #f3f2ee;
-        }
-
-        #citationModal .modal-header .modal-title {
-            font-size: 15px;
-            font-weight: 800;
-            letter-spacing: 0.06em;
-            text-transform: uppercase;
             color: #111827;
         }
 
-        .citation-form-grid {
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 10px 14px;
-            padding: 16px 18px 10px;
-            background: #f3f2ee;
+        #citationModal .modal-close {
+            position: absolute;
+            right: 16px;
+            top: 14px;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            border: 1px solid #111827;
+            background: transparent;
+            color: #111827;
+            font-size: 18px;
         }
 
-        .citation-form-grid .report-field {
-            margin: 0;
+        .citation-paper-form {
+            padding: 0;
+            background: #e7e5df;
+        }
+
+        .citation-grid {
             display: flex;
             flex-direction: column;
+            gap: 0;
+            border-top: 2px solid #1f2937;
+            border-bottom: 2px solid #1f2937;
+            background: #e7e5df;
+        }
+
+        .citation-row {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            border-bottom: 1px solid #111827;
+            min-height: 50px;
+        }
+
+        .citation-row.top-row {
+            grid-template-columns: 1.3fr 1fr 1fr;
+        }
+
+        .citation-row .citation-box {
             min-width: 0;
+            border-right: 1px solid #111827;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            background: rgba(255,255,255,0.06);
         }
 
-        .citation-form-grid .report-field label {
-            display: block;
-            font-size: 10px;
-            font-weight: 800;
-            letter-spacing: 0.08em;
+        .citation-row .citation-box:last-child {
+            border-right: none;
+        }
+
+        .citation-row .citation-box label {
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: 0.05em;
             text-transform: uppercase;
-            color: #334155;
-            margin-bottom: 5px;
-            white-space: nowrap;
+            color: #111827;
+            padding: 3px 6px 0;
+            line-height: 1.1;
         }
 
-        .citation-form-grid .report-field input,
-        .citation-form-grid .report-field textarea {
+        .citation-row .citation-box input,
+        .citation-row .citation-box textarea {
             width: 100%;
-            min-height: 34px;
-            border-radius: 0;
-            border: 1px solid #1f2937;
-            background: #ffffff;
+            border: none;
+            background: transparent;
             color: #111827;
             font-size: 13px;
-            padding: 7px 8px;
+            padding: 2px 6px 6px;
+            min-height: 24px;
+            border-radius: 0;
             box-shadow: none;
+            outline: none;
+            font-family: inherit;
         }
 
-        .citation-form-grid .report-field textarea {
-            min-height: 62px;
+        .citation-row .citation-box textarea {
+            min-height: 52px;
             resize: vertical;
         }
 
-        .citation-form-grid .report-field.wide {
+        .citation-row .citation-box.wide-box {
+            grid-column: span 2;
+        }
+
+        .citation-row .citation-box.single-line-box {
             grid-column: 1 / -1;
+        }
+
+        .citation-row .citation-box.compact-box {
+            min-width: 110px;
+        }
+
+        .citation-row .citation-box input:focus,
+        .citation-row .citation-box textarea:focus {
+            background: rgba(255,255,255,0.12);
+        }
+
+        .citation-row.violation-row {
+            grid-template-columns: 1.1fr 1fr 1fr 1.2fr;
         }
 
         .citation-actions {
             display: flex;
             gap: 10px;
-            padding: 8px 18px 18px;
-            background: #f3f2ee;
+            padding: 14px 16px 18px;
+            background: #e7e5df;
         }
 
         .citation-actions .report-submit {
@@ -704,7 +747,7 @@
 
         #citationModal .lookup-error,
         #citationModal .lookup-result {
-            margin: 0 18px 18px;
+            margin: 0 16px 16px;
         }
 
         .record-action-btn.arrest {
@@ -2612,65 +2655,321 @@
     <div class="modal-overlay" id="citationModal">
         <div class="modal citation-paper-modal">
             <div class="citation-form-header">
-                <div class="citation-form-agency">Illinois State Police</div>
+                <div class="citation-form-agency">ILLINOIS STATE POLICE</div>
                 <div class="citation-form-title">Written Warning</div>
-            </div>
-            <div class="modal-header">
-                <div class="modal-title">Issue Citation</div>
                 <button class="modal-close" id="citationModalClose" type="button" aria-label="Close">×</button>
             </div>
-            <div class="citation-form-grid">
-                <div class="report-field">
-                    <label for="citationCivilianId">Civilian ID</label>
-                    <input type="text" id="citationCivilianId" readonly />
+
+            <div class="citation-paper-form">
+                <div class="citation-grid">
+                    <div class="citation-row top-row">
+                        <div class="citation-box">
+                            <label>Warning Number</label>
+                            <input type="text" id="citationWarningNumber" placeholder="1234567890" />
+                        </div>
+                        <div class="citation-box">
+                            <label>Incident Date</label>
+                            <input type="date" id="citationIncidentDate" />
+                        </div>
+                        <div class="citation-box">
+                            <label>Incident Time</label>
+                            <input type="time" id="citationIncidentTime" />
+                        </div>
+                    </div>
+
+                    <div class="citation-row">
+                        <div class="citation-box">
+                            <label>Civilian ID</label>
+                            <input type="text" id="citationCivilianId" readonly />
+                        </div>
+                        <div class="citation-box">
+                            <label>Civilian Name</label>
+                            <input type="text" id="citationCivilianName" readonly />
+                        </div>
+                        <div class="citation-box">
+                            <label>Statute / Code</label>
+                            <input type="text" id="citationStatute" placeholder="e.g. 625 ILCS 5/11-501" />
+                        </div>
+                        <div class="citation-box">
+                            <label>Location</label>
+                            <input type="text" id="citationLocation" placeholder="e.g. Highway 1" />
+                        </div>
+                    </div>
+
+                    <div class="citation-row">
+                        <div class="citation-box">
+                            <label>Dist Occurrence</label>
+                            <input type="text" id="citationDistOccurrence" />
+                        </div>
+                        <div class="citation-box">
+                            <label>Dist Assignment</label>
+                            <input type="text" id="citationDistAssignment" />
+                        </div>
+                        <div class="citation-box">
+                            <label>Officer Name</label>
+                            <input type="text" id="citationOfficerName" readonly />
+                        </div>
+                        <div class="citation-box">
+                            <label>Officer ID</label>
+                            <input type="text" id="citationOfficerId" readonly />
+                        </div>
+                    </div>
+
+                    <div class="citation-row">
+                        <div class="citation-box wide-box">
+                            <label>Method</label>
+                            <input type="text" id="citationMethod" placeholder="" />
+                        </div>
+                    </div>
+
+                    <div class="citation-row">
+                        <div class="citation-box wide-box single-line-box">
+                            <label>Location Description</label>
+                            <input type="text" id="citationLocationDescription" placeholder="" />
+                        </div>
+                    </div>
+
+                    <div class="citation-row">
+                        <div class="citation-box">
+                            <label>County</label>
+                            <input type="text" id="citationCounty" />
+                        </div>
+                        <div class="citation-box">
+                            <label>GPS Latitude</label>
+                            <input type="text" id="citationGpsLatitude" />
+                        </div>
+                        <div class="citation-box">
+                            <label>GPS Longitude</label>
+                            <input type="text" id="citationGpsLongitude" />
+                        </div>
+                    </div>
+
+                    <div class="citation-row">
+                        <div class="citation-box">
+                            <label>City</label>
+                            <input type="text" id="citationCity" />
+                        </div>
+                        <div class="citation-box">
+                            <label>Township</label>
+                            <input type="text" id="citationTownship" />
+                        </div>
+                    </div>
+
+                    <div class="citation-row">
+                        <div class="citation-box">
+                            <label>Highway or Street Name</label>
+                            <input type="text" id="citationHighwayStreet" />
+                        </div>
+                        <div class="citation-box">
+                            <label>Township Rd</label>
+                            <input type="text" id="citationTownshipRd" />
+                        </div>
+                        <div class="citation-box compact-box">
+                            <label>Milepost</label>
+                            <input type="text" id="citationMilepost" />
+                        </div>
+                        <div class="citation-box compact-box">
+                            <label>Distance</label>
+                            <input type="text" id="citationDistance" />
+                        </div>
+                        <div class="citation-box compact-box">
+                            <label>Unit</label>
+                            <input type="text" id="citationUnit" />
+                        </div>
+                    </div>
+
+                    <div class="citation-row">
+                        <div class="citation-box">
+                            <label>Address No.</label>
+                            <input type="text" id="citationAddressNo" />
+                        </div>
+                        <div class="citation-box">
+                            <label>Name of Intersection or Road Feature</label>
+                            <input type="text" id="citationRoadFeature" />
+                        </div>
+                        <div class="citation-box compact-box">
+                            <label>Direction</label>
+                            <input type="text" id="citationDirection" />
+                        </div>
+                    </div>
+
+                    <div class="citation-row violation-row">
+                        <div class="citation-box compact-box">
+                            <label>Violation Code</label>
+                            <input type="text" id="citationViolationCode" placeholder="625 ILCS 5/11-501" />
+                        </div>
+                        <div class="citation-box">
+                            <label>Posted Speed Limit</label>
+                            <input type="text" id="citationPostedSpeedLimit" />
+                        </div>
+                        <div class="citation-box">
+                            <label>Actual Speed</label>
+                            <input type="text" id="citationActualSpeed" />
+                        </div>
+                        <div class="citation-box">
+                            <label>Seat Belt Offender</label>
+                            <input type="text" id="citationSeatBeltOffender" placeholder="Driver / Passenger" />
+                        </div>
+                    </div>
+
+                    <div class="citation-row">
+                        <div class="citation-box wide-box">
+                            <label>Violation Description</label>
+                            <input type="text" id="citationReason" placeholder="Following too closely" />
+                        </div>
+                    </div>
+
+                    <div class="citation-row">
+                        <div class="citation-box">
+                            <label>Vehicle Year</label>
+                            <input type="text" id="citationVehicleYear" />
+                        </div>
+                        <div class="citation-box">
+                            <label>VIN</label>
+                            <input type="text" id="citationVin" />
+                        </div>
+                        <div class="citation-box">
+                            <label>Vehicle Make</label>
+                            <input type="text" id="citationVehicleMake" placeholder="Ford" />
+                        </div>
+                        <div class="citation-box">
+                            <label>Vehicle Model</label>
+                            <input type="text" id="citationVehicleModel" placeholder="F-150" />
+                        </div>
+                    </div>
+
+                    <div class="citation-row">
+                        <div class="citation-box">
+                            <label>Vehicle Type</label>
+                            <input type="text" id="citationVehicleType" />
+                        </div>
+                        <div class="citation-box">
+                            <label>Vehicle Color</label>
+                            <input type="text" id="citationVehicleColor" />
+                        </div>
+                    </div>
+
+                    <div class="citation-row">
+                        <div class="citation-box">
+                            <label>Vehicle Registration Number</label>
+                            <input type="text" id="citationVehiclePlate" placeholder="ABC1234" />
+                        </div>
+                        <div class="citation-box compact-box">
+                            <label>Registration Expiration</label>
+                            <input type="date" id="citationRegExpiration" />
+                        </div>
+                        <div class="citation-box compact-box">
+                            <label>Registration State</label>
+                            <input type="text" id="citationRegState" />
+                        </div>
+                        <div class="citation-box compact-box">
+                            <label>Fine Amount ($)</label>
+                            <input type="number" id="citationFine" placeholder="150" min="0" step="5" />
+                        </div>
+                    </div>
+
+                    <div class="citation-row">
+                        <div class="citation-box">
+                            <label>CMV</label>
+                            <input type="text" id="citationCmv" />
+                        </div>
+                        <div class="citation-box">
+                            <label>USDOT</label>
+                            <input type="text" id="citationUsdot" />
+                        </div>
+                    </div>
+
+                    <div class="citation-row">
+                        <div class="citation-box">
+                            <label>Last Name</label>
+                            <input type="text" id="citationLastName" />
+                        </div>
+                        <div class="citation-box">
+                            <label>First Name</label>
+                            <input type="text" id="citationFirstName" />
+                        </div>
+                        <div class="citation-box">
+                            <label>Middle Name</label>
+                            <input type="text" id="citationMiddleName" />
+                        </div>
+                        <div class="citation-box compact-box">
+                            <label>Sex</label>
+                            <input type="text" id="citationSex" />
+                        </div>
+                    </div>
+
+                    <div class="citation-row">
+                        <div class="citation-box wide-box single-line-box">
+                            <label>Address</label>
+                            <input type="text" id="citationAddress" />
+                        </div>
+                        <div class="citation-box compact-box">
+                            <label>Apt Number</label>
+                            <input type="text" id="citationAptNumber" />
+                        </div>
+                        <div class="citation-box compact-box">
+                            <label>Date of Birth</label>
+                            <input type="date" id="citationDob" />
+                        </div>
+                    </div>
+
+                    <div class="citation-row">
+                        <div class="citation-box">
+                            <label>City</label>
+                            <input type="text" id="citationResidenceCity" />
+                        </div>
+                        <div class="citation-box">
+                            <label>State</label>
+                            <input type="text" id="citationResidenceState" />
+                        </div>
+                        <div class="citation-box">
+                            <label>Zip Code</label>
+                            <input type="text" id="citationZipCode" />
+                        </div>
+                        <div class="citation-box compact-box">
+                            <label>CDL</label>
+                            <input type="text" id="citationCdl" />
+                        </div>
+                    </div>
+
+                    <div class="citation-row">
+                        <div class="citation-box">
+                            <label>Driver's License Number</label>
+                            <input type="text" id="citationDriversLicenseNumber" />
+                        </div>
+                        <div class="citation-box compact-box">
+                            <label>DL State</label>
+                            <input type="text" id="citationDlState" />
+                        </div>
+                        <div class="citation-box compact-box">
+                            <label>DL Class</label>
+                            <input type="text" id="citationDlClass" />
+                        </div>
+                        <div class="citation-box compact-box">
+                            <label>License Expires</label>
+                            <input type="date" id="citationLicenseExpires" />
+                        </div>
+                    </div>
+
+                    <div class="citation-row">
+                        <div class="citation-box compact-box">
+                            <label>Court Date</label>
+                            <input type="date" id="citationCourtDate" />
+                        </div>
+                        <div class="citation-box wide-box">
+                            <label>Notes</label>
+                            <textarea id="citationNotes" placeholder="Any details..."></textarea>
+                        </div>
+                    </div>
                 </div>
-                <div class="report-field">
-                    <label for="citationCivilianName">Civilian Name</label>
-                    <input type="text" id="citationCivilianName" readonly />
+
+                <div class="citation-actions">
+                    <button type="button" class="report-submit" id="citationSubmitBtn">Issue Citation</button>
+                    <button type="button" class="report-submit secondary" id="citationDownloadPdfBtn">Download PDF</button>
                 </div>
-                <div class="report-field">
-                    <label for="citationStatute">Statute / Code</label>
-                    <input type="text" id="citationStatute" placeholder="e.g. 18 U.S.C. § 1001, 2251(b)" />
-                </div>
-                <div class="report-field">
-                    <label for="citationReason">Violation</label>
-                    <input type="text" id="citationReason" placeholder="e.g. Speeding, Illegal U-Turn" />
-                </div>
-                <div class="report-field">
-                    <label for="citationLocation">Location</label>
-                    <input type="text" id="citationLocation" placeholder="e.g. Highway 1" />
-                </div>
-                <div class="report-field">
-                    <label for="citationFine">Fine Amount ($)</label>
-                    <input type="number" id="citationFine" placeholder="e.g. 150" min="0" step="5" />
-                </div>
-                <div class="report-field">
-                    <label for="citationVehicleMake">Vehicle Make</label>
-                    <input type="text" id="citationVehicleMake" placeholder="e.g. Ford" />
-                </div>
-                <div class="report-field">
-                    <label for="citationVehicleModel">Vehicle Model</label>
-                    <input type="text" id="citationVehicleModel" placeholder="e.g. F-150" />
-                </div>
-                <div class="report-field">
-                    <label for="citationVehiclePlate">License Plate</label>
-                    <input type="text" id="citationVehiclePlate" placeholder="e.g. ABC1234" />
-                </div>
-                <div class="report-field">
-                    <label for="citationCourtDate">Court Date</label>
-                    <input type="date" id="citationCourtDate" />
-                </div>
-                <div class="report-field wide">
-                    <label for="citationNotes">Notes</label>
-                    <textarea id="citationNotes" placeholder="Any details..."></textarea>
-                </div>
+                <div class="lookup-error" id="citationError"></div>
+                <div class="lookup-result" id="citationSuccess"></div>
             </div>
-            <div class="citation-actions">
-                <button type="button" class="report-submit" id="citationSubmitBtn">Issue Citation</button>
-                <button type="button" class="report-submit secondary" id="citationDownloadPdfBtn">Download PDF</button>
-            </div>
-            <div class="lookup-error" id="citationError"></div>
-            <div class="lookup-result" id="citationSuccess"></div>
         </div>
     </div>
 
