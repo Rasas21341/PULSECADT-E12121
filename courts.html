@@ -712,8 +712,23 @@
             const target = params.get("warrant");
             list.innerHTML = data.map(w => {
                 const active = target && w.warrant_number === target ? " active" : "";
-                return `<div class="warrant-item${active}"><div class="left"><div class="warrant-meta">${w.warrant_number || ""}</div><div class="warrant-sub">${w.civilian_name || ""} • ${w.type || ""}</div></div><div class="warrant-status">${w.status || ""}</div></div>`;
+                return `<div class="warrant-item${active}" data-wn="${w.warrant_number}"><div class="left"><div class="warrant-meta">${w.warrant_number || ""}</div><div class="warrant-sub">${w.civilian_name || ""} • ${w.type || ""}</div></div><div class="warrant-status">${w.status || ""}</div></div>`;
             }).join("");
+            list.querySelectorAll(".warrant-item").forEach(el => {
+                el.style.cursor = "pointer";
+                el.addEventListener("click", () => {
+                    const wn = el.getAttribute("data-wn");
+                    const w = data.find(x => x.warrant_number === wn);
+                    const panel = document.querySelector(".main-panel");
+                    if (panel && w) {
+                        panel.innerHTML = `<h2>${w.warrant_number}</h2><p><strong>Civilian:</strong> ${w.civilian_name || ""}</p><p><strong>Type:</strong> ${w.type || ""}</p><p><strong>Charges:</strong> ${(w.charges||[]).join(", ")}</p><p><strong>Status:</strong> ${w.status || ""}</p><p><strong>Court Date:</strong> ${w.court_date || ""}</p><p><strong>Judge:</strong> ${w.judge_name || ""}</p><p><strong>Description:</strong> ${w.description || ""}</p>`;
+                    }
+                });
+            });
+            if (target) {
+                const el = list.querySelector(`[data-wn="${target}"]`);
+                if (el) el.click();
+            }
         }
         loadWarrants();
     </script>
