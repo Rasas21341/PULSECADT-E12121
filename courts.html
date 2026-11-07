@@ -697,8 +697,26 @@
         </div>
     </footer>
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
-        function formatClock(d) {
+        const SUPABASE_URL = "https://zwdogalwbczdtvxvhrfd.supabase.co";
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp3ZG9nYWx3YmN6ZHR2eHZocmZkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM2NTA2MjQsImV4cCI6MjA5OTIyNjYyNH0.baPVVTtW0d3FDC2pTd1P3d5aoIc2FZkaD-6bBvDPFWw";
+        const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        async function loadWarrants() {
+            const list = document.querySelector(".warrant-list");
+            if (!list) return;
+            const { data, error } = await sb.from("warrants").select("*").order("created_at", { ascending: false });
+            if (error) { list.innerHTML = "<div class='empty'>Failed to load warrants.</div>"; return; }
+            if (!data || data.length === 0) { list.innerHTML = "<div class='empty'>No warrants.</div>"; return; }
+            const params = new URLSearchParams(location.search);
+            const target = params.get("warrant");
+            list.innerHTML = data.map(w => {
+                const active = target && w.warrant_number === target ? " active" : "";
+                return `<div class="warrant-item${active}"><div class="left"><div class="warrant-meta">${w.warrant_number || ""}</div><div class="warrant-sub">${w.civilian_name || ""} • ${w.type || ""}</div></div><div class="warrant-status">${w.status || ""}</div></div>`;
+            }).join("");
+        }
+        loadWarrants();
+    </script>
             const pad = n => String(n).padStart(2, '0');
             return `${pad(d.getHours())}:${pad(d.getMinutes())}`;
         }
