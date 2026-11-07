@@ -3955,7 +3955,7 @@ civilianRecordsList.innerHTML = records.map((record) => {
                     const extraditableBadge = w.extraditable ? ' <span class="license-status-badge" style="background:#fef2f2;color:#991b1b;border:1px solid #fecaca;">Extraditable</span>' : '';
                     const details = [chargesText, w.description, w.location, courtDate, w.notes].filter(Boolean).join(' | ');
                     return `
-                    <div class="record-item">
+                    <div class="record-item" style="background:#fef9c3;">
                         <div class="record-text">
                             <strong>${escapeHtml(w.type || "Warrant")} #${escapeHtml(w.warrant_number || "")} - ${escapeHtml(w.status || "Active")}${extraditableBadge}</strong>
                             <span>${details || 'No details'}</span>
