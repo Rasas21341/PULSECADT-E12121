@@ -4401,12 +4401,13 @@ civilianRecordsList.innerHTML = records.map((record) => {
                     const createdRow = Array.isArray(inserted) && inserted.length > 0 ? inserted[0] : { warrant_number: warrantNumber, status, extraditable };
 
                     if (warrantSuccess) {
-                        warrantSuccess.textContent = "Warrant " + warrantNumber + " created.";
+                        warrantSuccess.textContent = "Warrant " + warrantNumber + " created and sent to courts.";
                         warrantSuccess.style.display = "block";
                     }
                     if (warrantModal) warrantModal.classList.remove("open");
                     if (selectedCivilian && selectedCivilian.id) loadCivilianWarrants(selectedCivilian.id);
                     openWarrantCard(createdRow);
+                    try { window.open("courts.html?warrant=" + encodeURIComponent(warrantNumber), "_blank"); } catch (e) {}
                 } catch (err) {
                     if (warrantError) { warrantError.textContent = "Failed to create warrant."; warrantError.style.display = "block"; }
                     console.error("Failed to create warrant:", err);
