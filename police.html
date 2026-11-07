@@ -2821,8 +2821,12 @@ console.error("Permission check failed:", err);
         // Wait for session to be restored before loading data
         async function waitForSession() {
             if (!localSupabase) return false;
-            // First try to get existing session
-            const { data: { session } } = await localSupabase.auth.getSession();
+            // First try to get existing session (bounded so a stalled Supabase
+            // response cannot block loading the police panel indefinitely).
+            const session = await Promise.race([
+                localSupabase.auth.getSession().then(({ data: { session } }) => session),
+                new Promise((resolve) => setTimeout(() => resolve(null), 3000))
+            ]);
             if (session) return true;
             // If no session, wait for auth state change
             return new Promise((resolve) => {
@@ -3699,7 +3703,11 @@ if (licenceSubmitBtn) {
         });
 
         async function loadCivilianRecords(civilianId) {
-            if (!civilianRecordsList || !localSupabase) return;
+            if (!civilianRecordsList) return;
+            if (!localSupabase) {
+                civilianRecordsList.innerHTML = '<div class="empty">Database unavailable.</div>';
+                return;
+            }
             civilianRecordsList.innerHTML = '<div class="empty">Loading records...</div>';
             try {
                 const [citationsRes, arrestsRes] = await Promise.all([
@@ -3865,7 +3873,11 @@ civilianRecordsList.innerHTML = records.map((record) => {
 
         async function loadCivilianInsurance(civilianId) {
             const listEl = document.getElementById("civilianInsuranceList");
-            if (!listEl || !localSupabase) return;
+            if (!listEl) return;
+            if (!localSupabase) {
+                listEl.innerHTML = '<div class="empty">Database unavailable.</div>';
+                return;
+            }
             listEl.innerHTML = '<div class="empty">Loading insurance...</div>';
             try {
                 const { data, error } = await localSupabase
@@ -3917,7 +3929,11 @@ civilianRecordsList.innerHTML = records.map((record) => {
 
         async function loadCivilianWarrants(civilianId) {
             const listEl = document.getElementById("civilianWarrantsList");
-            if (!listEl || !localSupabase) return;
+            if (!listEl) return;
+            if (!localSupabase) {
+                listEl.innerHTML = '<div class="empty">Database unavailable.</div>';
+                return;
+            }
             listEl.innerHTML = '<div class="empty">Loading warrants...</div>';
             try {
                 const { data, error } = await localSupabase
@@ -3957,7 +3973,6 @@ civilianRecordsList.innerHTML = records.map((record) => {
                         if (row) openWarrantCard(row);
                     });
                 });
-                }).join("");
             } catch (err) {
                 listEl.innerHTML = '<div class="empty">Failed to load warrants.</div>';
                 console.error("Failed to load warrants:", err);
