@@ -582,6 +582,131 @@
             background: linear-gradient(180deg, #1f2937 0%, #111827 100%);
         }
 
+        #citationModal .modal {
+            max-width: 980px;
+            width: min(980px, calc(100vw - 32px));
+            background: #f3f2ee;
+            border: 2px solid #1f2937;
+            border-radius: 0;
+            box-shadow: 0 18px 45px rgba(15, 23, 42, 0.22);
+            padding: 0;
+            overflow: hidden;
+        }
+
+        .citation-form-header {
+            background: #111827;
+            color: #ffffff;
+            padding: 16px 18px 12px;
+            text-align: center;
+            border-bottom: 3px solid #111827;
+        }
+
+        .citation-form-agency {
+            font-size: 18px;
+            font-weight: 900;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .citation-form-title {
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            margin-top: 2px;
+            color: #f8fafc;
+        }
+
+        #citationModal .modal-header {
+            border-bottom: 2px solid #1f2937;
+            padding: 12px 18px;
+            background: #f3f2ee;
+        }
+
+        #citationModal .modal-header .modal-title {
+            font-size: 15px;
+            font-weight: 800;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: #111827;
+        }
+
+        .citation-form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px 14px;
+            padding: 16px 18px 10px;
+            background: #f3f2ee;
+        }
+
+        .citation-form-grid .report-field {
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+
+        .citation-form-grid .report-field label {
+            display: block;
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: #334155;
+            margin-bottom: 5px;
+            white-space: nowrap;
+        }
+
+        .citation-form-grid .report-field input,
+        .citation-form-grid .report-field textarea {
+            width: 100%;
+            min-height: 34px;
+            border-radius: 0;
+            border: 1px solid #1f2937;
+            background: #ffffff;
+            color: #111827;
+            font-size: 13px;
+            padding: 7px 8px;
+            box-shadow: none;
+        }
+
+        .citation-form-grid .report-field textarea {
+            min-height: 62px;
+            resize: vertical;
+        }
+
+        .citation-form-grid .report-field.wide {
+            grid-column: 1 / -1;
+        }
+
+        .citation-actions {
+            display: flex;
+            gap: 10px;
+            padding: 8px 18px 18px;
+            background: #f3f2ee;
+        }
+
+        .citation-actions .report-submit {
+            flex: 1;
+            border-radius: 0;
+            border: 1px solid #111827;
+            background: #111827;
+            color: #ffffff;
+            font-size: 13px;
+            font-weight: 800;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+        }
+
+        .citation-actions .report-submit.secondary {
+            background: #334155;
+            border-color: #334155;
+        }
+
+        #citationModal .lookup-error,
+        #citationModal .lookup-result {
+            margin: 0 18px 18px;
+        }
+
         .record-action-btn.arrest {
             background: #fee2e2;
             border-color: #fecaca;
@@ -2485,57 +2610,65 @@
     </div>
 
     <div class="modal-overlay" id="citationModal">
-        <div class="modal">
+        <div class="modal citation-paper-modal">
+            <div class="citation-form-header">
+                <div class="citation-form-agency">Illinois State Police</div>
+                <div class="citation-form-title">Written Warning</div>
+            </div>
             <div class="modal-header">
                 <div class="modal-title">Issue Citation</div>
                 <button class="modal-close" id="citationModalClose" type="button" aria-label="Close">×</button>
             </div>
-            <div class="report-field">
-                <label for="citationCivilianId">Civilian ID</label>
-                <input type="text" id="citationCivilianId" readonly />
+            <div class="citation-form-grid">
+                <div class="report-field">
+                    <label for="citationCivilianId">Civilian ID</label>
+                    <input type="text" id="citationCivilianId" readonly />
+                </div>
+                <div class="report-field">
+                    <label for="citationCivilianName">Civilian Name</label>
+                    <input type="text" id="citationCivilianName" readonly />
+                </div>
+                <div class="report-field">
+                    <label for="citationStatute">Statute / Code</label>
+                    <input type="text" id="citationStatute" placeholder="e.g. 18 U.S.C. § 1001, 2251(b)" />
+                </div>
+                <div class="report-field">
+                    <label for="citationReason">Violation</label>
+                    <input type="text" id="citationReason" placeholder="e.g. Speeding, Illegal U-Turn" />
+                </div>
+                <div class="report-field">
+                    <label for="citationLocation">Location</label>
+                    <input type="text" id="citationLocation" placeholder="e.g. Highway 1" />
+                </div>
+                <div class="report-field">
+                    <label for="citationFine">Fine Amount ($)</label>
+                    <input type="number" id="citationFine" placeholder="e.g. 150" min="0" step="5" />
+                </div>
+                <div class="report-field">
+                    <label for="citationVehicleMake">Vehicle Make</label>
+                    <input type="text" id="citationVehicleMake" placeholder="e.g. Ford" />
+                </div>
+                <div class="report-field">
+                    <label for="citationVehicleModel">Vehicle Model</label>
+                    <input type="text" id="citationVehicleModel" placeholder="e.g. F-150" />
+                </div>
+                <div class="report-field">
+                    <label for="citationVehiclePlate">License Plate</label>
+                    <input type="text" id="citationVehiclePlate" placeholder="e.g. ABC1234" />
+                </div>
+                <div class="report-field">
+                    <label for="citationCourtDate">Court Date</label>
+                    <input type="date" id="citationCourtDate" />
+                </div>
+                <div class="report-field wide">
+                    <label for="citationNotes">Notes</label>
+                    <textarea id="citationNotes" placeholder="Any details..."></textarea>
+                </div>
             </div>
-            <div class="report-field">
-                <label for="citationCivilianName">Civilian Name</label>
-                <input type="text" id="citationCivilianName" readonly />
+            <div class="citation-actions">
+                <button type="button" class="report-submit" id="citationSubmitBtn">Issue Citation</button>
+                <button type="button" class="report-submit secondary" id="citationDownloadPdfBtn">Download PDF</button>
             </div>
-            <div class="report-field">
-                <label for="citationStatute">Statute / Code</label>
-                <input type="text" id="citationStatute" placeholder="e.g. 18 U.S.C. § 1001, 2251(b)" />
-            </div>
-            <div class="report-field">
-                <label for="citationReason">Violation</label>
-                <input type="text" id="citationReason" placeholder="e.g. Speeding, Illegal U-Turn" />
-            </div>
-            <div class="report-field">
-                <label for="citationLocation">Location</label>
-                <input type="text" id="citationLocation" placeholder="e.g. Highway 1" />
-            </div>
-            <div class="report-field">
-                <label for="citationFine">Fine Amount ($)</label>
-                <input type="number" id="citationFine" placeholder="e.g. 150" min="0" step="5" />
-            </div>
-            <div class="report-field">
-                <label for="citationVehicleMake">Vehicle Make</label>
-                <input type="text" id="citationVehicleMake" placeholder="e.g. Ford" />
-            </div>
-            <div class="report-field">
-                <label for="citationVehicleModel">Vehicle Model</label>
-                <input type="text" id="citationVehicleModel" placeholder="e.g. F-150" />
-            </div>
-            <div class="report-field">
-                <label for="citationVehiclePlate">License Plate</label>
-                <input type="text" id="citationVehiclePlate" placeholder="e.g. ABC1234" />
-            </div>
-            <div class="report-field">
-                <label for="citationCourtDate">Court Date</label>
-                <input type="date" id="citationCourtDate" />
-            </div>
-            <div class="report-field">
-                <label for="citationNotes">Notes</label>
-                <textarea id="citationNotes" placeholder="Any details..."></textarea>
-            </div>
-            <button type="button" class="report-submit" id="citationSubmitBtn">Issue Citation</button>
-            <button type="button" class="report-submit" id="citationDownloadPdfBtn" style="background:#334155;">Download PDF</button>
             <div class="lookup-error" id="citationError"></div>
             <div class="lookup-result" id="citationSuccess"></div>
         </div>
