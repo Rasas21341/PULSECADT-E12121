@@ -583,8 +583,8 @@
         }
 
         #citationModal .modal {
-            max-width: 980px;
-            width: min(980px, calc(100vw - 32px));
+            max-width: 700px;
+            width: min(700px, calc(100vw - 26px));
             background: #e7e5df;
             border: 3px solid #1f2937;
             border-radius: 0;
@@ -592,19 +592,20 @@
             padding: 0;
             overflow: hidden;
             font-family: Arial, Helvetica, sans-serif;
+            max-height: calc(100vh - 40px);
         }
 
         .citation-form-header {
             background: #f1efe9;
             color: #111827;
-            padding: 10px 18px 8px;
+            padding: 8px 14px 6px;
             text-align: center;
             border-bottom: 3px solid #111827;
             position: relative;
         }
 
         .citation-form-agency {
-            font-size: 28px;
+            font-size: 18px;
             font-weight: 900;
             letter-spacing: 0.04em;
             text-transform: uppercase;
@@ -612,7 +613,7 @@
         }
 
         .citation-form-title {
-            font-size: 26px;
+            font-size: 18px;
             font-weight: 700;
             letter-spacing: 0.02em;
             margin-top: 2px;
@@ -621,15 +622,15 @@
 
         #citationModal .modal-close {
             position: absolute;
-            right: 16px;
-            top: 14px;
-            width: 28px;
-            height: 28px;
+            right: 12px;
+            top: 10px;
+            width: 24px;
+            height: 24px;
             border-radius: 50%;
             border: 1px solid #111827;
             background: transparent;
             color: #111827;
-            font-size: 18px;
+            font-size: 16px;
         }
 
         .citation-paper-form {
@@ -644,13 +645,15 @@
             border-top: 2px solid #1f2937;
             border-bottom: 2px solid #1f2937;
             background: #e7e5df;
+            max-height: 66vh;
+            overflow-y: auto;
         }
 
         .citation-row {
             display: grid;
             grid-template-columns: repeat(4, minmax(0, 1fr));
             border-bottom: 1px solid #111827;
-            min-height: 50px;
+            min-height: 40px;
         }
 
         .citation-row.top-row {
@@ -671,12 +674,12 @@
         }
 
         .citation-row .citation-box label {
-            font-size: 9px;
+            font-size: 8px;
             font-weight: 700;
             letter-spacing: 0.05em;
             text-transform: uppercase;
             color: #111827;
-            padding: 3px 6px 0;
+            padding: 2px 5px 0;
             line-height: 1.1;
         }
 
@@ -686,9 +689,9 @@
             border: none;
             background: transparent;
             color: #111827;
-            font-size: 13px;
-            padding: 2px 6px 6px;
-            min-height: 24px;
+            font-size: 12px;
+            padding: 1px 5px 5px;
+            min-height: 22px;
             border-radius: 0;
             box-shadow: none;
             outline: none;
@@ -696,7 +699,7 @@
         }
 
         .citation-row .citation-box textarea {
-            min-height: 52px;
+            min-height: 40px;
             resize: vertical;
         }
 
@@ -709,7 +712,7 @@
         }
 
         .citation-row .citation-box.compact-box {
-            min-width: 110px;
+            min-width: 90px;
         }
 
         .citation-row .citation-box input:focus,
@@ -723,8 +726,8 @@
 
         .citation-actions {
             display: flex;
-            gap: 10px;
-            padding: 14px 16px 18px;
+            gap: 8px;
+            padding: 10px 12px 14px;
             background: #e7e5df;
         }
 
@@ -734,10 +737,11 @@
             border: 1px solid #111827;
             background: #111827;
             color: #ffffff;
-            font-size: 13px;
+            font-size: 11px;
             font-weight: 800;
             letter-spacing: 0.06em;
             text-transform: uppercase;
+            padding: 9px 10px;
         }
 
         .citation-actions .report-submit.secondary {
@@ -747,7 +751,7 @@
 
         #citationModal .lookup-error,
         #citationModal .lookup-result {
-            margin: 0 16px 16px;
+            margin: 0 12px 12px;
         }
 
         .record-action-btn.arrest {
