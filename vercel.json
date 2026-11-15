@@ -4,5 +4,8 @@
     { "source": "/suggestionmake", "destination": "/suggestionmake.html" },
     { "source": "/changelogs", "destination": "/changelogs.html" },
     { "source": "/community/:id", "destination": "/community.html" }
+  ],
+  "redirects": [
+    { "source": "/:path*", "destination": "https://pulsecad.xyz/:path*", "has": [{ "type": "host", "value": "dev.pulsecad.xyz" }], "statusCode": 301 }
   ]
 }
