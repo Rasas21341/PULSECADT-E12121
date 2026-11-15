@@ -60,6 +60,44 @@
             outline: none;
         }
 
+        .scale-rating {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 6px 0;
+        }
+
+        .scale-btn {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            border: 1px solid #e2e8f0;
+            background: #ffffff;
+            color: #475569;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .scale-btn:hover {
+            border-color: #2563eb;
+            color: #2563eb;
+        }
+
+        .scale-btn.active {
+            background: #2563eb;
+            color: #ffffff;
+            border-color: #2563eb;
+        }
+
+        .scale-label {
+            font-size: 12px;
+            color: #94a3b8;
+            font-weight: 600;
+            min-width: 50px;
+        }
+
         .submit-btn {
             margin-top: 8px;
             width: 100%;
@@ -95,8 +133,25 @@
             <label>What time zone are you in?</label>
             <div class="field-oval"><input type="text" name="timezone" /></div>
 
-            <label>How active can you be each week?</label>
-            <div class="field-oval"><input type="text" name="active" /></div>
+            <label>How active can you be each week? <span style="color:#f87171;">*</span></label>
+            <div class="field-oval" style="display:flex; align-items:center; gap:10px;">
+                <div class="scale-rating" id="activeScale">
+                    <button type="button" class="scale-btn" data-val="1">1</button>
+                    <button type="button" class="scale-btn" data-val="2">2</button>
+                    <button type="button" class="scale-btn" data-val="3">3</button>
+                    <button type="button" class="scale-btn" data-val="4">4</button>
+                    <button type="button" class="scale-btn" data-val="5">5</button>
+                    <button type="button" class="scale-btn" data-val="6">6</button>
+                    <button type="button" class="scale-btn" data-val="7">7</button>
+                    <button type="button" class="scale-btn" data-val="8">8</button>
+                    <button type="button" class="scale-btn" data-val="9">9</button>
+                    <button type="button" class="scale-btn" data-val="10">10</button>
+                </div>
+                <input type="hidden" name="active_rating" id="activeRating" required />
+            </div>
+            <div style="font-size:12px; color:#94a3b8; margin-top:-8px; margin-bottom:16px; padding:0 16px;">
+                <span id="activeLabelLow">Not very active</span> &mdash; <span id="activeLabelHigh">Very active</span>
+            </div>
 
             <label>Have you been a member of our community before? If so, for how long?</label>
             <div class="field-oval"><input type="text" name="member" /></div>
@@ -133,6 +188,33 @@
                 e.preventDefault();
                 copyPasteDetected = true;
             });
+
+            const activeScale = document.getElementById("activeScale");
+            const activeRating = document.getElementById("activeRating");
+            const activeLabelLow = document.getElementById("activeLabelLow");
+            const activeLabelHigh = document.getElementById("activeLabelHigh");
+            if (activeScale) {
+                const labels = {
+                    1: "Not at all", 2: "Rarely", 3: "Occasionally", 4: "Lightly",
+                    5: "Moderate", 6: "Regularly", 7: "Often", 8: "Very often",
+                    9: "Almost daily", 10: "Daily / Always"
+                };
+                activeScale.querySelectorAll(".scale-btn").forEach((btn) => {
+                    btn.addEventListener("click", () => {
+                        const val = btn.getAttribute("data-val");
+                        activeRating.value = val;
+                        activeScale.querySelectorAll(".scale-btn").forEach((b) => b.classList.remove("active"));
+                        btn.classList.add("active");
+                        if (activeLabelLow) activeLabelLow.textContent = labels[val] || "";
+                        if (activeLabelHigh) activeLabelHigh.textContent = labels[val] || "";
+                    });
+                });
+                // default selection
+                activeRating.value = "5";
+                activeScale.querySelector('.scale-btn[data-val="5"]').classList.add("active");
+                if (activeLabelLow) activeLabelLow.textContent = labels[5];
+                if (activeLabelHigh) activeLabelHigh.textContent = labels[5];
+            }
 
             form.addEventListener("copy", (e) => {
                 e.preventDefault();
@@ -179,12 +261,14 @@
                     btn.textContent = "Submitting...";
                 }
 
+                const activeRating = document.getElementById("activeRating").value || "5";
+
                 const payload = {
                     email: user.email || form.email.value.trim(),
                     discord: form.discord.value.trim(),
                     age: form.age.value.trim(),
                     timezone: form.timezone.value.trim(),
-                    active: form.active.value.trim(),
+                    active_rating: activeRating ? parseInt(activeRating, 10) : null,
                     member: form.member.value.trim(),
                     copy_paste_detected: copyPasteDetected
                 };
