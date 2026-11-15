@@ -56,6 +56,15 @@
             background: #f1f5f9;
         }
 
+        .sidebar-section-label {
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: #64748b;
+            margin: 16px 12px 8px;
+        }
+
         .department-select {
             width: 100%;
             padding: 8px 12px;
@@ -620,9 +629,10 @@
         <button class="sidebar-btn" id="staffUsersBtn">Users</button>
         <button class="sidebar-btn" id="applicationsBtn">Applications</button>
         <button class="sidebar-btn" id="codesBtn" style="display:none;">CODES</button>
-        <button class="sidebar-btn" id="supportPanelNavBtn" style="display:none;">Support Panel</button>
         <button class="sidebar-btn" id="suggestionsNavBtn" style="display:none;">Suggestions</button>
         <button class="sidebar-btn" id="masterActionsBtn" style="display:none;">Master Actions</button>
+        <div class="sidebar-section-label" id="customerSupportLabel" style="display:none;">Customer Support</div>
+        <button class="sidebar-btn" id="supportPanelNavBtn" style="display:none;">Support Panel</button>
     </div>
     <div class="main">
         <div class="container">
@@ -657,6 +667,7 @@
         const supportPanelNavBtn = document.getElementById("supportPanelNavBtn");
         const suggestionsNavBtn = document.getElementById("suggestionsNavBtn");
         const masterActionsBtn = document.getElementById("masterActionsBtn");
+        const customerSupportLabel = document.getElementById("customerSupportLabel");
 
         let localSupabase = null;
         try {
@@ -1105,6 +1116,9 @@
             }
             if (supportPanelNavBtn && (lower === "management" || isSupport)) {
                 supportPanelNavBtn.style.display = "block";
+            }
+            if (customerSupportLabel && (lower === "management" || isSupport)) {
+                customerSupportLabel.style.display = "block";
             }
             if (suggestionsNavBtn && (lower === "management" || isSupport || lower === "development team")) {
                 suggestionsNavBtn.style.display = "block";
