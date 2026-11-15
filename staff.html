@@ -629,10 +629,11 @@
         <button class="sidebar-btn" id="staffUsersBtn">Users</button>
         <button class="sidebar-btn" id="applicationsBtn">Applications</button>
         <button class="sidebar-btn" id="codesBtn" style="display:none;">CODES</button>
-        <button class="sidebar-btn" id="suggestionsNavBtn" style="display:none;">Suggestions</button>
         <button class="sidebar-btn" id="masterActionsBtn" style="display:none;">Master Actions</button>
         <div class="sidebar-section-label" id="customerSupportLabel" style="display:none;">Customer Support</div>
         <button class="sidebar-btn" id="supportPanelNavBtn" style="display:none;">Support Panel</button>
+        <div class="sidebar-section-label" id="developmentTeamLabel" style="display:none;">Development Team</div>
+        <button class="sidebar-btn" id="suggestionsNavBtn" style="display:none;">Suggestions</button>
     </div>
     <div class="main">
         <div class="container">
@@ -668,6 +669,7 @@
         const suggestionsNavBtn = document.getElementById("suggestionsNavBtn");
         const masterActionsBtn = document.getElementById("masterActionsBtn");
         const customerSupportLabel = document.getElementById("customerSupportLabel");
+        const developmentTeamLabel = document.getElementById("developmentTeamLabel");
 
         let localSupabase = null;
         try {
@@ -1122,6 +1124,9 @@
             }
             if (suggestionsNavBtn && (lower === "management" || isSupport || lower === "development team")) {
                 suggestionsNavBtn.style.display = "block";
+            }
+            if (developmentTeamLabel && (lower === "management" || isSupport || lower === "development team")) {
+                developmentTeamLabel.style.display = "block";
             }
             if (masterActionsBtn && lower === "management") {
                 masterActionsBtn.style.display = "block";
