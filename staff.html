@@ -1358,6 +1358,14 @@
             pageTitle.textContent = "Master Actions";
             contentEl.innerHTML = `
                 <div class="master-actions">
+                    <h2>Global Announcement</h2>
+                    <p>Send a message to everyone logged into PulseCAD. It disappears after 10 seconds.</p>
+                    <div class="premium-key-display">
+                        <input type="text" class="premium-key-input" id="announcementInput" placeholder="Announcement message..." maxlength="300" />
+                        <button type="button" class="verified-btn" id="sendAnnouncementBtn" style="background:#2563eb;">Send</button>
+                    </div>
+                </div>
+                <div class="master-actions" style="margin-top:20px;">
                     <h2>Master Actions</h2>
                     <p>Global controls for the PulseCAD website. Management only.</p>
                     <div class="master-row">
@@ -1408,14 +1416,6 @@
                             <div class="master-row-sub">Open the public suggestion submission page.</div>
                         </div>
                         <button type="button" class="verified-btn" id="openSuggestionFormBtn">Open Form</button>
-                    </div>
-                </div>
-                <div class="master-actions" style="margin-top:20px;">
-                    <h2>Global Announcement</h2>
-                    <p>Send a message to everyone logged into PulseCAD. It disappears after 10 seconds.</p>
-                    <div class="premium-key-display">
-                        <input type="text" class="premium-key-input" id="announcementInput" placeholder="Announcement message..." maxlength="300" />
-                        <button type="button" class="verified-btn" id="sendAnnouncementBtn" style="background:#2563eb;">Send</button>
                     </div>
                 </div>
             `;
