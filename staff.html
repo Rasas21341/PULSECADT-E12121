@@ -1595,6 +1595,10 @@
                         <input type="text" class="premium-key-input" id="banReasonInput" placeholder="Reason for ban..." />
                         <button type="button" class="verified-btn" id="banEmailBtn" style="background:#dc2626;">Ban Email</button>
                     </div>
+                    <label style="display:flex;align-items:center;gap:8px;margin-top:12px;font-size:14px;color:#1a202c;cursor:pointer;">
+                        <input type="checkbox" id="banDeleteServersInput" style="width:16px;height:16px;cursor:pointer;" />
+                        Also delete every server they own
+                    </label>
                 </div>
                 <div class="codes-list-section">
                     <h3>Banned Emails</h3>
@@ -1608,6 +1612,7 @@
 
             const banEmailInput = document.getElementById("banEmailInput");
             const banReasonInput = document.getElementById("banReasonInput");
+            const banDeleteServersInput = document.getElementById("banDeleteServersInput");
             const banEmailBtn = document.getElementById("banEmailBtn");
             const bannedListBody = document.getElementById("bannedListBody");
             const bannedCount = document.getElementById("bannedCount");
@@ -1673,16 +1678,17 @@
                     }
                     try {
                         const { data: { user } } = await localSupabase.auth.getUser();
-                        const { data: existing, error: checkError } = await localSupabase
+                        const { data: existingRows, error: checkError } = await localSupabase
                             .from("banned_emails")
-                            .select("id")
-                            .ilike("email", email)
-                            .maybeSingle();
+                            .select("id, email");
                         if (checkError) {
                             alert("Failed to check banned emails: " + checkError.message);
                             return;
                         }
-                        if (existing) {
+                        const alreadyBanned = (existingRows || []).some(
+                            (item) => (item.email || "").toLowerCase() === email.toLowerCase()
+                        );
+                        if (alreadyBanned) {
                             alert("This email is already banned.");
                             return;
                         }
@@ -1698,8 +1704,45 @@
                             alert("Failed to ban email: " + insertError.message);
                             return;
                         }
+
+                        const deleteServers = !!(banDeleteServersInput && banDeleteServersInput.checked);
+                        if (deleteServers) {
+                            const { data: allServers, error: serversError } = await localSupabase
+                                .from("communities")
+                                .select("id, name, creator_email");
+                            if (serversError) {
+                                alert("Email banned, but failed to look up owned servers: " + serversError.message);
+                            } else {
+                                const owned = (allServers || []).filter(
+                                    (row) => (row.creator_email || "").toLowerCase() === email.toLowerCase()
+                                );
+                                if (owned.length === 0) {
+                                    alert("Email banned. No servers were owned by this account.");
+                                } else {
+                                    const ids = owned.map((row) => row.id);
+                                    const { error: membershipError } = await localSupabase
+                                        .from("user_communities")
+                                        .delete()
+                                        .in("community_id", ids);
+                                    if (membershipError) {
+                                        console.error("Failed to remove community memberships:", membershipError);
+                                    }
+                                    const { error: deleteError } = await localSupabase
+                                        .from("communities")
+                                        .delete()
+                                        .in("id", ids);
+                                    if (deleteError) {
+                                        alert("Email banned, but failed to delete their servers: " + deleteError.message);
+                                    } else {
+                                        alert(`Email banned. Deleted ${ids.length} server${ids.length === 1 ? '' : 's'} they owned.`);
+                                    }
+                                }
+                            }
+                        }
+
                         banEmailInput.value = "";
                         if (banReasonInput) banReasonInput.value = "";
+                        if (banDeleteServersInput) banDeleteServersInput.checked = false;
                         renderBanned();
                     } catch (err) {
                         alert("An unexpected error occurred.");

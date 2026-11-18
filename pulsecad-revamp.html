@@ -2322,10 +2322,11 @@ enable-ga="false"
             try {
                 const { data, error } = await localSupabase
                     .from("banned_emails")
-                    .select("id")
-                    .ilike("email", email)
-                    .maybeSingle();
-                if (!error && data) return true;
+                    .select("email");
+                if (!error && Array.isArray(data)) {
+                    const lower = email.toLowerCase();
+                    if (data.some((item) => (item.email || "").toLowerCase() === lower)) return true;
+                }
             } catch (err) {
                 console.error("Failed to check banned_emails table:", err);
             }
