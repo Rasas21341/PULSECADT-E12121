@@ -1592,6 +1592,7 @@
                     <p>Ban an email address to prevent them from logging into PulseCAD.</p>
                     <div class="premium-key-display">
                         <input type="email" class="premium-key-input" id="banEmailInput" placeholder="Enter email to ban..." />
+                        <input type="text" class="premium-key-input" id="banReasonInput" placeholder="Reason for ban..." />
                         <button type="button" class="verified-btn" id="banEmailBtn" style="background:#dc2626;">Ban Email</button>
                     </div>
                 </div>
@@ -1599,47 +1600,54 @@
                     <h3>Banned Emails</h3>
                     <div class="codes-count" id="bannedCount"></div>
                     <table class="codes-list-table">
-                        <tr><th>Email</th><th>Banned At</th><th>Actions</th></tr>
-                        <tbody id="bannedListBody"><tr><td colspan="3"><div class="empty">Loading...</div></td></tr></tbody>
+                        <tr><th>Email</th><th>Reason</th><th>Banned By</th><th>Banned At</th><th>Actions</th></tr>
+                        <tbody id="bannedListBody"><tr><td colspan="5"><div class="empty">Loading...</div></td></tr></tbody>
                     </table>
                 </div>
             `;
 
             const banEmailInput = document.getElementById("banEmailInput");
+            const banReasonInput = document.getElementById("banReasonInput");
             const banEmailBtn = document.getElementById("banEmailBtn");
             const bannedListBody = document.getElementById("bannedListBody");
             const bannedCount = document.getElementById("bannedCount");
+
+            function escapeHtml(value) {
+                return (value || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+            }
 
             async function renderBanned() {
                 if (!bannedListBody || !localSupabase) return;
                 try {
                     const { data, error } = await localSupabase
-                        .from("site_settings")
-                        .select("value")
-                        .eq("key", "banned_emails")
-                        .maybeSingle();
-                    let banned = [];
-                    if (data && Array.isArray(data.value)) {
-                        banned = data.value;
-                    }
-                    if (bannedCount) bannedCount.textContent = `${banned.length} banned email${banned.length === 1 ? '' : 's'}`;
-                    if (banned.length === 0) {
-                        bannedListBody.innerHTML = `<tr><td colspan="3"><div class="empty">No banned emails.</div></td></tr>`;
+                        .from("banned_emails")
+                        .select("id, email, reason, banned_by, banned_at")
+                        .order("banned_at", { ascending: false });
+                    if (error) {
+                        bannedListBody.innerHTML = `<tr><td colspan="5"><div class="empty">Failed to load banned emails: ${escapeHtml(error.message)}</div></td></tr>`;
                         return;
                     }
-                    bannedListBody.innerHTML = banned.map((item, index) => {
-                        const email = (item.email || "").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+                    const banned = Array.isArray(data) ? data : [];
+                    if (bannedCount) bannedCount.textContent = `${banned.length} banned email${banned.length === 1 ? '' : 's'}`;
+                    if (banned.length === 0) {
+                        bannedListBody.innerHTML = `<tr><td colspan="5"><div class="empty">No banned emails.</div></td></tr>`;
+                        return;
+                    }
+                    bannedListBody.innerHTML = banned.map((item) => {
+                        const email = escapeHtml(item.email);
+                        const reason = escapeHtml(item.reason) || `<span class="empty">—</span>`;
+                        const bannedBy = escapeHtml(item.banned_by) || "—";
                         const bannedAt = item.banned_at ? new Date(item.banned_at).toLocaleString() : "";
-                        return `<tr><td>${email}</td><td>${bannedAt}</td><td><button type="button" class="delete-code-btn" data-index="${index}">Unban</button></td></tr>`;
+                        return `<tr><td>${email}</td><td>${reason}</td><td>${bannedBy}</td><td>${bannedAt}</td><td><button type="button" class="delete-code-btn" data-id="${item.id}">Unban</button></td></tr>`;
                     }).join("");
 
                     bannedListBody.querySelectorAll(".delete-code-btn").forEach((btn) => {
                         btn.addEventListener("click", async () => {
-                            const idx = parseInt(btn.getAttribute("data-index"), 10);
-                            const newBanned = banned.filter((_, i) => i !== idx);
+                            const id = btn.getAttribute("data-id");
                             const { error } = await localSupabase
-                                .from("site_settings")
-                                .upsert({ key: "banned_emails", value: newBanned }, { onConflict: "key" });
+                                .from("banned_emails")
+                                .delete()
+                                .eq("id", id);
                             if (error) {
                                 alert("Failed to unban: " + error.message);
                                 return;
@@ -1648,7 +1656,7 @@
                         });
                     });
                 } catch (err) {
-                    bannedListBody.innerHTML = `<tr><td colspan="3"><div class="empty">An unexpected error occurred.</div></td></tr>`;
+                    bannedListBody.innerHTML = `<tr><td colspan="5"><div class="empty">An unexpected error occurred.</div></td></tr>`;
                     console.error(err);
                 }
             }
@@ -1658,33 +1666,40 @@
             if (banEmailBtn && banEmailInput && localSupabase) {
                 banEmailBtn.addEventListener("click", async () => {
                     const email = banEmailInput.value.trim();
+                    const reason = banReasonInput ? banReasonInput.value.trim() : "";
                     if (!email) {
                         alert("Please enter an email to ban.");
                         return;
                     }
                     try {
-                        const { data, error } = await localSupabase
-                            .from("site_settings")
-                            .select("value")
-                            .eq("key", "banned_emails")
+                        const { data: { user } } = await localSupabase.auth.getUser();
+                        const { data: existing, error: checkError } = await localSupabase
+                            .from("banned_emails")
+                            .select("id")
+                            .ilike("email", email)
                             .maybeSingle();
-                        let banned = [];
-                        if (data && Array.isArray(data.value)) {
-                            banned = data.value;
+                        if (checkError) {
+                            alert("Failed to check banned emails: " + checkError.message);
+                            return;
                         }
-                        if (banned.some((item) => (item.email || "").toLowerCase() === email.toLowerCase())) {
+                        if (existing) {
                             alert("This email is already banned.");
                             return;
                         }
-                        banned.push({ email: email, banned_at: new Date().toISOString() });
-                        const { error: updateError } = await localSupabase
-                            .from("site_settings")
-                            .upsert({ key: "banned_emails", value: banned }, { onConflict: "key" });
-                        if (updateError) {
-                            alert("Failed to ban email: " + updateError.message);
+                        const { error: insertError } = await localSupabase
+                            .from("banned_emails")
+                            .insert({
+                                email: email,
+                                reason: reason || null,
+                                banned_by: user ? user.email : null,
+                                banned_at: new Date().toISOString()
+                            });
+                        if (insertError) {
+                            alert("Failed to ban email: " + insertError.message);
                             return;
                         }
                         banEmailInput.value = "";
+                        if (banReasonInput) banReasonInput.value = "";
                         renderBanned();
                     } catch (err) {
                         alert("An unexpected error occurred.");

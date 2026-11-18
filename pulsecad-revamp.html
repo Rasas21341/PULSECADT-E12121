@@ -2320,6 +2320,16 @@ enable-ga="false"
         async function isEmailBanned(email) {
             if (!localSupabase || !email) return false;
             try {
+                const { data, error } = await localSupabase
+                    .from("banned_emails")
+                    .select("id")
+                    .ilike("email", email)
+                    .maybeSingle();
+                if (!error && data) return true;
+            } catch (err) {
+                console.error("Failed to check banned_emails table:", err);
+            }
+            try {
                 const { data } = await localSupabase
                     .from("site_settings")
                     .select("value")
