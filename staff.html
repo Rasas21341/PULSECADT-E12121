@@ -659,6 +659,7 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="announcements.js"></script>
     <script>
         const SUPABASE_URL = "https://zwdogalwbczdtvxvhrfd.supabase.co";
         const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp3ZG9nYWx3YmN6ZHR2eHZocmZkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM2NTA2MjQsImV4cCI6MjA5OTIyNjYyNH0.baPVVTtW0d3FDC2pTd1P3d5aoIc2FZkaD-6bBvDPFWw";
@@ -1409,6 +1410,14 @@
                         <button type="button" class="verified-btn" id="openSuggestionFormBtn">Open Form</button>
                     </div>
                 </div>
+                <div class="master-actions" style="margin-top:20px;">
+                    <h2>Global Announcement</h2>
+                    <p>Send a message to everyone logged into PulseCAD. It disappears after 10 seconds.</p>
+                    <div class="premium-key-display">
+                        <input type="text" class="premium-key-input" id="announcementInput" placeholder="Announcement message..." maxlength="300" />
+                        <button type="button" class="verified-btn" id="sendAnnouncementBtn" style="background:#2563eb;">Send</button>
+                    </div>
+                </div>
             `;
 
             const devToggle = document.getElementById("devModeToggle");
@@ -1464,6 +1473,33 @@
             if (openSuggestionFormBtn) {
                 openSuggestionFormBtn.addEventListener("click", () => {
                     window.open("/suggestionmake.html", "_blank");
+                });
+            }
+
+            const announcementInput = document.getElementById("announcementInput");
+            const sendAnnouncementBtn = document.getElementById("sendAnnouncementBtn");
+            if (sendAnnouncementBtn && announcementInput && localSupabase) {
+                sendAnnouncementBtn.addEventListener("click", async () => {
+                    const message = announcementInput.value.trim();
+                    if (!message) {
+                        alert("Please enter an announcement message.");
+                        return;
+                    }
+                    try {
+                        const { data: { user } } = await localSupabase.auth.getUser();
+                        const { error } = await localSupabase
+                            .from("announcements")
+                            .insert({ message: message, created_by: user ? user.email : null });
+                        if (error) {
+                            alert("Failed to send announcement: " + error.message);
+                            return;
+                        }
+                        announcementInput.value = "";
+                        alert("Announcement sent to all logged-in users.");
+                    } catch (err) {
+                        alert("An unexpected error occurred.");
+                        console.error(err);
+                    }
                 });
             }
         }
