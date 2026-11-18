@@ -495,6 +495,11 @@
             background: #b91c1c;
         }
 
+        .delete-code-btn.unban-btn {
+            padding: 2px 8px;
+            font-size: 10px;
+        }
+
         .give-key-btn {
             background: #16a34a;
             color: #ffffff;
@@ -1643,7 +1648,7 @@
                         const reason = escapeHtml(item.reason) || `<span class="empty">—</span>`;
                         const bannedBy = escapeHtml(item.banned_by) || "—";
                         const bannedAt = item.banned_at ? new Date(item.banned_at).toLocaleString() : "";
-                        return `<tr><td>${email}</td><td>${reason}</td><td>${bannedBy}</td><td>${bannedAt}</td><td><button type="button" class="delete-code-btn" data-id="${item.id}">Unban</button></td></tr>`;
+                        return `<tr><td>${email}</td><td>${reason}</td><td>${bannedBy}</td><td>${bannedAt}</td><td><button type="button" class="delete-code-btn unban-btn" data-id="${item.id}">Unban</button></td></tr>`;
                     }).join("");
 
                     bannedListBody.querySelectorAll(".delete-code-btn").forEach((btn) => {
