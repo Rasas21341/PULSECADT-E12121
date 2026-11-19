@@ -2309,8 +2309,11 @@ enable-ga="false"
                     .select("*", { count: "exact", head: true })
                     .eq("used_by", user.email)
                     .eq("used", true)
-                    .eq("used_for_community", false);
-                if (error) return 0;
+                    .or("used_for_community.is.null,used_for_community.eq.false");
+                if (error) {
+                    console.error("Failed to query redeemed keys:", error);
+                    return 0;
+                }
                 return count || 0;
             } catch (err) {
                 console.error("Failed to get redeemed count:", err);
@@ -3084,7 +3087,7 @@ if (dropdownLogoutBtn) {
                     }
                     const { error: updateError } = await localSupabase
                         .from("premium_keys")
-                        .update({ used: true, used_by: user.email, used_at: new Date().toISOString() })
+                        .update({ used: true, used_by: user.email, used_at: new Date().toISOString(), used_for_community: false })
                         .eq("id", data.id);
                     if (updateError) {
                         alert("Failed to redeem: " + updateError.message);
@@ -3703,7 +3706,7 @@ if (action === "leave") {
                     .select("id")
                     .eq("used_by", user.email)
                     .eq("used", true)
-                    .eq("used_for_community", false)
+                    .or("used_for_community.is.null,used_for_community.eq.false")
                     .limit(1)
                     .maybeSingle();
                 if (error || !data) return false;
@@ -4219,7 +4222,7 @@ await joinCommunity(data.id, passcode.trim());
                     }
                     const { error: updateError } = await localSupabase
                         .from("premium_keys")
-                        .update({ used: true, used_by: user.email, used_at: new Date().toISOString() })
+                        .update({ used: true, used_by: user.email, used_at: new Date().toISOString(), used_for_community: false })
                         .eq("id", data.id);
                     if (updateError) {
                         alert("Failed to redeem: " + updateError.message);
