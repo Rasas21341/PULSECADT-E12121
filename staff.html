@@ -1701,167 +1701,453 @@ const userDepartment = await getUserDepartment();
             }
             pageTitle.textContent = "Development Board";
             contentEl.innerHTML = `
+                <style>
+                    .kanban-board {
+                        display: flex;
+                        gap: 16px;
+                        overflow-x: auto;
+                        padding: 16px 0;
+                        min-height: 600px;
+                    }
+                    .kanban-column {
+                        flex: 0 0 300px;
+                        max-width: 300px;
+                        background: #f8fafc;
+                        border-radius: 12px;
+                        border: 1px solid #e2e8f0;
+                        display: flex;
+                        flex-direction: column;
+                        max-height: calc(100vh - 200px);
+                    }
+                    .kanban-header {
+                        padding: 16px;
+                        border-bottom: 1px solid #e2e8f0;
+                        border-radius: 12px 12px 0 0;
+                        font-weight: 700;
+                        font-size: 14px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: space-between;
+                        background: #ffffff;
+                    }
+                    .kanban-header.todo { border-top: 3px solid #94a3b8; }
+                    .kanban-header.in_progress { border-top: 3px solid #2563eb; }
+                    .kanban-header.review { border-top: 3px solid #f59e0b; }
+                    .kanban-header.done { border-top: 3px solid #16a34a; }
+                    .kanban-count {
+                        background: #f1f5f9;
+                        color: #64748b;
+                        padding: 2px 8px;
+                        border-radius: 999px;
+                        font-size: 12px;
+                        font-weight: 600;
+                    }
+                    .kanban-cards {
+                        flex: 1;
+                        overflow-y: auto;
+                        padding: 12px;
+                        display: flex;
+                        flex-direction: column;
+                        gap: 10px;
+                        min-height: 200px;
+                    }
+                    .kanban-card {
+                        background: #ffffff;
+                        border: 1px solid #e2e8f0;
+                        border-radius: 10px;
+                        padding: 14px;
+                        cursor: grab;
+                        transition: box-shadow 0.15s, transform 0.15s;
+                    }
+                    .kanban-card:hover {
+                        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+                        transform: translateY(-1px);
+                    }
+                    .kanban-card.dragging {
+                        opacity: 0.5;
+                        cursor: grabbing;
+                    }
+                    .kanban-card.todo { border-left: 3px solid #94a3b8; }
+                    .kanban-card.in_progress { border-left: 3px solid #2563eb; }
+                    .kanban-card.review { border-left: 3px solid #f59e0b; }
+                    .kanban-card.done { border-left: 3px solid #16a34a; }
+                    .kanban-card-title {
+                        font-weight: 600;
+                        font-size: 14px;
+                        color: #0f172a;
+                        margin-bottom: 6px;
+                    }
+                    .kanban-card-description {
+                        font-size: 13px;
+                        color: #64748b;
+                        margin-bottom: 10px;
+                        line-height: 1.4;
+                        display: -webkit-box;
+                        -webkit-line-clamp: 3;
+                        -webkit-box-orient: vertical;
+                        overflow: hidden;
+                    }
+                    .kanban-card-meta {
+                        display: flex;
+                        align-items: center;
+                        gap: 8px;
+                        flex-wrap: wrap;
+                        font-size: 11px;
+                    }
+                    .kanban-priority {
+                        padding: 2px 6px;
+                        border-radius: 4px;
+                        font-weight: 600;
+                        text-transform: uppercase;
+                    }
+                    .kanban-priority.high { background: #fef2f2; color: #dc2626; }
+                    .kanban-priority.medium { background: #fef3c7; color: #92400e; }
+                    .kanban-priority.low { background: #eff6ff; color: #2563eb; }
+                    .kanban-assignee {
+                        color: #64748b;
+                        background: #f1f5f9;
+                        padding: 2px 8px;
+                        border-radius: 999px;
+                    }
+                    .kanban-date {
+                        color: #94a3b8;
+                        margin-left: auto;
+                    }
+                    .kanban-actions {
+                        display: flex;
+                        gap: 6px;
+                        margin-top: 10px;
+                        padding-top: 10px;
+                        border-top: 1px solid #f1f5f9;
+                    }
+                    .kanban-btn {
+                        flex: 1;
+                        padding: 6px 8px;
+                        border-radius: 6px;
+                        font-size: 11px;
+                        font-weight: 600;
+                        border: 1px solid #e2e8f0;
+                        background: #ffffff;
+                        cursor: pointer;
+                        transition: all 0.15s;
+                    }
+                    .kanban-btn:hover { background: #f1f5f9; }
+                    .kanban-btn.delete { background: #fef2f2; border-color: #fecaca; color: #dc2626; }
+                    .kanban-btn.delete:hover { background: #fee2e2; }
+                    .kanban-add-btn {
+                        width: 100%;
+                        padding: 10px;
+                        border: 2px dashed #cbd5e1;
+                        border-radius: 10px;
+                        background: transparent;
+                        color: #64748b;
+                        font-size: 13px;
+                        font-weight: 600;
+                        cursor: pointer;
+                        margin-top: 8px;
+                        transition: all 0.15s;
+                    }
+                    .kanban-add-btn:hover {
+                        border-color: #2563eb;
+                        background: #eff6ff;
+                        color: #2563eb;
+                    }
+                    .modal-overlay {
+                        position: fixed;
+                        inset: 0;
+                        background: rgba(15, 23, 42, 0.5);
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        z-index: 1000;
+                        padding: 20px;
+                    }
+                    .modal-card {
+                        background: #ffffff;
+                        border-radius: 16px;
+                        width: 100%;
+                        max-width: 480px;
+                        max-height: 90vh;
+                        overflow-y: auto;
+                        box-shadow: 0 24px 60px rgba(0, 0, 0, 0.3);
+                    }
+                    .modal-header {
+                        padding: 20px;
+                        border-bottom: 1px solid #e2e8f0;
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                    }
+                    .modal-title { font-size: 18px; font-weight: 700; color: #0f172a; }
+                    .modal-close { background: none; border: none; font-size: 24px; color: #94a3b8; cursor: pointer; }
+                    .modal-body { padding: 20px; }
+                    .modal-field { margin-bottom: 16px; }
+                    .modal-label { display: block; font-size: 13px; font-weight: 600; color: #334155; margin-bottom: 6px; }
+                    .modal-input {
+                        width: 100%;
+                        padding: 10px 12px;
+                        border-radius: 8px;
+                        border: 1px solid #e2e8f0;
+                        font-size: 14px;
+                        color: #1a202c;
+                    }
+                    .modal-textarea { min-height: 100px; resize: vertical; font-family: inherit; }
+                    .modal-footer { padding: 16px 20px; border-top: 1px solid #e2e8f0; display: flex; justify-content: flex-end; gap: 10px; }
+                    .modal-btn { padding: 10px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; }
+                    .modal-btn.cancel { background: #ffffff; border: 1px solid #cbd5e1; color: #0f172a; }
+                    .modal-btn.cancel:hover { background: #f1f5f9; }
+                    .modal-btn.primary { background: #2563eb; border: none; color: #ffffff; }
+                    .modal-btn.primary:hover { background: #1d4ed8; }
+                    .kanban-drop-zone { background: #eff6ff; border: 2px dashed #2563eb; border-radius: 8px; min-height: 60px; }
+                </style>
                 <div class="master-actions">
                     <h2>Development Board</h2>
-                    <p>Internal board for Development Team to track tasks, bugs, and features.</p>
+                    <p>Kanban board for Development Team to track tasks, bugs, and features.</p>
                     <div class="master-row">
-                        <div>
-                            <div class="master-row-label">Create New Task</div>
-                            <div class="master-row-sub">Add a new task to the development board.</div>
-                        </div>
-                        <button type="button" class="verified-btn" id="createTaskBtn" style="background:#2563eb;">Create Task</button>
+                        <div style="flex:1;"></div>
+                        <button type="button" class="verified-btn" id="createTaskBtn" style="background:#2563eb;">+ Create Task</button>
                     </div>
                 </div>
-                <div class="codes-section" style="margin-top:20px;">
-                    <h3>Tasks</h3>
-                    <div class="codes-search-row">
-                        <select class="codes-search-input" id="taskStatusFilter">
-                            <option value="">All Statuses</option>
-                            <option value="todo">To Do</option>
-                            <option value="in_progress">In Progress</option>
-                            <option value="review">In Review</option>
-                            <option value="done">Done</option>
-                        </select>
+                <div class="kanban-board" id="kanbanBoard"></div>
+                <div class="modal-overlay" id="taskModal" style="display:none;">
+                    <div class="modal-card">
+                        <div class="modal-header">
+                            <div class="modal-title" id="modalTitle">Create Task</div>
+                            <button type="button" class="modal-close" id="modalClose">&times;</button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="modal-field">
+                                <label class="modal-label">Title *</label>
+                                <input type="text" class="modal-input" id="taskTitle" placeholder="Task title" required />
+                            </div>
+                            <div class="modal-field">
+                                <label class="modal-label">Description</label>
+                                <textarea class="modal-input modal-textarea" id="taskDescription" placeholder="Task description (optional)"></textarea>
+                            </div>
+                            <div class="modal-field">
+                                <label class="modal-label">Status</label>
+                                <select class="modal-input" id="taskStatus">
+                                    <option value="todo">To Do</option>
+                                    <option value="in_progress">In Progress</option>
+                                    <option value="review">In Review</option>
+                                    <option value="done">Done</option>
+                                </select>
+                            </div>
+                            <div class="modal-field">
+                                <label class="modal-label">Priority</label>
+                                <select class="modal-input" id="taskPriority">
+                                    <option value="low">Low</option>
+                                    <option value="medium" selected>Medium</option>
+                                    <option value="high">High</option>
+                                </select>
+                            </div>
+                            <div class="modal-field">
+                                <label class="modal-label">Assigned To</label>
+                                <input type="text" class="modal-input" id="taskAssignedTo" placeholder="Email or name (optional)" />
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="modal-btn cancel" id="modalCancel">Cancel</button>
+                            <button type="button" class="modal-btn primary" id="modalSave">Save</button>
+                        </div>
                     </div>
-                    <div class="codes-count" id="taskCount"></div>
-                    <table class="codes-list-table">
-                        <tr><th>Title</th><th>Description</th><th>Status</th><th>Priority</th><th>Assigned To</th><th>Created</th><th>Actions</th></tr>
-                        <tbody id="taskListBody"><tr><td colspan="7"><div class="empty">Loading...</div></td></tr></tbody>
-                    </table>
                 </div>
             `;
 
-            const statusFilter = document.getElementById("taskStatusFilter");
-            const taskListBody = document.getElementById("taskListBody");
-            const taskCount = document.getElementById("taskCount");
+            const kanbanBoard = document.getElementById("kanbanBoard");
             const createTaskBtn = document.getElementById("createTaskBtn");
+            const taskModal = document.getElementById("taskModal");
+            const modalClose = document.getElementById("modalClose");
+            const modalCancel = document.getElementById("modalCancel");
+            const modalSave = document.getElementById("modalSave");
+            const modalTitle = document.getElementById("modalTitle");
+            const taskTitle = document.getElementById("taskTitle");
+            const taskDescription = document.getElementById("taskDescription");
+            const taskStatus = document.getElementById("taskStatus");
+            const taskPriority = document.getElementById("taskPriority");
+            const taskAssignedTo = document.getElementById("taskAssignedTo");
 
-            async function renderTasks(filter = "") {
-                if (!taskListBody || !localSupabase) return;
+            let editingTaskId = null;
+            let allTasks = [];
+
+            const statuses = [
+                { id: 'todo', label: 'To Do', color: '#94a3b8' },
+                { id: 'in_progress', label: 'In Progress', color: '#2563eb' },
+                { id: 'review', label: 'In Review', color: '#f59e0b' },
+                { id: 'done', label: 'Done', color: '#16a34a' }
+            ];
+
+            function closeModal() {
+                taskModal.style.display = "none";
+                editingTaskId = null;
+                taskTitle.value = "";
+                taskDescription.value = "";
+                taskStatus.value = "todo";
+                taskPriority.value = "medium";
+                taskAssignedTo.value = "";
+            }
+
+            function openModal(task = null) {
+                if (task) {
+                    editingTaskId = task.id;
+                    modalTitle.textContent = "Edit Task";
+                    taskTitle.value = task.title || "";
+                    taskDescription.value = task.description || "";
+                    taskStatus.value = task.status || "todo";
+                    taskPriority.value = task.priority || "medium";
+                    taskAssignedTo.value = task.assigned_to || "";
+                } else {
+                    editingTaskId = null;
+                    modalTitle.textContent = "Create Task";
+                    taskTitle.value = "";
+                    taskDescription.value = "";
+                    taskStatus.value = "todo";
+                    taskPriority.value = "medium";
+                    taskAssignedTo.value = "";
+                }
+                taskModal.style.display = "flex";
+                taskTitle.focus();
+            }
+
+            modalClose?.addEventListener("click", closeModal);
+            modalCancel?.addEventListener("click", closeModal);
+            taskModal?.addEventListener("click", (e) => { if (e.target === taskModal) closeModal(); });
+            document.addEventListener("keydown", (e) => { if (e.key === "Escape" && taskModal?.style.display === "flex") closeModal(); });
+
+            createTaskBtn?.addEventListener("click", () => openModal());
+
+            modalSave?.addEventListener("click", async () => {
+                const title = taskTitle.value.trim();
+                if (!title) { alert("Title is required"); taskTitle.focus(); return; }
+                const description = taskDescription.value.trim();
+                const status = taskStatus.value;
+                const priority = taskPriority.value;
+                const assignedTo = taskAssignedTo.value.trim() || "Unassigned";
                 try {
-                    let query = localSupabase
+                    const { data: { user } } = await localSupabase.auth.getUser();
+                    if (editingTaskId) {
+                        const { error } = await localSupabase
+                            .from("development_tasks")
+                            .update({ title, description, status, priority, assigned_to: assignedTo, updated_at: new Date().toISOString() })
+                            .eq("id", editingTaskId);
+                        if (error) { alert("Failed to update task: " + error.message); return; }
+                    } else {
+                        const { error } = await localSupabase
+                            .from("development_tasks")
+                            .insert({ title, description, status, priority, assigned_to: assignedTo, created_by: user?.email || "Unknown", created_at: new Date().toISOString() });
+                        if (error) { alert("Failed to create task: " + error.message); return; }
+                    }
+                    closeModal();
+                    renderBoard();
+                } catch (err) { alert("An unexpected error occurred."); console.error(err); }
+            });
+
+            async function renderBoard() {
+                if (!kanbanBoard || !localSupabase) return;
+                try {
+                    const { data, error } = await localSupabase
                         .from("development_tasks")
                         .select("*")
-                        .order("created_at", { ascending: false });
-                    if (filter) {
-                        query = query.eq("status", filter);
-                    }
-                    const { data, error } = await query;
-                    if (error) {
-                        taskListBody.innerHTML = `<tr><td colspan="7"><div class="empty">Failed to load tasks: ${error.message}</div></td></tr>`;
-                        return;
-                    }
-                    const rows = Array.isArray(data) ? data : [];
-                    if (taskCount) taskCount.textContent = `${rows.length} task${rows.length === 1 ? '' : 's'}`;
-                    if (rows.length === 0) {
-                        taskListBody.innerHTML = `<tr><td colspan="7"><div class="empty">No tasks found.</div></td></tr>`;
-                        return;
-                    }
-                    taskListBody.innerHTML = rows.map((row) => {
-                        const title = (row.title || "").replace(/</g, "<").replace(/>/g, ">");
-                        const description = (row.description || "").replace(/</g, "<").replace(/>/g, ">");
-                        const status = row.status || "todo";
-                        const priority = row.priority || "medium";
-                        const assignedTo = row.assigned_to || "Unassigned";
-                        const created = row.created_at ? new Date(row.created_at).toLocaleString() : "";
-                        const statusClass = status === "done" ? "codes-used-yes" : "codes-used-no";
-                        const priorityClass = priority === "high" ? "color:#dc2626;" : priority === "low" ? "color:#2563eb;" : "color:#f59e0b;";
-                        return `<tr>
-                            <td><strong>${title}</strong></td>
-                            <td style="max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${description}</td>
-                            <td class="${statusClass}">${status.replace('_', ' ')}</td>
-                            <td style="${priorityClass}font-weight:600;">${priority}</td>
-                            <td>${assignedTo}</td>
-                            <td>${created}</td>
-                            <td>
-                                <select class="department-select" data-task-id="${row.id}" data-current-status="${status}" style="width:auto;padding:4px 8px;font-size:12px;">
-                                    <option value="todo" ${status === 'todo' ? 'selected' : ''}>To Do</option>
-                                    <option value="in_progress" ${status === 'in_progress' ? 'selected' : ''}>In Progress</option>
-                                    <option value="review" ${status === 'review' ? 'selected' : ''}>In Review</option>
-                                    <option value="done" ${status === 'done' ? 'selected' : ''}>Done</option>
-                                </select>
-                                <button type="button" class="delete-code-btn unban-btn" data-id="${row.id}">Delete</button>
-                            </td>
-                        </tr>`;
+                        .order("created_at", { ascending: true });
+                    if (error) { kanbanBoard.innerHTML = `<div class="empty">Failed to load tasks: ${error.message}</div>`; return; }
+                    allTasks = Array.isArray(data) ? data : [];
+                    
+                    kanbanBoard.innerHTML = statuses.map(s => {
+                        const tasks = allTasks.filter(t => t.status === s.id);
+                        return `
+                            <div class="kanban-column" data-status="${s.id}">
+                                <div class="kanban-header ${s.id}" style="border-top-color: ${s.color};">
+                                    <span>${s.label}</span>
+                                    <span class="kanban-count">${tasks.length}</span>
+                                </div>
+                                <div class="kanban-cards" id="cards-${s.id}" data-status="${s.id}">
+                                    ${tasks.map(task => renderCard(task)).join("")}
+                                    <button type="button" class="kanban-add-btn" data-status="${s.id}">+ Add Task</button>
+                                </div>
+                            </div>
+                        `;
                     }).join("");
 
-                    taskListBody.querySelectorAll(".department-select[data-task-id]").forEach((select) => {
-                        select.addEventListener("change", async () => {
-                            const taskId = select.getAttribute("data-task-id");
-                            const newStatus = select.value;
+                    // Add card click handlers
+                    kanbanBoard.querySelectorAll(".kanban-card").forEach(card => {
+                        card.addEventListener("click", (e) => {
+                            if (e.target.closest(".kanban-btn")) return;
+                            const taskId = card.getAttribute("data-task-id");
+                            const task = allTasks.find(t => t.id === taskId);
+                            if (task) openModal(task);
+                        });
+                    });
+
+                    // Add task button handlers
+                    kanbanBoard.querySelectorAll(".kanban-add-btn").forEach(btn => {
+                        btn.addEventListener("click", () => {
+                            taskStatus.value = btn.getAttribute("data-status");
+                            openModal();
+                        });
+                    });
+
+                    // Delete button handlers
+                    kanbanBoard.querySelectorAll(".kanban-btn.delete").forEach(btn => {
+                        btn.addEventListener("click", async (e) => {
+                            e.stopPropagation();
+                            const taskId = btn.getAttribute("data-task-id");
+                            if (!confirm("Delete this task?")) return;
+                            const { error } = await localSupabase.from("development_tasks").delete().eq("id", taskId);
+                            if (error) { alert("Failed to delete: " + error.message); return; }
+                            renderBoard();
+                        });
+                    });
+
+                    // Status change buttons
+                    kanbanBoard.querySelectorAll(".kanban-btn.move").forEach(btn => {
+                        btn.addEventListener("click", async (e) => {
+                            e.stopPropagation();
+                            const taskId = btn.getAttribute("data-task-id");
+                            const newStatus = btn.getAttribute("data-new-status");
                             const { error } = await localSupabase
                                 .from("development_tasks")
                                 .update({ status: newStatus, updated_at: new Date().toISOString() })
                                 .eq("id", taskId);
-                            if (error) {
-                                alert("Failed to update task: " + error.message);
-                                select.value = select.getAttribute("data-current-status");
-                                return;
-                            }
-                            renderTasks(statusFilter.value);
+                            if (error) { alert("Failed to move: " + error.message); return; }
+                            renderBoard();
                         });
                     });
 
-                    taskListBody.querySelectorAll(".delete-code-btn[data-id]").forEach((btn) => {
-                        btn.addEventListener("click", async () => {
-                            const id = btn.getAttribute("data-id");
-                            if (!confirm("Delete this task?")) return;
-                            const { error } = await localSupabase
-                                .from("development_tasks")
-                                .delete()
-                                .eq("id", id);
-                            if (error) {
-                                alert("Failed to delete task: " + error.message);
-                                return;
-                            }
-                            renderTasks(statusFilter.value);
-                        });
-                    });
-                } catch (err) {
-                    taskListBody.innerHTML = `<tr><td colspan="7"><div class="empty">An unexpected error occurred.</div></td></tr>`;
-                    console.error(err);
-                }
+                } catch (err) { kanbanBoard.innerHTML = `<div class="empty">An unexpected error occurred.</div>`; console.error(err); }
             }
 
-            renderTasks();
+            function renderCard(task) {
+                const title = (task.title || "").replace(/</g, "<").replace(/>/g, ">");
+                const description = (task.description || "").replace(/</g, "<").replace(/>/g, ">");
+                const status = task.status || "todo";
+                const priority = task.priority || "medium";
+                const assignedTo = task.assigned_to || "Unassigned";
+                const created = task.created_at ? new Date(task.created_at).toLocaleDateString() : "";
+                const statusIdx = statuses.findIndex(s => s.id === status);
+                const canMoveLeft = statusIdx > 0;
+                const canMoveRight = statusIdx < statuses.length - 1;
+                const nextStatus = canMoveRight ? statuses[statusIdx + 1].id : null;
+                const prevStatus = canMoveLeft ? statuses[statusIdx - 1].id : null;
 
-            if (statusFilter) {
-                statusFilter.addEventListener("change", () => {
-                    renderTasks(statusFilter.value);
-                });
+                return `
+                    <div class="kanban-card ${status}" data-task-id="${task.id}" draggable="true">
+                        <div class="kanban-card-title">${title}</div>
+                        ${description ? `<div class="kanban-card-description">${description}</div>` : ""}
+                        <div class="kanban-card-meta">
+                            <span class="kanban-priority ${priority}">${priority}</span>
+                            <span class="kanban-assignee">${assignedTo}</span>
+                            <span class="kanban-date">${created}</span>
+                        </div>
+                        <div class="kanban-actions">
+                            ${prevStatus ? `<button type="button" class="kanban-btn move" data-task-id="${task.id}" data-new-status="${prevStatus}">← Back</button>` : ""}
+                            ${nextStatus ? `<button type="button" class="kanban-btn move" data-task-id="${task.id}" data-new-status="${nextStatus}">Next →</button>` : ""}
+                            <button type="button" class="kanban-btn delete" data-task-id="${task.id}">Delete</button>
+                        </div>
+                    </div>
+                `;
             }
 
-            if (createTaskBtn && localSupabase) {
-                createTaskBtn.addEventListener("click", async () => {
-                    const title = prompt("Task title:");
-                    if (!title) return;
-                    const description = prompt("Task description (optional):") || "";
-                    const priority = prompt("Priority (low/medium/high):", "medium") || "medium";
-                    const assignedTo = prompt("Assigned to (email or name, optional):") || "Unassigned";
-                    try {
-                        const { data: { user } } = await localSupabase.auth.getUser();
-                        const { error } = await localSupabase
-                            .from("development_tasks")
-                            .insert({
-                                title: title,
-                                description: description,
-                                status: "todo",
-                                priority: priority,
-                                assigned_to: assignedTo,
-                                created_by: user?.email || "Unknown",
-                                created_at: new Date().toISOString()
-                            });
-                        if (error) {
-                            alert("Failed to create task: " + error.message);
-                            return;
-                        }
-                        renderTasks(statusFilter.value);
-                    } catch (err) {
-                        alert("An unexpected error occurred.");
-                        console.error(err);
-                    }
-                });
-            }
+            renderBoard();
         }
 
         async function loadBannedIds() {
