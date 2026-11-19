@@ -2051,6 +2051,28 @@ const userDepartment = await getUserDepartment();
                         .order("created_at", { ascending: true });
                     if (error) { kanbanBoard.innerHTML = `<div class="empty">Failed to load tasks: ${error.message}</div>`; return; }
                     allTasks = Array.isArray(data) ? data : [];
+
+                    // Sync open suggestions into the board as todo tasks
+                    try {
+                        const { data: suggestions } = await localSupabase.from("suggestions").select("*").eq("status", "open");
+                        if (Array.isArray(suggestions)) {
+                            const existingTitles = new Set(allTasks.map(t => (t.title || "").trim().toLowerCase()));
+                            const toInsert = suggestions.filter(s => !existingTitles.has((s.title || "").trim().toLowerCase())).map(s => ({
+                                title: s.title,
+                                description: s.message || "",
+                                status: "todo",
+                                priority: "medium",
+                                assigned_to: "Unassigned",
+                                created_by: s.author_name || s.email || "Anonymous",
+                                created_at: s.created_at || new Date().toISOString()
+                            }));
+                            if (toInsert.length) {
+                                await localSupabase.from("development_tasks").insert(toInsert);
+                                const { data: refreshed } = await localSupabase.from("development_tasks").select("*").order("created_at", { ascending: true });
+                                allTasks = Array.isArray(refreshed) ? refreshed : allTasks;
+                            }
+                        }
+                    } catch (e) { console.error(e); }
                     
                     kanbanBoard.innerHTML = statuses.map(s => {
                         const tasks = allTasks.filter(t => t.status === s.id);
