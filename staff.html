@@ -934,26 +934,30 @@
                     return;
                 }
 
-                const userDepartment = await getUserDepartment();
+const userDepartment = await getUserDepartment();
                 const isManagement = userDepartment === "Management";
+                const isManagementAssistant = userDepartment === "Management Assistant";
                 const isSupportLead = userDepartment === "Support Team Lead";
                 const isSupport = userDepartment === "Support Team";
-                let html = `<input type="text" class="search-box" id="userSearch" placeholder="Search users by email..." /><table><tr><th>Email</th><th>Created</th><th>Department</th>${(isManagement || isSupportLead) ? "<th>IP</th>" : ""}<th>Actions</th></tr>`;
+                let html = `<input type="text" class="search-box" id="userSearch" placeholder="Search users by email..." /><table><tr><th>Email</th><th>Created</th><th>Department</th>${(isManagement || isManagementAssistant || isSupportLead) ? "<th>IP</th>" : ""}<th>Actions</th></tr>`;
                 data.forEach((row) => {
-                    const email = (row.email || "N/A").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+                    const email = (row.email || "N/A").replace(/</g, "<").replace(/>/g, ">");
                     const created = row.created_at ? new Date(row.created_at).toLocaleString() : "";
                     const currentDept = row.department || "";
-                    const ipCell = (isManagement || isSupportLead) ? `<td>${(row.ip || "N/A").replace(/</g, "&lt;").replace(/>/g, "&gt;")}</td>` : "";
-                    const keyActions = (isManagement || isSupportLead) ? `<div class="key-row-actions"><button type="button" class="view-key-btn" data-user-id="${row.id}" data-email="${email.replace(/"/g, '&quot;')}">View</button><button type="button" class="give-key-btn" data-user-id="${row.id}" data-email="${email.replace(/"/g, '&quot;')}">Give Key</button></div>` : "";
+                    const ipCell = (isManagement || isManagementAssistant || isSupportLead) ? `<td>${(row.ip || "N/A").replace(/</g, "<").replace(/>/g, ">")}</td>` : "";
+                    const keyActions = (isManagement || isSupportLead) ? `<div class="key-row-actions"><button type="button" class="view-key-btn" data-user-id="${row.id}" data-email="${email.replace(/"/g, '"')}">View</button><button type="button" class="give-key-btn" data-user-id="${row.id}" data-email="${email.replace(/"/g, '"')}">Give Key</button></div>` : "";
                     let deptDisabled = "";
                     let deptOptions = `<option value="">Unassigned</option><option value="Management" ${currentDept === 'Management' ? 'selected' : ''}>Management</option><option value="Management Assistant" ${currentDept === 'Management Assistant' ? 'selected' : ''}>Management Assistant</option><option value="Support Team Lead" ${currentDept === 'Support Team Lead' ? 'selected' : ''}>Support Team Lead</option><option value="Support Team" ${currentDept === 'Support Team' ? 'selected' : ''}>Support Team</option><option value="Development Team" ${currentDept === 'Development Team' ? 'selected' : ''}>Development Team</option>`;
-                    if (!isManagement && !isSupportLead) {
+                    if (!isManagement && !isManagementAssistant && !isSupportLead) {
                         deptDisabled = "disabled";
                     }
                     if (isSupportLead) {
                         deptOptions = `<option value="">Unassigned</option><option value="Management Assistant" ${currentDept === 'Management Assistant' ? 'selected' : ''}>Management Assistant</option><option value="Support Team Lead" ${currentDept === 'Support Team Lead' ? 'selected' : ''}>Support Team Lead</option><option value="Support Team" ${currentDept === 'Support Team' ? 'selected' : ''}>Support Team</option><option value="Development Team" ${currentDept === 'Development Team' ? 'selected' : ''}>Development Team</option>`;
                     }
-                    html += `<tr><td>${email}</td><td>${created}</td><td><select class="department-select" data-user-id="${row.id}" data-current-dept="${(currentDept || '').replace(/</g, '&lt;').replace(/>/g, '&gt;')}" ${deptDisabled}>${deptOptions}</select></td>${ipCell}<td>${keyActions}</td></tr>`;
+                    if (isManagementAssistant) {
+                        deptOptions = `<option value="">Unassigned</option><option value="Support Team Lead" ${currentDept === 'Support Team Lead' ? 'selected' : ''}>Support Team Lead</option><option value="Support Team" ${currentDept === 'Support Team' ? 'selected' : ''}>Support Team</option><option value="Development Team" ${currentDept === 'Development Team' ? 'selected' : ''}>Development Team</option>`;
+                    }
+                    html += `<tr><td>${email}</td><td>${created}</td><td><select class="department-select" data-user-id="${row.id}" data-current-dept="${(currentDept || '').replace(/</g, '<').replace(/>/g, '>')}" ${deptDisabled}>${deptOptions}</select></td>${ipCell}<td>${keyActions}</td></tr>`;
                 });
                 html += "</table>";
                 contentEl.innerHTML = html;
@@ -976,6 +980,7 @@
                         const userDept = await getUserDepartment();
                         const isSupport = userDept === "Support Team" || userDept === "Support Team Lead";
                         const isSupportLead = userDept === "Support Team Lead";
+                        const isManagementAssistant = userDept === "Management Assistant";
                         const currentDept = select.getAttribute("data-current-dept") || "";
                         const newDepartment = select.value;
                         if (isSupport) {
@@ -991,6 +996,18 @@
                             }
                             if (!isSupportLead && newDepartment === "Management Assistant") {
                                 alert("Access denied. Only Support Team Lead can assign Management Assistant.");
+                                select.value = currentDept;
+                                return;
+                            }
+                        }
+                        if (isManagementAssistant) {
+                            if (currentDept === "Management" || currentDept === "Management Assistant") {
+                                alert("Access denied. Management Assistant cannot remove users from Management or Management Assistant.");
+                                select.value = currentDept;
+                                return;
+                            }
+                            if (newDepartment === "Management" || newDepartment === "Management Assistant") {
+                                alert("Access denied. Management Assistant cannot assign users to Management or Management Assistant.");
                                 select.value = currentDept;
                                 return;
                             }
