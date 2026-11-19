@@ -288,6 +288,17 @@
                         return;
                     }
 
+                    // Mirror suggestion into development board as a todo task
+                    await localSupabase.from("development_tasks").insert({
+                        title,
+                        description: message,
+                        status: "todo",
+                        priority: "medium",
+                        assigned_to: "Unassigned",
+                        created_by: payload.author_name || "Anonymous",
+                        created_at: new Date().toISOString()
+                    });
+
                     if (successEl) {
                         successEl.textContent = "Thanks! Your suggestion has been submitted.";
                         successEl.style.display = "block";
