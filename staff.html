@@ -952,10 +952,13 @@ const userDepartment = await getUserDepartment();
                         deptDisabled = "disabled";
                     }
                     if (isSupportLead) {
-                        deptOptions = `<option value="">Unassigned</option><option value="Management Assistant" ${currentDept === 'Management Assistant' ? 'selected' : ''}>Management Assistant</option><option value="Support Team Lead" ${currentDept === 'Support Team Lead' ? 'selected' : ''}>Support Team Lead</option><option value="Support Team" ${currentDept === 'Support Team' ? 'selected' : ''}>Support Team</option><option value="Development Team" ${currentDept === 'Development Team' ? 'selected' : ''}>Development Team</option>`;
+                        // Support Lead can see all but can only assign below Management
+                        // Keep Management and Management Assistant in options for display but they'll be blocked on change
+                        deptOptions = `<option value="">Unassigned</option><option value="Management" ${currentDept === 'Management' ? 'selected' : ''}>Management</option><option value="Management Assistant" ${currentDept === 'Management Assistant' ? 'selected' : ''}>Management Assistant</option><option value="Support Team Lead" ${currentDept === 'Support Team Lead' ? 'selected' : ''}>Support Team Lead</option><option value="Support Team" ${currentDept === 'Support Team' ? 'selected' : ''}>Support Team</option><option value="Development Team" ${currentDept === 'Development Team' ? 'selected' : ''}>Development Team</option>`;
                     }
                     if (isManagementAssistant) {
-                        deptOptions = `<option value="">Unassigned</option><option value="Support Team Lead" ${currentDept === 'Support Team Lead' ? 'selected' : ''}>Support Team Lead</option><option value="Support Team" ${currentDept === 'Support Team' ? 'selected' : ''}>Support Team</option><option value="Development Team" ${currentDept === 'Development Team' ? 'selected' : ''}>Development Team</option>`;
+                        // Management Assistant can see all but can only assign below Management Assistant
+                        deptOptions = `<option value="">Unassigned</option><option value="Management" ${currentDept === 'Management' ? 'selected' : ''}>Management</option><option value="Management Assistant" ${currentDept === 'Management Assistant' ? 'selected' : ''}>Management Assistant</option><option value="Support Team Lead" ${currentDept === 'Support Team Lead' ? 'selected' : ''}>Support Team Lead</option><option value="Support Team" ${currentDept === 'Support Team' ? 'selected' : ''}>Support Team</option><option value="Development Team" ${currentDept === 'Development Team' ? 'selected' : ''}>Development Team</option>`;
                     }
                     html += `<tr><td>${email}</td><td>${created}</td><td><select class="department-select" data-user-id="${row.id}" data-current-dept="${(currentDept || '').replace(/</g, '<').replace(/>/g, '>')}" ${deptDisabled}>${deptOptions}</select></td>${ipCell}<td>${keyActions}</td></tr>`;
                 });
