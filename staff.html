@@ -634,6 +634,7 @@
         <button class="sidebar-btn" id="staffUsersBtn">Users</button>
         <button class="sidebar-btn" id="applicationsBtn">Applications</button>
         <button class="sidebar-btn" id="masterActionsBtn" style="display:none;">Master Actions</button>
+        <button class="sidebar-btn" id="managementAssistantBtn" style="display:none;">Management Assistant</button>
         <div class="sidebar-section-label" id="customerSupportLabel" style="display:none;">Customer Support</div>
         <button class="sidebar-btn" id="codesBtn" style="display:none;">CODES</button>
         <button class="sidebar-btn" id="supportPanelNavBtn" style="display:none;">Support Panel</button>
@@ -674,6 +675,7 @@
         const supportPanelNavBtn = document.getElementById("supportPanelNavBtn");
         const suggestionsNavBtn = document.getElementById("suggestionsNavBtn");
         const masterActionsBtn = document.getElementById("masterActionsBtn");
+        const managementAssistantBtn = document.getElementById("managementAssistantBtn");
         const customerSupportLabel = document.getElementById("customerSupportLabel");
         const developmentTeamLabel = document.getElementById("developmentTeamLabel");
 
@@ -1137,6 +1139,9 @@
             if (masterActionsBtn && lower === "management") {
                 masterActionsBtn.style.display = "block";
             }
+            if (managementAssistantBtn && lower === "management") {
+                managementAssistantBtn.style.display = "block";
+            }
         }
 
         if (serversBtn) {
@@ -1153,6 +1158,10 @@
 
         if (masterActionsBtn) {
             masterActionsBtn.addEventListener("click", loadMasterActions);
+        }
+
+        if (managementAssistantBtn) {
+            managementAssistantBtn.addEventListener("click", loadManagementAssistant);
         }
 
         if (codesBtn) {
@@ -1496,6 +1505,155 @@
                         }
                         announcementInput.value = "";
                         alert("Announcement sent to all logged-in users.");
+                    } catch (err) {
+                        alert("An unexpected error occurred.");
+                        console.error(err);
+                    }
+                });
+            }
+        }
+
+        async function loadManagementAssistant() {
+            const staff = await ensureStaff();
+            if (!staff.allowed) return;
+            if ((staff.department || "").toLowerCase() !== "management") {
+                showStatus("Access denied. Management only.", "error");
+                return;
+            }
+            pageTitle.textContent = "Management Assistant";
+            contentEl.innerHTML = `
+                <div class="master-actions">
+                    <h2>Assign Management Assistant Role</h2>
+                    <p>Select a user to assign the Management Assistant department role. This grants limited administrative access to the staff dashboard.</p>
+                    <div class="master-row">
+                        <div>
+                            <div class="master-row-label">Select User</div>
+                            <div class="master-row-sub">Choose a user to promote to Management Assistant.</div>
+                        </div>
+                        <select class="premium-key-input" id="assistantUserSelect" style="width:100%;max-width:400px;">
+                            <option value="">Loading users...</option>
+                        </select>
+                    </div>
+                    <div class="master-row" style="margin-top:16px;">
+                        <div style="flex:1;"></div>
+                        <button type="button" class="verified-btn" id="assignAssistantBtn" style="background:#16a34a;">Assign Management Assistant</button>
+                    </div>
+                </div>
+                <div class="master-actions" style="margin-top:20px;">
+                    <h2>Current Management Assistants</h2>
+                    <p>Users currently assigned to the Management Assistant department.</p>
+                    <div class="codes-count" id="assistantCount"></div>
+                    <table class="codes-list-table">
+                        <tr><th>Email</th><th>Assigned At</th><th>Actions</th></tr>
+                        <tbody id="assistantListBody"><tr><td colspan="3"><div class="empty">Loading...</div></td></tr></tbody>
+                    </table>
+                </div>
+            `;
+
+            const userSelect = document.getElementById("assistantUserSelect");
+            const assignBtn = document.getElementById("assignAssistantBtn");
+            const assistantListBody = document.getElementById("assistantListBody");
+            const assistantCount = document.getElementById("assistantCount");
+
+            async function loadAvailableUsers() {
+                if (!userSelect || !localSupabase) return;
+                try {
+                    const { data, error } = await localSupabase
+                        .from("users")
+                        .select("id, email, created_at, department")
+                        .neq("department", "Management Assistant")
+                        .neq("department", "Management")
+                        .order("created_at", { ascending: false });
+                    if (error) {
+                        userSelect.innerHTML = `<option value="">Failed to load users: ${error.message}</option>`;
+                        return;
+                    }
+                    const users = Array.isArray(data) ? data : [];
+                    if (users.length === 0) {
+                        userSelect.innerHTML = `<option value="">No users available for assignment</option>`;
+                        return;
+                    }
+                    userSelect.innerHTML = `<option value="">Select a user...</option>` + users.map((u) => {
+                        const email = (u.email || "N/A").replace(/</g, "<").replace(/>/g, ">");
+                        const currentDept = u.department || "Unassigned";
+                        return `<option value="${u.id}">${email} (${currentDept})</option>`;
+                    }).join("");
+                } catch (err) {
+                    userSelect.innerHTML = `<option value="">Error loading users</option>`;
+                    console.error(err);
+                }
+            }
+
+            async function renderAssistantUsers() {
+                if (!assistantListBody || !localSupabase) return;
+                try {
+                    const { data, error } = await localSupabase
+                        .from("users")
+                        .select("id, email, created_at")
+                        .eq("department", "Management Assistant")
+                        .order("created_at", { ascending: false });
+                    if (error) {
+                        assistantListBody.innerHTML = `<tr><td colspan="3"><div class="empty">Failed to load: ${error.message}</div></td></tr>`;
+                        return;
+                    }
+                    const assistants = Array.isArray(data) ? data : [];
+                    if (assistantCount) assistantCount.textContent = `${assistants.length} management assistant${assistants.length === 1 ? '' : 's'}`;
+                    if (assistants.length === 0) {
+                        assistantListBody.innerHTML = `<tr><td colspan="3"><div class="empty">No management assistants found.</div></td></tr>`;
+                        return;
+                    }
+                    assistantListBody.innerHTML = assistants.map((row) => {
+                        const email = (row.email || "N/A").replace(/</g, "<").replace(/>/g, ">");
+                        const created = row.created_at ? new Date(row.created_at).toLocaleString() : "";
+                        return `<tr><td>${email}</td><td>${created}</td><td><button type="button" class="delete-code-btn unban-btn" data-id="${row.id}">Remove</button></td></tr>`;
+                    }).join("");
+
+                    assistantListBody.querySelectorAll(".delete-code-btn").forEach((btn) => {
+                        btn.addEventListener("click", async () => {
+                            const id = btn.getAttribute("data-id");
+                            if (!confirm("Are you sure you want to remove this user from Management Assistant?")) return;
+                            const { error } = await localSupabase
+                                .from("users")
+                                .update({ department: "" })
+                                .eq("id", id);
+                            if (error) {
+                                alert("Failed to remove from Management Assistant: " + error.message);
+                                return;
+                            }
+                            renderAssistantUsers();
+                            loadAvailableUsers();
+                        });
+                    });
+                } catch (err) {
+                    assistantListBody.innerHTML = `<tr><td colspan="3"><div class="empty">An unexpected error occurred.</div></td></tr>`;
+                    console.error(err);
+                }
+            }
+
+            loadAvailableUsers();
+            renderAssistantUsers();
+
+            if (assignBtn && userSelect && localSupabase) {
+                assignBtn.addEventListener("click", async () => {
+                    const userId = userSelect.value;
+                    if (!userId) {
+                        alert("Please select a user.");
+                        return;
+                    }
+                    if (!confirm("Assign Management Assistant role to this user? They will gain limited administrative access.")) return;
+                    try {
+                        const { error } = await localSupabase
+                            .from("users")
+                            .update({ department: "Management Assistant" })
+                            .eq("id", userId);
+                        if (error) {
+                            alert("Failed to assign Management Assistant: " + error.message);
+                            return;
+                        }
+                        alert("Management Assistant role assigned successfully.");
+                        userSelect.value = "";
+                        loadAvailableUsers();
+                        renderAssistantUsers();
                     } catch (err) {
                         alert("An unexpected error occurred.");
                         console.error(err);
