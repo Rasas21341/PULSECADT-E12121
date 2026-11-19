@@ -2067,7 +2067,8 @@ const userDepartment = await getUserDepartment();
                                 created_at: s.created_at || new Date().toISOString()
                             }));
                             if (toInsert.length) {
-                                await localSupabase.from("development_tasks").insert(toInsert);
+                                const { error: insErr } = await localSupabase.from("development_tasks").insert(toInsert);
+                                if (insErr) { console.error("sync insert failed:", insErr); alert("Sync failed: " + insErr.message); }
                                 const { data: refreshed } = await localSupabase.from("development_tasks").select("*").order("created_at", { ascending: true });
                                 allTasks = Array.isArray(refreshed) ? refreshed : allTasks;
                             }
