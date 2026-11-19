@@ -2965,6 +2965,25 @@
                             <textarea id="citationNotes" placeholder="Any details..."></textarea>
                         </div>
                     </div>
+
+                    <div class="citation-row">
+                        <div class="citation-box single-line-box">
+                            <label>Officer Signature</label>
+                            <div class="signature-pad-wrap">
+                                <div class="signature-pad-toolbar">
+                                    <span>Draw signature below</span>
+                                    <div class="signature-pad-actions">
+                                        <button type="button" class="signature-pad-btn" id="citationSigClearBtn">Clear</button>
+                                    </div>
+                                </div>
+                                <canvas id="citationSignatureCanvas" class="signature-canvas" width="560" height="140"></canvas>
+                            </div>
+                            <div class="signature-type-row">
+                                <input type="text" id="citationSignatureTyped" placeholder="Or type a signature name..." />
+                                <button type="button" class="signature-pad-btn" id="citationSigUseTypedBtn">Use Typed</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="citation-actions">
@@ -4798,6 +4817,8 @@ civilianRecordsList.innerHTML = records.map((record) => {
                     citationCourtDate.value = defaultDate.toISOString().slice(0, 10);
                 }
                 if (citationNotes) citationNotes.value = "";
+                clearCitationSignature();
+                setupCitationSignaturePad();
                 if (citationError) { citationError.textContent = ""; citationError.style.display = "none"; }
                 if (citationSuccess) { citationSuccess.textContent = ""; citationSuccess.style.display = "none"; }
                 if (citationModal) citationModal.classList.add("open");
@@ -4907,6 +4928,83 @@ civilianRecordsList.innerHTML = records.map((record) => {
             return typed ? ("text:" + typed) : "";
         }
 
+        function setupCitationSignaturePad() {
+            const canvas = document.getElementById("citationSignatureCanvas");
+            if (!canvas || canvas.dataset.bound === "1") return;
+            canvas.dataset.bound = "1";
+            const ctx = canvas.getContext("2d");
+            if (!ctx) return;
+            const resize = () => {
+                const rect = canvas.getBoundingClientRect();
+                if (!rect.width) return;
+                const ratio = window.devicePixelRatio || 1;
+                const prev = canvas.toDataURL();
+                canvas.width = Math.max(1, Math.floor(rect.width * ratio));
+                canvas.height = Math.max(1, Math.floor(rect.height * ratio));
+                ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+                ctx.lineWidth = 2;
+                ctx.lineCap = "round";
+                ctx.lineJoin = "round";
+                ctx.strokeStyle = "#111827";
+                if (prev && prev !== "data:,") {
+                    const img = new Image();
+                    img.onload = () => ctx.drawImage(img, 0, 0, rect.width, rect.height);
+                    img.src = prev;
+                }
+            };
+            resize();
+            window.addEventListener("resize", resize);
+            let drawing = false;
+            let hasInk = false;
+            const pos = (e) => {
+                const r = canvas.getBoundingClientRect();
+                return { x: e.clientX - r.left, y: e.clientY - r.top };
+            };
+            canvas.addEventListener("pointerdown", (e) => {
+                drawing = true; hasInk = true;
+                canvas.setPointerCapture(e.pointerId);
+                const p = pos(e); ctx.beginPath(); ctx.moveTo(p.x, p.y);
+            });
+            canvas.addEventListener("pointermove", (e) => {
+                if (!drawing) return;
+                const p = pos(e); ctx.lineTo(p.x, p.y); ctx.stroke();
+            });
+            const stop = () => { drawing = false; };
+            canvas.addEventListener("pointerup", stop);
+            canvas.addEventListener("pointerleave", stop);
+            canvas.addEventListener("pointercancel", stop);
+            canvas._clear = () => {
+                hasInk = false;
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+            };
+            canvas._hasInk = () => hasInk;
+            canvas._getDataUrl = () => {
+                if (!hasInk) return "";
+                return canvas.toDataURL("image/png");
+            };
+        }
+
+        function clearCitationSignature() {
+            const canvas = document.getElementById("citationSignatureCanvas");
+            if (canvas && canvas._clear) canvas._clear();
+            else if (canvas) {
+                const ctx = canvas.getContext("2d");
+                if (ctx) ctx.clearRect(0, 0, canvas.width, canvas.height);
+            }
+            const typed = document.getElementById("citationSignatureTyped");
+            if (typed) typed.value = "";
+        }
+
+        function getCitationSignatureValue() {
+            const canvas = document.getElementById("citationSignatureCanvas");
+            if (canvas && canvas._getDataUrl) {
+                const drawn = canvas._getDataUrl();
+                if (drawn) return drawn;
+            }
+            const typed = document.getElementById("citationSignatureTyped")?.value.trim() || "";
+            return typed ? ("text:" + typed) : "";
+        }
+
         const warrantSigClearBtn = document.getElementById("warrantSigClearBtn");
         if (warrantSigClearBtn) warrantSigClearBtn.addEventListener("click", clearWarrantSignature);
         const warrantSigUseTypedBtn = document.getElementById("warrantSigUseTypedBtn");
@@ -4914,6 +5012,29 @@ civilianRecordsList.innerHTML = records.map((record) => {
             warrantSigUseTypedBtn.addEventListener("click", () => {
                 const typed = document.getElementById("warrantSignatureTyped")?.value.trim();
                 const canvas = document.getElementById("warrantSignatureCanvas");
+                if (!typed || !canvas) return;
+                const ctx = canvas.getContext("2d");
+                if (!ctx) return;
+                const rect = canvas.getBoundingClientRect();
+                const ratio = window.devicePixelRatio || 1;
+                ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+                ctx.clearRect(0, 0, rect.width, rect.height);
+                ctx.fillStyle = "#111827";
+                ctx.font = "italic 36px Georgia, 'Times New Roman', serif";
+                ctx.textBaseline = "middle";
+                ctx.fillText(typed, 12, rect.height / 2);
+                canvas._hasInk = () => true;
+                canvas._getDataUrl = () => canvas.toDataURL("image/png");
+            });
+        }
+
+        const citationSigClearBtn = document.getElementById("citationSigClearBtn");
+        if (citationSigClearBtn) citationSigClearBtn.addEventListener("click", clearCitationSignature);
+        const citationSigUseTypedBtn = document.getElementById("citationSigUseTypedBtn");
+        if (citationSigUseTypedBtn) {
+            citationSigUseTypedBtn.addEventListener("click", () => {
+                const typed = document.getElementById("citationSignatureTyped")?.value.trim();
+                const canvas = document.getElementById("citationSignatureCanvas");
                 if (!typed || !canvas) return;
                 const ctx = canvas.getContext("2d");
                 if (!ctx) return;
@@ -5186,6 +5307,7 @@ civilianRecordsList.innerHTML = records.map((record) => {
                 const vehiclePlate = document.getElementById("citationVehiclePlate")?.value.trim() || "";
                 const courtDate = document.getElementById("citationCourtDate")?.value.trim() || "";
                 const notes = document.getElementById("citationNotes")?.value.trim() || "";
+                const signature = getCitationSignatureValue();
                 const citationError = document.getElementById("citationError");
                 const citationSuccess = document.getElementById("citationSuccess");
 
@@ -5223,6 +5345,8 @@ civilianRecordsList.innerHTML = records.map((record) => {
                             vehicle_plate: vehiclePlate || null,
                             court_date: courtDate || null,
                             notes: notes || null,
+                            signature: signature || null,
+                            signature_data_url: signature || null,
                             created_at: new Date().toISOString()
                         }]);
 
