@@ -1992,14 +1992,22 @@ hasRostersPermission = (rolesData || []).some(r => {
                                 </div>
                                 <div class="departments-view" id="departmentsView">
                                     <div class="members-view-header">
-                                        <div class="members-view-title">Departments</div>
+                                        <div class="members-view-title">Departments &amp; Penal Codes</div>
                                         <button type="button" class="add-department-btn" id="openAddDepartmentBtn">
                                             <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                                             Add department
                                         </button>
+                                        <button type="button" class="add-department-btn" id="openAddPenalCodeFromDeptBtn" style="margin-left:8px;">
+                                            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                                            Add Penal Code
+                                        </button>
                                     </div>
                                     <div class="view-body">
                                         <div id="departmentsList"></div>
+                                        <div class="penal-codes-section" id="penalCodesSection">
+                                            <div class="members-view-title">Penal Codes</div>
+                                            <div id="penalCodesList"></div>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="documents-view" id="documentsView">
@@ -2221,6 +2229,7 @@ if (membersViewClose && membersView) {
                                 closeAllPages();
                                 departmentsView.classList.add("open");
                                 loadDepartments();
+                                loadPenalCodes();
                             });
                         }
                         if (departmentsView) {
@@ -4143,6 +4152,10 @@ async function addDocument(title, departments) {
                         const openAddPenalCodeBtn = document.getElementById("openAddPenalCodeBtn");
                         if (openAddPenalCodeBtn) {
                             openAddPenalCodeBtn.addEventListener("click", openNewPenalCodeModal);
+                        }
+                        const openAddPenalCodeFromDeptBtn = document.getElementById("openAddPenalCodeFromDeptBtn");
+                        if (openAddPenalCodeFromDeptBtn) {
+                            openAddPenalCodeFromDeptBtn.addEventListener("click", openNewPenalCodeModal);
                         }
 
                         if (newDocModalClose) {

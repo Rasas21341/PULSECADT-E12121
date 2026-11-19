@@ -808,7 +808,7 @@
                     const partnerToggleBtn = canPartner
                         ? `<button class="partner-server-btn" data-id="${row.id}" data-partner="${partner}" style="padding:4px 10px;border-radius:999px;font-size:11px;font-weight:700;cursor:pointer;border:1px solid #f59e0b;background:#fef3c7;color:#92400e;">${partner ? "Remove Partner" : "Give Partner"}</button>`
                         : "";
-                    html += `<tr><td style="font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12px;word-break:break-all;color:#64748b;">${(row.passcode || "-").replace(/</g,"&lt;").replace(/>/g,"&gt;")}</td><td>${name}</td><td>${owner}</td><td>${created}</td><td>${statusCell}</td><td>${membersOnlyCell}</td><td>${proCell}<br/>${proToggleBtn}</td><td>${partnerToggleBtn}</td><td><div style="display:flex;gap:8px;flex-wrap:wrap;">${suspendBtn} ${deleteBtn}</div></td></tr>`;
+                    html += `<tr><td style="font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12px;word-break:break-all;color:#64748b;">${String(row.passcode ?? "-").replace(/</g,"&lt;").replace(/>/g,"&gt;")}</td><td>${name}</td><td>${owner}</td><td>${created}</td><td>${statusCell}</td><td>${membersOnlyCell}</td><td>${proCell}<br/>${proToggleBtn}</td><td>${partnerToggleBtn}</td><td><div style="display:flex;gap:8px;flex-wrap:wrap;">${suspendBtn} ${deleteBtn}</div></td></tr>`;
                 });
                 html += "</table>";
                 contentEl.innerHTML = html;
