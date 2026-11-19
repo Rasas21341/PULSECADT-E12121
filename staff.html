@@ -1124,22 +1124,23 @@
             const dept = (await getUserDepartment() || "").trim();
             const lower = dept.toLowerCase();
             const isSupport = lower === "support team" || lower === "support team lead";
+            const isManagementAssistant = lower === "management assistant";
             if (applicationsBtn && isSupport) {
                 applicationsBtn.style.display = "none";
             }
-            if (codesBtn && (lower === "management" || isSupport)) {
+            if (codesBtn && (lower === "management" || isSupport || isManagementAssistant)) {
                 codesBtn.style.display = "block";
             }
-            if (supportPanelNavBtn && (lower === "management" || isSupport)) {
+            if (supportPanelNavBtn && (lower === "management" || isSupport || isManagementAssistant)) {
                 supportPanelNavBtn.style.display = "block";
             }
-            if (customerSupportLabel && (lower === "management" || isSupport)) {
+            if (customerSupportLabel && (lower === "management" || isSupport || isManagementAssistant)) {
                 customerSupportLabel.style.display = "block";
             }
-            if (suggestionsNavBtn && (lower === "management" || isSupport || lower === "development team")) {
+            if (suggestionsNavBtn && (lower === "management" || isSupport || lower === "development team" || isManagementAssistant)) {
                 suggestionsNavBtn.style.display = "block";
             }
-            if (developmentTeamLabel && (lower === "management" || isSupport || lower === "development team")) {
+            if (developmentTeamLabel && (lower === "management" || isSupport || lower === "development team" || isManagementAssistant)) {
                 developmentTeamLabel.style.display = "block";
             }
             if (masterActionsBtn && lower === "management") {
