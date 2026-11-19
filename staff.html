@@ -2052,26 +2052,22 @@ const userDepartment = await getUserDepartment();
                     if (error) { kanbanBoard.innerHTML = `<div class="empty">Failed to load tasks: ${error.message}</div>`; return; }
                     allTasks = Array.isArray(data) ? data : [];
 
-                    // Sync open suggestions into the board as todo tasks
+                    // Surface open suggestions as todo cards on the development board
                     try {
                         const { data: suggestions } = await localSupabase.from("suggestions").select("*").eq("status", "open");
                         if (Array.isArray(suggestions)) {
-                            const existingTitles = new Set(allTasks.map(t => (t.title || "").trim().toLowerCase()));
-                            const toInsert = suggestions.filter(s => !existingTitles.has((s.title || "").trim().toLowerCase())).map(s => ({
-                                title: s.title,
-                                description: s.message || "",
-                                status: "todo",
-                                priority: "medium",
-                                assigned_to: "Unassigned",
-                                created_by: s.author_name || s.email || "Anonymous",
-                                created_at: s.created_at || new Date().toISOString()
-                            }));
-                            if (toInsert.length) {
-                                const { error: insErr } = await localSupabase.from("development_tasks").insert(toInsert);
-                                if (insErr) { console.error("sync insert failed:", insErr); alert("Sync failed: " + insErr.message); }
-                                const { data: refreshed } = await localSupabase.from("development_tasks").select("*").order("created_at", { ascending: true });
-                                allTasks = Array.isArray(refreshed) ? refreshed : allTasks;
-                            }
+                            suggestions.forEach(s => {
+                                allTasks.push({
+                                    id: "sug-" + s.id,
+                                    title: s.title,
+                                    description: s.message || "",
+                                    status: "todo",
+                                    priority: "medium",
+                                    assigned_to: "Unassigned",
+                                    created_at: s.created_at,
+                                    isSuggestion: true
+                                });
+                            });
                         }
                     } catch (e) { console.error(e); }
                     
@@ -2097,7 +2093,7 @@ const userDepartment = await getUserDepartment();
                             if (e.target.closest(".kanban-btn")) return;
                             const taskId = card.getAttribute("data-task-id");
                             const task = allTasks.find(t => t.id === taskId);
-                            if (task) openModal(task);
+                            if (task && !task.isSuggestion) openModal(task);
                         });
                     });
 
@@ -2162,9 +2158,9 @@ const userDepartment = await getUserDepartment();
                             <span class="kanban-date">${created}</span>
                         </div>
                         <div class="kanban-actions">
-                            ${prevStatus ? `<button type="button" class="kanban-btn move" data-task-id="${task.id}" data-new-status="${prevStatus}">← Back</button>` : ""}
-                            ${nextStatus ? `<button type="button" class="kanban-btn move" data-task-id="${task.id}" data-new-status="${nextStatus}">Next →</button>` : ""}
-                            <button type="button" class="kanban-btn delete" data-task-id="${task.id}">Delete</button>
+                            ${task.isSuggestion ? "" : (prevStatus ? `<button type="button" class="kanban-btn move" data-task-id="${task.id}" data-new-status="${prevStatus}">← Back</button>` : "")}
+                            ${task.isSuggestion ? "" : (nextStatus ? `<button type="button" class="kanban-btn move" data-task-id="${task.id}" data-new-status="${nextStatus}">Next →</button>` : "")}
+                            ${task.isSuggestion ? "" : `<button type="button" class="kanban-btn delete" data-task-id="${task.id}">Delete</button>`}
                         </div>
                     </div>
                 `;
