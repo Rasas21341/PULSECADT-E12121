@@ -56,6 +56,15 @@
             background: #f1f5f9;
         }
 
+        .sidebar-section-label {
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: #64748b;
+            margin: 16px 12px 8px;
+        }
+
         .department-select {
             width: 100%;
             padding: 8px 12px;
@@ -486,6 +495,11 @@
             background: #b91c1c;
         }
 
+        .delete-code-btn.unban-btn {
+            padding: 2px 8px;
+            font-size: 10px;
+        }
+
         .give-key-btn {
             background: #16a34a;
             color: #ffffff;
@@ -619,10 +633,12 @@
         <button class="sidebar-btn" id="serversBtn">Servers</button>
         <button class="sidebar-btn" id="staffUsersBtn">Users</button>
         <button class="sidebar-btn" id="applicationsBtn">Applications</button>
+        <button class="sidebar-btn" id="masterActionsBtn" style="display:none;">Master Actions</button>
+        <div class="sidebar-section-label" id="customerSupportLabel" style="display:none;">Customer Support</div>
         <button class="sidebar-btn" id="codesBtn" style="display:none;">CODES</button>
         <button class="sidebar-btn" id="supportPanelNavBtn" style="display:none;">Support Panel</button>
+        <div class="sidebar-section-label" id="developmentTeamLabel" style="display:none;">Development Team</div>
         <button class="sidebar-btn" id="suggestionsNavBtn" style="display:none;">Suggestions</button>
-        <button class="sidebar-btn" id="masterActionsBtn" style="display:none;">Master Actions</button>
     </div>
     <div class="main">
         <div class="container">
@@ -643,6 +659,7 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="announcements.js"></script>
     <script>
         const SUPABASE_URL = "https://zwdogalwbczdtvxvhrfd.supabase.co";
         const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp3ZG9nYWx3YmN6ZHR2eHZocmZkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM2NTA2MjQsImV4cCI6MjA5OTIyNjYyNH0.baPVVTtW0d3FDC2pTd1P3d5aoIc2FZkaD-6bBvDPFWw";
@@ -657,6 +674,8 @@
         const supportPanelNavBtn = document.getElementById("supportPanelNavBtn");
         const suggestionsNavBtn = document.getElementById("suggestionsNavBtn");
         const masterActionsBtn = document.getElementById("masterActionsBtn");
+        const customerSupportLabel = document.getElementById("customerSupportLabel");
+        const developmentTeamLabel = document.getElementById("developmentTeamLabel");
 
         let localSupabase = null;
         try {
@@ -1106,8 +1125,14 @@
             if (supportPanelNavBtn && (lower === "management" || isSupport)) {
                 supportPanelNavBtn.style.display = "block";
             }
+            if (customerSupportLabel && (lower === "management" || isSupport)) {
+                customerSupportLabel.style.display = "block";
+            }
             if (suggestionsNavBtn && (lower === "management" || isSupport || lower === "development team")) {
                 suggestionsNavBtn.style.display = "block";
+            }
+            if (developmentTeamLabel && (lower === "management" || isSupport || lower === "development team")) {
+                developmentTeamLabel.style.display = "block";
             }
             if (masterActionsBtn && lower === "management") {
                 masterActionsBtn.style.display = "block";
@@ -1333,6 +1358,14 @@
             pageTitle.textContent = "Master Actions";
             contentEl.innerHTML = `
                 <div class="master-actions">
+                    <h2>Global Announcement</h2>
+                    <p>Send a message to everyone logged into PulseCAD. It disappears after 10 seconds.</p>
+                    <div class="premium-key-display">
+                        <input type="text" class="premium-key-input" id="announcementInput" placeholder="Announcement message..." maxlength="300" />
+                        <button type="button" class="verified-btn" id="sendAnnouncementBtn" style="background:#2563eb;">Send</button>
+                    </div>
+                </div>
+                <div class="master-actions" style="margin-top:20px;">
                     <h2>Master Actions</h2>
                     <p>Global controls for the PulseCAD website. Management only.</p>
                     <div class="master-row">
@@ -1440,6 +1473,33 @@
             if (openSuggestionFormBtn) {
                 openSuggestionFormBtn.addEventListener("click", () => {
                     window.open("/suggestionmake.html", "_blank");
+                });
+            }
+
+            const announcementInput = document.getElementById("announcementInput");
+            const sendAnnouncementBtn = document.getElementById("sendAnnouncementBtn");
+            if (sendAnnouncementBtn && announcementInput && localSupabase) {
+                sendAnnouncementBtn.addEventListener("click", async () => {
+                    const message = announcementInput.value.trim();
+                    if (!message) {
+                        alert("Please enter an announcement message.");
+                        return;
+                    }
+                    try {
+                        const { data: { user } } = await localSupabase.auth.getUser();
+                        const { error } = await localSupabase
+                            .from("announcements")
+                            .insert({ message: message, created_by: user ? user.email : null });
+                        if (error) {
+                            alert("Failed to send announcement: " + error.message);
+                            return;
+                        }
+                        announcementInput.value = "";
+                        alert("Announcement sent to all logged-in users.");
+                    } catch (err) {
+                        alert("An unexpected error occurred.");
+                        console.error(err);
+                    }
                 });
             }
         }
@@ -1573,54 +1633,67 @@
                     <p>Ban an email address to prevent them from logging into PulseCAD.</p>
                     <div class="premium-key-display">
                         <input type="email" class="premium-key-input" id="banEmailInput" placeholder="Enter email to ban..." />
+                        <input type="text" class="premium-key-input" id="banReasonInput" placeholder="Reason for ban..." />
                         <button type="button" class="verified-btn" id="banEmailBtn" style="background:#dc2626;">Ban Email</button>
                     </div>
+                    <label style="display:flex;align-items:center;gap:8px;margin-top:12px;font-size:14px;color:#1a202c;cursor:pointer;">
+                        <input type="checkbox" id="banDeleteServersInput" style="width:16px;height:16px;cursor:pointer;" />
+                        Also delete every server they own
+                    </label>
                 </div>
                 <div class="codes-list-section">
                     <h3>Banned Emails</h3>
                     <div class="codes-count" id="bannedCount"></div>
                     <table class="codes-list-table">
-                        <tr><th>Email</th><th>Banned At</th><th>Actions</th></tr>
-                        <tbody id="bannedListBody"><tr><td colspan="3"><div class="empty">Loading...</div></td></tr></tbody>
+                        <tr><th>Email</th><th>Reason</th><th>Banned By</th><th>Banned At</th><th>Actions</th></tr>
+                        <tbody id="bannedListBody"><tr><td colspan="5"><div class="empty">Loading...</div></td></tr></tbody>
                     </table>
                 </div>
             `;
 
             const banEmailInput = document.getElementById("banEmailInput");
+            const banReasonInput = document.getElementById("banReasonInput");
+            const banDeleteServersInput = document.getElementById("banDeleteServersInput");
             const banEmailBtn = document.getElementById("banEmailBtn");
             const bannedListBody = document.getElementById("bannedListBody");
             const bannedCount = document.getElementById("bannedCount");
+
+            function escapeHtml(value) {
+                return (value || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+            }
 
             async function renderBanned() {
                 if (!bannedListBody || !localSupabase) return;
                 try {
                     const { data, error } = await localSupabase
-                        .from("site_settings")
-                        .select("value")
-                        .eq("key", "banned_emails")
-                        .maybeSingle();
-                    let banned = [];
-                    if (data && Array.isArray(data.value)) {
-                        banned = data.value;
-                    }
-                    if (bannedCount) bannedCount.textContent = `${banned.length} banned email${banned.length === 1 ? '' : 's'}`;
-                    if (banned.length === 0) {
-                        bannedListBody.innerHTML = `<tr><td colspan="3"><div class="empty">No banned emails.</div></td></tr>`;
+                        .from("banned_emails")
+                        .select("id, email, reason, banned_by, banned_at")
+                        .order("banned_at", { ascending: false });
+                    if (error) {
+                        bannedListBody.innerHTML = `<tr><td colspan="5"><div class="empty">Failed to load banned emails: ${escapeHtml(error.message)}</div></td></tr>`;
                         return;
                     }
-                    bannedListBody.innerHTML = banned.map((item, index) => {
-                        const email = (item.email || "").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+                    const banned = Array.isArray(data) ? data : [];
+                    if (bannedCount) bannedCount.textContent = `${banned.length} banned email${banned.length === 1 ? '' : 's'}`;
+                    if (banned.length === 0) {
+                        bannedListBody.innerHTML = `<tr><td colspan="5"><div class="empty">No banned emails.</div></td></tr>`;
+                        return;
+                    }
+                    bannedListBody.innerHTML = banned.map((item) => {
+                        const email = escapeHtml(item.email);
+                        const reason = escapeHtml(item.reason) || `<span class="empty">—</span>`;
+                        const bannedBy = escapeHtml(item.banned_by) || "—";
                         const bannedAt = item.banned_at ? new Date(item.banned_at).toLocaleString() : "";
-                        return `<tr><td>${email}</td><td>${bannedAt}</td><td><button type="button" class="delete-code-btn" data-index="${index}">Unban</button></td></tr>`;
+                        return `<tr><td>${email}</td><td>${reason}</td><td>${bannedBy}</td><td>${bannedAt}</td><td><button type="button" class="delete-code-btn unban-btn" data-id="${item.id}">Unban</button></td></tr>`;
                     }).join("");
 
                     bannedListBody.querySelectorAll(".delete-code-btn").forEach((btn) => {
                         btn.addEventListener("click", async () => {
-                            const idx = parseInt(btn.getAttribute("data-index"), 10);
-                            const newBanned = banned.filter((_, i) => i !== idx);
+                            const id = btn.getAttribute("data-id");
                             const { error } = await localSupabase
-                                .from("site_settings")
-                                .upsert({ key: "banned_emails", value: newBanned }, { onConflict: "key" });
+                                .from("banned_emails")
+                                .delete()
+                                .eq("id", id);
                             if (error) {
                                 alert("Failed to unban: " + error.message);
                                 return;
@@ -1629,7 +1702,7 @@
                         });
                     });
                 } catch (err) {
-                    bannedListBody.innerHTML = `<tr><td colspan="3"><div class="empty">An unexpected error occurred.</div></td></tr>`;
+                    bannedListBody.innerHTML = `<tr><td colspan="5"><div class="empty">An unexpected error occurred.</div></td></tr>`;
                     console.error(err);
                 }
             }
@@ -1639,33 +1712,78 @@
             if (banEmailBtn && banEmailInput && localSupabase) {
                 banEmailBtn.addEventListener("click", async () => {
                     const email = banEmailInput.value.trim();
+                    const reason = banReasonInput ? banReasonInput.value.trim() : "";
                     if (!email) {
                         alert("Please enter an email to ban.");
                         return;
                     }
                     try {
-                        const { data, error } = await localSupabase
-                            .from("site_settings")
-                            .select("value")
-                            .eq("key", "banned_emails")
-                            .maybeSingle();
-                        let banned = [];
-                        if (data && Array.isArray(data.value)) {
-                            banned = data.value;
+                        const { data: { user } } = await localSupabase.auth.getUser();
+                        const { data: existingRows, error: checkError } = await localSupabase
+                            .from("banned_emails")
+                            .select("id, email");
+                        if (checkError) {
+                            alert("Failed to check banned emails: " + checkError.message);
+                            return;
                         }
-                        if (banned.some((item) => (item.email || "").toLowerCase() === email.toLowerCase())) {
+                        const alreadyBanned = (existingRows || []).some(
+                            (item) => (item.email || "").toLowerCase() === email.toLowerCase()
+                        );
+                        if (alreadyBanned) {
                             alert("This email is already banned.");
                             return;
                         }
-                        banned.push({ email: email, banned_at: new Date().toISOString() });
-                        const { error: updateError } = await localSupabase
-                            .from("site_settings")
-                            .upsert({ key: "banned_emails", value: banned }, { onConflict: "key" });
-                        if (updateError) {
-                            alert("Failed to ban email: " + updateError.message);
+                        const { error: insertError } = await localSupabase
+                            .from("banned_emails")
+                            .insert({
+                                email: email,
+                                reason: reason || null,
+                                banned_by: user ? user.email : null,
+                                banned_at: new Date().toISOString()
+                            });
+                        if (insertError) {
+                            alert("Failed to ban email: " + insertError.message);
                             return;
                         }
+
+                        const deleteServers = !!(banDeleteServersInput && banDeleteServersInput.checked);
+                        if (deleteServers) {
+                            const { data: allServers, error: serversError } = await localSupabase
+                                .from("communities")
+                                .select("id, name, creator_email");
+                            if (serversError) {
+                                alert("Email banned, but failed to look up owned servers: " + serversError.message);
+                            } else {
+                                const owned = (allServers || []).filter(
+                                    (row) => (row.creator_email || "").toLowerCase() === email.toLowerCase()
+                                );
+                                if (owned.length === 0) {
+                                    alert("Email banned. No servers were owned by this account.");
+                                } else {
+                                    const ids = owned.map((row) => row.id);
+                                    const { error: membershipError } = await localSupabase
+                                        .from("user_communities")
+                                        .delete()
+                                        .in("community_id", ids);
+                                    if (membershipError) {
+                                        console.error("Failed to remove community memberships:", membershipError);
+                                    }
+                                    const { error: deleteError } = await localSupabase
+                                        .from("communities")
+                                        .delete()
+                                        .in("id", ids);
+                                    if (deleteError) {
+                                        alert("Email banned, but failed to delete their servers: " + deleteError.message);
+                                    } else {
+                                        alert(`Email banned. Deleted ${ids.length} server${ids.length === 1 ? '' : 's'} they owned.`);
+                                    }
+                                }
+                            }
+                        }
+
                         banEmailInput.value = "";
+                        if (banReasonInput) banReasonInput.value = "";
+                        if (banDeleteServersInput) banDeleteServersInput.checked = false;
                         renderBanned();
                     } catch (err) {
                         alert("An unexpected error occurred.");

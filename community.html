@@ -1747,6 +1747,7 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="announcements.js"></script>
     <script>
         const SUPABASE_URL = "https://zwdogalwbczdtvxvhrfd.supabase.co";
         const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp3ZG9nYWx3YmN6ZHR2eHZocmZkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM2NTA2MjQsImV4cCI6MjA5OTIyNjYyNH0.baPVVTtW0d3FDC2pTd1P3d5aoIc2FZkaD-6bBvDPFWw";
@@ -1888,12 +1889,6 @@ hasRostersPermission = (rolesData || []).some(r => {
                                             Members
                                         </button>
                                         <div class="member-list" id="memberList"></div>
-                                    </div>
-                                    <div class="btn-dropdown-wrap">
-                                        <button type="button" class="vehicles-btn" id="vehiclesBtn">
-                                            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/></svg>
-                                            Vehicles
-                                        </button>
                                     </div>
 <div class="btn-dropdown-wrap">
                                         <button type="button" class="documents-btn" id="documentsBtn">
@@ -3078,7 +3073,7 @@ async function loadRosters() {
                                 const perms = ((r.permissions || "").split(",").map(p => p.trim()));
                                 const hasRosters = perms.includes("rosters");
                                 return `
-                                <div class="request-item" data-role-id="${r.id}">
+                                <div class="request-item" draggable="true" data-role-id="${r.id}">
                                     <span class="drag-handle" title="Drag to reorder">&#x2826;</span>
                                     <div>
                                         <strong>${(r.name || 'Role').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</strong>
