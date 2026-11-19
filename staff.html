@@ -1190,7 +1190,7 @@ const userDepartment = await getUserDepartment();
             if (developmentTeamLabel && (isManagementOrAssistant || isSupport || lower === "development team")) {
                 developmentTeamLabel.style.display = "block";
             }
-            if (developmentBoardBtn && lower === "development team") {
+            if (developmentBoardBtn && (lower === "development team" || lower === "management")) {
                 developmentBoardBtn.style.display = "block";
             }
             if (masterActionsBtn && isManagementOrAssistant) {
@@ -1694,8 +1694,9 @@ const userDepartment = await getUserDepartment();
         async function loadDevelopmentBoard() {
             const staff = await ensureStaff();
             if (!staff.allowed) return;
-            if ((staff.department || "").toLowerCase() !== "development team") {
-                showStatus("Access denied. Development Team only.", "error");
+            const dept = (staff.department || "").toLowerCase();
+            if (dept !== "development team" && dept !== "management") {
+                showStatus("Access denied. Development Team or Management only.", "error");
                 return;
             }
             pageTitle.textContent = "Development Board";
