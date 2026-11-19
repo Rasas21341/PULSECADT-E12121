@@ -720,7 +720,7 @@
                 }
                 const department = (data?.department || "").trim();
                 const normalized = department.toLowerCase().replace(/\s+/g, "");
-                const allowedDepts = ["management", "supportteam", "supportteamlead", "support"];
+                const allowedDepts = ["management", "managementassistant", "supportteam", "supportteamlead", "support"];
                 if (allowedDepts.includes(normalized)) {
                     return { allowed: true, department };
                 }
@@ -977,6 +977,7 @@
                     select.addEventListener("change", async () => {
                         const userDept = await getUserDepartment();
                         const isSupport = userDept === "Support Team" || userDept === "Support Team Lead";
+                        const isSupportLead = userDept === "Support Team Lead";
                         const currentDept = select.getAttribute("data-current-dept") || "";
                         const newDepartment = select.value;
                         if (isSupport) {
@@ -987,6 +988,11 @@
                             }
                             if (newDepartment === "Management") {
                                 alert("Access denied. Support cannot assign users to Management.");
+                                select.value = currentDept;
+                                return;
+                            }
+                            if (!isSupportLead && newDepartment === "Management Assistant") {
+                                alert("Access denied. Only Support Team Lead can assign Management Assistant.");
                                 select.value = currentDept;
                                 return;
                             }
