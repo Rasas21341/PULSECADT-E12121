@@ -3496,15 +3496,17 @@ if (loggedInScreen) loggedInScreen.classList.remove("open");
                 return localSupabase
                     .from("communities")
                     .insert([payload])
+                    .select()
+                    .single()
                     .then(({ data: insertData, error }) => {
                         if (error) {
                             alert("Failed to save community: " + error.message);
                             return null;
                         }
-                        if (Array.isArray(insertData) && insertData[0]) {
-                                addCommunityCard(name, insertData[0].description || "Community", false, insertData[0].id, true, !!insertData[0].verification_requested, !!insertData[0].suspended, !!insertData[0].members_only, insertData[0].banner, !!insertData[0].partner);
+                        if (insertData) {
+                            addCommunityCard(name, insertData.description || "Community", false, insertData.id, true, !!insertData.verification_requested, !!insertData.suspended, !!insertData.members_only, insertData.banner, !!insertData.partner);
                         }
-                        return insertData ? insertData[0] : null;
+                        return insertData;
                     })
                     .catch((err) => {
                         alert("Failed to save community: " + (err.message || err));
@@ -3720,7 +3722,52 @@ if (action === "leave") {
 
         if (createCommunityCenteredBtn) {
             createCommunityCenteredBtn.addEventListener("click", async () => {
+                if (!localSupabase) {
+                    alert("Service unavailable.");
+                    return;
+                }
+                if (createCommunityCenteredBtn.disabled) {
+                    alert("Redeem a key before creating a community.");
+                    return;
+                }
 
+                createCommunityCenteredBtn.disabled = true;
+                try {
+                    const { data: { user } } = await localSupabase.auth.getUser();
+                    if (!user) {
+                        alert("You must be logged in to create a community.");
+                        return;
+                    }
+
+                    if (await getUserRedeemedCount() < 1) {
+                        alert("Redeem a key before creating a community.");
+                        return;
+                    }
+
+                    const name = prompt("Enter a name for your community:");
+                    if (!name || !name.trim()) return;
+
+                    const description = prompt("Enter a description for your community (optional):");
+                    if (description === null) return;
+
+                    const community = await saveCommunity(name.trim(), description.trim(), "", false);
+                    if (!community) return;
+
+                    if (!await consumeRedeemedKey()) {
+                        alert("Your community was created, but your redeemed key could not be marked as used. Please contact support before creating another community.");
+                        return;
+                    }
+
+                    alert("Community created successfully!");
+                    loadCommunities();
+                    updatePremiumUI();
+                } catch (err) {
+                    console.error("Failed to create community:", err);
+                    alert("Failed to create community: " + (err.message || err));
+                } finally {
+                    createCommunityCenteredBtn.disabled = false;
+                    updatePremiumUI();
+                }
             });
         }
 
