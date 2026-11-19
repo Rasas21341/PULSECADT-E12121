@@ -1864,9 +1864,8 @@ hasRostersPermission = (rolesData || []).some(r => {
                         }
 
                         const isCreator = communityData && communityData.creator_email === currentEmail;
-                        const isManagement = (currentUserDepartment || "").trim() === "Management";
-                        const canEditSettings = isCreator || isManagement || hasRostersPermission;
-                        console.log("Access check:", { isCreator, isManagement, hasRostersPermission, canEditSettings, currentEmail, creator_email: communityData?.creator_email });
+                        const canEditSettings = isCreator || hasRostersPermission;
+                        console.log("Access check:", { isCreator, hasRostersPermission, canEditSettings, currentEmail, creator_email: communityData?.creator_email });
                         if (!communityData || !canEditSettings) {
                             contentEl.innerHTML = `<div class="empty">Access denied.</div>`;
                             return;
