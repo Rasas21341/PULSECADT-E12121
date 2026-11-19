@@ -3133,7 +3133,7 @@ if (dropdownLogoutBtn) {
                         for (const row of data) {
                             const isCreator = row.creator_email === userEmail;
                             const joined = isCreator || joinedIds.has(row.id);
-                            if (!isCreator && !joined && !isManagement) continue;
+                            if (!isCreator && !joined) continue;
                             addCommunityCard(row.name, row.description || "Community", joined, row.id, isCreator, !!row.verification_requested, !!row.suspended, !!row.members_only, row.banner, !!row.partner, isManagement);
                         }
                     }
