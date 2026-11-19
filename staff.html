@@ -1232,7 +1232,8 @@
         async function loadCodes() {
             const staff = await ensureStaff();
             if (!staff.allowed) return;
-            if (staff.department !== "Management" && staff.department !== "Support Team") {
+            const dept = (staff.department || "").toLowerCase();
+            if (dept !== "management" && dept !== "support team" && dept !== "management assistant") {
                 showStatus("Access denied.", "error");
                 return;
             }
@@ -1673,8 +1674,8 @@
             const staff = await ensureStaff();
             if (!staff.allowed) return;
             const dept = (staff.department || "").toLowerCase();
-            if (dept !== "management" && dept !== "support team" && dept !== "support team lead" && dept !== "development team") {
-                showStatus("Access denied. Management, Support, or Development only.", "error");
+            if (dept !== "management" && dept !== "support team" && dept !== "support team lead" && dept !== "development team" && dept !== "management assistant") {
+                showStatus("Access denied. Management, Support, Development, or Management Assistant only.", "error");
                 return;
             }
             pageTitle.textContent = "Suggestions";
