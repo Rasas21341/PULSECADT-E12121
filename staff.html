@@ -634,7 +634,6 @@
         <button class="sidebar-btn" id="staffUsersBtn">Users</button>
         <button class="sidebar-btn" id="applicationsBtn">Applications</button>
         <button class="sidebar-btn" id="masterActionsBtn" style="display:none;">Master Actions</button>
-        <button class="sidebar-btn" id="managementAssistantBtn" style="display:none;">Management Assistant</button>
         <div class="sidebar-section-label" id="customerSupportLabel" style="display:none;">Customer Support</div>
         <button class="sidebar-btn" id="codesBtn" style="display:none;">CODES</button>
         <button class="sidebar-btn" id="supportPanelNavBtn" style="display:none;">Support Panel</button>
@@ -675,7 +674,6 @@
         const supportPanelNavBtn = document.getElementById("supportPanelNavBtn");
         const suggestionsNavBtn = document.getElementById("suggestionsNavBtn");
         const masterActionsBtn = document.getElementById("masterActionsBtn");
-        const managementAssistantBtn = document.getElementById("managementAssistantBtn");
         const customerSupportLabel = document.getElementById("customerSupportLabel");
         const developmentTeamLabel = document.getElementById("developmentTeamLabel");
 
@@ -1125,29 +1123,27 @@
             const lower = dept.toLowerCase();
             const isSupport = lower === "support team" || lower === "support team lead";
             const isManagementAssistant = lower === "management assistant";
+            const isManagementOrAssistant = lower === "management" || isManagementAssistant;
             if (applicationsBtn && isSupport) {
                 applicationsBtn.style.display = "none";
             }
-            if (codesBtn && (lower === "management" || isSupport || isManagementAssistant)) {
+            if (codesBtn && (isManagementOrAssistant || isSupport)) {
                 codesBtn.style.display = "block";
             }
-            if (supportPanelNavBtn && (lower === "management" || isSupport || isManagementAssistant)) {
+            if (supportPanelNavBtn && (isManagementOrAssistant || isSupport)) {
                 supportPanelNavBtn.style.display = "block";
             }
-            if (customerSupportLabel && (lower === "management" || isSupport || isManagementAssistant)) {
+            if (customerSupportLabel && (isManagementOrAssistant || isSupport)) {
                 customerSupportLabel.style.display = "block";
             }
-            if (suggestionsNavBtn && (lower === "management" || isSupport || lower === "development team" || isManagementAssistant)) {
+            if (suggestionsNavBtn && (isManagementOrAssistant || isSupport || lower === "development team")) {
                 suggestionsNavBtn.style.display = "block";
             }
-            if (developmentTeamLabel && (lower === "management" || isSupport || lower === "development team" || isManagementAssistant)) {
+            if (developmentTeamLabel && (isManagementOrAssistant || isSupport || lower === "development team")) {
                 developmentTeamLabel.style.display = "block";
             }
-            if (masterActionsBtn && lower === "management") {
+            if (masterActionsBtn && isManagementOrAssistant) {
                 masterActionsBtn.style.display = "block";
-            }
-            if (managementAssistantBtn && lower === "management") {
-                managementAssistantBtn.style.display = "block";
             }
         }
 
@@ -1165,10 +1161,6 @@
 
         if (masterActionsBtn) {
             masterActionsBtn.addEventListener("click", loadMasterActions);
-        }
-
-        if (managementAssistantBtn) {
-            managementAssistantBtn.addEventListener("click", loadManagementAssistant);
         }
 
         if (codesBtn) {
@@ -1368,7 +1360,9 @@
             const staff = await ensureStaff();
             if (!staff.allowed) return;
             const deptLower = (staff.department || "").toLowerCase();
-            if (deptLower !== "management") {
+            const isManagement = deptLower === "management";
+            const isManagementAssistant = deptLower === "management assistant";
+            if (!isManagement && !isManagementAssistant) {
                 showStatus("Access denied. Management only.", "error");
                 return;
             }
@@ -1384,7 +1378,7 @@
                 </div>
                 <div class="master-actions" style="margin-top:20px;">
                     <h2>Master Actions</h2>
-                    <p>Global controls for the PulseCAD website. Management only.</p>
+                    <p>Global controls for the PulseCAD website.</p>
                     <div class="master-row">
                         <div>
                             <div class="master-row-label">Development Mode</div>
@@ -1395,6 +1389,7 @@
                             <span class="slider"></span>
                         </label>
                     </div>
+                    ${isManagement ? `
                     <div class="master-row">
                         <div>
                             <div class="master-row-label">Restart Servers</div>
@@ -1402,10 +1397,12 @@
                         </div>
                         <button type="button" class="verified-btn" id="restartServersBtn">Restart</button>
                     </div>
+                    ` : ''}
                 </div>
                 <div class="master-actions" style="margin-top:20px;">
                     <h2>Management</h2>
                     <p>Ban and unban user emails from accessing PulseCAD.</p>
+                    ${isManagement ? `
                     <div class="master-row">
                         <div>
                             <div class="master-row-label">Banned IDs</div>
@@ -1413,6 +1410,7 @@
                         </div>
                         <button type="button" class="verified-btn" id="bannedIdsBtn" style="background:#dc2626;">Banned IDs</button>
                     </div>
+                    ` : ''}
                     <div class="master-row">
                         <div>
                             <div class="master-row-label">Support Panel</div>
@@ -1504,9 +1502,11 @@
                     }
                     try {
                         const { data: { user } } = await localSupabase.auth.getUser();
+                        const senderEmail = user ? user.email : "Management";
+                        const fullMessage = `[${senderEmail}] ${message}`;
                         const { error } = await localSupabase
                             .from("announcements")
-                            .insert({ message: message, created_by: user ? user.email : null });
+                            .insert({ message: fullMessage, created_by: senderEmail });
                         if (error) {
                             alert("Failed to send announcement: " + error.message);
                             return;
