@@ -984,8 +984,27 @@ const userDepartment = await getUserDepartment();
                         const isSupport = userDept === "Support Team" || userDept === "Support Team Lead";
                         const isSupportLead = userDept === "Support Team Lead";
                         const isManagementAssistant = userDept === "Management Assistant";
+                        const isManagement = userDept === "Management";
                         const currentDept = select.getAttribute("data-current-dept") || "";
                         const newDepartment = select.value;
+                        const userId = select.getAttribute("data-user-id");
+
+                        // Get current user's ID to prevent self-modification
+                        let currentUserId = null;
+                        if (localSupabase) {
+                            try {
+                                const { data: { user } } = await localSupabase.auth.getUser();
+                                currentUserId = user?.id || null;
+                            } catch (err) { /* ignore */ }
+                        }
+
+                        // Prevent changing own rank
+                        if (currentUserId && currentUserId === userId) {
+                            alert("You cannot change your own rank.");
+                            select.value = currentDept;
+                            return;
+                        }
+
                         if (isSupport) {
                             if (currentDept === "Management") {
                                 alert("Access denied. Support cannot remove users from Management.");
@@ -1015,7 +1034,14 @@ const userDepartment = await getUserDepartment();
                                 return;
                             }
                         }
-                        const userId = select.getAttribute("data-user-id");
+                        if (isManagement) {
+                            // Management can see Management in dropdown but cannot assign it to others
+                            if (newDepartment === "Management") {
+                                alert("Access denied. Cannot assign Management role through this panel.");
+                                select.value = currentDept;
+                                return;
+                            }
+                        }
                         const { error } = await localSupabase
                             .from("users")
                             .update({ department: newDepartment })
