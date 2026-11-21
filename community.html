@@ -4835,6 +4835,7 @@ async function addDocument(title, departments) {
                     document.body.classList.add("mdt-mode");
 let displayName = "Officer";
                      let mdtUserId = null;
+                     let savedDept = null;
                      try {
 const { data: authData } = await localSupabase.auth.getUser();
                          mdtUserId = authData?.user?.id || null;
@@ -4842,14 +4843,13 @@ const { data: authData } = await localSupabase.auth.getUser();
                              || authData?.user?.user_metadata?.name
                              || authData?.user?.email
                              || "Officer";
-                         // load saved department
-                         let savedDept = null;
-                         if (mdtUserId) {
-                             try {
-                                 const { data: u } = await localSupabase.from("users").select("department").eq("id", mdtUserId).maybeSingle();
-                                 savedDept = u?.department || null;
-                             } catch (e) {}
-                         }
+                          // load saved department
+                          if (mdtUserId) {
+                              try {
+                                  const { data: u } = await localSupabase.from("users").select("department").eq("id", mdtUserId).maybeSingle();
+                                  savedDept = u?.department || null;
+                              } catch (e) {}
+                          }
                     } catch (e) {}
 
                     contentEl.innerHTML = `
