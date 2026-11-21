@@ -3487,15 +3487,26 @@ if (loggedInScreen) loggedInScreen.classList.remove("open");
             return code;
         }
 
+        function generateJoinCode() {
+            const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+            let code = "";
+            for (let i = 0; i < 8; i++) {
+                code += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return code;
+        }
+
         function saveCommunity(name, meta, passcode, membersOnly) {
             if (!localSupabase) return Promise.resolve(null);
             return localSupabase.auth.getUser().then(({ data }) => {
+                const joinCode = generateJoinCode();
                 const payload = {
                     user_id: data?.user?.id,
                     creator_email: data?.user?.email || "",
                     name,
                     description: meta || "",
                     verification_requested: false,
+                    join_code: joinCode
                 };
                 if (passcode && passcode.trim()) payload.passcode = passcode.trim();
                 if (membersOnly) payload.members_only = true;
