@@ -2139,6 +2139,15 @@
             return null;
         }
 
+        function generateJoinCode() {
+            const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+            let code = "";
+            for (let i = 0; i < 8; i++) {
+                code += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return code;
+        }
+
         async function loadCommunity() {
             try {
                 const id = getCommunityIdFromUrl();
@@ -2684,6 +2693,50 @@ if (membersViewClose && membersView) {
                                         .eq("id", id);
                                 } catch (err) {
                                     alert("Failed to save community passcode: " + (err.message || err));
+                                }
+                            });
+                        }
+
+                        // Join Code handlers
+                        const joinCodeInput = document.getElementById("joinCodeInput");
+                        const copyJoinCodeBtn = document.getElementById("copyJoinCodeBtn");
+                        const regenerateJoinCodeBtn = document.getElementById("regenerateJoinCodeBtn");
+
+                        if (copyJoinCodeBtn && joinCodeInput) {
+                            copyJoinCodeBtn.addEventListener("click", () => {
+                                navigator.clipboard.writeText(joinCodeInput.value).then(() => {
+                                    copyJoinCodeBtn.textContent = "Copied!";
+                                    setTimeout(() => copyJoinCodeBtn.textContent = "Copy", 2000);
+                                }).catch(() => {
+                                    alert("Failed to copy. Please select and copy manually.");
+                                });
+                            });
+                        }
+
+                        if (regenerateJoinCodeBtn) {
+                            regenerateJoinCodeBtn.addEventListener("click", async () => {
+                                if (!confirm("Generate a new join code? The old code will stop working.")) return;
+                                const newCode = generateJoinCode();
+                                try {
+                                    const { data: existing, error: checkError } = await localSupabase
+                                        .from("communities")
+                                        .select("id")
+                                        .eq("join_code", newCode)
+                                        .neq("id", id);
+                                    if (checkError) throw checkError;
+                                    if (existing && existing.length > 0) {
+                                        alert("Code collision, please try again.");
+                                        return;
+                                    }
+                                    const { error } = await localSupabase
+                                        .from("communities")
+                                        .update({ join_code: newCode })
+                                        .eq("id", id);
+                                    if (error) throw error;
+                                    if (joinCodeInput) joinCodeInput.value = newCode;
+                                    alert("New join code generated!");
+                                } catch (err) {
+                                    alert("Failed to regenerate join code: " + (err.message || err));
                                 }
                             });
                         }
