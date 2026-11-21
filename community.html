@@ -1153,6 +1153,42 @@
             color: #ef4444;
         }
 
+        .application-actions {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        .application-action-btn {
+            padding: 6px 12px;
+            border-radius: 6px;
+            border: 1px solid #cbd5e1;
+            background: #ffffff;
+            color: #0f172a;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .application-action-btn:hover {
+            background: #f8fafc;
+            border-color: #94a3b8;
+        }
+        .application-action-btn.open:hover {
+            background: #eff6ff;
+            border-color: #2563eb;
+            color: #2563eb;
+        }
+        .application-action-btn.edit:hover {
+            background: #f0fdf4;
+            border-color: #22c55e;
+            color: #166534;
+        }
+        .application-action-btn.delete:hover {
+            background: #fef2f2;
+            border-color: #ef4444;
+            color: #ef4444;
+        }
+
         .penal-codes-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
@@ -4668,10 +4704,15 @@ async function addDocument(title, departments) {
 
                         async function loadApplications() {
                             if (!applicationsList || !localSupabase) return;
+                            if (!currentCommunityId) {
+                                applicationsList.innerHTML = '<div class="empty">No community selected.</div>';
+                                return;
+                            }
                             try {
                                 const { data, error } = await localSupabase
                                     .from("applications")
                                     .select("*")
+                                    .eq("community_id", currentCommunityId)
                                     .order("created_at", { ascending: false });
                                 if (error) {
                                     applicationsList.innerHTML = '<div class="empty">Failed to load applications.</div>';
@@ -4692,10 +4733,10 @@ let html = '<div class="members-view-list">';
                                                 ${name ? `<div class="members-item-name">${name}</div>` : `<div class="members-item-name">Unnamed</div>`}
                                                 <div style="font-size:12px; color:#64748b; margin-top:2px;">${esc(created)}</div>
                                             </div>
-                                            <div style="display:flex; gap:6px;">
-                                                <button type="button" class="btn sm" data-action="open-application" data-application-id="${esc(row.id)}">Open</button>
-                                                <button type="button" class="btn sm" data-action="edit-application" data-application-id="${esc(row.id)}">Edit</button>
-                                                <button type="button" class="btn sm" data-action="delete-application" data-application-id="${esc(row.id)}" style="background:#fee2e2; color:#b91c1c; border-color:#fecaca;">Delete</button>
+                                            <div class="application-actions">
+                                                <button type="button" class="application-action-btn open" data-action="open-application" data-application-id="${esc(row.id)}">Open</button>
+                                                <button type="button" class="application-action-btn edit" data-action="edit-application" data-application-id="${esc(row.id)}">Edit</button>
+                                                <button type="button" class="application-action-btn delete" data-action="delete-application" data-application-id="${esc(row.id)}">Delete</button>
                                             </div>
                                         </div>
                                     </div>`;
@@ -4747,6 +4788,22 @@ let html = '<div class="members-view-list">';
                         const editAppSubmitBtn = document.getElementById("editAppSubmitBtn");
                         const editAppModalClose = document.getElementById("editAppModalClose");
                         const editAppError = document.getElementById("editAppError");
+                        const questionsList = document.getElementById("questionsList");
+                        const addQuestionBtn = document.getElementById("addQuestionBtn");
+
+                        // Question Modal elements
+                        const questionModal = document.getElementById("questionModal");
+                        const questionModalTitle = document.getElementById("questionModalTitle");
+                        const questionId = document.getElementById("questionId");
+                        const questionApplicationId = document.getElementById("questionApplicationId");
+                        const questionText = document.getElementById("questionText");
+                        const questionType = document.getElementById("questionType");
+                        const questionOptionsField = document.getElementById("questionOptionsField");
+                        const questionOptions = document.getElementById("questionOptions");
+                        const questionRequired = document.getElementById("questionRequired");
+                        const questionSubmitBtn = document.getElementById("questionSubmitBtn");
+                        const questionModalClose = document.getElementById("questionModalClose");
+                        const questionError = document.getElementById("questionError");
 
                         function openEditApplicationModal(applicationId) {
                             if (!editApplicationModal || !localSupabase) return;
@@ -4765,6 +4822,7 @@ let html = '<div class="members-view-list">';
                                     if (editAppName) editAppName.value = data.name || "";
                                     if (editAppError) { editAppError.textContent = ""; editAppError.style.display = "none"; }
                                     editApplicationModal.classList.add("open");
+                                    loadQuestions(applicationId);
                                 });
                         }
 
@@ -4804,6 +4862,202 @@ let html = '<div class="members-view-list">';
                                 closeEditApplicationModal();
                             } catch (err) {
                                 alert("Failed to update application.");
+                                console.error(err);
+                            }
+                        }
+
+                        // Question management
+                        async function loadQuestions(applicationId) {
+                            if (!questionsList || !localSupabase) return;
+                            try {
+                                const { data, error } = await localSupabase
+                                    .from("application_questions")
+                                    .select("*")
+                                    .eq("application_id", applicationId)
+                                    .order("display_order", { ascending: true });
+                                if (error) throw error;
+
+                                const esc = (v) => (v == null ? "" : String(v).replace(/</g, "<").replace(/>/g, ">"));
+                                if (!Array.isArray(data) || data.length === 0) {
+                                    questionsList.innerHTML = '<div style="color:#94a3b8; font-size:13px; padding:16px; text-align:center;">No questions yet. Click "Add Question" to create one.</div>';
+                                    return;
+                                }
+
+                                questionsList.innerHTML = data.map((q) => {
+                                    const typeLabel = {
+                                        text: "Short Text",
+                                        textarea: "Long Text",
+                                        select: "Dropdown",
+                                        radio: "Radio Buttons",
+                                        checkbox: "Checkboxes",
+                                        number: "Number",
+                                        email: "Email"
+                                    }[q.question_type] || q.question_type;
+                                    const optionsHtml = q.options && Array.isArray(q.options) ? q.options.join(", ") : "";
+                                    return `
+                                        <div class="question-item" style="display:flex; align-items:center; justify-content:space-between; gap:10px; padding:12px; border:1px solid #e2e8f0; border-radius:8px; margin-bottom:8px; background:#fff;">
+                                            <div style="flex:1; min-width:0;">
+                                                <div style="font-weight:600; color:#0f172a;">${esc(q.question_text)}</div>
+                                                <div style="font-size:12px; color:#64748b; margin-top:2px;">
+                                                    <span class="badge" style="background:#e2e8f0; color:#334155; padding:2px 8px; border-radius:999px; font-size:11px; font-weight:600;">${typeLabel}</span>
+                                                    ${q.required ? '<span class="badge" style="background:#fef3c7; color:#92400e; padding:2px 8px; border-radius:999px; font-size:11px; font-weight:600; margin-left:6px;">Required</span>' : ''}
+                                                    ${optionsHtml ? `<div style="margin-top:4px; font-size:11px; color:#94a3b8;">Options: ${esc(optionsHtml)}</div>` : ''}
+                                                </div>
+                                            </div>
+                                            <div class="application-actions">
+                                                <button type="button" class="application-action-btn edit" data-action="edit-question" data-question-id="${esc(q.id)}">Edit</button>
+                                                <button type="button" class="application-action-btn delete" data-action="delete-question" data-question-id="${esc(q.id)}">Delete</button>
+                                            </div>
+                                        </div>
+                                    `;
+                                }).join("");
+
+                                // Attach event listeners
+                                questionsList.querySelectorAll("[data-action='edit-question']").forEach((btn) => {
+                                    btn.addEventListener("click", (e) => {
+                                        const questionId = e.target.closest("[data-question-id]")?.getAttribute("data-question-id");
+                                        if (questionId) openQuestionModal(questionId, "edit");
+                                    });
+                                });
+                                questionsList.querySelectorAll("[data-action='delete-question']").forEach((btn) => {
+                                    btn.addEventListener("click", async (e) => {
+                                        const questionId = e.target.closest("[data-question-id]")?.getAttribute("data-question-id");
+                                        if (questionId && confirm("Delete this question?")) {
+                                            await deleteQuestion(questionId);
+                                        }
+                                    });
+                                });
+                            } catch (err) {
+                                console.error("Failed to load questions:", err);
+                                questionsList.innerHTML = '<div style="color:#ef4444; font-size:13px; padding:16px; text-align:center;">Failed to load questions.</div>';
+                            }
+                        }
+
+                        // Question Modal handlers
+                        function openQuestionModal(questionId = null, mode = "add") {
+                            if (!questionModal) return;
+                            if (questionId) {
+                                questionId.value = questionId;
+                                questionModalTitle.textContent = "Edit Question";
+                            } else {
+                                questionId.value = "";
+                                questionModalTitle.textContent = "Add Question";
+                            }
+                            if (questionApplicationId) questionApplicationId.value = editAppId.value;
+                            if (questionText) questionText.value = "";
+                            if (questionType) questionType.value = "text";
+                            if (questionOptions) questionOptions.value = "";
+                            if (questionRequired) questionRequired.checked = true;
+                            if (questionError) { questionError.textContent = ""; questionError.style.display = "none"; }
+                            toggleOptionsField();
+                            questionModal.classList.add("open");
+                            // Load existing data if editing
+                            if (mode === "edit" && questionId.value && localSupabase) {
+                                localSupabase
+                                    .from("application_questions")
+                                    .select("*")
+                                    .eq("id", questionId.value)
+                                    .single()
+                                    .then(({ data, error }) => {
+                                        if (!error && data) {
+                                            questionText.value = data.question_text || "";
+                                            questionType.value = data.question_type || "text";
+                                            questionRequired.checked = data.required !== false;
+                                            questionOptions.value = Array.isArray(data.options) ? data.options.join(", ") : "";
+                                            toggleOptionsField();
+                                        }
+                                    });
+                            }
+                        }
+
+                        function closeQuestionModal() {
+                            if (questionModal) questionModal.classList.remove("open");
+                            if (questionId) questionId.value = "";
+                        }
+
+                        function toggleOptionsField() {
+                            const type = questionType?.value;
+                            const showOptions = ["select", "radio", "checkbox"].includes(type);
+                            if (questionOptionsField) questionOptionsField.style.display = showOptions ? "block" : "none";
+                        }
+
+                        if (questionType) {
+                            questionType.addEventListener("change", toggleOptionsField);
+                        }
+                        if (questionModalClose) {
+                            questionModalClose.addEventListener("click", closeQuestionModal);
+                        }
+                        if (questionModal) {
+                            questionModal.addEventListener("click", (e) => {
+                                if (e.target === questionModal) closeQuestionModal();
+                            });
+                        }
+                        if (questionSubmitBtn) {
+                            questionSubmitBtn.onclick = async () => {
+                                const qId = questionId?.value;
+                                const appId = questionApplicationId?.value;
+                                const text = questionText?.value?.trim();
+                                const type = questionType?.value || "text";
+                                const required = questionRequired?.checked !== false;
+                                const optionsStr = questionOptions?.value?.trim() || "";
+                                const options = optionsStr ? optionsStr.split(",").map((o) => o.trim()).filter(Boolean) : null;
+
+                                if (!text) {
+                                    if (questionError) { questionError.textContent = "Question text is required."; questionError.style.display = "block"; }
+                                    return;
+                                }
+                                if (["select", "radio", "checkbox"].includes(type) && (!options || options.length === 0)) {
+                                    if (questionError) { questionError.textContent = "Options are required for this question type."; questionError.style.display = "block"; }
+                                    return;
+                                }
+
+                                await saveQuestion(qId, appId, text, type, required, options);
+                            };
+                        }
+
+                        if (addQuestionBtn) {
+                            addQuestionBtn.addEventListener("click", () => openQuestionModal(null, "add"));
+                        }
+
+                        async function saveQuestion(questionId, applicationId, questionText, questionType, required, options) {
+                            if (!localSupabase || !applicationId) return;
+                            try {
+                                const payload = {
+                                    application_id: applicationId,
+                                    question_text: questionText,
+                                    question_type: questionType,
+                                    required: required,
+                                    options: options
+                                };
+                                if (questionId) {
+                                    await localSupabase.from("application_questions").update(payload).eq("id", questionId);
+                                } else {
+                                    // Get max display_order
+                                    const { data: existing } = await localSupabase
+                                        .from("application_questions")
+                                        .select("display_order")
+                                        .eq("application_id", applicationId)
+                                        .order("display_order", { ascending: false })
+                                        .limit(1);
+                                    payload.display_order = (existing?.[0]?.display_order ?? -1) + 1;
+                                    await localSupabase.from("application_questions").insert([payload]);
+                                }
+                                closeQuestionModal();
+                                loadQuestions(applicationId);
+                            } catch (err) {
+                                alert("Failed to save question: " + (err.message || err));
+                                console.error(err);
+                            }
+                        }
+
+                        async function deleteQuestion(questionId) {
+                            if (!localSupabase) return;
+                            const applicationId = editAppId?.value;
+                            try {
+                                await localSupabase.from("application_questions").delete().eq("id", questionId);
+                                if (applicationId) loadQuestions(applicationId);
+                            } catch (err) {
+                                alert("Failed to delete question.");
                                 console.error(err);
                             }
                         }
