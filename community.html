@@ -4917,10 +4917,8 @@ async function addDocument(title, departments) {
 document.getElementById("mdtJoinDeptBtn")?.addEventListener("click", async () => {
                           const code = prompt("Enter department join code:");
                           if (!code) return;
-                          // Validate code against departments
                           const matched = (Array.isArray(departments) ? departments : []).find((d) => String(d.join_code || d.passcode || "").trim() === code.trim());
-                          if (!matched) { alert("Invalid join code"); return; }
-                          if (currentUserId && localSupabase) {
+                          if (matched && currentUserId && localSupabase) {
                               try {
                                   await localSupabase.from("users").update({ department: matched.name || matched.id }).eq("id", currentUserId);
                                   currentUserDepartment = matched.name || matched.id;
