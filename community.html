@@ -4923,6 +4923,11 @@ document.getElementById("mdtJoinDeptBtn")?.addEventListener("click", async () =>
                           if (matched && mdtUserId && localSupabase) {
                               try {
                                   await localSupabase.from("users").update({ department: matched.name || matched.id }).eq("id", mdtUserId);
+                                  // ensure membership in community
+                                  const { data: existing } = await localSupabase.from("user_communities").select("id").eq("user_id", mdtUserId).eq("community_id", id).maybeSingle();
+                                  if (!existing) {
+                                      await localSupabase.from("user_communities").insert([{ user_id: mdtUserId, community_id: id, joined_at: new Date().toISOString() }]);
+                                  }
                                   currentUserDepartment = matched.name || matched.id;
                               } catch (e) { console.error(e); }
                           }
