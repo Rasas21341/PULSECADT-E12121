@@ -317,6 +317,200 @@
             min-height: 100vh;
         }
 
+        body.mdt-mode {
+            min-height: 100vh;
+            padding: 24px;
+            background:
+                radial-gradient(circle at 50% -20%, rgba(93, 61, 201, 0.32), transparent 38rem),
+                #080d18;
+            color: #dce5f8;
+        }
+
+        body.mdt-mode .container {
+            max-width: 1180px;
+        }
+
+        .mdt-shell {
+            min-height: calc(100vh - 48px);
+        }
+
+        .mdt-topbar {
+            height: 58px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid rgba(129, 146, 190, 0.15);
+            margin-bottom: 22px;
+        }
+
+        .mdt-brand,
+        .mdt-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #eef3ff;
+            font-weight: 800;
+        }
+
+        .mdt-brand-mark {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: grid;
+            place-items: center;
+            background: linear-gradient(135deg, #8b5cf6, #4f46e5);
+            box-shadow: 0 8px 24px rgba(99, 102, 241, 0.25);
+        }
+
+        .mdt-online {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            color: #94a3b8;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .mdt-online::before {
+            content: "";
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #22c55e;
+            box-shadow: 0 0 12px #22c55e;
+        }
+
+        .mdt-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 280px;
+            gap: 18px;
+        }
+
+        .mdt-card,
+        .mdt-departments {
+            border: 1px solid rgba(129, 146, 190, 0.16);
+            border-radius: 12px;
+            background: rgba(20, 28, 52, 0.78);
+            box-shadow: 0 18px 50px rgba(0, 0, 0, 0.16);
+        }
+
+        .mdt-welcome {
+            min-height: 150px;
+            padding: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .mdt-welcome h1 {
+            margin: 0 0 6px;
+            font-size: 24px;
+            color: #f8fafc;
+        }
+
+        .mdt-welcome p {
+            margin: 0;
+            color: #8f9db9;
+            font-size: 13px;
+        }
+
+        .mdt-duty-btn {
+            border: 0;
+            border-radius: 999px;
+            padding: 10px 16px;
+            background: linear-gradient(135deg, #6d28d9, #8b5cf6);
+            color: #fff;
+            font-weight: 800;
+            cursor: pointer;
+        }
+
+        .mdt-departments {
+            grid-column: 1;
+            margin-top: 18px;
+            padding: 16px;
+        }
+
+        .mdt-section-title {
+            color: #dfe7f7;
+            font-size: 14px;
+            font-weight: 800;
+            margin-bottom: 12px;
+        }
+
+        .mdt-department-list {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+        }
+
+        .mdt-department {
+            min-height: 82px;
+            border: 1px solid rgba(129, 146, 190, 0.14);
+            border-left: 3px solid #6366f1;
+            border-radius: 9px;
+            background: rgba(26, 35, 64, 0.74);
+            color: #eaf0ff;
+            text-align: left;
+            padding: 14px;
+            cursor: pointer;
+        }
+
+        .mdt-department:hover {
+            border-color: rgba(139, 92, 246, 0.55);
+            background: rgba(35, 44, 78, 0.86);
+        }
+
+        .mdt-department-name {
+            display: block;
+            font-size: 14px;
+            font-weight: 800;
+        }
+
+        .mdt-department-meta {
+            display: block;
+            margin-top: 8px;
+            color: #8795b3;
+            font-size: 12px;
+        }
+
+        .mdt-sidebar {
+            grid-column: 2;
+            grid-row: 1 / span 2;
+            border: 1px solid rgba(129, 146, 190, 0.16);
+            border-radius: 12px;
+            background: rgba(20, 28, 52, 0.78);
+            padding: 16px;
+            height: fit-content;
+        }
+
+        .mdt-quick-actions {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .mdt-action {
+            min-height: 70px;
+            border: 1px solid rgba(129, 146, 190, 0.12);
+            border-radius: 9px;
+            background: rgba(26, 35, 64, 0.74);
+            color: #dbe4f8;
+            font-size: 12px;
+            font-weight: 800;
+            cursor: pointer;
+        }
+
+        .mdt-action:hover {
+            border-color: rgba(139, 92, 246, 0.55);
+        }
+
+        @media (max-width: 800px) {
+            body.mdt-mode { padding: 12px; }
+            .mdt-grid { grid-template-columns: 1fr; }
+            .mdt-sidebar { grid-column: 1; grid-row: auto; }
+            .mdt-department-list { grid-template-columns: 1fr; }
+        }
+
         .dashboard-top-right {
             position: fixed;
             top: 24px;
@@ -4635,6 +4829,103 @@ async function addDocument(title, departments) {
                         }
                         return;
                     }
+                }
+
+                if (mdt === "1") {
+                    document.body.classList.add("mdt-mode");
+                    let displayName = "Officer";
+                    try {
+                        const { data: authData } = await localSupabase.auth.getUser();
+                        displayName = authData?.user?.user_metadata?.full_name
+                            || authData?.user?.user_metadata?.name
+                            || authData?.user?.email
+                            || "Officer";
+                    } catch (e) {}
+
+                    contentEl.innerHTML = `
+                        <div class="mdt-shell">
+                            <div class="mdt-topbar">
+                                <div class="mdt-brand">
+                                    <div class="mdt-brand-mark">D</div>
+                                    <span>${name}</span>
+                                </div>
+                                <div class="mdt-profile">
+                                    <span class="mdt-online">System online</span>
+                                    <span>${displayName.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</span>
+                                </div>
+                            </div>
+                            <div class="mdt-grid">
+                                <div class="mdt-card mdt-welcome">
+                                    <div>
+                                        <h1>Welcome back, ${displayName.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</h1>
+                                        <p>${name} MDT Dashboard</p>
+                                    </div>
+                                    <button type="button" class="mdt-duty-btn" id="mdtDutyBtn">Go on duty</button>
+                                </div>
+                                <div class="mdt-departments">
+                                    <div class="mdt-section-title">Departments</div>
+                                    <div class="mdt-department-list" id="mdtDepartmentList">
+                                        <div class="empty">Loading departments...</div>
+                                    </div>
+                                </div>
+                                <aside class="mdt-sidebar">
+                                    <div class="mdt-section-title">Quick actions</div>
+                                    <div class="mdt-quick-actions">
+                                        <button type="button" class="mdt-action" id="mdtLeaveBtn">Request leave</button>
+                                        <button type="button" class="mdt-action" id="mdtDispatchBtn">Dispatch</button>
+                                        <button type="button" class="mdt-action" id="mdtDepartmentBtn">Departments</button>
+                                        <button type="button" class="mdt-action" id="mdtCivilianBtn">Civilian</button>
+                                    </div>
+                                </aside>
+                            </div>
+                        </div>
+                    `;
+
+                    const departmentList = document.getElementById("mdtDepartmentList");
+                    const { data: departments } = await localSupabase
+                        .from("departments")
+                        .select("*")
+                        .eq("community_id", id)
+                        .order("created_at", { ascending: true });
+
+                    if (departmentList) {
+                        const departmentRows = Array.isArray(departments) ? departments : [];
+                        if (!departmentRows.length) {
+                            departmentList.innerHTML = '<div class="empty">No departments have been set up yet.</div>';
+                        } else {
+                            departmentList.innerHTML = departmentRows.map((dept) => `
+                                <button type="button" class="mdt-department" data-department-id="${dept.id}">
+                                    <span class="mdt-department-name">${(dept.name || "Department").replace(/</g, "&lt;").replace(/>/g, "&gt;")}</span>
+                                    <span class="mdt-department-meta">${(dept.type || "Department").replace(/</g, "&lt;").replace(/>/g, "&gt;")}</span>
+                                </button>
+                            `).join("");
+
+                            departmentList.querySelectorAll(".mdt-department").forEach((button) => {
+                                button.addEventListener("click", () => {
+                                    const dept = departmentRows.find((item) => item.id === button.dataset.departmentId);
+                                    if (!dept) return;
+                                    const passcode = dept.passcode != null ? String(dept.passcode).trim() : "";
+                                    if (passcode) {
+                                        openDeptPasscodeModal(dept);
+                                    } else {
+                                        openPoliceForDepartment(dept);
+                                    }
+                                });
+                            });
+                        }
+                    }
+
+                    document.getElementById("mdtCivilianBtn")?.addEventListener("click", () => {
+                        window.open(`/civilian.html?communityId=${id}`, "_blank");
+                    });
+                    document.getElementById("mdtDepartmentBtn")?.addEventListener("click", () => {
+                        departmentList?.scrollIntoView({ behavior: "smooth", block: "center" });
+                    });
+                    document.getElementById("mdtDispatchBtn")?.addEventListener("click", () => {
+                        const firstDept = Array.isArray(departments) ? departments[0] : null;
+                        if (firstDept) openPoliceForDepartment(firstDept);
+                    });
+                    return;
                 }
 
                 contentEl.innerHTML = `
