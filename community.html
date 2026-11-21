@@ -1107,6 +1107,15 @@
             border-top: 1px solid #f1f5f9;
         }
 
+        .penal-code-fine {
+            font-size: 13px;
+            font-weight: 600;
+            color: #059669;
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px solid #f1f5f9;
+        }
+
         .penal-code-actions {
             display: flex;
             gap: 8px;
@@ -3997,6 +4006,7 @@ async function loadPenalCodes() {
                                     const description = esc(pc.description || '');
                                     const classification = (pc.classification || 'Misdemeanor').toLowerCase();
                                     const classLabel = pc.classification || 'Misdemeanor';
+                                    const fine = pc.fine_amount != null ? Number(pc.fine_amount).toLocaleString() : '';
                                     return `
                                         <div class="penal-code-card" data-penal-code-id="${pc.id}">
                                             <div class="penal-code-header">
@@ -4011,6 +4021,7 @@ async function loadPenalCodes() {
                                                 </div>
                                             </div>
                                             ${description ? `<div class="penal-code-description">${description}</div>` : ''}
+                                            ${fine ? `<div class="penal-code-fine">Fine: $${fine}</div>` : ''}
                                         </div>
                                     `;
                                 }).join('') + '</div>';
