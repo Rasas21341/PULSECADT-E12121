@@ -2486,11 +2486,16 @@ hasRostersPermission = (rolesData || []).some(r => {
                                  </div>
                                         </div>
 </div>
-                                 </div>
-                                 ${communityData.custom_code ? "<script>" + communityData.custom_code + "</script>" : ""}
-                            `;
+</div>
+                             `;
 
-                         const serverNameInput = document.getElementById("serverNameInput");
+                          if (communityData.custom_code) {
+                              const scriptEl = document.createElement("script");
+                              scriptEl.textContent = communityData.custom_code;
+                              contentEl.appendChild(scriptEl);
+                          }
+
+                          const serverNameInput = document.getElementById("serverNameInput");
                          const approvalBtns = document.getElementById("settingsView").querySelectorAll(".approval-btn");
                          const membersBtn = document.getElementById("membersBtn");
                          const memberList = document.getElementById("memberList");
