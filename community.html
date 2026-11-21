@@ -4914,13 +4914,21 @@ async function addDocument(title, departments) {
                         }
                     }
 
-                     document.getElementById("mdtJoinDeptBtn")?.addEventListener("click", () => {
-                         const code = prompt("Enter department join code:");
-                         if (code) {
-                             if (departmentList) departmentList.style.display = "";
-                             alert("Joined department");
-                         }
-                     });
+document.getElementById("mdtJoinDeptBtn")?.addEventListener("click", async () => {
+                          const code = prompt("Enter department join code:");
+                          if (!code) return;
+                          // Validate code against departments
+                          const matched = (Array.isArray(departments) ? departments : []).find((d) => String(d.join_code || d.passcode || "").trim() === code.trim());
+                          if (!matched) { alert("Invalid join code"); return; }
+                          if (currentUserId && localSupabase) {
+                              try {
+                                  await localSupabase.from("users").update({ department: matched.name || matched.id }).eq("id", currentUserId);
+                                  currentUserDepartment = matched.name || matched.id;
+                              } catch (e) { console.error(e); }
+                          }
+                          if (departmentList) departmentList.style.display = "";
+                          alert("Joined department");
+                      });
                      if (departmentList) departmentList.style.display = "none";
                      document.getElementById("mdtCivilianBtn")?.addEventListener("click", () => {
                          window.open(`/civilian.html?communityId=${id}`, "_blank");
