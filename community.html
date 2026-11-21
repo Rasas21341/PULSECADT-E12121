@@ -1648,9 +1648,12 @@
         <div id="content"></div>
     </div>
 
-     <div class="modal-overlay" id="policeModal">
-         <div class="modal">
-             <div class="modal-title">Officer Details</div>
+      <div class="modal-overlay" id="policeModal">
+          <div class="modal">
+              <div class="modal-header">
+                  <div class="modal-title">Officer Details</div>
+                  <button class="modal-close" id="policeModalClose" type="button" aria-label="Close">×</button>
+              </div>
              <div class="field">
                  <label for="poName">Name</label>
                  <input type="text" id="poName" placeholder="Officer name" />
@@ -5050,6 +5053,7 @@ async function addDocument(title, departments) {
             policeModal.addEventListener("click", (e) => {
                 if (e.target === policeModal) policeModal.classList.remove("open");
             });
+            document.getElementById("policeModalClose")?.addEventListener("click", () => policeModal.classList.remove("open"));
         }
 
         const poSubmit = document.getElementById("poSubmit");
