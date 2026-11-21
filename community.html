@@ -1898,7 +1898,7 @@
     </div>
 
     <div class="modal-overlay" id="editApplicationModal">
-        <div class="modal">
+        <div class="modal" style="max-width:700px;">
             <div class="modal-header">
                 <div class="modal-title" style="font-size:15px;">Edit Application</div>
                 <button class="modal-close" id="editAppModalClose" type="button" aria-label="Close">×</</button>
@@ -1908,8 +1908,54 @@
                 <label for="editAppName">Application Name</label>
                 <input type="text" id="editAppName" placeholder="e.g., Police Officer, Dispatcher, Support Team" />
             </div>
-            <button type="button" class="submit-btn" id="editAppSubmitBtn">Save Changes</button>
+            <div class="field" style="margin-top:20px; padding-top:20px; border-top:1px solid #e2e8f0;">
+                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:12px;">
+                    <div class="modal-title" style="font-size:14px;">Questions</div>
+                    <button type="button" class="btn sm" id="addQuestionBtn">+ Add Question</button>
+                </div>
+                <div id="questionsList"></div>
+            </div>
+            <button type="button" class="submit-btn" id="editAppSubmitBtn" style="margin-top:16px;">Save Changes</button>
             <div class="modal-error" id="editAppError"></div>
+        </div>
+    </div>
+
+    <!-- Add/Edit Question Modal -->
+    <div class="modal-overlay" id="questionModal">
+        <div class="modal" style="max-width:500px;">
+            <div class="modal-header">
+                <div class="modal-title" style="font-size:15px;" id="questionModalTitle">Add Question</div>
+                <button class="modal-close" id="questionModalClose" type="button" aria-label="Close">×</</button>
+            </div>
+            <input type="hidden" id="questionId" />
+            <input type="hidden" id="questionApplicationId" />
+            <div class="field">
+                <label for="questionText">Question Text</label>
+                <input type="text" id="questionText" placeholder="e.g., What is your Discord username?" />
+            </div>
+            <div class="field">
+                <label for="questionType">Question Type</label>
+                <select id="questionType">
+                    <option value="text">Short Text</option>
+                    <option value="textarea">Long Text</option>
+                    <option value="select">Dropdown</option>
+                    <option value="radio">Radio Buttons</option>
+                    <option value="checkbox">Checkboxes</option>
+                    <option value="number">Number</option>
+                    <option value="email">Email</option>
+                </select>
+            </div>
+            <div class="field" id="questionOptionsField" style="display:none;">
+                <label for="questionOptions">Options (comma-separated)</label>
+                <input type="text" id="questionOptions" placeholder="Option A, Option B, Option C" />
+            </div>
+            <div class="field">
+                <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+                    <input type="checkbox" id="questionRequired" checked /> Required
+                </label>
+            </div>
+            <button type="button" class="submit-btn" id="questionSubmitBtn" style="margin-top:12px;">Save Question</button>
+            <div class="modal-error" id="questionError"></div>
         </div>
     </div>
 
