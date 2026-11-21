@@ -1897,6 +1897,22 @@
         </div>
     </div>
 
+    <div class="modal-overlay" id="editApplicationModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title" style="font-size:15px;">Edit Application</div>
+                <button class="modal-close" id="editAppModalClose" type="button" aria-label="Close">×</</button>
+            </div>
+            <input type="hidden" id="editAppId" />
+            <div class="field">
+                <label for="editAppName">Application Name</label>
+                <input type="text" id="editAppName" placeholder="e.g., Police Officer, Dispatcher, Support Team" />
+            </div>
+            <button type="button" class="submit-btn" id="editAppSubmitBtn">Save Changes</button>
+            <div class="modal-error" id="editAppError"></div>
+        </div>
+    </div>
+
     <div class="modal-overlay" id="newRosterModal">
         <div class="modal">
             <div class="modal-header">
@@ -4625,14 +4641,123 @@ let html = '<div class="members-view-list">';
                                     const created = row.created_at ? new Date(row.created_at).toLocaleString() : "";
                                     const name = esc(row.name || "");
                                     html += `<div class="members-item">
-                                        ${name ? `<div class="members-item-name">${name}</div>` : `<div class="members-item-name">Unnamed</div>`}
-                                        <div style="font-size:12px; color:#64748b; margin-top:2px;">${esc(created)}</div>
+                                        <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; width:100%;">
+                                            <div>
+                                                ${name ? `<div class="members-item-name">${name}</div>` : `<div class="members-item-name">Unnamed</div>`}
+                                                <div style="font-size:12px; color:#64748b; margin-top:2px;">${esc(created)}</div>
+                                            </div>
+                                            <div style="display:flex; gap:6px;">
+                                                <button type="button" class="btn sm" data-action="open-application" data-application-id="${esc(row.id)}">Open</button>
+                                                <button type="button" class="btn sm" data-action="edit-application" data-application-id="${esc(row.id)}">Edit</button>
+                                                <button type="button" class="btn sm" data-action="delete-application" data-application-id="${esc(row.id)}" style="background:#fee2e2; color:#b91c1c; border-color:#fecaca;">Delete</button>
+                                            </div>
+                                        </div>
                                     </div>`;
                                 });
                                 html += '</div>';
                                 applicationsList.innerHTML = html;
                             } catch (err) {
                                 applicationsList.innerHTML = '<div class="empty">An unexpected error occurred.</div>';
+                                console.error(err);
+                            }
+                        }
+
+                        // Application action handlers
+                        if (applicationsList) {
+                            applicationsList.addEventListener("click", async (e) => {
+                                const btn = e.target.closest("[data-action]");
+                                if (!btn) return;
+                                const action = btn.getAttribute("data-action");
+                                const applicationId = btn.getAttribute("data-application-id");
+                                if (!applicationId) return;
+
+                                if (action === "open-application") {
+                                    window.open(`/application.html?id=${encodeURIComponent(applicationId)}`, "_blank");
+                                } else if (action === "edit-application") {
+                                    openEditApplicationModal(applicationId);
+                                } else if (action === "delete-application") {
+                                    if (confirm("Delete this application?")) {
+                                        await deleteApplication(applicationId);
+                                    }
+                                }
+                            });
+                        }
+
+                        async function deleteApplication(applicationId) {
+                            if (!localSupabase) return;
+                            try {
+                                await localSupabase.from("applications").delete().eq("id", applicationId);
+                                loadApplications();
+                            } catch (err) {
+                                alert("Failed to delete application.");
+                                console.error(err);
+                            }
+                        }
+
+                        // Edit Application Modal handler
+                        const editApplicationModal = document.getElementById("editApplicationModal");
+                        const editAppId = document.getElementById("editAppId");
+                        const editAppName = document.getElementById("editAppName");
+                        const editAppSubmitBtn = document.getElementById("editAppSubmitBtn");
+                        const editAppModalClose = document.getElementById("editAppModalClose");
+                        const editAppError = document.getElementById("editAppError");
+
+                        function openEditApplicationModal(applicationId) {
+                            if (!editApplicationModal || !localSupabase) return;
+                            localSupabase
+                                .from("applications")
+                                .select("*")
+                                .eq("id", applicationId)
+                                .single()
+                                .then(({ data, error }) => {
+                                    if (error || !data) {
+                                        console.error("Failed to fetch application:", error);
+                                        alert("Failed to load application data.");
+                                        return;
+                                    }
+                                    if (editAppId) editAppId.value = data.id;
+                                    if (editAppName) editAppName.value = data.name || "";
+                                    if (editAppError) { editAppError.textContent = ""; editAppError.style.display = "none"; }
+                                    editApplicationModal.classList.add("open");
+                                });
+                        }
+
+                        function closeEditApplicationModal() {
+                            if (editApplicationModal) editApplicationModal.classList.remove("open");
+                            if (editAppId) editAppId.value = "";
+                        }
+
+                        if (editAppModalClose) {
+                            editAppModalClose.addEventListener("click", closeEditApplicationModal);
+                        }
+                        if (editApplicationModal) {
+                            editApplicationModal.addEventListener("click", (e) => {
+                                if (e.target === editApplicationModal) closeEditApplicationModal();
+                            });
+                        }
+                        if (editAppSubmitBtn) {
+                            editAppSubmitBtn.onclick = async () => {
+                                const applicationId = editAppId ? editAppId.value : "";
+                                const name = editAppName ? editAppName.value.trim() : "";
+                                if (!name) {
+                                    if (editAppError) { editAppError.textContent = "Application name is required."; editAppError.style.display = "block"; }
+                                    return;
+                                }
+                                await updateApplication(applicationId, name);
+                            };
+                        }
+
+                        async function updateApplication(applicationId, name) {
+                            if (!localSupabase) return;
+                            try {
+                                await localSupabase
+                                    .from("applications")
+                                    .update({ name: name })
+                                    .eq("id", applicationId);
+                                loadApplications();
+                                closeEditApplicationModal();
+                            } catch (err) {
+                                alert("Failed to update application.");
                                 console.error(err);
                             }
                         }
