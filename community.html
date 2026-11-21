@@ -1828,6 +1828,10 @@
                     <option value="Infraction">Infraction</option>
                 </select>
             </div>
+            <div class="field">
+                <label for="newPenalCodeFine">Fine Amount ($)</label>
+                <input type="number" id="newPenalCodeFine" placeholder="0" min="0" step="1" />
+            </div>
             <button type="button" class="submit-btn" id="newPenalCodeSubmitBtn">Add Penal Code</button>
             <div class="modal-error" id="newPenalCodeError"></div>
         </div>
@@ -1859,6 +1863,10 @@
                     <option value="Felony">Felony</option>
                     <option value="Infraction">Infraction</option>
                 </select>
+            </div>
+            <div class="field">
+                <label for="editPenalCodeFine">Fine Amount ($)</label>
+                <input type="number" id="editPenalCodeFine" placeholder="0" min="0" step="1" />
             </div>
             <button type="button" class="submit-btn" id="editPenalCodeSubmitBtn">Save Changes</button>
             <div class="modal-error" id="editPenalCodeError"></div>
@@ -4416,6 +4424,7 @@ async function addDocument(title, departments) {
                         const newPenalCodeCode = document.getElementById("newPenalCodeCode");
                         const newPenalCodeDescription = document.getElementById("newPenalCodeDescription");
                         const newPenalCodeClassification = document.getElementById("newPenalCodeClassification");
+                        const newPenalCodeFine = document.getElementById("newPenalCodeFine");
                         const newPenalCodeSubmitBtn = document.getElementById("newPenalCodeSubmitBtn");
                         const newPenalCodeModalClose = document.getElementById("newPenalCodeModalClose");
                         const newPenalCodeError = document.getElementById("newPenalCodeError");
@@ -4426,6 +4435,7 @@ async function addDocument(title, departments) {
                             if (newPenalCodeCode) newPenalCodeCode.value = "";
                             if (newPenalCodeDescription) newPenalCodeDescription.value = "";
                             if (newPenalCodeClassification) newPenalCodeClassification.value = "Misdemeanor";
+                            if (newPenalCodeFine) newPenalCodeFine.value = "";
                             if (newPenalCodeError) { newPenalCodeError.textContent = ""; newPenalCodeError.style.display = "none"; }
                             newPenalCodeModal.classList.add("open");
                         }
@@ -4448,12 +4458,13 @@ async function addDocument(title, departments) {
                                 const code = newPenalCodeCode ? newPenalCodeCode.value.trim() : "";
                                 const description = newPenalCodeDescription ? newPenalCodeDescription.value.trim() : "";
                                 const classification = newPenalCodeClassification ? newPenalCodeClassification.value : "Misdemeanor";
+                                const fine = newPenalCodeFine ? parseInt(newPenalCodeFine.value, 10) || 0 : 0;
                                 if (!title) {
                                     if (newPenalCodeError) { newPenalCodeError.textContent = "Statute name is required."; newPenalCodeError.style.display = "block"; }
                                     return;
                                 }
                                 closeNewPenalCodeModal();
-                                await addPenalCode(title, code, description, classification);
+                                await addPenalCode(title, code, description, classification, fine);
                             };
                         }
 
@@ -4464,6 +4475,7 @@ async function addDocument(title, departments) {
                         const editPenalCodeCode = document.getElementById("editPenalCodeCode");
                         const editPenalCodeDescription = document.getElementById("editPenalCodeDescription");
                         const editPenalCodeClassification = document.getElementById("editPenalCodeClassification");
+                        const editPenalCodeFine = document.getElementById("editPenalCodeFine");
                         const editPenalCodeSubmitBtn = document.getElementById("editPenalCodeSubmitBtn");
                         const editPenalCodeModalClose = document.getElementById("editPenalCodeModalClose");
                         const editPenalCodeError = document.getElementById("editPenalCodeError");
@@ -4487,6 +4499,7 @@ async function addDocument(title, departments) {
                                     if (editPenalCodeCode) editPenalCodeCode.value = data.code || "";
                                     if (editPenalCodeDescription) editPenalCodeDescription.value = data.description || "";
                                     if (editPenalCodeClassification) editPenalCodeClassification.value = data.classification || "Misdemeanor";
+                                    if (editPenalCodeFine) editPenalCodeFine.value = data.fine_amount || "";
                                     if (editPenalCodeError) { editPenalCodeError.textContent = ""; editPenalCodeError.style.display = "none"; }
                                     editPenalCodeModal.classList.add("open");
                                 });
@@ -4512,11 +4525,12 @@ async function addDocument(title, departments) {
                                 const code = editPenalCodeCode ? editPenalCodeCode.value.trim() : "";
                                 const description = editPenalCodeDescription ? editPenalCodeDescription.value.trim() : "";
                                 const classification = editPenalCodeClassification ? editPenalCodeClassification.value : "Misdemeanor";
+                                const fine = editPenalCodeFine ? parseInt(editPenalCodeFine.value, 10) || 0 : 0;
                                 if (!title) {
                                     if (editPenalCodeError) { editPenalCodeError.textContent = "Statute name is required."; editPenalCodeError.style.display = "block"; }
                                     return;
                                 }
-                                await updatePenalCode(penalCodeId, title, code, description, classification);
+                                await updatePenalCode(penalCodeId, title, code, description, classification, fine);
                             };
                         }
 
