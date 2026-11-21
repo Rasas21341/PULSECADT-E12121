@@ -5020,6 +5020,7 @@ let html = '<div class="members-view-list">';
                                 responsesList.innerHTML = data.map((sub) => {
                                     const submitted = sub.submitted_at ? new Date(sub.submitted_at).toLocaleString() : "";
                                     const userEmail = esc(sub.user_email || "Unknown");
+                                    const pasteFlag = sub.copy_paste_detected ? '<span style="background:#fef2f2; color:#b91c1c; padding:2px 8px; border-radius:999px; font-size:11px; font-weight:600; margin-left:8px;">⚠ Paste detected</span>' : '';
                                     let answersHtml = "";
                                     if (sub.answers && typeof sub.answers === "object") {
                                         answersHtml = Object.entries(sub.answers).map(([key, value]) => {
@@ -5030,7 +5031,7 @@ let html = '<div class="members-view-list">';
                                     return `
                                         <div style="border:1px solid #e2e8f0; border-radius:8px; padding:16px; margin-bottom:12px; background:#fff;">
                                             <div style="display:flex; justify-content:space-between; margin-bottom:12px; padding-bottom:12px; border-bottom:1px solid #f1f5f9;">
-                                                <div><strong>Submitted by:</strong> ${userEmail}</div>
+                                                <div><strong>Submitted by:</strong> ${userEmail} ${pasteFlag}</div>
                                                 <div style="color:#64748b; font-size:12px;">${esc(submitted)}</div>
                                             </div>
                                             <div>${answersHtml || '<div style="color:#94a3b8; font-size:13px;">No answers</div>'}</div>

@@ -271,6 +271,33 @@
         const appSubtitle = document.getElementById("appSubtitle");
         const submitBtn = document.getElementById("submitBtn");
 
+        let copyPasteDetected = false;
+
+        // Copy/paste detection
+        if (form) {
+            form.addEventListener("paste", (e) => {
+                e.preventDefault();
+                copyPasteDetected = true;
+            });
+            form.addEventListener("copy", (e) => {
+                e.preventDefault();
+                copyPasteDetected = true;
+            });
+            form.addEventListener("cut", (e) => {
+                e.preventDefault();
+                copyPasteDetected = true;
+            });
+            form.addEventListener("contextmenu", (e) => {
+                e.preventDefault();
+            });
+            form.addEventListener("keydown", (e) => {
+                if ((e.ctrlKey || e.metaKey) && (e.key === "c" || e.key === "v" || e.key === "x")) {
+                    e.preventDefault();
+                    copyPasteDetected = true;
+                }
+            });
+        }
+
         const urlParams = new URLSearchParams(window.location.search);
         const applicationId = urlParams.get("id");
 
@@ -450,6 +477,7 @@
                     user_id: user.id,
                     user_email: user.email,
                     answers: answers,
+                    copy_paste_detected: copyPasteDetected,
                     submitted_at: new Date().toISOString()
                 };
 
