@@ -2281,15 +2281,37 @@ if (membersViewClose && membersView) {
                         if (communityPasscodeInput) {
                             communityPasscodeInput.addEventListener("blur", async () => {
                                 const newPasscode = communityPasscodeInput.value.trim();
+                                if (!newPasscode) {
+                                    try {
+                                        await localSupabase
+                                            .from("communities")
+                                            .update({ passcode: null })
+                                            .eq("id", id);
+                                    } catch (err) {
+                                        alert("Failed to remove community passcode.");
+                                    }
+                                    return;
+                                }
                                 try {
+                                    const { data: existing, error: checkError } = await localSupabase
+                                        .from("communities")
+                                        .select("id, name")
+                                        .eq("passcode", newPasscode)
+                                        .neq("id", id);
+                                    if (checkError) throw checkError;
+                                    if (existing && existing.length > 0) {
+                                        communityPasscodeInput.value = "";
+                                        alert("The community code is taken. Another community is already using this join code.");
+                                        return;
+                                    }
                                     await localSupabase
                                         .from("communities")
-                                        .update({ passcode: newPasscode || null })
+                                        .update({ passcode: newPasscode })
                                         .eq("id", id);
                                 } catch (err) {
-                                    alert("Failed to save community passcode.");
+                                    alert("Failed to save community passcode: " + (err.message || err));
                                 }
-});
+                            });
                         }
 
                         const erlcApiKeyInput = document.getElementById("erlcApiKeyInput");
