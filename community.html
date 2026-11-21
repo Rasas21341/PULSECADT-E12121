@@ -4833,10 +4833,11 @@ async function addDocument(title, departments) {
 
                 if (mdt === "1") {
                     document.body.classList.add("mdt-mode");
-                    let displayName = "Officer";
-                    try {
-const { data: authData } = await localSupabase.auth.getUser();
-                         const mdtUserId = authData?.user?.id || null;
+let displayName = "Officer";
+                     let mdtUserId = null;
+                     try {
+                         const { data: authData } = await localSupabase.auth.getUser();
+                         mdtUserId = authData?.user?.id || null;
                          displayName = authData?.user?.user_metadata?.full_name
                             || authData?.user?.user_metadata?.name
                             || authData?.user?.email
