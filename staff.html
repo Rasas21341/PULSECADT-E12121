@@ -774,17 +774,18 @@
                     return;
                 }
 
-                let html = `<input type="text" class="search-box" id="serverSearch" placeholder="Search servers by name, owner, or code..." /><table><tr><th>Code</th><th>Name</th><th>Owner</th><th>Created</th><th>Status</th><th>Members Only</th><th>Pro</th><th>Partner</th><th>Actions</th></tr>`;
+let html = `<input type="text" class="search-box" id="serverSearch" placeholder="Search servers by name, owner, or code..." /><table><tr><th>Join Code</th><th>Name</th><th>Owner</th><th>Created</th><th>Status</th><th>Members Only</th><th>Pro</th><th>Partner</th><th>Actions</th></tr>`;
                 const canSuspend = userDepartment !== "Support Team" && userDepartment !== "Support Team Lead";
                 const canDelete = userDepartment !== "Support Team" && userDepartment !== "Support Team Lead";
                 const canPro = userDepartment !== "Support Team" && userDepartment !== "Support Team Lead";
                 const canPartner = userDepartment !== "Support Team" && userDepartment !== "Support Team Lead";
                 data.forEach((row) => {
-                    const name = (row.name || "N/A").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-                    const owner = (row.creator_email || "N/A").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+                    const name = (row.name || "N/A").replace(/</g, "<").replace(/>/g, ">");
+                    const owner = (row.creator_email || "N/A").replace(/</g, "<").replace(/>/g, ">");
                     const created = row.created_at ? new Date(row.created_at).toLocaleString() : "";
                     const suspended = !!row.suspended;
                     const membersOnly = !!row.members_only;
+                    const joinCode = (row.join_code || row.passcode || "-").replace(/</g, "<").replace(/>/g, ">");
                     const statusCell = suspended
                         ? `<span style="display:inline-flex;align-items:center;background:#dc2626;color:#ffffff;border-radius:999px;padding:2px 9px;font-size:10px;font-weight:600;width:auto;">Suspended</span>`
                         : `<span style="display:inline-flex;align-items:center;background:#16a34a;color:#ffffff;border-radius:999px;padding:2px 9px;font-size:10px;font-weight:600;width:auto;">Active</span>`;
@@ -808,7 +809,7 @@
                     const partnerToggleBtn = canPartner
                         ? `<button class="partner-server-btn" data-id="${row.id}" data-partner="${partner}" style="padding:4px 10px;border-radius:999px;font-size:11px;font-weight:700;cursor:pointer;border:1px solid #f59e0b;background:#fef3c7;color:#92400e;">${partner ? "Remove Partner" : "Give Partner"}</button>`
                         : "";
-                    html += `<tr><td style="font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12px;word-break:break-all;color:#64748b;">${String(row.passcode ?? "-").replace(/</g,"&lt;").replace(/>/g,"&gt;")}</td><td>${name}</td><td>${owner}</td><td>${created}</td><td>${statusCell}</td><td>${membersOnlyCell}</td><td>${proCell}<br/>${proToggleBtn}</td><td>${partnerToggleBtn}</td><td><div style="display:flex;gap:8px;flex-wrap:wrap;">${suspendBtn} ${deleteBtn}</div></td></tr>`;
+                    html += `<tr><td style="font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12px;word-break:break-all;">${joinCode}</td><td>${name}</td><td>${owner}</td><td>${created}</td><td>${statusCell}</td><td>${membersOnlyCell}</td><td>${proCell}<br/>${proToggleBtn}</td><td>${partnerToggleBtn}</td><td><div style="display:flex;gap:8px;flex-wrap:wrap;">${suspendBtn} ${deleteBtn}</div></td></tr>`;
                 });
                 html += "</table>";
                 contentEl.innerHTML = html;
