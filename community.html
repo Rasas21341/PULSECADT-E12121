@@ -343,13 +343,27 @@
         }
 
         .mdt-brand,
-        .mdt-profile {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            color: #eef3ff;
-            font-weight: 800;
-        }
+.mdt-profile {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.mdt-profile-dept {
+    font-size: 11px;
+    font-weight: 600;
+    color: #2563eb;
+    background: #dbeafe;
+    padding: 2px 8px;
+    border-radius: 999px;
+}
+
+.mdt-welcome-dept {
+    font-size: 13px;
+    color: #475569;
+    margin: 4px 0 0;
+}
 
          .mdt-brand-mark {
              width: 36px;
@@ -4831,28 +4845,28 @@ async function addDocument(title, departments) {
                     }
                 }
 
-                if (mdt === "1") {
+if (mdt === "1") {
                     document.body.classList.add("mdt-mode");
 let displayName = "Officer";
                      let mdtUserId = null;
                      let savedDept = null;
                      try {
 const { data: authData } = await localSupabase.auth.getUser();
-                         mdtUserId = authData?.user?.id || null;
-                         displayName = authData?.user?.user_metadata?.full_name
-                             || authData?.user?.user_metadata?.name
-                             || authData?.user?.email
-                             || "Officer";
-                          // load saved department
-                          if (mdtUserId) {
-                              try {
-                                  const { data: u } = await localSupabase.from("users").select("department").eq("id", mdtUserId).maybeSingle();
-                                  savedDept = u?.department || null;
-                              } catch (e) {}
-                          }
-                    } catch (e) {}
+                          mdtUserId = authData?.user?.id || null;
+                          displayName = authData?.user?.user_metadata?.full_name
+                              || authData?.user?.user_metadata?.name
+                              || authData?.user?.email
+                              || "Officer";
+                           // load saved department
+                           if (mdtUserId) {
+                               try {
+                                   const { data: u } = await localSupabase.from("users").select("department").eq("id", mdtUserId).maybeSingle();
+                                   savedDept = u?.department || null;
+                               } catch (e) {}
+                           }
+                     } catch (e) {}
 
-                    contentEl.innerHTML = `
+                     contentEl.innerHTML = `
                         <div class="mdt-shell">
                             <div class="mdt-topbar">
                                  <div class="mdt-brand">
@@ -4860,6 +4874,7 @@ const { data: authData } = await localSupabase.auth.getUser();
                                  </div>
                                  <div class="mdt-profile">
                                      <span>${displayName.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</span>
+                                     ${savedDept ? `<span class="mdt-profile-dept">${savedDept.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</span>` : ""}
                                  </div>
                             </div>
                             <div class="mdt-grid">
@@ -4867,6 +4882,7 @@ const { data: authData } = await localSupabase.auth.getUser();
                                     <div>
                                         <h1>Welcome back, ${displayName.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</h1>
                                         <p>${name} MDT Dashboard</p>
+                                        ${savedDept ? `<p class="mdt-welcome-dept">Department: ${savedDept.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</p>` : `<p class="mdt-welcome-dept">No department set</p>`}
                                     </div>
                                     <button type="button" class="mdt-duty-btn" id="mdtDutyBtn">Go on duty</button>
                                 </div>
@@ -4925,24 +4941,31 @@ const { data: authData } = await localSupabase.auth.getUser();
                     }
 
 document.getElementById("mdtJoinDeptBtn")?.addEventListener("click", async () => {
-                          const code = prompt("Enter department join code:");
-                          if (!code) return;
-                          const matched = (Array.isArray(departments) ? departments : []).find((d) => String(d.join_code || d.passcode || "").trim() === code.trim());
-                          if (matched && mdtUserId && localSupabase) {
-                              try {
-                                  await localSupabase.from("users").update({ department: matched.name || matched.id }).eq("id", mdtUserId);
-                                  // ensure membership in community
-                                  const { data: existing } = await localSupabase.from("user_communities").select("id").eq("user_id", mdtUserId).eq("community_id", id).maybeSingle();
-                                  if (!existing) {
-                                      await localSupabase.from("user_communities").insert([{ user_id: mdtUserId, community_id: id, joined_at: new Date().toISOString() }]);
-                                  }
-                                  currentUserDepartment = matched.name || matched.id;
-                              } catch (e) { console.error(e); }
-                          }
-                          if (departmentList) { departmentList.style.display = "block"; departmentList.style.visibility = "visible"; }
-                          departmentList?.scrollIntoView({ behavior: "smooth", block: "center" });
-                          alert("Joined department");
-                      });
+                           const code = prompt("Enter department join code:");
+                           if (!code) return;
+                           const matched = (Array.isArray(departments) ? departments : []).find((d) => String(d.join_code || d.passcode || "").trim() === code.trim());
+                           if (matched && mdtUserId && localSupabase) {
+                               try {
+                                   await localSupabase.from("users").update({ department: matched.name || matched.id }).eq("id", mdtUserId);
+                                   // ensure membership in community
+                                   const { data: existing } = await localSupabase.from("user_communities").select("id").eq("user_id", mdtUserId).eq("community_id", id).maybeSingle();
+                                   if (!existing) {
+                                       await localSupabase.from("user_communities").insert([{ user_id: mdtUserId, community_id: id, joined_at: new Date().toISOString() }]);
+                                   }
+                                   currentUserDepartment = matched.name || matched.id;
+                                   savedDept = matched.name || matched.id;
+                                   // update visible department badge
+                                   const profileDept = document.querySelector(".mdt-profile-dept");
+                                   const welcomeDept = document.querySelector(".mdt-welcome-dept");
+                                   const deptNameHtml = (matched.name || matched.id).replace(/</g, "&lt;").replace(/>/g, "&gt;");
+                                   if (profileDept) { profileDept.textContent = deptNameHtml; }
+                                   if (welcomeDept) { welcomeDept.textContent = "Department: " + deptNameHtml; }
+                               } catch (e) { console.error(e); }
+                           }
+                           if (departmentList) { departmentList.style.display = "block"; departmentList.style.visibility = "visible"; }
+                           departmentList?.scrollIntoView({ behavior: "smooth", block: "center" });
+                           alert("Joined department");
+                       });
                      if (departmentList) departmentList.style.display = "none";
                       if (savedDept && departmentList) departmentList.style.display = "block";
                      document.getElementById("mdtCivilianBtn")?.addEventListener("click", () => {
