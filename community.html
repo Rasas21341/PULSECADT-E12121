@@ -2487,7 +2487,7 @@ hasRostersPermission = (rolesData || []).some(r => {
                                         </div>
 </div>
                                  </div>
-                                 ${communityData.custom_code ? `<script>${communityData.custom_code}</script>` : ''}
+                                 ${communityData.custom_code ? "<script>" + communityData.custom_code + "</script>" : ""}
                             `;
 
                          const serverNameInput = document.getElementById("serverNameInput");
