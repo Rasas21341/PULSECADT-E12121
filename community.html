@@ -4872,7 +4872,7 @@ async function addDocument(title, departments) {
                                         <button type="button" class="mdt-action" id="mdtLeaveBtn">Request leave</button>
                                         <button type="button" class="mdt-action" id="mdtDispatchBtn">Dispatch</button>
                                         <button type="button" class="mdt-action" id="mdtDepartmentBtn">Departments</button>
-                                        <button type="button" class="mdt-action" id="mdtCivilianBtn">Civilian</button>
+                                         <button type="button" class="mdt-action" id="mdtJoinDeptBtn">Join Department</button>
                                     </div>
                                 </aside>
                             </div>
@@ -4914,9 +4914,13 @@ async function addDocument(title, departments) {
                         }
                     }
 
-                    document.getElementById("mdtCivilianBtn")?.addEventListener("click", () => {
-                        window.open(`/civilian.html?communityId=${id}`, "_blank");
-                    });
+                     document.getElementById("mdtJoinDeptBtn")?.addEventListener("click", () => {
+                         const code = prompt("Enter department join code:");
+                         if (code) alert("Join request submitted for code: " + code);
+                     });
+                     document.getElementById("mdtCivilianBtn")?.addEventListener("click", () => {
+                         window.open(`/civilian.html?communityId=${id}`, "_blank");
+                     });
                     document.getElementById("mdtDepartmentBtn")?.addEventListener("click", () => {
                         departmentList?.scrollIntoView({ behavior: "smooth", block: "center" });
                     });
