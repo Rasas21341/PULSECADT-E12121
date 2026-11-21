@@ -4916,8 +4916,12 @@ async function addDocument(title, departments) {
 
                      document.getElementById("mdtJoinDeptBtn")?.addEventListener("click", () => {
                          const code = prompt("Enter department join code:");
-                         if (code) alert("Join request submitted for code: " + code);
+                         if (code) {
+                             if (departmentList) departmentList.style.display = "";
+                             alert("Joined department");
+                         }
                      });
+                     if (departmentList) departmentList.style.display = "none";
                      document.getElementById("mdtCivilianBtn")?.addEventListener("click", () => {
                          window.open(`/civilian.html?communityId=${id}`, "_blank");
                      });
