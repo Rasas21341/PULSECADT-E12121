@@ -1967,7 +1967,7 @@
     </div>
 
     <div class="modal-overlay" id="editApplicationModal">
-        <div class="modal" style="max-width:700px;">
+        <div class="modal" style="max-width:900px;">
             <div class="modal-header">
                 <div class="modal-title" style="font-size:15px;">Edit Application</div>
                 <button class="modal-close" id="editAppModalClose" type="button" aria-label="Close">×</</button>
@@ -1977,12 +1977,24 @@
                 <label for="editAppName">Application Name</label>
                 <input type="text" id="editAppName" placeholder="e.g., Police Officer, Dispatcher, Support Team" />
             </div>
-            <div class="field" style="margin-top:20px; padding-top:20px; border-top:1px solid #e2e8f0;">
-                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:12px;">
-                    <div class="modal-title" style="font-size:14px;">Questions</div>
-                    <button type="button" class="btn sm" id="addQuestionBtn">+ Add Question</button>
+            <div style="display:flex; gap:8px; margin-top:16px; border-bottom:1px solid #e2e8f0; padding-bottom:8px;">
+                <button type="button" class="btn sm tab-btn active" data-tab="questions">Questions</button>
+                <button type="button" class="btn sm tab-btn" data-tab="responses">Responses</button>
+            </div>
+            <div id="tabQuestions" class="tab-content" style="display:block;">
+                <div class="field" style="margin-top:20px; padding-top:20px; border-top:1px solid #e2e8f0;">
+                    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:12px;">
+                        <div class="modal-title" style="font-size:14px;">Questions</div>
+                        <button type="button" class="btn sm" id="addQuestionBtn">+ Add Question</button>
+                    </div>
+                    <div id="questionsList"></div>
                 </div>
-                <div id="questionsList"></div>
+            </div>
+            <div id="tabResponses" class="tab-content" style="display:none;">
+                <div class="field" style="margin-top:20px; padding-top:20px; border-top:1px solid #e2e8f0;">
+                    <div class="modal-title" style="font-size:14px; margin-bottom:12px;">Application Responses</div>
+                    <div id="responsesList"></div>
+                </div>
             </div>
             <button type="button" class="submit-btn" id="editAppSubmitBtn" style="margin-top:16px;">Save Changes</button>
             <div class="modal-error" id="editAppError"></div>
@@ -4863,7 +4875,28 @@ let html = '<div class="members-view-list">';
                         function closeEditApplicationModal() {
                             if (editApplicationModal) editApplicationModal.classList.remove("open");
                             if (editAppId) editAppId.value = "";
+                            // Reset to questions tab
+                            switchTab("questions");
                         }
+
+                        // Tab switching
+                        function switchTab(tabName) {
+                            document.querySelectorAll(".tab-btn").forEach((btn) => {
+                                btn.classList.toggle("active", btn.dataset.tab === tabName);
+                            });
+                            document.querySelectorAll(".tab-content").forEach((content) => {
+                                content.style.display = content.id === "tab" + tabName.charAt(0).toUpperCase() + tabName.slice(1) ? "block" : "none";
+                            });
+                            if (tabName === "responses") {
+                                const appId = editAppId?.value;
+                                if (appId) loadResponses(appId);
+                            }
+                        }
+
+                        // Tab button handlers
+                        document.querySelectorAll(".tab-btn").forEach((btn) => {
+                            btn.addEventListener("click", () => switchTab(btn.dataset.tab));
+                        });
 
                         if (editAppModalClose) {
                             editAppModalClose.addEventListener("click", closeEditApplicationModal);
@@ -4964,6 +4997,49 @@ let html = '<div class="members-view-list">';
                             } catch (err) {
                                 console.error("Failed to load questions:", err);
                                 questionsList.innerHTML = '<div style="color:#ef4444; font-size:13px; padding:16px; text-align:center;">Failed to load questions.</div>';
+                            }
+                        }
+
+                        async function loadResponses(applicationId) {
+                            const responsesList = document.getElementById("responsesList");
+                            if (!responsesList || !localSupabase) return;
+                            try {
+                                const { data, error } = await localSupabase
+                                    .from("application_submissions")
+                                    .select("*")
+                                    .eq("application_id", applicationId)
+                                    .order("submitted_at", { ascending: false });
+                                if (error) throw error;
+
+                                const esc = (v) => (v == null ? "" : String(v).replace(/</g, "<").replace(/>/g, ">"));
+                                if (!Array.isArray(data) || data.length === 0) {
+                                    responsesList.innerHTML = '<div style="color:#94a3b8; font-size:13px; padding:16px; text-align:center;">No responses yet.</div>';
+                                    return;
+                                }
+
+                                responsesList.innerHTML = data.map((sub) => {
+                                    const submitted = sub.submitted_at ? new Date(sub.submitted_at).toLocaleString() : "";
+                                    const userEmail = esc(sub.user_email || "Unknown");
+                                    let answersHtml = "";
+                                    if (sub.answers && typeof sub.answers === "object") {
+                                        answersHtml = Object.entries(sub.answers).map(([key, value]) => {
+                                            const val = Array.isArray(value) ? value.join(", ") : value;
+                                            return `<div style="margin-bottom:6px;"><strong>${esc(key)}:</strong> ${esc(val)}</div>`;
+                                        }).join("");
+                                    }
+                                    return `
+                                        <div style="border:1px solid #e2e8f0; border-radius:8px; padding:16px; margin-bottom:12px; background:#fff;">
+                                            <div style="display:flex; justify-content:space-between; margin-bottom:12px; padding-bottom:12px; border-bottom:1px solid #f1f5f9;">
+                                                <div><strong>Submitted by:</strong> ${userEmail}</div>
+                                                <div style="color:#64748b; font-size:12px;">${esc(submitted)}</div>
+                                            </div>
+                                            <div>${answersHtml || '<div style="color:#94a3b8; font-size:13px;">No answers</div>'}</div>
+                                        </div>
+                                    `;
+                                }).join("");
+                            } catch (err) {
+                                console.error("Failed to load responses:", err);
+                                responsesList.innerHTML = '<div style="color:#ef4444; font-size:13px; padding:16px; text-align:center;">Failed to load responses.</div>';
                             }
                         }
 
