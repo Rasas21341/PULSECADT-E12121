@@ -4924,7 +4924,7 @@ document.getElementById("mdtJoinDeptBtn")?.addEventListener("click", async () =>
                                   currentUserDepartment = matched.name || matched.id;
                               } catch (e) { console.error(e); }
                           }
-                          if (departmentList) departmentList.style.display = "";
+                          if (departmentList) departmentList.style.display = "block";
                           alert("Joined department");
                       });
                      if (departmentList) departmentList.style.display = "none";
