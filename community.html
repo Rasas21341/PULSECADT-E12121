@@ -4899,9 +4899,10 @@ async function addDocument(title, departments) {
                                 </button>
                             `).join("");
 
-                            departmentList.querySelectorAll(".mdt-department").forEach((button) => {
-                                button.addEventListener("click", () => {
-                                    const dept = departmentRows.find((item) => item.id === button.dataset.departmentId);
+                             departmentList.querySelectorAll(".mdt-department").forEach((button) => {
+                                 button.addEventListener("click", () => {
+                                     if (!window.mdtOnDuty) { alert("Go on duty first"); return; }
+                                     const dept = departmentRows.find((item) => item.id === button.dataset.departmentId);
                                     if (!dept) return;
                                     const passcode = dept.passcode != null ? String(dept.passcode).trim() : "";
                                     if (passcode) {
@@ -4920,7 +4921,14 @@ async function addDocument(title, departments) {
                     document.getElementById("mdtDepartmentBtn")?.addEventListener("click", () => {
                         departmentList?.scrollIntoView({ behavior: "smooth", block: "center" });
                     });
-                    document.getElementById("mdtDispatchBtn")?.addEventListener("click", () => {
+                     const dutyBtn = document.getElementById("mdtDutyBtn");
+                     window.mdtOnDuty = false;
+                     dutyBtn?.addEventListener("click", () => {
+                         window.mdtOnDuty = true;
+                         if (dutyBtn) { dutyBtn.textContent = "On duty"; dutyBtn.disabled = true; }
+                     });
+                     document.getElementById("mdtDispatchBtn")?.addEventListener("click", () => {
+                         if (!window.mdtOnDuty) { alert("Go on duty first"); return; }
                         const firstDept = Array.isArray(departments) ? departments[0] : null;
                         if (firstDept) openPoliceForDepartment(firstDept);
                     });
