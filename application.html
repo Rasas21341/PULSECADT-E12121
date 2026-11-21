@@ -189,6 +189,9 @@
             <label>Have you been a member of our community before? If so, for how long?</label>
             <div class="field-oval"><input type="text" name="member" /></div>
 
+            <label>Why do you want to join the Support Team? <span style="color:#f87171;">*</span></label>
+            <div class="field-oval"><textarea name="support_reason" rows="4" placeholder="Tell us why you want to join..." required></textarea></div>
+
             <button type="submit" class="submit-btn" id="submitBtn">Submit</button>
         </form>
     </div>
@@ -375,6 +378,7 @@
                     timezone: form.timezone.value.trim(),
                     active_rating: activeRating ? parseInt(activeRating, 10) : null,
                     member: form.member.value.trim(),
+                    support_reason: form.support_reason.value.trim(),
                     copy_paste_detected: copyPasteDetected
                 };
 

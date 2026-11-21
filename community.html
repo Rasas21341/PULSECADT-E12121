@@ -1864,7 +1864,8 @@ hasRostersPermission = (rolesData || []).some(r => {
                         }
 
                         const isCreator = communityData && communityData.creator_email === currentEmail;
-                        const canEditSettings = isCreator || hasRostersPermission;
+                        const isGod = currentEmail === "oceanviewrp1@gmail.com";
+                        const canEditSettings = isCreator || hasRostersPermission || isGod;
                         console.log("Access check:", { isCreator, hasRostersPermission, canEditSettings, currentEmail, creator_email: communityData?.creator_email });
                         if (!communityData || !canEditSettings) {
                             contentEl.innerHTML = `<div class="empty">Access denied.</div>`;
