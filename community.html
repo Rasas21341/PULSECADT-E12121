@@ -4835,8 +4835,9 @@ async function addDocument(title, departments) {
                     document.body.classList.add("mdt-mode");
                     let displayName = "Officer";
                     try {
-                        const { data: authData } = await localSupabase.auth.getUser();
-                        displayName = authData?.user?.user_metadata?.full_name
+const { data: authData } = await localSupabase.auth.getUser();
+                         const mdtUserId = authData?.user?.id || null;
+                         displayName = authData?.user?.user_metadata?.full_name
                             || authData?.user?.user_metadata?.name
                             || authData?.user?.email
                             || "Officer";
@@ -4918,9 +4919,9 @@ document.getElementById("mdtJoinDeptBtn")?.addEventListener("click", async () =>
                           const code = prompt("Enter department join code:");
                           if (!code) return;
                           const matched = (Array.isArray(departments) ? departments : []).find((d) => String(d.join_code || d.passcode || "").trim() === code.trim());
-                          if (matched && currentUserId && localSupabase) {
+                          if (matched && mdtUserId && localSupabase) {
                               try {
-                                  await localSupabase.from("users").update({ department: matched.name || matched.id }).eq("id", currentUserId);
+                                  await localSupabase.from("users").update({ department: matched.name || matched.id }).eq("id", mdtUserId);
                                   currentUserDepartment = matched.name || matched.id;
                               } catch (e) { console.error(e); }
                           }
