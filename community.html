@@ -4039,7 +4039,7 @@ async function loadPenalCodes() {
                             }
                         }
 
-                        async function addPenalCode(title, code, description, classification) {
+                        async function addPenalCode(title, code, description, classification, fine) {
                             if (!title || !localSupabase) return;
                             try {
                                 await localSupabase
@@ -4049,7 +4049,8 @@ async function loadPenalCodes() {
                                         title: title.trim(), 
                                         code: code.trim(), 
                                         description: description.trim(), 
-                                        classification: classification 
+                                        classification: classification,
+                                        fine_amount: fine
                                     }]);
                                 loadPenalCodes();
                             } catch (err) {
@@ -4057,7 +4058,7 @@ async function loadPenalCodes() {
                             }
                         }
 
-                        async function updatePenalCode(penalCodeId, title, code, description, classification) {
+                        async function updatePenalCode(penalCodeId, title, code, description, classification, fine) {
                             if (!title || !localSupabase) return;
                             try {
                                 await localSupabase
@@ -4066,7 +4067,8 @@ async function loadPenalCodes() {
                                         title: title.trim(), 
                                         code: code.trim(), 
                                         description: description.trim(), 
-                                        classification: classification 
+                                        classification: classification,
+                                        fine_amount: fine
                                     })
                                     .eq("id", penalCodeId);
                                 loadPenalCodes();
