@@ -4544,14 +4544,14 @@ async function addDocument(title, departments) {
 
                         const openAddApplicationBtn = document.getElementById("openAddApplicationBtn");
                         const newApplicationModal = document.getElementById("newApplicationModal");
-                        const newAppQuestion = document.getElementById("newAppQuestion");
+                        const newAppName = document.getElementById("newAppName");
                         const newAppSubmitBtn = document.getElementById("newAppSubmitBtn");
                         const newAppModalClose = document.getElementById("newAppModalClose");
                         const newAppError = document.getElementById("newAppError");
 
                         function openNewApplicationModal() {
                             if (!newApplicationModal) return;
-                            if (newAppQuestion) newAppQuestion.value = "";
+                            if (newAppName) newAppName.value = "";
                             if (newAppError) { newAppError.textContent = ""; newAppError.style.display = "none"; }
                             newApplicationModal.classList.add("open");
                         }
@@ -4573,25 +4573,25 @@ async function addDocument(title, departments) {
                         }
                         if (newAppSubmitBtn) {
                             newAppSubmitBtn.onclick = async () => {
-                                const question = newAppQuestion ? newAppQuestion.value.trim() : "";
-                                if (!question) {
-                                    if (newAppError) { newAppError.textContent = "Question is required."; newAppError.style.display = "block"; }
+                                const name = newAppName ? newAppName.value.trim() : "";
+                                if (!name) {
+                                    if (newAppError) { newAppError.textContent = "Application name is required."; newAppError.style.display = "block"; }
                                     return;
                                 }
                                 closeNewApplicationModal();
-                                await addApplication({ question });
+                                await addApplication({ name });
                             };
                         }
 
-                        async function addApplication({ question }) {
+                        async function addApplication({ name }) {
                             if (!localSupabase) return;
                             try {
                                 const payload = {
-                                    question: question || "",
+                                    name: name,
                                     community_id: currentCommunityId || null
                                 };
                                 const { error } = await localSupabase
-                                    .from("application_submissions")
+                                    .from("applications")
                                     .insert([payload]);
                                 if (error) {
                                     alert("Failed to create application: " + error.message);
