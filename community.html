@@ -5051,9 +5051,9 @@ async function addDocument(title, departments) {
 
         if (policeModal) {
             policeModal.addEventListener("click", (e) => {
-                if (e.target === policeModal) policeModal.classList.remove("open");
+                if (e.target === policeModal) { policeModal.classList.remove("open"); policeModal.style.display = "none"; }
             });
-            document.getElementById("policeModalClose")?.addEventListener("click", () => policeModal.classList.remove("open"));
+            document.getElementById("policeModalClose")?.addEventListener("click", () => { policeModal.classList.remove("open"); policeModal.style.display = "none"; });
         }
 
         const poSubmit = document.getElementById("poSubmit");
