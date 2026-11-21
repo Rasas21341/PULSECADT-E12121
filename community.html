@@ -1885,13 +1885,14 @@
     <div class="modal-overlay" id="newApplicationModal">
         <div class="modal">
             <div class="modal-header">
-                <div class="modal-title" style="font-size:15px;">New Question</div>
+                <div class="modal-title" style="font-size:15px;">Create Application</div>
                 <button class="modal-close" id="newAppModalClose" type="button" aria-label="Close">×</</button>
             </div>
             <div class="field">
-                <textarea id="newAppQuestion" placeholder="Type your question..." style="width:100%; padding:10px 12px; border-radius:10px; border:1px solid #cbd5e1; font-size:14px; font-family:inherit;"></textarea>
+                <label for="newAppName">Application Name</label>
+                <input type="text" id="newAppName" placeholder="e.g., Police Officer, Dispatcher, Support Team" />
             </div>
-            <button type="button" class="submit-btn" id="newAppSubmitBtn">Submit</button>
+            <button type="button" class="submit-btn" id="newAppSubmitBtn">Create</button>
             <div class="modal-error" id="newAppError"></div>
         </div>
     </div>
