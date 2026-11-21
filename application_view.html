@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application - PulseCAD</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #080d1f;
+            color: #1a202c;
+            padding: 40px 24px;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        #networkBackground {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            background: radial-gradient(circle at 50% 15%, #151c43 0%, #090d20 55%, #050713 100%);
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            z-index: 1;
+            pointer-events: none;
+            background:
+                linear-gradient(rgba(80, 105, 180, 0.035) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(80, 105, 180, 0.035) 1px, transparent 1px);
+            background-size: 54px 54px;
+        }
+
+        .container {
+            max-width: 720px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 2;
+            padding: 28px;
+            border: 1px solid rgba(148, 163, 184, 0.18);
+            border-radius: 20px;
+            background: rgba(248, 250, 252, 0.96);
+            box-shadow: 0 24px 80px rgba(0, 0, 0, 0.38);
+            backdrop-filter: blur(10px);
+        }
+
+        .app-head {
+            font-size: 22px;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 8px;
+        }
+
+        .app-subtitle {
+            font-size: 14px;
+            color: #64748b;
+            margin-bottom: 24px;
+        }
+
+        .app-form label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #334155;
+            margin-bottom: 8px;
+        }
+
+        .app-form .field-oval {
+            border: 1px solid #e2e8f0;
+            border-radius: 999px;
+            padding: 12px 16px;
+            margin-bottom: 16px;
+            background: #ffffff;
+        }
+
+        .app-form .field-oval input,
+        .app-form .field-oval textarea,
+        .app-form .field-oval select {
+            width: 100%;
+            border: none;
+            background: transparent;
+            padding: 0;
+            font-size: 14px;
+            color: #1a202c;
+            outline: none;
+            font-family: inherit;
+        }
+
+        .app-form .field-oval input:focus,
+        .app-form .field-oval textarea:focus,
+        .app-form .field-oval select:focus {
+            outline: none;
+        }
+
+        .app-form .field-oval textarea {
+            min-height: 100px;
+            resize: vertical;
+            padding: 8px 0;
+        }
+
+        .required-mark {
+            color: #f87171;
+            margin-left: 4px;
+        }
+
+        .checkbox-group, .radio-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .checkbox-label, .radio-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: #1a202c;
+            cursor: pointer;
+            font-weight: 400;
+        }
+
+        .checkbox-label input, .radio-label input {
+            width: 18px;
+            height: 18px;
+            accent-color: #2563eb;
+        }
+
+        .submit-btn {
+            margin-top: 8px;
+            width: 100%;
+            text-align: center;
+            padding: 12px 16px;
+            border-radius: 999px;
+            border: 1px solid #e2e8f0;
+            background: #2563eb;
+            color: #ffffff;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .submit-btn:hover {
+            background: #1d4ed8;
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .error-message {
+            color: #ef4444;
+            font-size: 13px;
+            margin-top: 4px;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #64748b;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="networkBackground" aria-hidden="true"></canvas>
+    <div class="container">
+        <div class="app-head" id="appTitle">Loading...</div>
+        <div class="app-subtitle" id="appSubtitle">Please wait...</div>
+        <form class="app-form" id="appForm">
+            <div id="questionsContainer"></div>
+            <button type="submit" class="submit-btn" id="submitBtn">Submit Application</button>
+        </form>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        (() => {
+            const canvas = document.getElementById("networkBackground");
+            if (!canvas) return;
+
+            const ctx = canvas.getContext("2d");
+            let nodes = [];
+            let width = 0;
+            let height = 0;
+
+            function resize() {
+                const dpr = Math.min(window.devicePixelRatio || 1, 2);
+                width = window.innerWidth;
+                height = window.innerHeight;
+                canvas.width = width * dpr;
+                canvas.height = height * dpr;
+                canvas.style.width = width + "px";
+                canvas.style.height = height + "px";
+                ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+                const count = Math.min(70, Math.max(28, Math.floor(width * height / 18000)));
+                nodes = Array.from({ length: count }, () => ({
+                    x: Math.random() * width,
+                    y: Math.random() * height,
+                    vx: (Math.random() - 0.5) * 0.24,
+                    vy: (Math.random() - 0.5) * 0.24,
+                    r: Math.random() * 1.2 + 0.7
+                }));
+            }
+
+            function draw() {
+                ctx.clearRect(0, 0, width, height);
+
+                for (let i = 0; i < nodes.length; i++) {
+                    const node = nodes[i];
+                    node.x += node.vx;
+                    node.y += node.vy;
+
+                    if (node.x < -20) node.x = width + 20;
+                    if (node.x > width + 20) node.x = -20;
+                    if (node.y < -20) node.y = height + 20;
+                    if (node.y > height + 20) node.y = -20;
+
+                    for (let j = i + 1; j < nodes.length; j++) {
+                        const other = nodes[j];
+                        const dx = node.x - other.x;
+                        const dy = node.y - other.y;
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+
+                        if (distance < 150) {
+                            ctx.beginPath();
+                            ctx.moveTo(node.x, node.y);
+                            ctx.lineTo(other.x, other.y);
+                            ctx.strokeStyle = `rgba(92, 115, 190, ${(1 - distance / 150) * 0.22})`;
+                            ctx.lineWidth = 0.7;
+                            ctx.stroke();
+                        }
+                    }
+
+                    ctx.beginPath();
+                    ctx.arc(node.x, node.y, node.r, 0, Math.PI * 2);
+                    ctx.fillStyle = "rgba(145, 166, 218, 0.48)";
+                    ctx.fill();
+                }
+
+                requestAnimationFrame(draw);
+            }
+
+            window.addEventListener("resize", resize);
+            resize();
+            draw();
+        })();
+
+        const SUPABASE_URL = "https://zwdogalwbczdtvxvhrfd.supabase.co";
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp3ZG9nYWx3YmN6ZHR2eHZocmZkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM2NTA2MjQsImV4cCI6MjA5OTIyNjYyNH0.baPVVTtW0d3FDC2pTd1P3d5aoIc2FZkaD-6bBvDPFWw";
+
+        const localSupabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const form = document.getElementById("appForm");
+        const questionsContainer = document.getElementById("questionsContainer");
+        const appTitle = document.getElementById("appTitle");
+        const appSubtitle = document.getElementById("appSubtitle");
+        const submitBtn = document.getElementById("submitBtn");
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const applicationId = urlParams.get("id");
+
+        async function loadApplication() {
+            if (!applicationId || !localSupabase) {
+                appTitle.textContent = "Invalid Application";
+                appSubtitle.textContent = "No application ID provided.";
+                questionsContainer.innerHTML = "";
+                submitBtn.disabled = true;
+                return;
+            }
+
+            try {
+                // Fetch application
+                const { data: app, error: appError } = await localSupabase
+                    .from("applications")
+                    .select("*")
+                    .eq("id", applicationId)
+                    .maybeSingle();
+
+                if (appError || !app) {
+                    throw new Error("Application not found");
+                }
+
+                appTitle.textContent = app.name;
+                appSubtitle.textContent = `Submit your application for ${app.name}`;
+
+                // Fetch questions
+                const { data: questions, error: qError } = await localSupabase
+                    .from("application_questions")
+                    .select("*")
+                    .eq("application_id", applicationId)
+                    .order("display_order", { ascending: true });
+
+                if (qError) throw qError;
+
+                renderQuestions(questions || []);
+            } catch (err) {
+                console.error("Failed to load application:", err);
+                appTitle.textContent = "Error";
+                appSubtitle.textContent = "Failed to load application.";
+                questionsContainer.innerHTML = `<div style="color:#ef4444; text-align:center; padding:20px;">${err.message}</div>`;
+                submitBtn.disabled = true;
+            }
+        }
+
+        function renderQuestions(questions) {
+            if (!questions.length) {
+                questionsContainer.innerHTML = '<div style="color:#64748b; text-align:center; padding:20px;">This application has no questions yet.</div>';
+                return;
+            }
+
+            questionsContainer.innerHTML = questions.map((q) => {
+                const required = q.required !== false;
+                const fieldId = `q_${q.id}`;
+                const errorId = `err_${q.id}`;
+
+                let inputHtml = "";
+                switch (q.question_type) {
+                    case "textarea":
+                        inputHtml = `<textarea id="${fieldId}" name="${fieldId}" ${required ? "required" : ""} placeholder="Your answer..."></textarea>`;
+                        break;
+                    case "select":
+                        const options = Array.isArray(q.options) ? q.options : [];
+                        inputHtml = `<select id="${fieldId}" name="${fieldId}" ${required ? "required" : ""}>
+                            <option value="">Select an option</option>
+                            ${options.map(opt => `<option value="${escapeHtml(opt)}">${escapeHtml(opt)}</option>`).join("")}
+                        </select>`;
+                        break;
+                    case "radio":
+                        const radioOptions = Array.isArray(q.options) ? q.options : [];
+                        inputHtml = `<div class="radio-group" id="${fieldId}" name="${fieldId}" ${required ? "required" : ""}>
+                            ${radioOptions.map((opt, i) => `
+                                <label class="radio-label">
+                                    <input type="radio" name="${fieldId}" value="${escapeHtml(opt)}" ${i === 0 && required ? "required" : ""} />
+                                    ${escapeHtml(opt)}
+                                </label>
+                            `).join("")}
+                        </div>`;
+                        break;
+                    case "checkbox":
+                        const checkOptions = Array.isArray(q.options) ? q.options : [];
+                        inputHtml = `<div class="checkbox-group" id="${fieldId}" name="${fieldId}">
+                            ${checkOptions.map(opt => `
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="${fieldId}" value="${escapeHtml(opt)}" />
+                                    ${escapeHtml(opt)}
+                                </label>
+                            `).join("")}
+                        </div>`;
+                        break;
+                    case "number":
+                        inputHtml = `<input type="number" id="${fieldId}" name="${fieldId}" ${required ? "required" : ""} placeholder="Enter a number" />`;
+                        break;
+                    case "email":
+                        inputHtml = `<input type="email" id="${fieldId}" name="${fieldId}" ${required ? "required" : ""} placeholder="you@example.com" />`;
+                        break;
+                    default: // text
+                        inputHtml = `<input type="text" id="${fieldId}" name="${fieldId}" ${required ? "required" : ""} placeholder="Your answer..." />`;
+                }
+
+                return `
+                    <label>
+                        ${escapeHtml(q.question_text)}${required ? '<span class="required-mark">*</span>' : ''}
+                        <div class="field-oval" data-question-id="${q.id}" data-question-type="${q.question_type}" data-required="${required}">
+                            ${inputHtml}
+                        </div>
+                        <div class="error-message" id="${errorId}"></div>
+                    </label>
+                `;
+            }).join("");
+        }
+
+        function escapeHtml(text) {
+            if (text === null || text === undefined) return "";
+            const div = document.createElement("div");
+            div.textContent = String(text);
+            return div.innerHTML;
+        }
+
+        async function submitApplication(e) {
+            e.preventDefault();
+
+            if (!applicationId || !localSupabase) return;
+
+            const { data: { user } } = await localSupabase.auth.getUser();
+            if (!user) {
+                alert("You must be logged in to submit an application.");
+                return;
+            }
+
+            const questions = questionsContainer.querySelectorAll("[data-question-id]");
+            const answers = {};
+            let valid = true;
+
+            questions.forEach((field) => {
+                const qId = field.getAttribute("data-question-id");
+                const qType = field.getAttribute("data-question-type");
+                const required = field.getAttribute("data-required") === "true";
+                const errorEl = document.getElementById(`err_${qId}`);
+                let value;
+
+                if (qType === "radio" || qType === "checkbox") {
+                    const inputs = field.querySelectorAll(`input[name="q_${qId}"]`);
+                    if (qType === "radio") {
+                        const checked = Array.from(inputs).find(i => i.checked);
+                        value = checked ? checked.value : "";
+                    } else {
+                        value = Array.from(inputs).filter(i => i.checked).map(i => i.value);
+                    }
+                } else {
+                    const input = field.querySelector("input, textarea, select");
+                    value = input ? input.value.trim() : "";
+                }
+
+                if (required && (value === "" || (Array.isArray(value) && value.length === 0))) {
+                    if (errorEl) {
+                        errorEl.textContent = "This field is required.";
+                        errorEl.classList.add("show");
+                    }
+                    valid = false;
+                } else {
+                    if (errorEl) errorEl.classList.remove("show");
+                }
+
+                answers[qId] = value;
+            });
+
+            if (!valid) return;
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = "Submitting...";
+
+            try {
+                const payload = {
+                    application_id: applicationId,
+                    user_id: user.id,
+                    user_email: user.email,
+                    answers: answers,
+                    submitted_at: new Date().toISOString()
+                };
+
+                const { error } = await localSupabase
+                    .from("application_submissions")
+                    .insert([payload]);
+
+                if (error) throw error;
+
+                submitBtn.textContent = "Submitted";
+                submitBtn.style.background = "#22c55e";
+                alert("Application submitted successfully!");
+                form.reset();
+            } catch (err) {
+                console.error("Submit failed:", err);
+                alert("Failed to submit: " + err.message);
+                submitBtn.disabled = false;
+                submitBtn.textContent = "Submit Application";
+            }
+        }
+
+        if (form) {
+            form.addEventListener("submit", submitApplication);
+        }
+
+        loadApplication();
+    </script>
+</body>
+</html>

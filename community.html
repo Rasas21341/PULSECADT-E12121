@@ -4793,7 +4793,7 @@ let html = '<div class="members-view-list">';
                                 if (!applicationId) return;
 
                                 if (action === "open-application") {
-                                    window.open(`/application.html?id=${encodeURIComponent(applicationId)}`, "_blank");
+                                    window.open(`/application_view.html?id=${encodeURIComponent(applicationId)}`, "_blank");
                                 } else if (action === "edit-application") {
                                     openEditApplicationModal(applicationId);
                                 } else if (action === "delete-application") {
