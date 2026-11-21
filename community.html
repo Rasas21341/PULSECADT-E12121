@@ -4836,12 +4836,20 @@ async function addDocument(title, departments) {
 let displayName = "Officer";
                      let mdtUserId = null;
                      try {
-                         const { data: authData } = await localSupabase.auth.getUser();
+const { data: authData } = await localSupabase.auth.getUser();
                          mdtUserId = authData?.user?.id || null;
                          displayName = authData?.user?.user_metadata?.full_name
-                            || authData?.user?.user_metadata?.name
-                            || authData?.user?.email
-                            || "Officer";
+                             || authData?.user?.user_metadata?.name
+                             || authData?.user?.email
+                             || "Officer";
+                         // load saved department
+                         let savedDept = null;
+                         if (mdtUserId) {
+                             try {
+                                 const { data: u } = await localSupabase.from("users").select("department").eq("id", mdtUserId).maybeSingle();
+                                 savedDept = u?.department || null;
+                             } catch (e) {}
+                         }
                     } catch (e) {}
 
                     contentEl.innerHTML = `
@@ -4936,6 +4944,7 @@ document.getElementById("mdtJoinDeptBtn")?.addEventListener("click", async () =>
                           alert("Joined department");
                       });
                      if (departmentList) departmentList.style.display = "none";
+                      if (savedDept && departmentList) departmentList.style.display = "block";
                      document.getElementById("mdtCivilianBtn")?.addEventListener("click", () => {
                          window.open(`/civilian.html?communityId=${id}`, "_blank");
                      });
