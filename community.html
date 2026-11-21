@@ -1189,6 +1189,39 @@
             color: #ef4444;
         }
 
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 8px 14px;
+            border-radius: 6px;
+            border: 1px solid #cbd5e1;
+            background: #ffffff;
+            color: #0f172a;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s;
+            font-family: inherit;
+        }
+        .btn:hover {
+            background: #f8fafc;
+            border-color: #94a3b8;
+        }
+        .btn.sm {
+            padding: 5px 12px;
+            font-size: 12px;
+        }
+        .btn.primary {
+            background: #2563eb;
+            color: #ffffff;
+            border-color: #2563eb;
+        }
+        .btn.primary:hover {
+            background: #1d4ed8;
+        }
+
         .penal-codes-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
@@ -4935,10 +4968,10 @@ let html = '<div class="members-view-list">';
                         }
 
                         // Question Modal handlers
-                        function openQuestionModal(questionId = null, mode = "add") {
+                        function openQuestionModal(questionIdParam = null, mode = "add") {
                             if (!questionModal) return;
-                            if (questionId) {
-                                questionId.value = questionId;
+                            if (questionIdParam) {
+                                questionId.value = questionIdParam;
                                 questionModalTitle.textContent = "Edit Question";
                             } else {
                                 questionId.value = "";
@@ -4953,11 +4986,11 @@ let html = '<div class="members-view-list">';
                             toggleOptionsField();
                             questionModal.classList.add("open");
                             // Load existing data if editing
-                            if (mode === "edit" && questionId.value && localSupabase) {
+                            if (mode === "edit" && questionIdParam && localSupabase) {
                                 localSupabase
                                     .from("application_questions")
                                     .select("*")
-                                    .eq("id", questionId.value)
+                                    .eq("id", questionIdParam)
                                     .single()
                                     .then(({ data, error }) => {
                                         if (!error && data) {
