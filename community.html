@@ -2342,10 +2342,17 @@ hasRostersPermission = (rolesData || []).some(r => {
     <input type="text" id="erlcApiKeyInput" placeholder="ERLC API key" value="${initialErkKey.replace(/</g, '&lt;').replace(/>/g, '&gt;')}" />
 </div>
 <div class="field">
-                                               <label>Supervisor Password</label>
-                                               <input type="text" id="supervisorInput" placeholder="Supervisor password" value="${(communityData.supervisor || '').replace(/</g, '&lt;').replace(/>/g, '&gt;')}" />
-                                           </div>
-                                           <div class="field">
+                                            <label>Supervisor Password</label>
+                                            <input type="text" id="supervisorInput" placeholder="Supervisor password" value="${(communityData.supervisor || '').replace(/</g, '<').replace(/>/g, '>')}" />
+                                        </div>
+                                        ${communityData.pro ? `
+                                        <div class="field">
+                                            <label>Custom Code (Pro)</label>
+                                            <textarea id="customCodeInput" placeholder="Enter custom CSS/JS to inject into your community pages..." style="min-height:120px; font-family:monospace; font-size:13px; line-height:1.5;">${(communityData.custom_code || '').replace(/</g, '<').replace(/>/g, '>')}</textarea>
+                                            <p style="font-size:12px; color:#64748b; margin-top:6px;">Custom CSS/JS injected into your community dashboard and MDT. Available for Pro communities only.</p>
+                                        </div>
+                                        ` : ''}
+                                        <div class="field">
                                                <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:14px; font-weight:600; color:#334155;">
                                                    <input type="checkbox" id="modToolsOffDutyToggle" style="cursor:pointer; width:18px; height:18px;" ${communityData.mod_tools_off_duty ? 'checked' : ''} />
                                                    <span>Toggle toolboxes while off duty</span>
@@ -2478,9 +2485,10 @@ hasRostersPermission = (rolesData || []).some(r => {
                                      </div>
                                  </div>
                                         </div>
-                                    </div>
-                                </div>
-                         `;
+</div>
+                                 </div>
+                                 ${communityData.custom_code ? `<script>${communityData.custom_code}</script>` : ''}
+                            `;
 
                          const serverNameInput = document.getElementById("serverNameInput");
                          const approvalBtns = document.getElementById("settingsView").querySelectorAll(".approval-btn");
@@ -2764,20 +2772,37 @@ if (erlcApiKeyInput) {
                               });
 }
 
-                         if (supervisorInput) {
-                              supervisorInput.addEventListener("blur", async () => {
-                                  const val = supervisorInput.value.trim();
-                                  try {
-                                      const { error } = await localSupabase
-                                          .from("communities")
-                                          .update({ supervisor: val || null })
-                                          .eq("id", id);
-                                      if (error) console.warn("DB save of supervisor failed:", error.message);
-                                  } catch (err) {
-                                      console.error("Failed to save supervisor:", err);
-                                  }
-                               });
-                           }
+if (supervisorInput) {
+                                supervisorInput.addEventListener("blur", async () => {
+                                    const val = supervisorInput.value.trim();
+                                    try {
+                                        const { error } = await localSupabase
+                                            .from("communities")
+                                            .update({ supervisor: val || null })
+                                            .eq("id", id);
+                                        if (error) console.warn("DB save of supervisor failed:", error.message);
+                                    } catch (err) {
+                                        console.error("Failed to save supervisor:", err);
+                                    }
+                                });
+                            }
+
+                            // Custom Code (Pro only)
+                            const customCodeInput = document.getElementById("customCodeInput");
+                            if (customCodeInput) {
+                                customCodeInput.addEventListener("blur", async () => {
+                                    const val = customCodeInput.value.trim();
+                                    try {
+                                        const { error } = await localSupabase
+                                            .from("communities")
+                                            .update({ custom_code: val || null })
+                                            .eq("id", id);
+                                        if (error) console.warn("DB save of custom_code failed:", error.message);
+                                    } catch (err) {
+                                        console.error("Failed to save custom_code:", err);
+                                    }
+                                });
+                            }
 
                            const modToolsOffDutyToggle = document.getElementById("modToolsOffDutyToggle");
                            if (modToolsOffDutyToggle) {
