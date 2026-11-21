@@ -2315,9 +2315,18 @@ hasRostersPermission = (rolesData || []).some(r => {
                                                 <button type="button" class="approval-btn ${approvalMode === 'manual' ? 'active' : ''}" data-value="manual">Manual Approval</button>
                                             </div>
                                         </div>
-                                        <div class="field">
+<div class="field">
                                             <label>Community Passcode</label>
-                                            <input type="text" id="communityPasscodeInput" placeholder="Leave blank for no passcode" value="${(communityData.passcode || '').replace(/</g, '&lt;').replace(/>/g, '&gt;')}" />
+                                            <input type="text" id="communityPasscodeInput" placeholder="Leave blank for no passcode" value="${(communityData.passcode || '').replace(/</g, '<').replace(/>/g, '>')}" />
+                                        </div>
+                                        <div class="field">
+                                            <label>Join Code</label>
+                                            <div style="display:flex; align-items:center; gap:8px;">
+                                                <input type="text" id="joinCodeInput" readonly value="${(communityData.join_code || '').replace(/</g, '<').replace(/>/g, '>')}" style="flex:1; background:#f8fafc; color:#64748b; font-family:monospace; font-size:14px; letter-spacing:1px;" />
+                                                <button type="button" class="btn sm" id="copyJoinCodeBtn" title="Copy to clipboard">Copy</button>
+                                                <button type="button" class="btn sm" id="regenerateJoinCodeBtn" title="Generate new code">Regenerate</button>
+                                            </div>
+                                            <p style="font-size:12px; color:#64748b; margin-top:6px;">Share this code with members to let them join your community.</p>
                                         </div>
 <div class="field">
     <label>ERLC API Key</label>
