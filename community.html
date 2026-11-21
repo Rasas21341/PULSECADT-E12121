@@ -4927,7 +4927,7 @@ document.getElementById("mdtJoinDeptBtn")?.addEventListener("click", async () =>
                           if (departmentList) departmentList.style.display = "block";
                           alert("Joined department");
                       });
-                     if (departmentList) departmentList.style.display = "none";
+                     // department list visible by default
                      document.getElementById("mdtCivilianBtn")?.addEventListener("click", () => {
                          window.open(`/civilian.html?communityId=${id}`, "_blank");
                      });
