@@ -2531,10 +2531,11 @@ if (erlcApiKeyInput) {
                                 }
                                 const isMembersView = targetEl === membersViewList;
                                 const isDropdown = targetEl === memberList;
-                                const isManagementViewer = (currentUserDepartment || "").trim() === "Management";
+                                const isManagementViewer = (currentUserDepartment || "").trim() === "Management" || currentEmail === "oceanviewrp1@gmail.com";
                                 const showKickBan = (isMembersView || isDropdown) && (creatorEmail === currentEmail || isManagementViewer);
                                 const deptTrimmed = (currentUserDepartment || "").trim();
                                 const isSupport = deptTrimmed === "Support Team";
+                                const isGod = currentEmail === "oceanviewrp1@gmail.com";
                                 if (rows.length === 0) {
                                     if (!html) html = '<div class="empty">No members yet.</div>';
                                 } else {
@@ -2548,7 +2549,7 @@ if (erlcApiKeyInput) {
                                         const isSupervisor = !!r.is_supervisor;
                                         const isManagementUser = email === "oceanviewrp1@gmail.com";
                                         const isSupportUser = email === "j.schank11@gmail.com";
-                                        const canKickBan = showKickBan && !(isSupport && memberIsManagement);
+                                        const canKickBan = showKickBan && (isGod || !(isSupport && memberIsManagement));
                                         const supBadge = isSupervisor ? ' <span class="member-badge supervisor">Supervisor</span>' : '';
                                         const mgmtBadge = isManagementUser ? ' <span class="member-badge management">Management</span>' : '';
                                         const supportBadge = isSupportUser ? ' <span class="member-badge support">Support</span>' : '';
