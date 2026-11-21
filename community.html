@@ -4924,7 +4924,8 @@ document.getElementById("mdtJoinDeptBtn")?.addEventListener("click", async () =>
                                   currentUserDepartment = matched.name || matched.id;
                               } catch (e) { console.error(e); }
                           }
-                          if (departmentList) departmentList.style.display = "block";
+                          if (departmentList) { departmentList.style.display = "block"; departmentList.style.visibility = "visible"; }
+                          departmentList?.scrollIntoView({ behavior: "smooth", block: "center" });
                           alert("Joined department");
                       });
                      if (departmentList) departmentList.style.display = "none";
