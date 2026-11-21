@@ -3566,7 +3566,7 @@ if (loggedInScreen) loggedInScreen.classList.remove("open");
               const panelButtons = !isSuspended
                   ? isManagementViewer
                       ? `<button type="button" class="panel-manage-btn panel-mod" data-id="${id || ''}">${settingsIcon}Server Moderation</button>`
-                      : `<button type="button" class="panel-btn panel-open-mdt" data-id="${id || ''}">${buildingIcon}Open MDT</button><button type="button" class="panel-manage-btn panel-manage" data-id="${id || ''}">${settingsIcon}Manage</button><button type="button" class="panel-manage-btn panel-mod" data-id="${id || ''}">${settingsIcon}Server Moderation</button>`
+                      : `<button type="button" class="panel-btn panel-open-mdt" data-id="${id || ''}">Open MDT</button><button type="button" class="panel-manage-btn panel-manage" data-id="${id || ''}">${settingsIcon}Manage</button><button type="button" class="panel-manage-btn panel-mod" data-id="${id || ''}">${settingsIcon}Server Moderation</button>`
                   : "";
               const joinBtn = (!isJoined && !isCreator && !isSuspended) ? '<button type="button" class="community-list-join">Join</button>' : "";
               card.innerHTML = `<div class="community-banner-container">${bannerImg}</div><div class="community-list-info"${communityId}><div class="community-list-name">${escapedName}</div>${creatorText}${isSuspended ? '<div class="community-list-meta" style="color:#dc2626;font-weight:700;">This community has been suspended.</div>' : ''}<div class="community-list-meta"></div></div>${badgesHtml}${lockIcon}${kebabHtml}<div class="community-list-actions">${panelButtons}${leaveBtn}${joinBtn}</div>`;
