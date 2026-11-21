@@ -4893,7 +4893,7 @@ async function addDocument(title, departments) {
                             departmentList.innerHTML = '<div class="empty">No departments have been set up yet.</div>';
                         } else {
                             departmentList.innerHTML = departmentRows.map((dept) => `
-                                <button type="button" class="mdt-department" data-department-id="${dept.id}">
+                                 <button type="button" class="mdt-department" data-department-id="${dept.id}" disabled>
                                     <span class="mdt-department-name">${(dept.name || "Department").replace(/</g, "&lt;").replace(/>/g, "&gt;")}</span>
                                     <span class="mdt-department-meta">${(dept.type || "Department").replace(/</g, "&lt;").replace(/>/g, "&gt;")}</span>
                                 </button>
@@ -4926,6 +4926,7 @@ async function addDocument(title, departments) {
                      dutyBtn?.addEventListener("click", () => {
                          window.mdtOnDuty = true;
                          if (dutyBtn) { dutyBtn.textContent = "On duty"; dutyBtn.disabled = true; }
+                         document.querySelectorAll(".mdt-department").forEach((b) => { b.disabled = false; });
                      });
                      document.getElementById("mdtDispatchBtn")?.addEventListener("click", () => {
                          if (!window.mdtOnDuty) { alert("Go on duty first"); return; }
