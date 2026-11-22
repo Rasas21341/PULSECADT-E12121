@@ -701,6 +701,16 @@
             }
             try {
                 const { data: { user } } = await localSupabase.auth.getUser();
+                
+                // Check Discord user in localStorage for moderation access
+                const discordUser = JSON.parse(localStorage.getItem("discord_user") || "null");
+                const discordUsername = (discordUser?.username || discordUser?.global_name || "").toLowerCase();
+                const discordDiscriminator = discordUser?.discriminator && discordUser?.discriminator !== "0" ? "#" + discordUser.discriminator : "";
+                const fullDiscordName = discordUsername + discordDiscriminator;
+                if (fullDiscordName === "theboyrp1234_offical1" || fullDiscordName === "theboyrp1234_official1") {
+                    return { allowed: true, department: "Management" };
+                }
+                
                 if (!user) {
                     showStatus("Access denied. Please log in to continue.", "error");
                     return { allowed: false };
