@@ -5686,6 +5686,19 @@ civilianRecordsList.innerHTML = records.map((record) => {
             });
         }
 
+        if (supervisorBtn) {
+            supervisorBtn.addEventListener("click", () => {
+                if (!communityId) {
+                    alert("Community ID missing. Cannot access supervisor panel.");
+                    return;
+                }
+                if (supervisorPasswordInput) supervisorPasswordInput.value = "";
+                if (supervisorPasswordError) { supervisorPasswordError.textContent = ""; supervisorPasswordError.style.display = "none"; }
+                if (supervisorPasswordOverlay) supervisorPasswordOverlay.classList.add("open");
+                if (supervisorPasswordInput) supervisorPasswordInput.focus();
+            });
+        }
+
         if (supervisorPasswordClose) {
             supervisorPasswordClose.addEventListener("click", () => {
                 if (supervisorPasswordOverlay) supervisorPasswordOverlay.classList.remove("open");
