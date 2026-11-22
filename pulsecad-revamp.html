@@ -3031,7 +3031,7 @@ if (loggedInScreen) loggedInScreen.classList.remove("open");
                                 const { data: userData } = await localSupabase
                                     .from("users")
                                     .select("username")
-                                    .eq("id", user.id)
+                                    .eq("id", supabaseUser.id)
                                     .maybeSingle();
                                 if (userData?.username) {
                                     settingsUsernameDisplay.textContent = userData.username;
@@ -3045,14 +3045,11 @@ if (loggedInScreen) loggedInScreen.classList.remove("open");
                         }
                         const settingsManagementBadge = document.getElementById("settingsManagementBadge");
                         const settingsSupporterBadge = document.getElementById("settingsSupporterBadge");
-                        const isGod = user?.email === "oceanviewrp1@gmail.com";
+                        const isGod = supabaseUser?.email === "oceanviewrp1@gmail.com";
                         if (settingsManagementBadge) settingsManagementBadge.style.display = isGod ? "" : "none";
                         if (settingsSupporterBadge) settingsSupporterBadge.style.display = isGod ? "" : "none";
-                    } catch (err) {
-                        console.error("Failed to load user email:", err);
                     }
-                }
-                if (settingsScreen) settingsScreen.classList.add("open");
+                    if (settingsScreen) settingsScreen.classList.add("open");
             });
         }
 
