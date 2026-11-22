@@ -1097,8 +1097,10 @@
             background: #1d4ed8;
         }
 
-        @media (max-width: 480px) {
-            .create-community-centered-btn,
+         @media (max-width: 480px) {
+             .topbar { flex-wrap: wrap; gap: 4px; padding: 6px 8px; }
+             .topbar .login-btn, .topbar .pro-btn, .topbar .features-btn { padding: 4px 8px; font-size: 11px; }
+         }
             .join-community-centered-btn {
                 padding: 6px 12px;
                 font-size: 12px;
