@@ -2601,7 +2601,15 @@
         <span class="live-map-btn-label">Live Map</span>
     </button>
 
-    <div class="units-citations-overlay" id="unitsCitationsOverlay">
+    <div class="units-citations-overlay" id="penalCodesOverlay">
+        <div class="units-citations-modal">
+            <div class="units-citations-header">
+                <div class="units-citations-title">Penal Codes</div>
+                <button class="units-citations-close" id="penalCodesClose" type="button" aria-label="Close">×</button>
+            </div>
+            <div id="penalCodesListPolice"></div>
+        </div>
+    </div>
         <div class="units-citations-modal">
             <div class="units-citations-header">
                 <div class="units-citations-title">Units / Citations</div>
@@ -5956,6 +5964,7 @@ civilianRecordsList.innerHTML = records.map((record) => {
 
                      </div>
                      <button type="button" class="supervisor-panel-btn" id="supervisorCitationsBtn" style="margin: 10px 0;">View Citations</button>
+                     <button type="button" class="supervisor-panel-btn" id="supervisorPenalBtn" style="margin: 10px 0;">View Penal Codes</button>
                      <div class="supervisor-section-title">🚑 ON DUTY UNITS</div>
                 <div class="supervisor-units-table-wrap">
                     <table class="supervisor-units-table">
@@ -6004,11 +6013,17 @@ civilianRecordsList.innerHTML = records.map((record) => {
             });
         }
 
-        if (unitsCitationsOverlay) {
-            unitsCitationsOverlay.addEventListener("click", (e) => {
-                if (e.target === unitsCitationsOverlay) {
-                    unitsCitationsOverlay.classList.remove("open");
-                }
+        const penalCodesClose = document.getElementById("penalCodesClose");
+        if (penalCodesClose) {
+            penalCodesClose.addEventListener("click", () => {
+                const overlay = document.getElementById("penalCodesOverlay");
+                if (overlay) overlay.classList.remove("open");
+            });
+        }
+        const penalCodesOverlay = document.getElementById("penalCodesOverlay");
+        if (penalCodesOverlay) {
+            penalCodesOverlay.addEventListener("click", (e) => {
+                if (e.target === penalCodesOverlay) penalCodesOverlay.classList.remove("open");
             });
         }
 
@@ -6016,6 +6031,19 @@ civilianRecordsList.innerHTML = records.map((record) => {
             supervisorPanelContent.addEventListener("click", (e) => {
                 const btn = e.target && e.target.closest ? e.target.closest("#supervisorCitationsBtn") : null;
                 if (btn && unitsCitationsBtn) unitsCitationsBtn.click();
+                const pbtn = e.target && e.target.closest ? e.target.closest("#supervisorPenalBtn") : null;
+                if (pbtn) {
+                    const overlay = document.getElementById("penalCodesOverlay");
+                    const list = document.getElementById("penalCodesListPolice");
+                    if (overlay) overlay.classList.add("open");
+                    if (list && localSupabase) {
+                        list.innerHTML = "Loading...";
+                        localSupabase.from("penal_codes").select("*").order("title").then(({data,err})=>{
+                            if (err || !data || !data.length) { list.innerHTML = "No penal codes."; return; }
+                            list.innerHTML = data.map(pc=>`<div style="padding:8px;border-bottom:1px solid #333"><strong>${pc.title||''}</strong> ${pc.code||''} <span>${pc.classification||''}</span><div>${pc.description||''}</div></div>`).join("");
+                        });
+                    }
+                }
             });
         }
 
