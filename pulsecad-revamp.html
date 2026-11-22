@@ -3005,11 +3005,28 @@ if (loggedInScreen) loggedInScreen.classList.remove("open");
                 const joinedDate = localStorage.getItem("pulsecad_joined") || new Date().toLocaleDateString();
                 localStorage.setItem("pulsecad_joined", joinedDate);
                 if (settingsJoined) settingsJoined.textContent = joinedDate;
-                if (settingsEmail && localSupabase) {
-                    try {
-                        const { data: { user } } = await localSupabase.auth.getUser();
-                        if (user?.email) settingsEmail.textContent = user.email;
-                        if (settingsUsernameDisplay && user?.id) {
+                if (settingsEmail) {
+                    let emailSet = false;
+                    let supabaseUser = null;
+                    if (localSupabase) {
+                        try {
+                            const { data: { user } } = await localSupabase.auth.getUser();
+                            supabaseUser = user;
+                            if (user?.email) {
+                                settingsEmail.textContent = user.email;
+                                emailSet = true;
+                            }
+                        } catch (err) {
+                            console.error("Failed to load user email from Supabase:", err);
+                        }
+                    }
+                    if (!emailSet) {
+                        const discordUser = JSON.parse(localStorage.getItem("discord_user") || "null");
+                        if (discordUser?.email) {
+                            settingsEmail.textContent = discordUser.email;
+                        }
+                    }
+                    if (settingsUsernameDisplay && supabaseUser) {
                             try {
                                 const { data: userData } = await localSupabase
                                     .from("users")
