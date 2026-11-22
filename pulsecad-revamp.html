@@ -2640,6 +2640,7 @@ enable-ga="false"
 
             if (topbar) topbar.style.display = "none";
             if (userDropdown) userDropdown.style.display = "inline-flex";
+            if (userEmailDisplay) userEmailDisplay.textContent = displayName || userData.global_name || userData.username || "";
             if (container) container.style.display = "none";
 if (loggedInScreen) loggedInScreen.classList.add("open");
             if (authModal) authModal.classList.remove("open");
@@ -3458,13 +3459,24 @@ if (loggedInScreen) loggedInScreen.classList.remove("open");
          }
 
         async function restoreSession() {
-            if (!localSupabase) return;
+             const discordUser = getStoredDiscordUser();
+             const discordUsername = discordUser ? discordUser.global_name || discordUser.username || "" : "";
+             const discordDisplayName = discordUser
+                 ? discordUsername + (discordUser.discriminator && discordUser.discriminator !== "0" ? "#" + discordUser.discriminator : "")
+                 : "";
+
+             if (!localSupabase) {
+                 if (discordUser) updateDiscordUserUI(discordUser, discordDisplayName);
+                 return;
+             }
             try {
                 const { data: { session } } = await localSupabase.auth.getSession();
                 if (session && session.user) {
                     applyLoggedInUI(session.user.email || "");
                     updatePremiumUI();
                     loadCommunities();
+                 } else if (discordUser) {
+                     updateDiscordUserUI(discordUser, discordDisplayName);
                 } else {
                     applyLoggedOutUI();
                 }
@@ -3493,13 +3505,6 @@ if (loggedInScreen) loggedInScreen.classList.remove("open");
         refreshLockdown();
 
         handleDiscordCallback();
-
-        const storedDiscordUser = getStoredDiscordUser();
-        if (storedDiscordUser) {
-            const discordUsername = storedDiscordUser.global_name || storedDiscordUser.username || "";
-            const displayName = discordUsername + (storedDiscordUser.discriminator && storedDiscordUser.discriminator !== "0" ? "#" + storedDiscordUser.discriminator : "");
-            updateDiscordUserUI(storedDiscordUser, displayName);
-        }
 
         function generatePasscode() {
             const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
