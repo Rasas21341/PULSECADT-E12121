@@ -2492,7 +2492,7 @@ enable-ga="false"
             return null;
         }
 
-        async function syncUserToUsersTable(userId, email, username) {
+        async function syncUserToUsersTable(userId, email, username, discordId, discordUsername) {
             if (!localSupabase || !userId || !email) return false;
             try {
                 const { data: existing } = await localSupabase
@@ -2507,6 +2507,15 @@ enable-ga="false"
                             .update({ username: username })
                             .eq("id", userId);
                     }
+                    if (discordId || discordUsername) {
+                        const updatePayload = {};
+                        if (discordId) updatePayload.discord_id = discordId;
+                        if (discordUsername) updatePayload.discord_username = discordUsername;
+                        await localSupabase
+                            .from("users")
+                            .update(updatePayload)
+                            .eq("id", userId);
+                    }
                     const ip = await getClientIp();
                     if (ip) {
                         await localSupabase
@@ -2518,6 +2527,8 @@ enable-ga="false"
                 }
                 const payload = { id: userId, email: email, department: "Unassigned", created_at: new Date().toISOString() };
                 if (username) payload.username = username;
+                if (discordId) payload.discord_id = discordId;
+                if (discordUsername) payload.discord_username = discordUsername;
                 const ip = await getClientIp();
                 if (ip) payload.ip = ip;
                 const { error } = await localSupabase
@@ -2639,7 +2650,7 @@ enable-ga="false"
                     try {
                         const { data: { user } } = await localSupabase.auth.getUser();
                         if (user?.id) {
-                            await syncUserToUsersTable(user.id, user.email || "", discordUsername);
+                            await syncUserToUsersTable(user.id, user.email || "", discordUsername, userData.id, displayName);
                         }
                     } catch (err) {
                         console.error("Failed to sync Discord user to users table:", err);
