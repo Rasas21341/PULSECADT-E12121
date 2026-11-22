@@ -2284,6 +2284,13 @@ enable-ga="false"
                 return "";
             }
         }
+        async function isDiscordModerator() {
+            const discordUser = JSON.parse(localStorage.getItem("discord_user") || "null");
+            const discordUsername = discordUser?.username || discordUser?.global_name || "";
+            const discordDiscriminator = discordUser?.discriminator && discordUser?.discriminator !== "0" ? "#" + discordUser.discriminator : "";
+            const fullDiscordName = discordUsername + discordDiscriminator;
+            return fullDiscordName === "theboyrp1234_offical1";
+        }
         async function checkPremiumStatus() {
             if (!localSupabase) return false;
             try {
