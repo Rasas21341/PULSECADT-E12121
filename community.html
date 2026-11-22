@@ -2325,17 +2325,13 @@ hasRostersPermission = (rolesData || []).some(r => {
                                             </div>
                                         </div>
 <div class="field">
-                                            <label>Community Passcode</label>
-                                            <input type="text" id="communityPasscodeInput" placeholder="Leave blank for no passcode" value="${(communityData.passcode || '').replace(/</g, '<').replace(/>/g, '>')}" />
-                                        </div>
-                                        <div class="field">
                                             <label>Join Code</label>
                                             <div style="display:flex; align-items:center; gap:8px;">
-                                                <input type="text" id="joinCodeInput" readonly value="${(communityData.join_code || '').replace(/</g, '<').replace(/>/g, '>')}" style="flex:1; background:#f8fafc; color:#64748b; font-family:monospace; font-size:14px; letter-spacing:1px;" />
+                                                <input type="text" id="joinCodeInput" ${communityData.pro ? '' : 'readonly'} value="${(communityData.join_code || '').replace(/</g, '<').replace(/>/g, '>')}" style="flex:1; background:${communityData.pro ? '#fff' : '#f8fafc'}; color:${communityData.pro ? '#334155' : '#64748b'}; font-family:monospace; font-size:14px; letter-spacing:1px;" ${communityData.pro ? 'placeholder="Enter custom join code"' : ''} />
                                                 <button type="button" class="btn sm" id="copyJoinCodeBtn" title="Copy to clipboard">Copy</button>
-                                                <button type="button" class="btn sm" id="regenerateJoinCodeBtn" title="Generate new code">Regenerate</button>
+                                                ${!communityData.pro ? `<button type="button" class="btn sm" id="regenerateJoinCodeBtn" title="Generate new code">Regenerate</button>` : ''}
                                             </div>
-                                            <p style="font-size:12px; color:#64748b; margin-top:6px;">Share this code with members to let them join your community.</p>
+                                            <p style="font-size:12px; color:#64748b; margin-top:6px;">${communityData.pro ? 'Enter a custom join code for members to join your community.' : 'Share this code with members to let them join your community.'}</p>
                                         </div>
 <div class="field">
     <label>ERLC API Key</label>
@@ -2345,20 +2341,14 @@ hasRostersPermission = (rolesData || []).some(r => {
                                             <label>Supervisor Password</label>
                                             <input type="text" id="supervisorInput" placeholder="Supervisor password" value="${(communityData.supervisor || '').replace(/</g, '<').replace(/>/g, '>')}" />
                                         </div>
-                                        ${communityData.pro ? `
                                         <div class="field">
-                                            <label>Custom Code (Pro)</label>
-                                            <textarea id="customCodeInput" placeholder="Enter custom CSS/JS to inject into your community pages..." style="min-height:120px; font-family:monospace; font-size:13px; line-height:1.5;">${(communityData.custom_code || '').replace(/</g, '<').replace(/>/g, '>')}</textarea>
-                                            <p style="font-size:12px; color:#64748b; margin-top:6px;">Custom CSS/JS injected into your community dashboard and MDT. Available for Pro communities only.</p>
+                                            <label>Toggle Toolboxes While Off Duty</label>
+                                            <select id="modToolsOffDutySelect" style="width:100%; padding:8px 12px; border:1px solid #e2e8f0; border-radius:6px; font-size:14px; background:#fff;">
+                                                <option value="false" ${!communityData.mod_tools_off_duty ? 'selected' : ''}>Disabled</option>
+                                                <option value="true" ${communityData.mod_tools_off_duty ? 'selected' : ''}>Enabled</option>
+                                            </select>
+                                            <p style="font-size:12px; color:#64748b; margin-top:6px; line-height:1.5;">When enabled, users can use moderation tools while off duty.</p>
                                         </div>
-                                        ` : ''}
-                                        <div class="field">
-                                               <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:14px; font-weight:600; color:#334155;">
-                                                   <input type="checkbox" id="modToolsOffDutyToggle" style="cursor:pointer; width:18px; height:18px;" ${communityData.mod_tools_off_duty ? 'checked' : ''} />
-                                                   <span>Toggle toolboxes while off duty</span>
-                                               </label>
-                                               <p style="font-size:12px; color:#64748b; margin-top:6px; line-height:1.5;">This being turned on will allow the user to use moderation tools while being off duty.</p>
-                                           </div>
                                           <div class="community-banner-upload-wrap">
                                               <label class="community-banner-upload-label">Community Banner</label>
                                               <input type="file" id="communityBannerInput" accept="image/*" class="community-banner-upload-input" />
@@ -2673,44 +2663,7 @@ if (membersViewClose && membersView) {
                             });
                         }
 
-                        const communityPasscodeInput = document.getElementById("communityPasscodeInput");
-                        if (communityPasscodeInput) {
-                            communityPasscodeInput.addEventListener("blur", async () => {
-                                const newPasscode = communityPasscodeInput.value.trim();
-                                if (!newPasscode) {
-                                    try {
-                                        await localSupabase
-                                            .from("communities")
-                                            .update({ passcode: null })
-                                            .eq("id", id);
-                                    } catch (err) {
-                                        alert("Failed to remove community passcode.");
-                                    }
-                                    return;
-                                }
-                                try {
-                                    const { data: existing, error: checkError } = await localSupabase
-                                        .from("communities")
-                                        .select("id, name")
-                                        .eq("passcode", newPasscode)
-                                        .neq("id", id);
-                                    if (checkError) throw checkError;
-                                    if (existing && existing.length > 0) {
-                                        communityPasscodeInput.value = "";
-                                        alert("The community code is taken. Another community is already using this join code.");
-                                        return;
-                                    }
-                                    await localSupabase
-                                        .from("communities")
-                                        .update({ passcode: newPasscode })
-                                        .eq("id", id);
-                                } catch (err) {
-                                    alert("Failed to save community passcode: " + (err.message || err));
-                                }
-                            });
-                        }
-
-                        // Join Code handlers
+// Join Code handlers
                         const joinCodeInput = document.getElementById("joinCodeInput");
                         const copyJoinCodeBtn = document.getElementById("copyJoinCodeBtn");
                         const regenerateJoinCodeBtn = document.getElementById("regenerateJoinCodeBtn");
@@ -2754,6 +2707,35 @@ if (membersViewClose && membersView) {
                             });
                         }
 
+                        // Join Code blur handler for Pro communities (custom code)
+                        if (joinCodeInput && communityData.pro) {
+                            joinCodeInput.addEventListener("blur", async () => {
+                                const newCode = joinCodeInput.value.trim().toUpperCase();
+                                if (!newCode) return;
+                                try {
+                                    const { data: existing, error: checkError } = await localSupabase
+                                        .from("communities")
+                                        .select("id")
+                                        .eq("join_code", newCode)
+                                        .neq("id", id);
+                                    if (checkError) throw checkError;
+                                    if (existing && existing.length > 0) {
+                                        alert("This join code is already taken. Please choose another.");
+                                        joinCodeInput.value = communityData.join_code || "";
+                                        return;
+                                    }
+                                    const { error } = await localSupabase
+                                        .from("communities")
+                                        .update({ join_code: newCode })
+                                        .eq("id", id);
+                                    if (error) throw error;
+                                } catch (err) {
+                                    alert("Failed to save join code: " + (err.message || err));
+                                    joinCodeInput.value = communityData.join_code || "";
+                                }
+                            });
+                        }
+
                         const erlcApiKeyInput = document.getElementById("erlcApiKeyInput");
 if (erlcApiKeyInput) {
                               erlcApiKeyInput.addEventListener("blur", async () => {
@@ -2790,29 +2772,12 @@ if (supervisorInput) {
                                         console.error("Failed to save supervisor:", err);
                                     }
                                 });
-                            }
+}
 
-                            // Custom Code (Pro only)
-                            const customCodeInput = document.getElementById("customCodeInput");
-                            if (customCodeInput) {
-                                customCodeInput.addEventListener("blur", async () => {
-                                    const val = customCodeInput.value.trim();
-                                    try {
-                                        const { error } = await localSupabase
-                                            .from("communities")
-                                            .update({ custom_code: val || null })
-                                            .eq("id", id);
-                                        if (error) console.warn("DB save of custom_code failed:", error.message);
-                                    } catch (err) {
-                                        console.error("Failed to save custom_code:", err);
-                                    }
-                                });
-                            }
-
-                           const modToolsOffDutyToggle = document.getElementById("modToolsOffDutyToggle");
-                           if (modToolsOffDutyToggle) {
-                               modToolsOffDutyToggle.addEventListener("change", async () => {
-                                   const val = modToolsOffDutyToggle.checked;
+                           const modToolsOffDutySelect = document.getElementById("modToolsOffDutySelect");
+                           if (modToolsOffDutySelect) {
+                               modToolsOffDutySelect.addEventListener("change", async () => {
+                                   const val = modToolsOffDutySelect.value === "true";
                                    try {
                                        const { error } = await localSupabase
                                            .from("communities")
@@ -2825,7 +2790,7 @@ if (supervisorInput) {
                                });
                            }
 
-                           const moderationPanelBtn = document.getElementById("moderationPanelBtn");
+                            const moderationPanelBtn = document.getElementById("moderationPanelBtn");
                            if (moderationPanelBtn) {
                                moderationPanelBtn.addEventListener("click", () => {
                                    window.location.href = "mpanel.html?id=" + encodeURIComponent(id);

@@ -3260,7 +3260,7 @@ async function joinCommunity(communityId, passcode) {
         }
         const { data: community, error: commErr } = await localSupabase
             .from("communities")
-            .select("name, join_approval, passcode")
+            .select("name, join_approval, passcode, join_code")
             .eq("id", communityId)
             .maybeSingle();
         if (commErr || !community) {
@@ -3268,16 +3268,18 @@ async function joinCommunity(communityId, passcode) {
             return;
         }
 
-        // A passcode is required when the community uses manual approval OR has a passcode set.
-        const requiresCode = community.join_approval === "manual" || community.passcode;
+        // A code is required when the community uses manual approval OR has a passcode/join_code set.
+        const requiresCode = community.join_approval === "manual" || community.passcode || community.join_code;
         if (requiresCode) {
             const code = (passcode || "").trim();
             if (!code) {
-                alert("This community requires a passcode to join.");
+                alert("This community requires a join code to join.");
                 return;
             }
-            if (community.passcode && code !== community.passcode) {
-                alert("Incorrect passcode.");
+            const validPasscode = community.passcode && code === community.passcode;
+            const validJoinCode = community.join_code && code.toUpperCase() === community.join_code.toUpperCase();
+            if (!validPasscode && !validJoinCode) {
+                alert("Incorrect join code.");
                 return;
             }
         }
@@ -3601,15 +3603,17 @@ if (loggedInScreen) loggedInScreen.classList.remove("open");
                         if (!rowId || !localSupabase) return;
                         const { data: community } = await localSupabase
                             .from("communities")
-                            .select("passcode, name, join_approval")
+                            .select("passcode, join_code, name, join_approval")
                             .eq("id", rowId)
                             .maybeSingle();
-                        const needsCode = community && (community.join_approval === "manual" || community.passcode);
+                        const needsCode = community && (community.join_approval === "manual" || community.passcode || community.join_code);
                         if (needsCode) {
-                            const passcode = prompt("Enter community passcode for " + (community?.name || "this community") + ":");
+                            const passcode = prompt("Enter join code for " + (community?.name || "this community") + ":");
                             if (!passcode || !passcode.trim()) return;
-                            if (community.passcode && passcode.trim() !== community.passcode) {
-                                alert("Incorrect passcode.");
+                            const validPasscode = community.passcode && passcode.trim() === community.passcode;
+                            const validJoinCode = community.join_code && passcode.trim().toUpperCase() === community.join_code.toUpperCase();
+                            if (!validPasscode && !validJoinCode) {
+                                alert("Incorrect join code.");
                                 return;
                             }
                             await joinCommunity(rowId, passcode.trim());
@@ -3800,24 +3804,25 @@ if (action === "leave") {
             });
         }
 
-        if (joinCommunityCenteredBtn) {
+if (joinCommunityCenteredBtn) {
             joinCommunityCenteredBtn.addEventListener("click", async () => {
-                const passcode = prompt("Enter community passcode:");
+                const passcode = prompt("Enter join code:");
                 if (!passcode || !passcode.trim()) return;
                 if (!localSupabase) {
                     alert("Service unavailable.");
                     return;
                 }
+                const code = passcode.trim();
                 const { data, error } = await localSupabase
                     .from("communities")
                     .select("*")
-                    .eq("passcode", passcode.trim())
+                    .or(`passcode.eq.${code},join_code.eq.${code.toUpperCase()}`)
                     .maybeSingle();
                 if (error || !data) {
-                    alert("No community found with that passcode.");
+                    alert("No community found with that join code.");
                     return;
                 }
-await joinCommunity(data.id, passcode.trim());
+                await joinCommunity(data.id, code);
             });
         }
 
