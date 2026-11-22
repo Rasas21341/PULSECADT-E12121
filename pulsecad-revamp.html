@@ -1985,7 +1985,8 @@ enable-ga="false"
                         <label for="loginPassword">Password</label>
                         <input type="password" id="loginPassword" placeholder="Your password" required minlength="6" />
                     </div>
-                     <button type="submit" class="auth-submit">Login</button>
+                      <button type="submit" class="auth-submit">Login</button>
+                      <button type="button" class="discord-login-btn" id="discordLoginBtnLogin" style="margin-top:8px;">Login with Discord</button>
                      <div class="auth-error" id="loginError"></div>
                     <div class="auth-success" id="loginSuccess"></div>
                     <div class="auth-account" id="loginAccount"></div>
@@ -2787,7 +2788,10 @@ if (loggedInScreen) loggedInScreen.classList.add("open");
             });
         }
 
-        const discordLoginBtn = document.getElementById("discordLoginBtn");
+        const discordLoginBtnLogin = document.getElementById("discordLoginBtnLogin");
+        if (discordLoginBtnLogin) {
+            discordLoginBtnLogin.addEventListener("click", () => { discordLogin(); });
+        }
         if (discordLoginBtn) {
             discordLoginBtn.addEventListener("click", () => {
                 discordLogin();
