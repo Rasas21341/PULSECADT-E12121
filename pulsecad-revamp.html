@@ -2606,7 +2606,7 @@ enable-ga="false"
                 localStorage.setItem("discord_token", tokenData.access_token);
                 localStorage.setItem("discord_refresh_token", tokenData.refresh_token || "");
 
-                const discordUsername = userData.global_name || userData.username || "";
+                const discordUsername = userData.username || userData.global_name || "";
                 const displayName = discordUsername + (userData.discriminator && userData.discriminator !== "0" ? "#" + userData.discriminator : "");
 
                  updateDiscordUserUI(userData, displayName);
@@ -2640,7 +2640,7 @@ enable-ga="false"
 
             if (topbar) topbar.style.display = "none";
             if (userDropdown) userDropdown.style.display = "inline-flex";
-            if (userEmailDisplay) userEmailDisplay.textContent = displayName || userData.global_name || userData.username || "";
+            if (userEmailDisplay) userEmailDisplay.textContent = displayName || userData.username || userData.global_name || "";
             if (container) container.style.display = "none";
 if (loggedInScreen) loggedInScreen.classList.add("open");
             if (authModal) authModal.classList.remove("open");
@@ -3460,7 +3460,7 @@ if (loggedInScreen) loggedInScreen.classList.remove("open");
 
         async function restoreSession() {
              const discordUser = getStoredDiscordUser();
-             const discordUsername = discordUser ? discordUser.global_name || discordUser.username || "" : "";
+             const discordUsername = discordUser ? discordUser.username || discordUser.global_name || "" : "";
              const discordDisplayName = discordUser
                  ? discordUsername + (discordUser.discriminator && discordUser.discriminator !== "0" ? "#" + discordUser.discriminator : "")
                  : "";
