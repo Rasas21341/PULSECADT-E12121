@@ -2657,6 +2657,16 @@ if (loggedInScreen) loggedInScreen.classList.add("open");
             return data ? JSON.parse(data) : null;
         }
 
+        function restoreDiscordUserUI() {
+            const userData = getStoredDiscordUser();
+            if (!userData) return false;
+
+            const username = userData.username || userData.global_name || "";
+            const displayName = username + (userData.discriminator && userData.discriminator !== "0" ? "#" + userData.discriminator : "");
+            updateDiscordUserUI(userData, displayName);
+            return true;
+        }
+
         function clearDiscordSession() {
             localStorage.removeItem("discord_user");
             localStorage.removeItem("discord_token");
@@ -3459,14 +3469,8 @@ if (loggedInScreen) loggedInScreen.classList.remove("open");
          }
 
         async function restoreSession() {
-             const discordUser = getStoredDiscordUser();
-             const discordUsername = discordUser ? discordUser.username || discordUser.global_name || "" : "";
-             const discordDisplayName = discordUser
-                 ? discordUsername + (discordUser.discriminator && discordUser.discriminator !== "0" ? "#" + discordUser.discriminator : "")
-                 : "";
-
              if (!localSupabase) {
-                 if (discordUser) updateDiscordUserUI(discordUser, discordDisplayName);
+                 restoreDiscordUserUI();
                  return;
              }
             try {
@@ -3475,9 +3479,7 @@ if (loggedInScreen) loggedInScreen.classList.remove("open");
                     applyLoggedInUI(session.user.email || "");
                     updatePremiumUI();
                     loadCommunities();
-                 } else if (discordUser) {
-                     updateDiscordUserUI(discordUser, discordDisplayName);
-                } else {
+                } else if (!restoreDiscordUserUI()) {
                     applyLoggedOutUI();
                 }
                 await updateModerationBtn();
@@ -3490,7 +3492,7 @@ if (loggedInScreen) loggedInScreen.classList.remove("open");
             localSupabase.auth.onAuthStateChange((event, session) => {
                 if (session && session.user) {
                     applyLoggedInUI(session.user.email || "");
-                } else {
+                } else if (!restoreDiscordUserUI()) {
                     applyLoggedOutUI();
                 }
                 loadCommunities();
