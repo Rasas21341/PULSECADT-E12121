@@ -1930,7 +1930,7 @@ enable-ga="false"
             </div>
             <button type="button" class="pro-btn" id="topbarProBtn">Pro</button>
             <button type="button" class="login-btn" id="topbarLoginBtn">Login</button>
-            <button type="button" class="login-btn" id="topbarPricingBtn">Pricing</button>
+            <button type="button" class="login-btn" id="topbarPricingBtn" onclick="document.getElementById('pricingOverlay').style.display='flex'">Pricing</button>
             <div class="tos-dropdown-wrap">
                 <button type="button" class="features-btn" id="topbarTosBtn">More</button>
                 <div class="features-dropdown" id="tosDropdown" style="right:0;">
@@ -4636,7 +4636,7 @@ if (joinCommunityCenteredBtn) {
   <div style="background:#111;color:#fff;padding:24px;border-radius:12px;max-width:480px;width:90%;">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
       <h2 style="margin:0;">Pricing</h2>
-      <button id="pricingClose" type="button" style="background:none;border:none;color:#fff;font-size:20px;cursor:pointer;">×</button>
+      <button id="pricingClose" type="button" style="background:none;border:none;color:#fff;font-size:20px;cursor:pointer;" onclick="document.getElementById('pricingOverlay').style.display='none'">×</button>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
       <div style="border:1px solid #333;border-radius:8px;padding:16px;">
