@@ -1257,12 +1257,12 @@
         .supervisor-panel-overlay {
             position: fixed;
             inset: 0;
-            background: rgba(15, 23, 42, 0.55);
+            background: rgba(5, 10, 22, 0.78);
             display: none;
             align-items: center;
             justify-content: center;
             z-index: 1200;
-            padding: 16px;
+            padding: 24px;
         }
 
         .supervisor-panel-overlay.open {
@@ -1270,29 +1270,28 @@
         }
 
         .supervisor-panel-modal {
-            background: #ffffff;
-            border-radius: 20px;
-            border: 1px solid #e2e8f0;
-            padding: 22px;
+            background: #0f172a;
+            border-radius: 14px;
+            border: 1px solid #334155;
+            padding: 24px;
             width: 100%;
-            max-width: 520px;
-            box-shadow: 0 20px 50px rgba(15, 23, 42, 0.18);
-            max-height: 85vh;
+            max-width: 1160px;
+            box-shadow: 0 24px 70px rgba(0, 0, 0, 0.5);
+            max-height: 90vh;
             overflow-y: auto;
         }
 
         .supervisor-panel-title {
-            font-size: 18px;
+            font-size: 21px;
             font-weight: 700;
-            color: #0f172a;
-            margin-bottom: 14px;
+            color: #f8fafc;
         }
 
         .supervisor-panel-close {
             border: none;
             background: transparent;
-            color: #64748b;
-            font-size: 20px;
+            color: #94a3b8;
+            font-size: 26px;
             cursor: pointer;
             line-height: 1;
             padding: 4px;
@@ -1300,15 +1299,118 @@
         }
 
         .supervisor-panel-close:hover {
-            background: #f1f5f9;
-            color: #0f172a;
+            background: #334155;
+            color: #ffffff;
         }
 
         .supervisor-panel-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 14px;
+            margin-bottom: 22px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #334155;
+        }
+
+        .supervisor-dashboard-community {
+            color: #94a3b8;
+            font-size: 13px;
+            margin-top: 5px;
+        }
+
+        .supervisor-dashboard-stats {
+            display: grid;
+            grid-template-columns: repeat(5, minmax(0, 1fr));
+            gap: 12px;
+            margin-bottom: 26px;
+        }
+
+        .supervisor-stat-card {
+            min-height: 104px;
+            padding: 18px 12px;
+            border: 1px solid #334155;
+            border-radius: 9px;
+            background: #1e293b;
+            text-align: center;
+        }
+
+        .supervisor-stat-value {
+            color: #f97316;
+            font-size: 29px;
+            font-weight: 700;
+            line-height: 1.1;
+            margin-bottom: 8px;
+        }
+
+        .supervisor-stat-value.blue {
+            color: #3b82f6;
+        }
+
+        .supervisor-stat-label {
+            color: #a9bfd8;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+        }
+
+        .supervisor-section-title {
+            color: #a9bfd8;
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .supervisor-units-table-wrap {
+            overflow-x: auto;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            background: #1e293b;
+        }
+
+        .supervisor-units-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 620px;
+        }
+
+        .supervisor-units-table th {
+            padding: 12px 14px;
+            color: #a9bfd8;
+            background: #0f172a;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            text-align: left;
+            text-transform: uppercase;
+        }
+
+        .supervisor-units-table td {
+            padding: 14px;
+            border-top: 1px solid #334155;
+            color: #dbeafe;
+            font-size: 13px;
+        }
+
+        .supervisor-units-empty {
+            padding: 26px !important;
+            color: #94a3b8 !important;
+            text-align: center;
+        }
+
+        @media (max-width: 760px) {
+            .supervisor-panel-overlay {
+                padding: 12px;
+            }
+
+            .supervisor-panel-modal {
+                padding: 18px;
+                max-height: 94vh;
+            }
+
+            .supervisor-dashboard-stats {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
         }
 
         .supervisor-field {
@@ -2545,7 +2647,10 @@
     <div class="supervisor-panel-overlay" id="supervisorPanelOverlay">
         <div class="supervisor-panel-modal">
             <div class="supervisor-panel-header">
-                <div class="supervisor-panel-title">Supervisor Panel</div>
+                <div>
+                    <div class="supervisor-panel-title">★ Supervisor Panel</div>
+                    <div class="supervisor-dashboard-community" id="supervisorDashboardCommunity"></div>
+                </div>
                 <button class="supervisor-panel-close" id="supervisorPanelClose" type="button" aria-label="Close">×</button>
             </div>
             <div id="supervisorPanelContent"></div>
@@ -5808,44 +5913,57 @@ civilianRecordsList.innerHTML = records.map((record) => {
 
         function openSupervisorPanel(communityName) {
             if (!supervisorPanelOverlay || !supervisorPanelContent) return;
-            const esc = (t) => (t || "").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+            const communityEl = document.getElementById("supervisorDashboardCommunity");
+            if (communityEl) communityEl.textContent = communityName ? "Community: " + communityName : "Supervisor access granted";
+
+            const unitRows = Array.from(document.querySelectorAll("#unitsTableBody tr"))
+                .filter((row) => !row.querySelector(".units-empty"))
+                .map((row) => Array.from(row.querySelectorAll("td")).map((cell) => cell.textContent.trim()))
+                .filter((cells) => cells.length >= 4);
+            const callRows = Array.from(document.querySelectorAll("#callsTableBody tr"))
+                .filter((row) => !row.querySelector(".calls-empty"))
+                .map((row) => Array.from(row.querySelectorAll("td")).map((cell) => cell.textContent.trim()))
+                .filter((cells) => cells.length >= 5);
+
+            const onDutyRows = unitRows.filter((cells) => !/unavailable|off.?duty/i.test(cells[2]));
+            const onDuty = onDutyRows.length;
+            const activeCalls = callRows.filter((cells) => !/closed/i.test(cells[4])).length;
+            const criticalCalls = callRows.filter((cells) => /critical|major/i.test(cells[1])).length;
+            const fireCalls = callRows.filter((cells) => /fire/i.test(cells[1])).length;
+            const medicalCalls = callRows.filter((cells) => /medical|ems|ambulance/i.test(cells[1])).length;
+            const escapeHtml = (value) => String(value || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+            const unitContent = onDutyRows.length
+                ? onDutyRows.map((cells) => {
+                    const callsign = cells[0] === officerName ? officerCallsign : cells[3];
+                    const call = callRows.find((row) => !/closed/i.test(row[4]) && row[5] && (row[5].includes(cells[0]) || (callsign && row[5].includes(callsign))));
+                    const activeIncident = call ? call[0] : (cells[0] === officerName ? cells[3] : "—");
+                    return `<tr>
+                        <td>${escapeHtml(callsign || "—")}</td>
+                        <td>${escapeHtml(cells[0])}</td>
+                        <td>${escapeHtml(cells[1] || "—")}</td>
+                        <td>${escapeHtml(cells[2])}</td>
+                        <td>${escapeHtml(activeIncident || "—")}</td>
+                    </tr>`;
+                }).join("")
+                : '<tr><td class="supervisor-units-empty" colspan="5">No units on duty.</td></tr>';
+
             supervisorPanelContent.innerHTML = `
-                <div style="font-size:14px; color:#475569; margin-bottom:12px;">Community: <strong>${esc(communityName)}</strong></div>
-                <div style="font-size:14px; color:#166534; font-weight:700;">Supervisor access granted.</div>
-                <div style="font-size:13px; color:#64748b; margin-top:8px;">Logged-in staff:</div>
-                <div id="supervisorPeopleList" style="margin-top:8px; max-height:260px; overflow-y:auto; border:1px solid #e2e8f0; border-radius:8px;">
-                    <div style="padding:10px 12px; color:#94a3b8; font-size:13px;">Loading people...</div>
+                <div class="supervisor-dashboard-stats">
+                    <div class="supervisor-stat-card"><div class="supervisor-stat-value">${onDuty}</div><div class="supervisor-stat-label">Units on duty</div></div>
+                    <div class="supervisor-stat-card"><div class="supervisor-stat-value">${activeCalls}</div><div class="supervisor-stat-label">Active incidents</div></div>
+                    <div class="supervisor-stat-card"><div class="supervisor-stat-value">${callRows.length}</div><div class="supervisor-stat-label">Calls shown</div></div>
+                    <div class="supervisor-stat-card"><div class="supervisor-stat-value">${criticalCalls}</div><div class="supervisor-stat-label">Critical calls</div></div>
+                    <div class="supervisor-stat-card"><div class="supervisor-stat-value blue">${fireCalls + medicalCalls}</div><div class="supervisor-stat-label">Fire / medical</div></div>
+                </div>
+                <div class="supervisor-section-title">🚑 ON DUTY UNITS</div>
+                <div class="supervisor-units-table-wrap">
+                    <table class="supervisor-units-table">
+                        <thead><tr><th>Callsign</th><th>Name</th><th>Rank</th><th>Status</th><th>Active incident</th></tr></thead>
+                        <tbody>${unitContent}</tbody>
+                    </table>
                 </div>
             `;
             supervisorPanelOverlay.classList.add("open");
-            loadSupervisorPeople();
-        }
-
-        async function loadSupervisorPeople() {
-            const listEl = document.getElementById("supervisorPeopleList");
-            if (!listEl || !localSupabase) return;
-            try {
-                const { data, error } = await localSupabase
-                    .from("users")
-                    .select("id,email,department,ip,created_at")
-                    .order("created_at", { ascending: false });
-                if (error || !Array.isArray(data) || data.length === 0) {
-                    listEl.innerHTML = '<div style="padding:10px 12px; color:#94a3b8; font-size:13px;">No logged-in people found.</div>';
-                    return;
-                }
-                const esc = (t) => (t || "").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-                listEl.innerHTML = data.map((u) => `
-                    <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 12px; border-bottom:1px solid #f1f5f9;">
-                        <div>
-                            <div style="font-size:13px; font-weight:600; color:#0f172a;">${esc(u.email || "Unknown")}</div>
-                            <div style="font-size:11px; color:#64748b;">${esc(u.department || "Unassigned")} · IP ${esc(u.ip || "n/a")}</div>
-                        </div>
-                        <span style="font-size:10px; color:#94a3b8;">${esc((u.created_at || "").slice(0, 16).replace("T", " "))}</span>
-                    </div>
-                `).join('');
-            } catch (err) {
-                listEl.innerHTML = '<div style="padding:10px 12px; color:#dc2626; font-size:13px;">Failed to load people.</div>';
-            }
         }
 
         if (supervisorPanelClose) {
