@@ -2,21 +2,119 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Team</title>
 <style>
-body{font-family:system-ui;background:#0b0b0b;color:#fff;margin:0;padding:40px;}
-h1{margin:0 0 12px;}
+* {
+  box-sizing: border-box;
+}
+
+body {
+  min-height: 100vh;
+  margin: 0;
+  display: grid;
+  place-items: center;
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: #fff;
+  background: #070a17;
+}
+
+.team-card {
+  width: min(500px, calc(100vw - 32px));
+  height: 300px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  border-radius: 18px;
+  background: #070919;
+  box-shadow:
+    0 18px 50px rgba(0, 0, 0, 0.35),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.025);
+  overflow: hidden;
+  text-align: center;
+}
+
+.portrait {
+  position: relative;
+  width: 128px;
+  height: 128px;
+  margin-top: 30px;
+  border: 2px solid #4c82f5;
+  border-radius: 50%;
+  background: transparent;
+  box-shadow: 0 0 18px rgba(76, 130, 245, 0.12);
+}
+
+.portrait img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  border-radius: 50%;
+  object-fit: cover;
+  opacity: 0;
+}
+
+.avatar-name {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+  margin: 0;
+  white-space: nowrap;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 800;
+  line-height: 1;
+  text-shadow: 0 2px 8px #070919;
+}
+
+.team-name {
+  margin: 26px 0 0;
+  color: #fff;
+  font-size: 27px;
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -0.8px;
+  text-shadow: 0 3px 12px rgba(0, 0, 0, 0.45);
+}
+
+.team-role {
+  margin: 20px 0 0;
+  color: #6da0ff;
+  font-size: 18px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+@media (max-width: 520px) {
+  .team-card {
+    height: 280px;
+  }
+
+  .portrait {
+    width: 118px;
+    height: 118px;
+  }
+
+  .team-name {
+    margin-top: 22px;
+  }
+
+  .team-role {
+    margin-top: 18px;
+  }
+}
 </style>
 </head>
 <body>
-<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;text-align:center;">
-  <img src="https://media.discordapp.net/attachments/1568828554714677258/1574116294473551882/images.jpg?ex=6b04798a&is=6b03280a&hm=2dd5b588c9ef8ac44dd174cdf0583cea9e2a9e96f8de67ae9eec2768582b25d5&format=webp&width=512&height=512" alt="Ownership Team" style="max-width:320px;border-radius:50%;margin-bottom:16px;" />
-  <h1>Ownership Team</h1>
-  <h2 class="text-2xl font-black mt-6">@theboyrp1234_official1</h2>
-  <div class="flex gap-2 justify-center mt-3">
-    <span class="bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold py-1 px-3 rounded-full transition">beta tester</span>
-    <span class="bg-red-600 hover:bg-red-700 text-white text-xs font-bold py-1 px-3 rounded-full transition">Nexus Staff</span>
+<section class="team-card" aria-label="Ryan team profile">
+  <div class="portrait">
+    <span class="avatar-name">Ryan Avatar</span>
   </div>
-</div>
+  <h1 class="team-name">Ryan</h1>
+  <p class="team-role">Chief Operating Officer</p>
+</section>
 </body>
 </html>
