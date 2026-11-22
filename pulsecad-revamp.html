@@ -2797,6 +2797,7 @@ if (loggedInScreen) loggedInScreen.classList.add("open");
         if (discordLoginBtnLogin) {
             discordLoginBtnLogin.addEventListener("click", () => { discordLogin(); });
         }
+        const discordLoginBtn = document.getElementById("discordLoginBtn");
         if (discordLoginBtn) {
             discordLoginBtn.addEventListener("click", () => {
                 discordLogin();
