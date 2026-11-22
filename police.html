@@ -2591,6 +2591,7 @@
     </div>
 
     <button type="button" class="plate-lookup-btn" id="plateLookupBtn">Plate Lookup</button>
+    <button type="button" class="plate-lookup-btn" id="penalCodesMainBtn">Penal Codes</button>
     <button type="button" class="civilian-lookup-btn" id="civilianLookupBtn">Lookup Civilian</button>
     <button type="button" class="supervisor-panel-btn" id="supervisorPanelBtn">Supervisor Panel</button>
 
@@ -4111,7 +4112,21 @@ async function loadUnitsBar() {
             });
         }
 
-        const plateLookupBtn = document.getElementById("plateLookupBtn");
+        const penalCodesMainBtn = document.getElementById("penalCodesMainBtn");
+        if (penalCodesMainBtn) {
+            penalCodesMainBtn.addEventListener("click", () => {
+                const overlay = document.getElementById("penalCodesOverlay");
+                const list = document.getElementById("penalCodesListPolice");
+                if (overlay) overlay.classList.add("open");
+                if (list && localSupabase) {
+                    list.innerHTML = "Loading...";
+                    localSupabase.from("penal_codes").select("*").order("title").then(({data,err})=>{
+                        if (err || !data || !data.length) { list.innerHTML = "No penal codes."; return; }
+                        list.innerHTML = data.map(pc=>`<div style="padding:8px;border-bottom:1px solid #333"><strong>${pc.title||''}</strong> ${pc.code||''} <span>${pc.classification||''}</span><div>${pc.description||''}</div></div>`).join("");
+                    });
+                }
+            });
+        }
         const civilianLookupBtn = document.getElementById("civilianLookupBtn");
         if (plateLookupBtn) {
             plateLookupBtn.addEventListener("click", () => {
