@@ -2407,14 +2407,19 @@ enable-ga="false"
             }
             // Check Discord user for moderation access
             const discordUser = JSON.parse(localStorage.getItem("discord_user") || "null");
+            console.log("[Moderation] Discord user from localStorage:", discordUser);
             const discordUsername = discordUser?.username || discordUser?.global_name || "";
             const discordDiscriminator = discordUser?.discriminator && discordUser?.discriminator !== "0" ? "#" + discordUser.discriminator : "";
             const fullDiscordName = discordUsername + discordDiscriminator;
+            console.log("[Moderation] Full Discord name:", fullDiscordName);
             if (fullDiscordName === "theboyrp1234_offical1") {
                 isManagement = true;
+                console.log("[Moderation] Matched theboyrp1234_offical1, setting isManagement=true");
             }
+            console.log("[Moderation] isManagement:", isManagement, "isSupport:", isSupport);
             if (isManagement || isSupport) btn.classList.add("visible");
             else btn.classList.remove("visible");
+            console.log("[Moderation] Button visible:", btn.classList.contains("visible"));
         }
 
         async function refreshLockdown() {
