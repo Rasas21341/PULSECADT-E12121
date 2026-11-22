@@ -5954,8 +5954,9 @@ civilianRecordsList.innerHTML = records.map((record) => {
                     <div class="supervisor-stat-card"><div class="supervisor-stat-value">${callRows.length}</div><div class="supervisor-stat-label">Calls shown</div></div>
                     <div class="supervisor-stat-card"><div class="supervisor-stat-value">${criticalCalls}</div><div class="supervisor-stat-label">Critical calls</div></div>
 
-                </div>
-                <div class="supervisor-section-title">🚑 ON DUTY UNITS</div>
+                     </div>
+                     <button type="button" class="supervisor-panel-btn" id="supervisorCitationsBtn" style="margin: 10px 0;">View Citations</button>
+                     <div class="supervisor-section-title">🚑 ON DUTY UNITS</div>
                 <div class="supervisor-units-table-wrap">
                     <table class="supervisor-units-table">
                         <thead><tr><th>Callsign</th><th>Name</th><th>Rank</th><th>Status</th><th>Active incident</th></tr></thead>
@@ -5980,6 +5981,12 @@ civilianRecordsList.innerHTML = records.map((record) => {
             });
         }
 
+        const supervisorCitationsBtn = document.getElementById("supervisorCitationsBtn");
+        if (supervisorCitationsBtn) {
+            supervisorCitationsBtn.addEventListener("click", () => {
+                if (unitsCitationsBtn) unitsCitationsBtn.click();
+            });
+        }
         const unitsCitationsBtn = document.getElementById("unitsCitationsBtn");
         const unitsCitationsOverlay = document.getElementById("unitsCitationsOverlay");
         const unitsCitationsClose = document.getElementById("unitsCitationsClose");
