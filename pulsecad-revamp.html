@@ -2659,6 +2659,7 @@ if (loggedInScreen) loggedInScreen.classList.add("open");
                 loginSuccess.textContent = "Discord account connected.";
                 loginSuccess.style.display = "block";
             }
+            updateModerationBtn();
         }
 
         function getStoredDiscordUser() {
@@ -2673,6 +2674,7 @@ if (loggedInScreen) loggedInScreen.classList.add("open");
             const username = userData.username || userData.global_name || "";
             const displayName = username + (userData.discriminator && userData.discriminator !== "0" ? "#" + userData.discriminator : "");
             updateDiscordUserUI(userData, displayName);
+            updateModerationBtn();
             return true;
         }
 
