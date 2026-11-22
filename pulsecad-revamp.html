@@ -1930,6 +1930,7 @@ enable-ga="false"
             </div>
             <button type="button" class="pro-btn" id="topbarProBtn">Pro</button>
             <button type="button" class="login-btn" id="topbarLoginBtn">Login</button>
+            <button type="button" class="login-btn" id="topbarPricingBtn">Pricing</button>
             <div class="tos-dropdown-wrap">
                 <button type="button" class="features-btn" id="topbarTosBtn">More</button>
                 <div class="features-dropdown" id="tosDropdown" style="right:0;">
@@ -2899,7 +2900,12 @@ if (loggedInScreen) loggedInScreen.classList.add("open");
                          await localSupabase.auth.signOut();
                          const loginSuccess = document.getElementById("loginSuccess");
                          if (loginSuccess) { loginSuccess.textContent = "You have been logged out."; loginSuccess.style.display = "block"; }
-                         const topbarLoginBtn = document.getElementById("topbarLoginBtn");
+        const pricingBtn = document.getElementById("topbarPricingBtn");
+        if (pricingBtn) {
+            pricingBtn.addEventListener("click", () => {
+                alert("Regular: standard features.\nPro: custom Community Code for your community + more Department Slots.");
+            });
+        }
                          if (topbarLoginBtn) topbarLoginBtn.style.display = "inline-block";
                          const topbar = document.querySelector(".topbar");
                          if (topbar) topbar.style.display = "block";
