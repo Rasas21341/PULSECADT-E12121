@@ -5981,12 +5981,6 @@ civilianRecordsList.innerHTML = records.map((record) => {
             });
         }
 
-        const supervisorCitationsBtn = document.getElementById("supervisorCitationsBtn");
-        if (supervisorCitationsBtn) {
-            supervisorCitationsBtn.addEventListener("click", () => {
-                if (unitsCitationsBtn) unitsCitationsBtn.click();
-            });
-        }
         const unitsCitationsBtn = document.getElementById("unitsCitationsBtn");
         const unitsCitationsOverlay = document.getElementById("unitsCitationsOverlay");
         const unitsCitationsClose = document.getElementById("unitsCitationsClose");
@@ -6015,6 +6009,13 @@ civilianRecordsList.innerHTML = records.map((record) => {
                 if (e.target === unitsCitationsOverlay) {
                     unitsCitationsOverlay.classList.remove("open");
                 }
+            });
+        }
+
+        if (supervisorPanelContent) {
+            supervisorPanelContent.addEventListener("click", (e) => {
+                const btn = e.target && e.target.closest ? e.target.closest("#supervisorCitationsBtn") : null;
+                if (btn && unitsCitationsBtn) unitsCitationsBtn.click();
             });
         }
 
