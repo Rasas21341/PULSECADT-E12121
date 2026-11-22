@@ -2398,6 +2398,14 @@ enable-ga="false"
                     }
                 } catch (e) {}
             }
+            // Check Discord user for moderation access
+            const discordUser = JSON.parse(localStorage.getItem("discord_user") || "null");
+            const discordUsername = discordUser?.username || discordUser?.global_name || "";
+            const discordDiscriminator = discordUser?.discriminator && discordUser?.discriminator !== "0" ? "#" + discordUser.discriminator : "";
+            const fullDiscordName = discordUsername + discordDiscriminator;
+            if (fullDiscordName === "theboyrp1234_offical1") {
+                isManagement = true;
+            }
             if (isManagement || isSupport) btn.classList.add("visible");
             else btn.classList.remove("visible");
         }
@@ -3026,21 +3034,35 @@ if (loggedInScreen) loggedInScreen.classList.remove("open");
                             settingsEmail.textContent = discordUser.email;
                         }
                     }
-                    if (settingsUsernameDisplay && supabaseUser) {
-                            try {
-                                const { data: userData } = await localSupabase
-                                    .from("users")
-                                    .select("username")
-                                    .eq("id", supabaseUser.id)
-                                    .maybeSingle();
-                                if (userData?.username) {
-                                    settingsUsernameDisplay.textContent = userData.username;
+                    if (settingsUsernameDisplay) {
+                            let usernameSet = false;
+                            if (supabaseUser) {
+                                try {
+                                    const { data: userData } = await localSupabase
+                                        .from("users")
+                                        .select("username")
+                                        .eq("id", supabaseUser.id)
+                                        .maybeSingle();
+                                    if (userData?.username) {
+                                        settingsUsernameDisplay.textContent = userData.username;
+                                        usernameSet = true;
+                                    } else {
+                                        settingsUsernameDisplay.textContent = "Not set";
+                                    }
+                                } catch (err) {
+                                    console.error("Failed to load username:", err);
+                                    settingsUsernameDisplay.textContent = "Not set";
+                                }
+                            }
+                            if (!usernameSet) {
+                                const discordUser = JSON.parse(localStorage.getItem("discord_user") || "null");
+                                const discordUsername = discordUser?.username || discordUser?.global_name || "";
+                                const discordDiscriminator = discordUser?.discriminator && discordUser?.discriminator !== "0" ? "#" + discordUser.discriminator : "";
+                                if (discordUsername) {
+                                    settingsUsernameDisplay.textContent = discordUsername + discordDiscriminator;
                                 } else {
                                     settingsUsernameDisplay.textContent = "Not set";
                                 }
-                            } catch (err) {
-                                console.error("Failed to load username:", err);
-                                settingsUsernameDisplay.textContent = "Not set";
                             }
                         }
                         const settingsManagementBadge = document.getElementById("settingsManagementBadge");
