@@ -13,21 +13,34 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: #ffffff;
+            background: #0f172a;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
             color: #1a202c;
+            overflow: hidden;
+        }
+
+        #snowCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
         }
 
         .container {
             text-align: center;
             padding: 60px 32px;
             max-width: 560px;
-            background: #ffffff;
+            background: rgba(255, 255, 255, 0.95);
             border-radius: 12px;
             border: 1px solid #e2e8f0;
+            z-index: 1;
+            position: relative;
         }
 
         .trusted-footer {
@@ -1901,6 +1914,7 @@ enable-ga="false"
 ></call-us>--> 
 <script defer src="https://downloads-global.3cx.com/downloads/livechatandtalk/v1/callus.js" id="tcx-callus-js" charset="utf-8"></script>
 <body>
+    <canvas id="snowCanvas"></canvas>
     </div>
     <img class="top-left-logo" id="topLeftLogo" src="https://cdn.discordapp.com/icons/1498000979101093999/c96c547fbd94e68254d8335dadb2e437.webp?size=1024" alt="Logo" draggable="false" />
     <div class="topbar" id="topbar" style="display:none;">
@@ -4684,6 +4698,58 @@ if (joinCommunityCenteredBtn) {
             warrantsSubBtn.addEventListener("click", () => {
                 window.location.href = "police.html";
             });
+        }
+
+        // Snow animation
+        const snowCanvas = document.getElementById("snowCanvas");
+        if (snowCanvas) {
+            const ctx = snowCanvas.getContext("2d");
+            let snowflakes = [];
+            const flakeCount = 100;
+
+            function resizeCanvas() {
+                snowCanvas.width = window.innerWidth;
+                snowCanvas.height = window.innerHeight;
+            }
+            resizeCanvas();
+            window.addEventListener("resize", resizeCanvas);
+
+            function createSnowflakes() {
+                snowflakes = [];
+                for (let i = 0; i < flakeCount; i++) {
+                    snowflakes.push({
+                        x: Math.random() * snowCanvas.width,
+                        y: Math.random() * snowCanvas.height,
+                        radius: Math.random() * 3 + 1,
+                        speed: Math.random() * 1 + 0.5,
+                        wind: Math.random() * 0.5 - 0.25,
+                        opacity: Math.random() * 0.6 + 0.2
+                    });
+                }
+            }
+            createSnowflakes();
+
+            function animateSnow() {
+                ctx.clearRect(0, 0, snowCanvas.width, snowCanvas.height);
+                ctx.fillStyle = "#ffffff";
+                for (const flake of snowflakes) {
+                    ctx.globalAlpha = flake.opacity;
+                    ctx.beginPath();
+                    ctx.arc(flake.x, flake.y, flake.radius, 0, Math.PI * 2);
+                    ctx.fill();
+                    flake.y += flake.speed;
+                    flake.x += flake.wind;
+                    if (flake.y > snowCanvas.height) {
+                        flake.y = -10;
+                        flake.x = Math.random() * snowCanvas.width;
+                    }
+                    if (flake.x > snowCanvas.width) flake.x = 0;
+                    if (flake.x < 0) flake.x = snowCanvas.width;
+                }
+                ctx.globalAlpha = 1;
+                requestAnimationFrame(animateSnow);
+            }
+            animateSnow();
         }
     </script>
 <div id="pricingOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9999;align-items:center;justify-content:center;" class="pricing-overlay">
