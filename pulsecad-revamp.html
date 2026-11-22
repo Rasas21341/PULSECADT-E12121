@@ -2684,7 +2684,7 @@ if (loggedInScreen) loggedInScreen.classList.add("open");
             params.append("state", state);
             params.append("prompt", "consent");
 
-            window.location.href = "https://discord.com/api/oauth2/authorize?" + params.toString();
+            window.top.location.href = "https://discord.com/api/oauth2/authorize?" + params.toString();
         }
 
         window.switchTab = function(tab) {
