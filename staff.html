@@ -935,6 +935,7 @@ let html = `<input type="text" class="search-box" id="serverSearch" placeholder=
                 const { data, error } = await localSupabase
                     .from("users")
                     .select("id, email, created_at, department, ip, discord_id, discord_username")
+                    .not("discord_id", "is", null)
                     .order("created_at", { ascending: false });
 
                 if (error) {
