@@ -952,7 +952,7 @@ const userDepartment = await getUserDepartment();
                 const isManagementAssistant = userDepartment === "Management Assistant";
                 const isSupportLead = userDepartment === "Support Team Lead";
                 const isSupport = userDepartment === "Support Team";
-                let html = `<input type="text" class="search-box" id="userSearch" placeholder="Search users by email or Discord..." /><table><tr><th>Email</th><th>Discord</th><th>Created</th><th>Department</th>${(isManagement || isSupportLead) ? "<th>IP</th>" : ""}<th>Actions</th></tr>`;
+                let html = `<input type="text" class="search-box" id="userSearch" placeholder="Search users by email or Discord..." /><table><tr><th>Discord</th><th>Email</th><th>Created</th><th>Department</th>${(isManagement || isSupportLead) ? "<th>IP</th>" : ""}<th>Actions</th></tr>`;
                 data.forEach((row) => {
                     const email = (row.email || "N/A").replace(/</g, "<").replace(/>/g, ">");
                     const discordDisplay = row.discord_username ? `${row.discord_username} (${row.discord_id || "N/A"})` : "Not linked";
@@ -974,7 +974,7 @@ const userDepartment = await getUserDepartment();
                         // Management Assistant can see all but can only assign below Management Assistant
                         deptOptions = `<option value="">Unassigned</option><option value="Management" ${currentDept === 'Management' ? 'selected' : ''}>Management</option><option value="Management Assistant" ${currentDept === 'Management Assistant' ? 'selected' : ''}>Management Assistant</option><option value="Support Team Lead" ${currentDept === 'Support Team Lead' ? 'selected' : ''}>Support Team Lead</option><option value="Support Team" ${currentDept === 'Support Team' ? 'selected' : ''}>Support Team</option><option value="Development Team" ${currentDept === 'Development Team' ? 'selected' : ''}>Development Team</option>`;
                     }
-                    html += `<tr><td>${email}</td><td>${discordDisplay}</td><td>${created}</td><td><select class="department-select" data-user-id="${row.id}" data-current-dept="${(currentDept || '').replace(/</g, '<').replace(/>/g, '>')}" ${deptDisabled}>${deptOptions}</select></td>${ipCell}<td>${keyActions}</td></tr>`;
+                    html += `<tr><td>${discordDisplay}</td><td>${email}</td><td>${created}</td><td><select class="department-select" data-user-id="${row.id}" data-current-dept="${(currentDept || '').replace(/</g, '<').replace(/>/g, '>')}" ${deptDisabled}>${deptOptions}</select></td>${ipCell}<td>${keyActions}</td></tr>`;
                 });
                 html += "</table>";
                 contentEl.innerHTML = html;
