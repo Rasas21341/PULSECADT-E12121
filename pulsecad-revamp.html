@@ -2495,45 +2495,16 @@ enable-ga="false"
         async function syncUserToUsersTable(userId, email, username, discordId, discordUsername) {
             if (!localSupabase || !userId || !email) return false;
             try {
-                const { data: existing } = await localSupabase
-                    .from("users")
-                    .select("id, username")
-                    .eq("id", userId)
-                    .maybeSingle();
-                if (existing) {
-                    if (username && !existing.username) {
-                        await localSupabase
-                            .from("users")
-                            .update({ username: username })
-                            .eq("id", userId);
-                    }
-                    if (discordId || discordUsername) {
-                        const updatePayload = {};
-                        if (discordId) updatePayload.discord_id = discordId;
-                        if (discordUsername) updatePayload.discord_username = discordUsername;
-                        await localSupabase
-                            .from("users")
-                            .update(updatePayload)
-                            .eq("id", userId);
-                    }
-                    const ip = await getClientIp();
-                    if (ip) {
-                        await localSupabase
-                            .from("users")
-                            .update({ ip: ip })
-                            .eq("id", userId);
-                    }
-                    return true;
-                }
                 const payload = { id: userId, email: email, department: "Unassigned", created_at: new Date().toISOString() };
                 if (username) payload.username = username;
                 if (discordId) payload.discord_id = discordId;
                 if (discordUsername) payload.discord_username = discordUsername;
                 const ip = await getClientIp();
                 if (ip) payload.ip = ip;
+
                 const { error } = await localSupabase
                     .from("users")
-                    .insert([payload]);
+                    .upsert(payload, { onConflict: "id" });
                 if (error) {
                     console.error("Failed to sync user to users table:", error);
                     return false;
