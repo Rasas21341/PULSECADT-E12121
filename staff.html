@@ -1115,10 +1115,9 @@ const userDepartment = await getUserDepartment();
 
             try {
                 const { data, error } = await localSupabase
-                    .from("users")
-                    .select("id, email, discord_id, discord_username, created_at")
-                    .not("discord_id", "is", null)
-                    .order("created_at", { ascending: false });
+                    .from("discord_users")
+                    .select("discord_id, username, display_name, email, avatar, last_seen")
+                    .order("last_seen", { ascending: false });
 
                 if (error) {
                     contentEl.innerHTML = `<div class="empty">Failed to load Discord users: ${error.message}</div>`;
@@ -1130,12 +1129,12 @@ const userDepartment = await getUserDepartment();
                     return;
                 }
 
-                let html = `<input type="text" class="search-box" id="discordUserSearch" placeholder="Search by Discord name or email..." /><table><tr><th>Discord</th><th>Email</th><th>Linked</th></tr>`;
+                let html = `<input type="text" class="search-box" id="discordUserSearch" placeholder="Search by Discord name or email..." /><table><tr><th>Discord</th><th>Email</th><th>Last Seen</th></tr>`;
                 data.forEach((row) => {
                     const email = (row.email || "N/A").replace(/</g, "<").replace(/>/g, ">");
-                    const username = (row.discord_username || "Unknown").replace(/</g, "<").replace(/>/g, ">");
+                    const username = (row.display_name || row.username || "Unknown").replace(/</g, "<").replace(/>/g, ">");
                     const discordId = (row.discord_id || "N/A").replace(/</g, "<").replace(/>/g, ">");
-                    const linked = row.created_at ? new Date(row.created_at).toLocaleString() : "";
+                    const linked = row.last_seen ? new Date(row.last_seen).toLocaleString() : "";
                     html += `<tr><td>${username} (${discordId})</td><td>${email}</td><td>${linked}</td></tr>`;
                 });
                 html += "</table>";

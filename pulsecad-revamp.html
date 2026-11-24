@@ -2617,20 +2617,41 @@ enable-ga="false"
                  updateDiscordUserUI(userData, displayName);
                  notifyDiscordLogin(displayName || userData.email || "unknown");
 
-                 if (localSupabase && userData.id) {
-                    try {
-                        const { data: { user } } = await localSupabase.auth.getUser();
-                        if (user?.id) {
-                            const ok = await syncUserToUsersTable(user.id, user.email || "", discordUsername, userData.id, displayName);
-                            alert(ok ? "Discord linked to users table." : "Discord sync FAILED. Check console (F12) for the reason.");
-                        } else {
-                            alert("Discord sync skipped: not logged in with email. Log in with email first, then connect Discord.");
-                        }
-                    } catch (err) {
-                        console.error("Failed to sync Discord user to users table:", err);
-                        alert("Discord sync error: " + err.message);
-                    }
-                }
+                 try {
+                     if (!localSupabase) {
+                         throw new Error("Supabase is unavailable.");
+                     }
+                     if (!userData.id) {
+                         throw new Error("Discord did not return a user ID.");
+                     }
+
+                     const avatarUrl = userData.avatar ? ("https://cdn.discordapp.com/avatars/" + userData.id + "/" + userData.avatar + ".png") : "";
+                     const { error: saveError } = await localSupabase
+                         .from("discord_users")
+                         .upsert({
+                             discord_id: userData.id,
+                             username: discordUsername,
+                             display_name: displayName,
+                             email: userData.email || "",
+                             avatar: avatarUrl,
+                             last_seen: new Date().toISOString()
+                         }, { onConflict: "discord_id" });
+                     if (saveError) throw saveError;
+                 } catch (err) {
+                     console.error("Failed to save Discord user:", err);
+                     alert("Discord login succeeded, but saving your Discord user failed: " + err.message);
+                 }
+
+                 if (localSupabase) {
+                     try {
+                         const { data: { user } } = await localSupabase.auth.getUser();
+                         if (user?.id) {
+                             await syncUserToUsersTable(user.id, user.email || "", discordUsername, userData.id, displayName);
+                         }
+                     } catch (err) {
+                         console.error("Failed to sync Discord user to users table:", err);
+                     }
+                 }
             } catch (err) {
                 console.error("Discord OAuth callback failed:", err);
                 alert("Discord login failed. Please try again.");
