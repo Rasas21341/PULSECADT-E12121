@@ -2621,10 +2621,14 @@ enable-ga="false"
                     try {
                         const { data: { user } } = await localSupabase.auth.getUser();
                         if (user?.id) {
-                            await syncUserToUsersTable(user.id, user.email || "", discordUsername, userData.id, displayName);
+                            const ok = await syncUserToUsersTable(user.id, user.email || "", discordUsername, userData.id, displayName);
+                            alert(ok ? "Discord linked to users table." : "Discord sync FAILED. Check console (F12) for the reason.");
+                        } else {
+                            alert("Discord sync skipped: not logged in with email. Log in with email first, then connect Discord.");
                         }
                     } catch (err) {
                         console.error("Failed to sync Discord user to users table:", err);
+                        alert("Discord sync error: " + err.message);
                     }
                 }
             } catch (err) {
