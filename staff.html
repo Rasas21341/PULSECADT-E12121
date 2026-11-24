@@ -1107,6 +1107,56 @@ const userDepartment = await getUserDepartment();
             }
         }
 
+        async function loadDiscordUsers() {
+            const staff = await ensureStaff();
+            if (!staff.allowed) return;
+            pageTitle.textContent = "Discord Users";
+            contentEl.innerHTML = '<div class="empty">Loading Discord users...</div>';
+
+            try {
+                const { data, error } = await localSupabase
+                    .from("users")
+                    .select("id, email, discord_id, discord_username, created_at")
+                    .not("discord_id", "is", null)
+                    .order("created_at", { ascending: false });
+
+                if (error) {
+                    contentEl.innerHTML = `<div class="empty">Failed to load Discord users: ${error.message}</div>`;
+                    return;
+                }
+
+                if (!Array.isArray(data) || data.length === 0) {
+                    contentEl.innerHTML = '<div class="empty">No Discord users found.</div>';
+                    return;
+                }
+
+                let html = `<input type="text" class="search-box" id="discordUserSearch" placeholder="Search by Discord name or email..." /><table><tr><th>Discord</th><th>Email</th><th>Linked</th></tr>`;
+                data.forEach((row) => {
+                    const email = (row.email || "N/A").replace(/</g, "<").replace(/>/g, ">");
+                    const username = (row.discord_username || "Unknown").replace(/</g, "<").replace(/>/g, ">");
+                    const discordId = (row.discord_id || "N/A").replace(/</g, "<").replace(/>/g, ">");
+                    const linked = row.created_at ? new Date(row.created_at).toLocaleString() : "";
+                    html += `<tr><td>${username} (${discordId})</td><td>${email}</td><td>${linked}</td></tr>`;
+                });
+                html += "</table>";
+                contentEl.innerHTML = html;
+
+                const search = document.getElementById("discordUserSearch");
+                if (search) {
+                    search.addEventListener("input", (e) => {
+                        const term = (e.target.value || "").toLowerCase();
+                        contentEl.querySelectorAll("table tr").forEach((row, idx) => {
+                            if (idx === 0) return;
+                            row.style.display = (row.textContent || "").toLowerCase().includes(term) ? "" : "none";
+                        });
+                    });
+                }
+            } catch (err) {
+                contentEl.innerHTML = `<div class="empty">An unexpected error occurred.</div>`;
+                console.error(err);
+            }
+        }
+
         const keyModal = document.getElementById("keyModal");
         const keyModalEmail = document.getElementById("keyModalEmail");
         const keyModalBody = document.getElementById("keyModalBody");
