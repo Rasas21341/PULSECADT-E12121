@@ -173,6 +173,11 @@ const headers = {};
          return;
      }
 
+    if (req.url.split("?")[0] === "/api/panels") {
+        await require("./api/panels")(req, res);
+        return;
+    }
+
     if (req.url.startsWith("/api/discord-webhook")) {
         if (req.method !== "POST") {
             res.writeHead(405, { "Content-Type": "application/json" });

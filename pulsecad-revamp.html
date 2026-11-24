@@ -2344,26 +2344,45 @@ enable-ga="false"
             }
         }
 
+        async function requestDiscordPanelApi(action, values) {
+            const discordToken = localStorage.getItem("discord_token") || "";
+            if (!discordToken) {
+                throw new Error("Sign in with Discord again before creating a panel.");
+            }
+
+            const response = await fetch("/api/panels", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ action, discordToken, ...(values || {}) })
+            });
+            let result = {};
+            try {
+                result = await response.json();
+            } catch (err) {
+                throw new Error("The panel service returned an invalid response.");
+            }
+            if (!response.ok) {
+                throw new Error(result.error || "Panel request failed.");
+            }
+            return result;
+        }
+
         async function getUserRedeemedCount() {
             if (!localSupabase) return 0;
-            try {
-                const account = await getCurrentAccount();
-                if (!account.email) return 0;
-                const { count, error } = await localSupabase
-                    .from("premium_keys")
-                    .select("*", { count: "exact", head: true })
-                    .eq("used_by", account.email)
-                    .eq("used", true)
-                    .or("used_for_community.is.null,used_for_community.eq.false");
-                if (error) {
-                    console.error("Failed to query redeemed keys:", error);
-                    return 0;
-                }
-                return count || 0;
-            } catch (err) {
-                console.error("Failed to get redeemed count:", err);
-                return 0;
+            const account = await getCurrentAccount();
+            if (!account.email) return 0;
+            if (!account.userId) {
+                const result = await requestDiscordPanelApi("check");
+                return Number(result.count) || 0;
             }
+            const { count, error } = await localSupabase
+                .from("premium_keys")
+                .select("*", { count: "exact", head: true })
+                .eq("used_by", account.email)
+                .eq("used", true)
+                .or("used_for_community.is.null,used_for_community.eq.false");
+            if (error) throw error;
+            return count || 0;
         }
 
         async function isEmailBanned(email) {
@@ -2394,7 +2413,14 @@ enable-ga="false"
         }
 
         async function updatePremiumUI() {
-            const count = await getUserRedeemedCount();
+            let count = 0;
+            let accessError = null;
+            try {
+                count = await getUserRedeemedCount();
+            } catch (err) {
+                accessError = err;
+                console.error("Failed to verify panel key access:", err);
+            }
             const premiumBadge = document.getElementById("settingsPremiumBadge");
             if (premiumBadge) {
                 premiumBadge.style.display = count > 0 ? "inline-block" : "none";
@@ -2402,9 +2428,12 @@ enable-ga="false"
             }
             const createBtn = document.getElementById("createCommunityCenteredBtn");
             if (createBtn) {
-                createBtn.disabled = count === 0;
-                createBtn.style.opacity = count === 0 ? "0.5" : "1";
-                createBtn.style.cursor = count === 0 ? "not-allowed" : "pointer";
+                createBtn.disabled = !!accessError || count === 0;
+                createBtn.style.opacity = createBtn.disabled ? "0.5" : "1";
+                createBtn.style.cursor = createBtn.disabled ? "not-allowed" : "pointer";
+                createBtn.title = accessError
+                    ? "Unable to verify key access: " + accessError.message
+                    : count === 0 ? "An assigned key is required to create a panel." : "";
             }
             const premiumCountDisplay = document.getElementById("premiumCountDisplay");
             const premiumCountText = document.getElementById("premiumCountText");
@@ -3891,21 +3920,33 @@ if (action === "leave") {
                         return;
                     }
 
-                    const name = prompt("Enter a name for your community:");
+                    const name = prompt("Enter a name for your panel:");
                     if (!name || !name.trim()) return;
 
-                    const description = prompt("Enter a description for your community (optional):");
+                    const description = prompt("Enter a description for your panel (optional):");
                     if (description === null) return;
 
-                    const community = await saveCommunity(name.trim(), description.trim(), "", false);
+                    let community;
+                    if (account.userId) {
+                        community = await saveCommunity(name.trim(), description.trim(), "", false);
+                    } else {
+                        const result = await requestDiscordPanelApi("create", {
+                            name: name.trim(),
+                            description: description.trim()
+                        });
+                        community = result.community;
+                        if (community) {
+                            addCommunityCard(community.name, community.description || "Community", false, community.id, true, !!community.verification_requested, !!community.suspended, !!community.members_only, community.banner, !!community.partner);
+                        }
+                    }
                     if (!community) return;
 
-                    if (!await consumeRedeemedKey()) {
+                    if (account.userId && !await consumeRedeemedKey()) {
                         alert("Your community was created, but your redeemed key could not be marked as used. Please contact support before creating another community.");
                         return;
                     }
 
-                    alert("Community created successfully!");
+                    alert("Panel created successfully!");
                     loadCommunities();
                     updatePremiumUI();
                 } catch (err) {
