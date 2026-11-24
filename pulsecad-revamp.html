@@ -1176,52 +1176,6 @@
             color: #d7d9dc;
         }
 
-        .managed-keys-section {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid #202327;
-        }
-
-        .managed-keys-heading {
-            color: #aeb4bc;
-            font-size: 12px;
-            font-weight: 700;
-        }
-
-        .managed-keys-list {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            max-height: 120px;
-            overflow-y: auto;
-        }
-
-        .managed-key-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 10px;
-            padding: 8px 10px;
-            border: 1px solid #202327;
-            border-radius: 8px;
-            background: #141619;
-        }
-
-        .managed-key-code {
-            color: #f1f3f5;
-            font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-            font-size: 12px;
-            overflow-wrap: anywhere;
-        }
-
-        .managed-key-status {
-            color: #aeb4bc;
-            font-size: 11px;
-            white-space: nowrap;
-        }
-
         .logged-in-actions {
             position: fixed;
             top: 50%;
@@ -2097,10 +2051,6 @@ enable-ga="false"
            </div>
 <div class="panels-manage-card open" id="panelsManageCard">
               <div class="panels-manage-title">Panels you manage</div>
-              <div class="managed-keys-section">
-                  <div class="managed-keys-heading">Keys assigned to you</div>
-                  <div class="managed-keys-list" id="managedKeysList"></div>
-              </div>
               <div class="logged-in-communities" id="loggedInCommunities"></div>
           </div>
         <div class="staff-dashboard-card" id="staffDashboardCard">
@@ -2372,15 +2322,37 @@ enable-ga="false"
             }
         }
 
+        async function getCurrentAccount() {
+            if (localSupabase) {
+                try {
+                    const { data, error } = await localSupabase.auth.getUser();
+                    if (error) throw error;
+                    if (data?.user?.email) {
+                        return { userId: data.user.id || null, email: data.user.email };
+                    }
+                } catch (err) {
+                    console.error("Failed to get authenticated account:", err);
+                }
+            }
+
+            try {
+                const discordUser = JSON.parse(localStorage.getItem("discord_user") || "null");
+                return { userId: null, email: (discordUser?.email || "").trim() };
+            } catch (err) {
+                console.error("Failed to read Discord account:", err);
+                return { userId: null, email: "" };
+            }
+        }
+
         async function getUserRedeemedCount() {
             if (!localSupabase) return 0;
             try {
-                const { data: { user } } = await localSupabase.auth.getUser();
-                if (!user) return 0;
+                const account = await getCurrentAccount();
+                if (!account.email) return 0;
                 const { count, error } = await localSupabase
                     .from("premium_keys")
                     .select("*", { count: "exact", head: true })
-                    .eq("used_by", user.email)
+                    .eq("used_by", account.email)
                     .eq("used", true)
                     .or("used_for_community.is.null,used_for_community.eq.false");
                 if (error) {
@@ -2445,6 +2417,13 @@ enable-ga="false"
                 }
             }
         }
+
+        window.addEventListener("focus", () => {
+            const loggedInScreen = document.getElementById("loggedInScreen");
+            if (loggedInScreen?.classList.contains("open")) {
+                updatePremiumUI();
+            }
+        });
 
         async function updateModerationBtn() {
             const btn = document.getElementById("moderationBtn");
@@ -2730,7 +2709,8 @@ if (loggedInScreen) loggedInScreen.classList.add("open");
                 loginSuccess.textContent = "Discord account connected.";
                 loginSuccess.style.display = "block";
             }
-            loadAssignedKeys(userData.email || "");
+            updatePremiumUI();
+            loadCommunities();
             updateModerationBtn();
         }
 
@@ -3252,118 +3232,44 @@ if (dropdownLogoutBtn) {
         const createCommunityCenteredBtn = document.getElementById("createCommunityCenteredBtn");
         const joinCommunityCenteredBtn = document.getElementById("joinCommunityCenteredBtn");
         const loggedInCommunities = document.getElementById("loggedInCommunities");
-        const managedKeysList = document.getElementById("managedKeysList");
 
-        async function loadAssignedKeys(email) {
-            if (!managedKeysList) return;
-            managedKeysList.textContent = "Loading assigned keys...";
-
-            if (!localSupabase) {
-                managedKeysList.textContent = "Keys are unavailable because the service is not connected.";
-                return;
-            }
-
-            let accountEmail = (email || "").trim();
-            if (!accountEmail) {
-                try {
-                    const { data: { user } } = await localSupabase.auth.getUser();
-                    accountEmail = user?.email || "";
-                } catch (err) {
-                    console.error("Failed to get account email for assigned keys:", err);
-                }
-            }
-            if (!accountEmail) {
-                try {
-                    const discordUser = JSON.parse(localStorage.getItem("discord_user") || "null");
-                    accountEmail = discordUser?.email || "";
-                } catch (err) {
-                    console.error("Failed to read Discord email for assigned keys:", err);
-                }
-            }
-            if (!accountEmail) {
-                managedKeysList.textContent = "No email is associated with this login.";
-                return;
-            }
-
-            try {
-                const { data, error } = await localSupabase
-                    .from("premium_keys")
-                    .select("key, used_for_community, created_at")
-                    .eq("used_by", accountEmail)
-                    .eq("used", true)
-                    .order("created_at", { ascending: false });
-                if (error) throw error;
-
-                managedKeysList.replaceChildren();
-                if (!Array.isArray(data) || data.length === 0) {
-                    managedKeysList.textContent = "No keys have been assigned to this account yet.";
-                    return;
-                }
-
-                data.forEach((row) => {
-                    const keyRow = document.createElement("div");
-                    keyRow.className = "managed-key-row";
-
-                    const keyCode = document.createElement("span");
-                    keyCode.className = "managed-key-code";
-                    keyCode.textContent = row.key || "Unknown key";
-
-                    const keyStatus = document.createElement("span");
-                    keyStatus.className = "managed-key-status";
-                    keyStatus.textContent = row.used_for_community ? "Applied to a panel" : "Available";
-
-                    keyRow.append(keyCode, keyStatus);
-                    managedKeysList.appendChild(keyRow);
-                });
-            } catch (err) {
-                console.error("Failed to load assigned keys:", err);
-                managedKeysList.textContent = "Failed to load keys: " + err.message;
-            }
-        }
-
-        window.addEventListener("focus", () => {
-            const loggedInScreen = document.getElementById("loggedInScreen");
-            if (loggedInScreen?.classList.contains("open")) {
-                loadAssignedKeys();
-                updatePremiumUI();
-            }
-        });
-
-        function loadCommunities() {
+        async function loadCommunities() {
             if (!loggedInCommunities || !localSupabase) return;
             loggedInCommunities.innerHTML = "";
-            localSupabase.auth.getUser().then(({ data: userData }) => {
-                const user = userData?.user;
-                const userId = user?.id;
-                const userEmail = user?.email;
-                if (!userId) {
+            try {
+                const account = await getCurrentAccount();
+                const userId = account.userId;
+                const userEmail = account.email;
+                if (!userEmail) {
                     loggedInCommunities.innerHTML = "";
                     return;
                 }
-                Promise.all([
+
+                const [commRes, userRes, joinedRes] = await Promise.all([
                     localSupabase.from("communities").select("*").order("created_at", { ascending: false }),
-                    localSupabase.from("users").select("department").eq("id", userId).maybeSingle(),
-                    localSupabase.from("user_communities").select("community_id").eq("user_id", userId)
-                ]).then(async ([commRes, userRes, joinedRes]) => {
-                    const { data, error } = commRes;
-                    if (error) {
-                        alert("Failed to load communities: " + error.message);
-                        return;
-                    }
-                    const isManagement = !!(userRes.data && (userRes.data.department || "").trim() === "Management");
-                    const joinedIds = new Set((joinedRes.data || []).map((r) => r.community_id));
-                    if (Array.isArray(data)) {
-                        for (const row of data) {
-                            const isCreator = row.creator_email === userEmail;
-                            const joined = isCreator || joinedIds.has(row.id);
-                            if (!isCreator && !joined) continue;
-                            addCommunityCard(row.name, row.description || "Community", joined, row.id, isCreator, !!row.verification_requested, !!row.suspended, !!row.members_only, row.banner, !!row.partner, isManagement);
-                        }
-                    }
-                }).catch((err) => alert("Failed to load communities: " + (err.message || err)));
-            }).catch((err) => {
-                console.error("Auth error in loadCommunities:", err);
-            });
+                    userId
+                        ? localSupabase.from("users").select("department").eq("id", userId).maybeSingle()
+                        : Promise.resolve({ data: null, error: null }),
+                    userId
+                        ? localSupabase.from("user_communities").select("community_id").eq("user_id", userId)
+                        : Promise.resolve({ data: [], error: null })
+                ]);
+                if (commRes.error) {
+                    throw commRes.error;
+                }
+
+                const isManagement = !!(userRes.data && (userRes.data.department || "").trim() === "Management");
+                const joinedIds = new Set((joinedRes.data || []).map((row) => row.community_id));
+                for (const row of commRes.data || []) {
+                    const isCreator = (row.creator_email || "").toLowerCase() === userEmail.toLowerCase();
+                    const joined = isCreator || joinedIds.has(row.id);
+                    if (!isCreator && !joined) continue;
+                    addCommunityCard(row.name, row.description || "Community", joined, row.id, isCreator, !!row.verification_requested, !!row.suspended, !!row.members_only, row.banner, !!row.partner, isManagement);
+                }
+            } catch (err) {
+                console.error("Failed to load communities:", err);
+                alert("Failed to load communities: " + (err.message || err));
+            }
         }
 
         async function checkUserJoined(userId, communityId) {
@@ -3635,7 +3541,7 @@ if (loggedInScreen) loggedInScreen.classList.add("open");
                const trustedFooter = document.getElementById("trustedFooter");
               if (trustedFooter) trustedFooter.style.display = "none";
               if (topbar) topbar.style.top = "24px";
-              loadAssignedKeys(email || "");
+              updatePremiumUI();
           }
 
         function applyLoggedOutUI() {
@@ -3653,8 +3559,6 @@ if (loggedInScreen) loggedInScreen.classList.remove("open");
             if (settingsScreen) settingsScreen.classList.remove("open");
             if (container) container.style.display = "block";
             if (topLeftLogo) topLeftLogo.classList.remove("visible");
-            const managedKeysList = document.getElementById("managedKeysList");
-            if (managedKeysList) managedKeysList.replaceChildren();
                const trustedFooter = document.getElementById("trustedFooter");
               if (trustedFooter) trustedFooter.style.display = "block";
          }
@@ -3717,43 +3621,40 @@ if (loggedInScreen) loggedInScreen.classList.remove("open");
             return code;
         }
 
-        function saveCommunity(name, meta, passcode, membersOnly) {
-            if (!localSupabase) return Promise.resolve(null);
-            return localSupabase.auth.getUser().then(({ data }) => {
+        async function saveCommunity(name, meta, passcode, membersOnly) {
+            if (!localSupabase) return null;
+            try {
+                const account = await getCurrentAccount();
+                if (!account.email) {
+                    alert("Sign in with an account that has an email address to create a community.");
+                    return null;
+                }
                 const joinCode = generateJoinCode();
                 const payload = {
-                    user_id: data?.user?.id,
-                    creator_email: data?.user?.email || "",
+                    creator_email: account.email,
                     name,
                     description: meta || "",
                     verification_requested: false,
                     join_code: joinCode
                 };
+                if (account.userId) payload.user_id = account.userId;
                 if (passcode && passcode.trim()) payload.passcode = passcode.trim();
                 if (membersOnly) payload.members_only = true;
-                return localSupabase
+                const { data: insertData, error } = await localSupabase
                     .from("communities")
                     .insert([payload])
                     .select()
-                    .single()
-                    .then(({ data: insertData, error }) => {
-                        if (error) {
-                            alert("Failed to save community: " + error.message);
-                            return null;
-                        }
-                        if (insertData) {
-                            addCommunityCard(name, insertData.description || "Community", false, insertData.id, true, !!insertData.verification_requested, !!insertData.suspended, !!insertData.members_only, insertData.banner, !!insertData.partner);
-                        }
-                        return insertData;
-                    })
-                    .catch((err) => {
-                        alert("Failed to save community: " + (err.message || err));
-                        return null;
-                    });
-            }).catch(() => {
-                alert("You must be logged in to save a community.");
-                return Promise.resolve(null);
-            });
+                    .single();
+                if (error) throw error;
+                if (insertData) {
+                    addCommunityCard(name, insertData.description || "Community", false, insertData.id, true, !!insertData.verification_requested, !!insertData.suspended, !!insertData.members_only, insertData.banner, !!insertData.partner);
+                }
+                return insertData;
+            } catch (err) {
+                alert("Failed to save community: " + (err.message || err));
+                console.error("Failed to save community:", err);
+                return null;
+            }
         }
 
         function addCommunityCard(name, meta, joined, id, creator, verified, suspended, membersOnly, banner, partner, isManagement) {
@@ -3940,22 +3841,24 @@ if (action === "leave") {
         async function consumeRedeemedKey() {
             if (!localSupabase) return false;
             try {
-                const { data: { user } } = await localSupabase.auth.getUser();
-                if (!user) return false;
+                const account = await getCurrentAccount();
+                if (!account.email) return false;
                 const { data, error } = await localSupabase
                     .from("premium_keys")
                     .select("id")
-                    .eq("used_by", user.email)
+                    .eq("used_by", account.email)
                     .eq("used", true)
                     .or("used_for_community.is.null,used_for_community.eq.false")
                     .limit(1)
                     .maybeSingle();
-                if (error || !data) return false;
+                if (error) throw error;
+                if (!data) return false;
                 const { error: updateError } = await localSupabase
                     .from("premium_keys")
                     .update({ used_for_community: true })
                     .eq("id", data.id);
-                return !updateError;
+                if (updateError) throw updateError;
+                return true;
             } catch (err) {
                 console.error("Failed to consume redeemed key:", err);
                 return false;
@@ -3977,9 +3880,9 @@ if (action === "leave") {
 
                 createCommunityCenteredBtn.disabled = true;
                 try {
-                    const { data: { user } } = await localSupabase.auth.getUser();
-                    if (!user) {
-                        alert("You must be logged in to create a community.");
+                    const account = await getCurrentAccount();
+                    if (!account.email) {
+                        alert("Sign in with Discord or an email account before creating a community.");
                         return;
                     }
 
