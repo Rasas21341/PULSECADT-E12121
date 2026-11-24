@@ -1176,6 +1176,52 @@
             color: #d7d9dc;
         }
 
+        .managed-keys-section {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #202327;
+        }
+
+        .managed-keys-heading {
+            color: #aeb4bc;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .managed-keys-list {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            max-height: 120px;
+            overflow-y: auto;
+        }
+
+        .managed-key-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 8px 10px;
+            border: 1px solid #202327;
+            border-radius: 8px;
+            background: #141619;
+        }
+
+        .managed-key-code {
+            color: #f1f3f5;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+            font-size: 12px;
+            overflow-wrap: anywhere;
+        }
+
+        .managed-key-status {
+            color: #aeb4bc;
+            font-size: 11px;
+            white-space: nowrap;
+        }
+
         .logged-in-actions {
             position: fixed;
             top: 50%;
@@ -2051,6 +2097,10 @@ enable-ga="false"
            </div>
 <div class="panels-manage-card open" id="panelsManageCard">
               <div class="panels-manage-title">Panels you manage</div>
+              <div class="managed-keys-section">
+                  <div class="managed-keys-heading">Keys assigned to you</div>
+                  <div class="managed-keys-list" id="managedKeysList"></div>
+              </div>
               <div class="logged-in-communities" id="loggedInCommunities"></div>
           </div>
         <div class="staff-dashboard-card" id="staffDashboardCard">
@@ -2680,6 +2730,7 @@ if (loggedInScreen) loggedInScreen.classList.add("open");
                 loginSuccess.textContent = "Discord account connected.";
                 loginSuccess.style.display = "block";
             }
+            loadAssignedKeys(userData.email || "");
             updateModerationBtn();
         }
 
@@ -3201,6 +3252,74 @@ if (dropdownLogoutBtn) {
         const createCommunityCenteredBtn = document.getElementById("createCommunityCenteredBtn");
         const joinCommunityCenteredBtn = document.getElementById("joinCommunityCenteredBtn");
         const loggedInCommunities = document.getElementById("loggedInCommunities");
+        const managedKeysList = document.getElementById("managedKeysList");
+
+        async function loadAssignedKeys(email) {
+            if (!managedKeysList) return;
+            managedKeysList.textContent = "Loading assigned keys...";
+
+            if (!localSupabase) {
+                managedKeysList.textContent = "Keys are unavailable because the service is not connected.";
+                return;
+            }
+
+            let accountEmail = (email || "").trim();
+            if (!accountEmail) {
+                try {
+                    const { data: { user } } = await localSupabase.auth.getUser();
+                    accountEmail = user?.email || "";
+                } catch (err) {
+                    console.error("Failed to get account email for assigned keys:", err);
+                }
+            }
+            if (!accountEmail) {
+                try {
+                    const discordUser = JSON.parse(localStorage.getItem("discord_user") || "null");
+                    accountEmail = discordUser?.email || "";
+                } catch (err) {
+                    console.error("Failed to read Discord email for assigned keys:", err);
+                }
+            }
+            if (!accountEmail) {
+                managedKeysList.textContent = "No email is associated with this login.";
+                return;
+            }
+
+            try {
+                const { data, error } = await localSupabase
+                    .from("premium_keys")
+                    .select("key, used_for_community, created_at")
+                    .eq("used_by", accountEmail)
+                    .eq("used", true)
+                    .order("created_at", { ascending: false });
+                if (error) throw error;
+
+                managedKeysList.replaceChildren();
+                if (!Array.isArray(data) || data.length === 0) {
+                    managedKeysList.textContent = "No keys have been assigned to this account yet.";
+                    return;
+                }
+
+                data.forEach((row) => {
+                    const keyRow = document.createElement("div");
+                    keyRow.className = "managed-key-row";
+
+                    const keyCode = document.createElement("span");
+                    keyCode.className = "managed-key-code";
+                    keyCode.textContent = row.key || "Unknown key";
+
+                    const keyStatus = document.createElement("span");
+                    keyStatus.className = "managed-key-status";
+                    keyStatus.textContent = row.used_for_community ? "Applied to a panel" : "Available";
+
+                    keyRow.append(keyCode, keyStatus);
+                    managedKeysList.appendChild(keyRow);
+                });
+            } catch (err) {
+                console.error("Failed to load assigned keys:", err);
+                managedKeysList.textContent = "Failed to load keys: " + err.message;
+            }
+        }
 
         function loadCommunities() {
             if (!loggedInCommunities || !localSupabase) return;
@@ -3508,6 +3627,7 @@ if (loggedInScreen) loggedInScreen.classList.add("open");
                const trustedFooter = document.getElementById("trustedFooter");
               if (trustedFooter) trustedFooter.style.display = "none";
               if (topbar) topbar.style.top = "24px";
+              loadAssignedKeys(email || "");
           }
 
         function applyLoggedOutUI() {
@@ -3525,6 +3645,8 @@ if (loggedInScreen) loggedInScreen.classList.remove("open");
             if (settingsScreen) settingsScreen.classList.remove("open");
             if (container) container.style.display = "block";
             if (topLeftLogo) topLeftLogo.classList.remove("visible");
+            const managedKeysList = document.getElementById("managedKeysList");
+            if (managedKeysList) managedKeysList.replaceChildren();
                const trustedFooter = document.getElementById("trustedFooter");
               if (trustedFooter) trustedFooter.style.display = "block";
          }
