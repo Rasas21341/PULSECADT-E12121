@@ -3321,6 +3321,14 @@ if (dropdownLogoutBtn) {
             }
         }
 
+        window.addEventListener("focus", () => {
+            const loggedInScreen = document.getElementById("loggedInScreen");
+            if (loggedInScreen?.classList.contains("open")) {
+                loadAssignedKeys();
+                updatePremiumUI();
+            }
+        });
+
         function loadCommunities() {
             if (!loggedInCommunities || !localSupabase) return;
             loggedInCommunities.innerHTML = "";
