@@ -4781,9 +4781,25 @@ if (joinCommunityCenteredBtn) {
             });
         }
 
-        // Snow animation
-        const snowCanvas = document.getElementById("snowCanvas");
-        if (snowCanvas) {
+        // Snow animation (only when logged in)
+        async function initSnow() {
+            let loggedIn = false;
+            if (localSupabase) {
+                try {
+                    const { data: { user } } = await localSupabase.auth.getUser();
+                    if (user?.email) loggedIn = true;
+                } catch (err) { /* ignore */ }
+            }
+            if (!loggedIn) {
+                try {
+                    const discordUser = JSON.parse(localStorage.getItem("discord_user") || "null");
+                    if (discordUser?.email) loggedIn = true;
+                } catch (err) { /* ignore */ }
+            }
+            if (!loggedIn) return;
+
+            const snowCanvas = document.getElementById("snowCanvas");
+            if (!snowCanvas) return;
             const ctx = snowCanvas.getContext("2d");
             let snowflakes = [];
             const flakeCount = 100;
@@ -4832,6 +4848,7 @@ if (joinCommunityCenteredBtn) {
             }
             animateSnow();
         }
+        initSnow();
     </script>
 <div id="pricingOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9999;align-items:center;justify-content:center;" class="pricing-overlay">
   <div style="background:#111;color:#fff;padding:24px;border-radius:12px;max-width:480px;width:90%;">
