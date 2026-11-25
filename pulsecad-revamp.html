@@ -2375,25 +2375,44 @@ enable-ga="false"
                 const result = await requestDiscordPanelApi("check");
                 return Number(result.count) || 0;
             }
-            const email = account.email;
-            const { count, error } = await localSupabase
-                .from("premium_keys")
-                .select("*", { count: "exact", head: true })
-                .ilike("used_by", email)
-                .eq("used", true)
-                .or("used_for_community.is.null,used_for_community.eq.false");
-            if (!error && count && count > 0) return count;
+            const email = (account.email || "").trim();
+            if (!email) return 0;
+
+            let found = 0;
+            let lastError = null;
+
+            try {
+                const { count, error } = await localSupabase
+                    .from("premium_keys")
+                    .select("*", { count: "exact", head: true })
+                    .ilike("used_by", email)
+                    .eq("used", true)
+                    .or("used_for_community.is.null,used_for_community.eq.false");
+                if (!error && count && count > 0) {
+                    console.log("[premium] keys found in premium_keys:", count);
+                    return count;
+                }
+                lastError = error;
+            } catch (err) {
+                console.error("[premium] premium_keys query failed:", err);
+                lastError = err;
+            }
+
             try {
                 const { data: userRow } = await localSupabase
                     .from("users")
                     .select("premium_key")
                     .ilike("email", email)
                     .maybeSingle();
-                if (userRow && userRow.premium_key) return 1;
+                if (userRow && userRow.premium_key) {
+                    console.log("[premium] key found in users.premium_key");
+                    return 1;
+                }
             } catch (err) {
-                console.error("Failed to check user premium_key:", err);
+                console.error("[premium] users.premium_key query failed:", err);
             }
-            if (error) throw error;
+
+            if (lastError) console.error("[premium] no key found for email:", email, "last error:", lastError);
             return 0;
         }
 
