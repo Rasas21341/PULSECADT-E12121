@@ -1092,7 +1092,7 @@ const userDepartment = await getUserDepartment();
                         }
                         const { error } = await localSupabase
                             .from("premium_keys")
-                            .insert([{ key: key, used: true, used_by: userEmail, used_at: new Date().toISOString(), created_at: new Date().toISOString() }]);
+                            .insert([{ key: key, used: true, used_by: userEmail, used_at: new Date().toISOString(), created_at: new Date().toISOString(), used_for_community: false }]);
                         if (error) {
                             alert("Failed to give key: " + error.message);
                             return;
@@ -1188,7 +1188,7 @@ const userDepartment = await getUserDepartment();
 
                             const { error: insertError } = await localSupabase
                                 .from("premium_keys")
-                                .insert([{ key: key, used: true, used_by: userEmail, used_at: new Date().toISOString(), created_at: new Date().toISOString() }]);
+                                .insert([{ key: key, used: true, used_by: userEmail, used_at: new Date().toISOString(), created_at: new Date().toISOString(), used_for_community: false }]);
                             if (insertError) throw insertError;
 
                             try {
