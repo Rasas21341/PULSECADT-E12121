@@ -1083,6 +1083,7 @@ const userDepartment = await getUserDepartment();
                             alert("Access denied. Management only.");
                             return;
                         }
+                        const userId = btn.getAttribute("data-user-id");
                         const userEmail = btn.getAttribute("data-email");
                         const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
                         let key = "MDT-";
@@ -1095,6 +1096,14 @@ const userDepartment = await getUserDepartment();
                         if (error) {
                             alert("Failed to give key: " + error.message);
                             return;
+                        }
+                        try {
+                            await localSupabase
+                                .from("users")
+                                .update({ premium_key: key, premium_key_at: new Date().toISOString() })
+                                .eq("id", userId);
+                        } catch (err) {
+                            console.error("Failed to save key to user record:", err);
                         }
                         alert("Key given successfully: " + key);
                     });
@@ -1181,6 +1190,22 @@ const userDepartment = await getUserDepartment();
                                 .from("premium_keys")
                                 .insert([{ key: key, used: true, used_by: userEmail, used_at: new Date().toISOString(), created_at: new Date().toISOString() }]);
                             if (insertError) throw insertError;
+
+                            try {
+                                const { data: matchedUsers } = await localSupabase
+                                    .from("users")
+                                    .select("id")
+                                    .eq("email", userEmail)
+                                    .limit(1);
+                                if (matchedUsers && matchedUsers.length) {
+                                    await localSupabase
+                                        .from("users")
+                                        .update({ premium_key: key, premium_key_at: new Date().toISOString() })
+                                        .eq("id", matchedUsers[0].id);
+                                }
+                            } catch (err) {
+                                console.error("Failed to save key to user record:", err);
+                            }
 
                             alert("Key given successfully: " + key);
                         } catch (err) {
