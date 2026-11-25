@@ -2375,10 +2375,11 @@ enable-ga="false"
                 const result = await requestDiscordPanelApi("check");
                 return Number(result.count) || 0;
             }
+            const email = account.email;
             const { count, error } = await localSupabase
                 .from("premium_keys")
                 .select("*", { count: "exact", head: true })
-                .eq("used_by", account.email)
+                .ilike("used_by", email)
                 .eq("used", true)
                 .or("used_for_community.is.null,used_for_community.eq.false");
             if (!error && count && count > 0) return count;
@@ -2386,7 +2387,7 @@ enable-ga="false"
                 const { data: userRow } = await localSupabase
                     .from("users")
                     .select("premium_key")
-                    .eq("email", account.email)
+                    .ilike("email", email)
                     .maybeSingle();
                 if (userRow && userRow.premium_key) return 1;
             } catch (err) {
