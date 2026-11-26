@@ -3954,7 +3954,7 @@ if (action === "leave") {
                     if (description === null) return;
 
                     let community;
-                    if (account.userId) {
+                    if (localSupabase && account.email) {
                         community = await saveCommunity(name.trim(), description.trim(), "", false);
                     } else {
                         const result = await requestDiscordPanelApi("create", {
@@ -3968,7 +3968,7 @@ if (action === "leave") {
                     }
                     if (!community) return;
 
-                    if (account.userId && !await consumeRedeemedKey()) {
+                    if (!await consumeRedeemedKey()) {
                         alert("Your community was created, but your redeemed key could not be marked as used. Please contact support before creating another community.");
                         return;
                     }
