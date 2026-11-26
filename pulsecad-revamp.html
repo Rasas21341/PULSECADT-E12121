@@ -2512,8 +2512,19 @@ enable-ga="false"
             if (fullDiscordName === "theboyrp1234_offical1" || fullDiscordName === "theboyrp1234_official1") {
                 isManagement = true;
             }
-            if (isManagement || isSupport) btn.classList.add("visible");
-            else btn.classList.remove("visible");
+            if (isManagement || isSupport) {
+                btn.classList.add("visible");
+                const discordUser = JSON.parse(localStorage.getItem("discord_user") || "null");
+                if (discordUser) {
+                    const name = (discordUser.display_name || discordUser.username || discordUser.global_name || "").trim();
+                    if (name) btn.textContent = name + " • Moderation";
+                } else {
+                    btn.textContent = "Moderation";
+                }
+            } else {
+                btn.classList.remove("visible");
+                btn.textContent = "Moderation";
+            }
         }
 
         async function refreshLockdown() {
