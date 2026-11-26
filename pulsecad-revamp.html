@@ -2370,15 +2370,11 @@ enable-ga="false"
         async function getUserRedeemedCount() {
             if (!localSupabase) return 0;
             const account = await getCurrentAccount();
-            if (!account.email) return 0;
-            if (!account.userId) {
-                const result = await requestDiscordPanelApi("check");
-                return Number(result.count) || 0;
-            }
             const email = (account.email || "").trim();
             if (!email) return 0;
 
-            let found = 0;
+            console.log("[premium] checking keys for email:", email);
+
             let lastError = null;
 
             try {
