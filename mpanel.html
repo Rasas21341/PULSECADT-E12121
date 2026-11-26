@@ -1044,12 +1044,26 @@ const shiftFooterDotEl = document.getElementById("shiftFooterDot");
             try {
                 const { data: { user } } = await localSupabase.auth.getUser();
                 if (!user) {
-                    return;
-                }
-                currentUser = user;
-                const displayName = (user.email || "").split("@")[0].split(/[._-]/)[0];
-                if (displayName) {
-                    shiftNameEl.textContent = "Hey, " + displayName.charAt(0).toUpperCase() + displayName.slice(1) + "!";
+                    const discordUser = JSON.parse(localStorage.getItem("discord_user") || "null");
+                    if (discordUser) {
+                        const name = (discordUser.display_name || discordUser.username || discordUser.global_name || "").trim();
+                        currentUser = {
+                            id: discordUser.discord_id || discordUser.id || "discord-" + (discordUser.username || ""),
+                            email: discordUser.email || "",
+                            discordUsername: name
+                        };
+                        if (name) {
+                            shiftNameEl.textContent = "Hey, " + name.charAt(0).toUpperCase() + name.slice(1) + "!";
+                        }
+                    } else {
+                        return;
+                    }
+                } else {
+                    currentUser = user;
+                    const displayName = (user.email || "").split("@")[0].split(/[._-]/)[0];
+                    if (displayName) {
+                        shiftNameEl.textContent = "Hey, " + displayName.charAt(0).toUpperCase() + displayName.slice(1) + "!";
+                    }
                 }
                 const { data, error } = await localSupabase
                     .from("communities")
