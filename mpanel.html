@@ -1078,7 +1078,9 @@ const shiftFooterDotEl = document.getElementById("shiftFooterDot");
                 }
                 const topbarServerName = document.getElementById("topbarServerName");
                 if (topbarServerName) topbarServerName.textContent = data.name || "Community";
-                const isCreator = data.creator_email === currentUser.email;
+                const isCreator = data.creator_email && currentUser.email
+                    ? data.creator_email.trim().toLowerCase() === currentUser.email.trim().toLowerCase()
+                    : false;
                 let isManagement = false;
                 if (currentUser.id) {
                     try {
@@ -1086,6 +1088,16 @@ const shiftFooterDotEl = document.getElementById("shiftFooterDot");
                             .from("users")
                             .select("department")
                             .eq("id", currentUser.id)
+                            .maybeSingle();
+                        isManagement = !!(u && (u.department || "").trim() === "Management");
+                    } catch (e) {}
+                }
+                if (!isManagement && currentUser.email) {
+                    try {
+                        const { data: u } = await localSupabase
+                            .from("users")
+                            .select("department")
+                            .ilike("email", currentUser.email)
                             .maybeSingle();
                         isManagement = !!(u && (u.department || "").trim() === "Management");
                     } catch (e) {}
