@@ -1078,26 +1078,26 @@ const shiftFooterDotEl = document.getElementById("shiftFooterDot");
                 }
                 const topbarServerName = document.getElementById("topbarServerName");
                 if (topbarServerName) topbarServerName.textContent = data.name || "Community";
-                const isCreator = data.creator_email === user.email;
+                const isCreator = data.creator_email === currentUser.email;
                 let isManagement = false;
-                if (user.id) {
+                if (currentUser.id) {
                     try {
                         const { data: u } = await localSupabase
                             .from("users")
                             .select("department")
-                            .eq("id", user.id)
+                            .eq("id", currentUser.id)
                             .maybeSingle();
                         isManagement = !!(u && (u.department || "").trim() === "Management");
                     } catch (e) {}
                 }
                 let hasModRole = false;
-                if (!isCreator && !isManagement && user.id) {
+                if (!isCreator && !isManagement && currentUser.id) {
                     try {
                         const { data: assignments } = await localSupabase
                             .from("member_roles")
                             .select("role_id")
                             .eq("community_id", communityId)
-                            .eq("user_id", user.id);
+                            .eq("user_id", currentUser.id);
                         if (Array.isArray(assignments) && assignments.length > 0) {
                             const roleIds = assignments.map(r => r.role_id);
                             const { data: rolesData } = await localSupabase
@@ -1124,7 +1124,7 @@ const shiftFooterDotEl = document.getElementById("shiftFooterDot");
                 }
                 const managementBadge = document.getElementById("managementBadge");
                 const shiftRoleEl = document.getElementById("shiftRole");
-                if (user.email === "oceanviewrp1@gmail.com") {
+                if (currentUser.email === "oceanviewrp1@gmail.com") {
                     if (managementBadge) managementBadge.style.display = "inline-block";
                     if (shiftRoleEl) shiftRoleEl.textContent = "Community Moderator";
                 } else {
