@@ -2197,6 +2197,7 @@
                         let currentEmail = "";
                         let currentUserDepartment = "";
                         let currentUserId = null;
+                        let currentDiscordUsername = "";
                         try {
                             const userData = await localSupabase.auth.getUser();
                             currentEmail = userData?.data?.user?.email || "";
@@ -2220,6 +2221,7 @@
                                 const discordUser = JSON.parse(localStorage.getItem("discord_user") || "null");
                                 if (discordUser && discordUser.email) {
                                     currentEmail = discordUser.email;
+                                    currentDiscordUsername = (discordUser.display_name || discordUser.username || discordUser.global_name || "").trim();
                                 }
                             } catch (e) {}
                         }
@@ -2303,7 +2305,7 @@
                                     <div class="btn-dropdown-wrap">
                                         <button type="button" class="members-btn" id="membersBtn">
                                             <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                                            Members
+                                            ${currentDiscordUsername || "Members"}
                                         </button>
                                         <div class="member-list" id="memberList"></div>
                                     </div>
