@@ -2990,7 +2990,10 @@ if (supervisorInput) {
                                     return match ? match[0] : null;
                                 })() : null;
                                 if (creatorEmail) {
-                                    html += `<button type="button" class="member-btn">${esc(creatorEmail)} (Owner)</button>`;
+                                    const ownerDisplay = (creatorEmail.trim().toLowerCase() === (currentEmail || "").trim().toLowerCase() && currentDiscordUsername)
+                                        ? currentDiscordUsername
+                                        : creatorEmail;
+                                    html += `<button type="button" class="member-btn">${esc(ownerDisplay)} (Owner)</button>`;
                                 }
                                 const isMembersView = targetEl === membersViewList;
                                 const isDropdown = targetEl === memberList;
