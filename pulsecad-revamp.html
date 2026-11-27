@@ -2358,6 +2358,38 @@ enable-ga="false"
             <p>PulseCAD is currently in development mode and unavailable to the public.</p>
         </div>
     </div>
+<!-- Create Community Modal -->
+<div class="cc-modal-overlay" id="ccModalOverlay" style="display:none;">
+  <div class="cc-modal">
+    <div class="cc-modal-header">
+      <div class="cc-modal-title">Create Community</div>
+      <button type="button" class="cc-modal-close" id="ccModalClose">&times;</button>
+    </div>
+    <div class="cc-modal-body">
+      <div class="cc-error" id="ccModalError"></div>
+      <div class="cc-modal-field">
+        <label class="cc-modal-label">Discord Server</label>
+        <select class="cc-modal-select" id="ccServerSelect">
+          <option value="">Loading servers...</option>
+        </select>
+        <div class="cc-modal-hint">Select the Discord server this community is for.</div>
+      </div>
+      <div class="cc-modal-field">
+        <label class="cc-modal-label">Community Name</label>
+        <input type="text" class="cc-modal-input" id="ccNameInput" placeholder="e.g. Ocean View RP" />
+      </div>
+      <div class="cc-modal-field">
+        <label class="cc-modal-label">Description</label>
+        <input type="text" class="cc-modal-input" id="ccDescInput" placeholder="Optional description" />
+      </div>
+    </div>
+    <div class="cc-modal-footer">
+      <button type="button" class="cc-btn-cancel" id="ccModalCancel">Cancel</button>
+      <button type="button" class="cc-btn-create" id="ccModalCreate">Create Community</button>
+    </div>
+  </div>
+</div>
+
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="announcements.js"></script>
     <script>
@@ -4120,6 +4152,7 @@ if (action === "leave") {
         loadCommunities();
 
         if (createCommunityCenteredBtn) {
+            console.log("[cc] create btn found, setting up modal");
             const ccModalOverlay = document.getElementById("ccModalOverlay");
             const ccModalClose = document.getElementById("ccModalClose");
             const ccModalCancel = document.getElementById("ccModalCancel");
@@ -4129,6 +4162,13 @@ if (action === "leave") {
             const ccDescInput = document.getElementById("ccDescInput");
             const ccModalError = document.getElementById("ccModalError");
 
+            console.log("[cc] elements:", { ccModalOverlay: !!ccModalOverlay, ccModalClose: !!ccModalClose, ccModalCancel: !!ccModalCancel, ccModalCreate: !!ccModalCreate, ccServerSelect: !!ccServerSelect, ccNameInput: !!ccNameInput, ccDescInput: !!ccDescInput, ccModalError: !!ccModalError });
+
+            if (!ccModalOverlay || !ccModalCreate) {
+                console.error("[cc] modal elements missing!");
+                return;
+            }
+
             function closeCCModal() {
                 ccModalOverlay.style.display = "none";
                 ccModalError.style.display = "none";
@@ -4137,7 +4177,6 @@ if (action === "leave") {
                 ccNameInput.value = "";
                 ccDescInput.value = "";
                 ccModalCreate.disabled = false;
-                ccModalCreate.replaceWith(ccModalCreate.cloneNode(true));
             }
 
             ccModalClose.addEventListener("click", closeCCModal);
@@ -4169,8 +4208,7 @@ if (action === "leave") {
                 }
             }
 
-            const ccModalCreateBtn = document.getElementById("ccModalCreate");
-            ccModalCreateBtn.addEventListener("click", async () => {
+            ccModalCreate.addEventListener("click", async () => {
                 console.log("[cc] modal create clicked");
                 ccModalError.style.display = "none";
                 const serverId = ccServerSelect.value;
@@ -4188,7 +4226,7 @@ if (action === "leave") {
                     return;
                 }
 
-                ccModalCreateBtn.disabled = true;
+                ccModalCreate.disabled = true;
                 closeCCModal();
 
                 try {
@@ -5193,38 +5231,6 @@ if (joinCommunityCenteredBtn) {
   // toggle display on open/close via class
   var origAdd=DOMTokenList.prototype.add;})();
 </script>
-
-<!-- Create Community Modal -->
-<div class="cc-modal-overlay" id="ccModalOverlay" style="display:none;">
-  <div class="cc-modal">
-    <div class="cc-modal-header">
-      <div class="cc-modal-title">Create Community</div>
-      <button type="button" class="cc-modal-close" id="ccModalClose">&times;</button>
-    </div>
-    <div class="cc-modal-body">
-      <div class="cc-error" id="ccModalError"></div>
-      <div class="cc-modal-field">
-        <label class="cc-modal-label">Discord Server</label>
-        <select class="cc-modal-select" id="ccServerSelect">
-          <option value="">Loading servers...</option>
-        </select>
-        <div class="cc-modal-hint">Select the Discord server this community is for.</div>
-      </div>
-      <div class="cc-modal-field">
-        <label class="cc-modal-label">Community Name</label>
-        <input type="text" class="cc-modal-input" id="ccNameInput" placeholder="e.g. Ocean View RP" />
-      </div>
-      <div class="cc-modal-field">
-        <label class="cc-modal-label">Description</label>
-        <input type="text" class="cc-modal-input" id="ccDescInput" placeholder="Optional description" />
-      </div>
-    </div>
-    <div class="cc-modal-footer">
-      <button type="button" class="cc-btn-cancel" id="ccModalCancel">Cancel</button>
-      <button type="button" class="cc-btn-create" id="ccModalCreate">Create Community</button>
-    </div>
-  </div>
-</div>
 
 </body>
 </html>
