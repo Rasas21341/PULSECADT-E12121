@@ -2367,7 +2367,7 @@ enable-ga="false"
         const DISCORD_CLIENT_ID = "1575717866035220480";
         const DISCORD_CLIENT_SECRET = "DB3G-UOsVlXHTpT5DgbS6Uyy343Y8ZS8";
         const DISCORD_REDIRECT_URI = "https://www.pulsecad.xyz/pulsecad-revamp.html";
-        const DISCORD_SCOPES = "identify email";
+        const DISCORD_SCOPES = "identify email guilds";
 
         const POLAR_CHECKOUT_URL = "https://buy.polar.sh/polar_cl_c3sBwfAb3N9CkFkLbK2pNuXPacIwERwgcefl50XTRPn";
 
@@ -4171,19 +4171,25 @@ if (action === "leave") {
 
                 async function loadDiscordGuilds() {
                     const token = localStorage.getItem("discord_token") || "";
+                    console.log("[cc] discord token present:", !!token);
                     if (!token) {
                         serverSelect.innerHTML = '<option value="">Not signed in to Discord</option>';
                         return;
                     }
                     try {
+                        console.log("[cc] fetching guilds...");
                         const res = await fetch("https://discord.com/api/users/@me/guilds", {
                             headers: { Authorization: "Bearer " + token }
                         });
+                        console.log("[cc] guilds response status:", res.status);
                         if (!res.ok) {
-                            serverSelect.innerHTML = '<option value="">Failed to load servers</option>';
+                            const body = await res.text();
+                            console.error("[cc] guilds failed body:", body);
+                            serverSelect.innerHTML = '<option value="">Discord auth expired - sign in again</option>';
                             return;
                         }
                         const guilds = await res.json();
+                        console.log("[cc] guilds:", guilds);
                         serverSelect.innerHTML = '<option value="">Select a server</option>' +
                             (Array.isArray(guilds) ? guilds.map((g) => '<option value="' + g.id + '">' + (g.name || "Unnamed Server") + '</option>').join("") : "");
                     } catch (err) {
