@@ -3066,7 +3066,7 @@ if (supervisorInput) {
                                     try {
                                         const discordUser = JSON.parse(localStorage.getItem("discord_user") || "null");
                                         if (discordUser && discordUser.id && discordUser.avatar) {
-                                            ownerAvatar = `<img src="https://cdn.discordapp.com/avatars/${discordUser.id}/${discordUser.avatar}.png?size=64" class="member-avatar" alt="${esc(ownerDisplay)}" />`;
+                                            ownerAvatar = `<img src="https://cdn.discordapp.com/avatars/${discordUser.id}/${discordUser.avatar}.png?size=64" class="member-avatar" alt="${esc(ownerDisplay)}" onerror="this.style.display='none'" />`;
                                         }
                                     } catch (e) {}
                                     html += `<button type="button" class="member-btn">${ownerAvatar}${esc(ownerDisplay)} (Owner)</button>`;
@@ -3099,8 +3099,12 @@ if (supervisorInput) {
                                         const dd = discordDataById[r.user_id] || {};
                                         let memberAvatarHtml = "";
                                         let memberDisplayName = email;
-                                        if (dd.discord_id && dd.avatar) {
-                                            memberAvatarHtml = `<img src="https://cdn.discordapp.com/avatars/${dd.discord_id}/${dd.avatar}.png?size=64" class="member-avatar" alt="${esc(memberDisplayName)}" />`;
+                                        if (dd.avatar) {
+                                            let avatarSrc = dd.avatar;
+                                            if (!avatarSrc.startsWith("http") && !avatarSrc.startsWith("data:") && dd.discord_id) {
+                                                avatarSrc = "https://cdn.discordapp.com/avatars/" + dd.discord_id + "/" + avatarSrc + ".png?size=64";
+                                            }
+                                            memberAvatarHtml = `<img src="${avatarSrc}" class="member-avatar" alt="${esc(memberDisplayName)}" onerror="this.style.display='none'" />`;
                                         }
                                         if (dd.discord_username) {
                                             memberDisplayName = esc(dd.discord_username);
