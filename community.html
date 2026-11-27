@@ -2763,6 +2763,9 @@ if (membersViewClose && membersView) {
                                         alert("Discord Guild ID saved!");
                                     }
                                 } catch (err) {
+                                    alert("Failed to save Discord Guild ID: " + err.message);
+                                    console.error(err);
+                                }
                             });
                         }
 
