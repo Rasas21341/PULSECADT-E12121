@@ -3887,7 +3887,7 @@ async function loadRolePermissions(roleId) {
     try {
         const { data: roleData, error: roleError } = await localSupabase
             .from("roles")
-            .select("permissions")
+            .select("permissions, linked_discord_role_id")
             .eq("id", roleId)
             .maybeSingle();
         if (roleError) throw roleError;
@@ -3899,8 +3899,29 @@ async function loadRolePermissions(roleId) {
         if (editRoleFullPermsPermission) {
             editRoleFullPermsPermission.checked = permList.includes("full") || permList.includes("admin");
         }
+        if (editRoleDiscordRole && roleData) {
+            editRoleDiscordRole.value = roleData.linked_discord_role_id || "";
+        }
     } catch (err) {
         console.error("Failed to load role permissions:", err);
+        // Column may not exist yet; try without it
+        try {
+            const { data: roleData } = await localSupabase
+                .from("roles")
+                .select("permissions")
+                .eq("id", roleId)
+                .maybeSingle();
+            const perms = (roleData && roleData.permissions) ? roleData.permissions : "";
+            const permList = perms.split(",").map(p => p.trim());
+            if (editRoleCloseCallPermission) {
+                editRoleCloseCallPermission.checked = permList.includes("close_call");
+            }
+            if (editRoleFullPermsPermission) {
+                editRoleFullPermsPermission.checked = permList.includes("full") || permList.includes("admin");
+            }
+        } catch (e2) {
+            console.error("Failed to load role permissions (fallback):", e2);
+        }
     }
 }
 
