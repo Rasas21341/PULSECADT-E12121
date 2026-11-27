@@ -3869,9 +3869,11 @@ if (loggedInScreen) loggedInScreen.classList.remove("open");
         }
 
         async function saveCommunity(name, meta, passcode, membersOnly, discordGuildId) {
+            console.log("[cc] saveCommunity called:", { name, discordGuildId, membersOnly });
             if (!localSupabase) return null;
             try {
                 const account = await getCurrentAccount();
+                console.log("[cc] saveCommunity account:", account);
                 if (!account.email) {
                     alert("Sign in with an account that has an email address to create a community.");
                     return null;
@@ -3888,11 +3890,13 @@ if (loggedInScreen) loggedInScreen.classList.remove("open");
                 if (passcode && passcode.trim()) payload.passcode = passcode.trim();
                 if (membersOnly) payload.members_only = true;
                 if (discordGuildId) payload.discord_guild_id = discordGuildId;
+                console.log("[cc] insert payload:", payload);
                 const { data: insertData, error } = await localSupabase
                     .from("communities")
                     .insert([payload])
                     .select()
                     .single();
+                console.log("[cc] insert result:", { insertData, error });
                 if (error) throw error;
                 if (insertData) {
                     addCommunityCard(name, insertData.description || "Community", false, insertData.id, true, !!insertData.verification_requested, !!insertData.suspended, !!insertData.members_only, insertData.banner, !!insertData.partner);
@@ -4167,6 +4171,7 @@ if (action === "leave") {
 
             const ccModalCreateBtn = document.getElementById("ccModalCreate");
             ccModalCreateBtn.addEventListener("click", async () => {
+                console.log("[cc] modal create clicked");
                 ccModalError.style.display = "none";
                 const serverId = ccServerSelect.value;
                 const name = ccNameInput.value.trim();
@@ -4236,6 +4241,7 @@ if (action === "leave") {
             });
 
             createCommunityCenteredBtn.addEventListener("click", async () => {
+                console.log("[cc] create btn clicked");
                 if (!localSupabase) {
                     alert("Service unavailable.");
                     return;
@@ -4248,6 +4254,7 @@ if (action === "leave") {
                 createCommunityCenteredBtn.disabled = true;
                 try {
                     const account = await getCurrentAccount();
+                    console.log("[cc] account:", account);
                     if (!account.email) {
                         alert("Sign in with Discord or an email account before creating a community.");
                         createCommunityCenteredBtn.disabled = false;
@@ -4260,6 +4267,7 @@ if (action === "leave") {
                         return;
                     }
 
+                    console.log("[cc] opening modal");
                     await loadDiscordGuilds();
                     ccModalOverlay.style.display = "flex";
                 } catch (err) {
