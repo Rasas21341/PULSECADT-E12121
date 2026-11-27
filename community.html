@@ -5507,13 +5507,13 @@ let displayName = "Officer";
                      let mdtUserId = null;
                      let savedDept = null;
                      try {
-const { data: authData } = await localSupabase.auth.getUser();
-                          mdtUserId = authData?.user?.id || null;
-                          displayName = authData?.user?.user_metadata?.full_name
-                              || authData?.user?.user_metadata?.name
-                              || authData?.user?.email
-                              || "Officer";
-                           // load saved department
+ const { data: authData } = await localSupabase.auth.getUser();
+                           mdtUserId = authData?.user?.id || null;
+                           displayName = authData?.user?.user_metadata?.full_name
+                               || authData?.user?.user_metadata?.name
+                               || authData?.user?.email
+                               || "Officer";
+                            // load saved department
                            if (mdtUserId) {
                                try {
                                    const { data: u } = await localSupabase.from("users").select("department").eq("id", mdtUserId).maybeSingle();
@@ -5521,6 +5521,16 @@ const { data: authData } = await localSupabase.auth.getUser();
                                } catch (e) {}
                            }
                      } catch (e) {}
+                     // Discord fallback for username
+                     if (displayName === "Officer") {
+                         try {
+                             const discordUser = JSON.parse(localStorage.getItem("discord_user") || "null");
+                             if (discordUser) {
+                                 displayName = (discordUser.display_name || discordUser.username || discordUser.global_name || "Officer").trim();
+                                 if (!mdtUserId && discordUser.discord_id) mdtUserId = discordUser.discord_id;
+                             }
+                         } catch (e) {}
+                     }
 
                      contentEl.innerHTML = `
                         <div class="mdt-shell">
