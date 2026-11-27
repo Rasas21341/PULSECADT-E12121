@@ -1438,7 +1438,21 @@
             text-transform: uppercase;
             letter-spacing: 0.5px;
             color: #ffffff;
-            background: #1e40af;
+            background: #047857;
+            vertical-align: middle;
+        }
+
+        .member-badge.discord-role {
+            display: inline-block;
+            margin-left: 6px;
+            padding: 1px 6px;
+            border-radius: 999px;
+            font-size: 9px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #ffffff;
+            background: #6366f1;
             vertical-align: middle;
         }
 
@@ -3665,7 +3679,7 @@ async function loadRosters() {
                             rolesList.innerHTML = data.map((r) => {
                                 const perms = ((r.permissions || "").split(",").map(p => p.trim()));
                                 const hasRosters = perms.includes("rosters");
-                                const linkedDiscord = r.linked_discord_role_id ? `<span class="member-badge management" style="background:#6366f1; margin-left:6px; font-size:10px;">Discord: ${r.linked_discord_role_id}</span>` : '';
+                                const linkedDiscord = r.linked_discord_role_id ? `<span class="member-badge discord-role" style="margin-left:6px;">Discord: ${r.linked_discord_role_id}</span>` : '';
                                 return `
                                 <div class="request-item" draggable="true" data-role-id="${r.id}">
                                     <span class="drag-handle" title="Drag to reorder">&#x2826;</span>
