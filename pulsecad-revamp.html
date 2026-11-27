@@ -1871,11 +1871,121 @@
               padding: 18px;
           }
 
-          .members-empty {
+          /* Create Community Modal */
+          .cc-modal-overlay {
+              position: fixed;
+              inset: 0;
+              background: rgba(0,0,0,0.6);
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              z-index: 10000;
+              backdrop-filter: blur(4px);
+          }
+          .cc-modal {
+              background: #1a1b1e;
+              border: 1px solid #334155;
+              border-radius: 12px;
+              width: 440px;
+              max-width: 92vw;
+              max-height: 90vh;
+              display: flex;
+              flex-direction: column;
+              box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+          }
+          .cc-modal-header {
+              padding: 16px 20px;
+              border-bottom: 1px solid #334155;
+              display: flex;
+              align-items: center;
+              justify-content: space-between;
+          }
+          .cc-modal-title {
+              font-weight: 700;
+              font-size: 18px;
+              color: #e6e6e6;
+          }
+          .cc-modal-close {
+              background: transparent;
+              border: none;
+              color: #94a3b8;
+              font-size: 20px;
+              cursor: pointer;
+              padding: 0 6px;
+              line-height: 1;
+          }
+          .cc-modal-close:hover { color: #ffffff; }
+          .cc-modal-body {
+              padding: 20px;
+              overflow-y: auto;
+              max-height: 60vh;
+          }
+          .cc-modal-field {
+              margin-bottom: 14px;
+          }
+          .cc-modal-label {
+              display: block;
               font-size: 13px;
               color: #94a3b8;
-              text-align: center;
-              padding: 18px;
+              margin-bottom: 6px;
+              font-weight: 600;
+          }
+          .cc-modal-input,
+          .cc-modal-select {
+              width: 100%;
+              padding: 10px 12px;
+              border-radius: 8px;
+              border: 1px solid #334155;
+              background: #0f1013;
+              color: #e6e6e6;
+              font-size: 14px;
+              box-sizing: border-box;
+          }
+          .cc-modal-input:focus,
+          .cc-modal-select:focus {
+              outline: none;
+              border-color: #3b82f6;
+          }
+          .cc-modal-select option { background: #0f1013; color: #e6e6e6; }
+          .cc-modal-hint {
+              font-size: 12px;
+              color: #64748b;
+              margin-top: 4px;
+          }
+          .cc-modal-footer {
+              padding: 14px 20px;
+              border-top: 1px solid #334155;
+              display: flex;
+              justify-content: flex-end;
+              gap: 10px;
+          }
+          .cc-btn-cancel {
+              padding: 8px 16px;
+              border-radius: 8px;
+              border: 1px solid #334155;
+              background: transparent;
+              color: #e6e6e6;
+              cursor: pointer;
+              font-size: 14px;
+          }
+          .cc-btn-cancel:hover { background: #242529; }
+          .cc-btn-create {
+              padding: 8px 18px;
+              border-radius: 8px;
+              border: 1px solid #3b82f6;
+              background: #3b82f6;
+              color: #ffffff;
+              cursor: pointer;
+              font-size: 14px;
+              font-weight: 700;
+          }
+          .cc-btn-create:hover { background: #2563eb; }
+          .cc-btn-create:disabled { opacity: 0.6; cursor: not-allowed; }
+          .cc-error {
+              color: #f87171;
+              font-size: 12px;
+              margin-top: 6px;
+              display: none;
           }
         </style>
 <style>
@@ -3758,7 +3868,7 @@ if (loggedInScreen) loggedInScreen.classList.remove("open");
             return code;
         }
 
-        async function saveCommunity(name, meta, passcode, membersOnly) {
+        async function saveCommunity(name, meta, passcode, membersOnly, discordGuildId) {
             if (!localSupabase) return null;
             try {
                 const account = await getCurrentAccount();
@@ -3777,6 +3887,7 @@ if (loggedInScreen) loggedInScreen.classList.remove("open");
                 if (account.userId) payload.user_id = account.userId;
                 if (passcode && passcode.trim()) payload.passcode = passcode.trim();
                 if (membersOnly) payload.members_only = true;
+                if (discordGuildId) payload.discord_guild_id = discordGuildId;
                 const { data: insertData, error } = await localSupabase
                     .from("communities")
                     .insert([payload])
@@ -4005,6 +4116,54 @@ if (action === "leave") {
         loadCommunities();
 
         if (createCommunityCenteredBtn) {
+            const ccModalOverlay = document.getElementById("ccModalOverlay");
+            const ccModalClose = document.getElementById("ccModalClose");
+            const ccModalCancel = document.getElementById("ccModalCancel");
+            const ccModalCreate = document.getElementById("ccModalCreate");
+            const ccServerSelect = document.getElementById("ccServerSelect");
+            const ccNameInput = document.getElementById("ccNameInput");
+            const ccDescInput = document.getElementById("ccDescInput");
+            const ccModalError = document.getElementById("ccModalError");
+
+            function closeCCModal() {
+                ccModalOverlay.style.display = "none";
+                ccModalError.style.display = "none";
+                ccModalError.textContent = "";
+                ccServerSelect.innerHTML = '<option value="">Loading servers...</option>';
+                ccNameInput.value = "";
+                ccDescInput.value = "";
+                ccModalCreate.disabled = false;
+            }
+
+            ccModalClose.addEventListener("click", closeCCModal);
+            ccModalCancel.addEventListener("click", closeCCModal);
+            ccModalOverlay.addEventListener("click", (e) => {
+                if (e.target === ccModalOverlay) closeCCModal();
+            });
+
+            async function loadDiscordGuilds() {
+                const token = localStorage.getItem("discord_token") || "";
+                if (!token) {
+                    ccServerSelect.innerHTML = '<option value="">Not signed in to Discord</option>';
+                    return;
+                }
+                try {
+                    const res = await fetch("https://discord.com/api/users/@me/guilds", {
+                        headers: { Authorization: "Bearer " + token }
+                    });
+                    if (!res.ok) {
+                        ccServerSelect.innerHTML = '<option value="">Failed to load servers</option>';
+                        return;
+                    }
+                    const guilds = await res.json();
+                    ccServerSelect.innerHTML = '<option value="">Select a server</option>' +
+                        (Array.isArray(guilds) ? guilds.map((g) => '<option value="' + g.id + '">' + (g.name || "Unnamed Server") + '</option>').join("") : "");
+                } catch (err) {
+                    console.error("Failed to load Discord guilds:", err);
+                    ccServerSelect.innerHTML = '<option value="">Error loading servers</option>';
+                }
+            }
+
             createCommunityCenteredBtn.addEventListener("click", async () => {
                 if (!localSupabase) {
                     alert("Service unavailable.");
@@ -4028,35 +4187,62 @@ if (action === "leave") {
                         return;
                     }
 
-                    const name = prompt("Enter a name for your panel:");
-                    if (!name || !name.trim()) return;
+                    await loadDiscordGuilds();
+                    ccModalOverlay.style.display = "flex";
 
-                    const description = prompt("Enter a description for your panel (optional):");
-                    if (description === null) return;
+                    return new Promise((resolve) => {
+                        ccModalCreate.onclick = async () => {
+                            ccModalError.style.display = "none";
+                            const serverId = ccServerSelect.value;
+                            const name = ccNameInput.value.trim();
+                            const description = ccDescInput.value.trim();
 
-                    let community;
-                    if (localSupabase && account.email) {
-                        community = await saveCommunity(name.trim(), description.trim(), "", false);
-                    } else {
-                        const result = await requestDiscordPanelApi("create", {
-                            name: name.trim(),
-                            description: description.trim()
-                        });
-                        community = result.community;
-                        if (community) {
-                            addCommunityCard(community.name, community.description || "Community", false, community.id, true, !!community.verification_requested, !!community.suspended, !!community.members_only, community.banner, !!community.partner);
-                        }
-                    }
-                    if (!community) return;
+                            if (!serverId) {
+                                ccModalError.textContent = "Please select a Discord server.";
+                                ccModalError.style.display = "block";
+                                return;
+                            }
+                            if (!name) {
+                                ccModalError.textContent = "Please enter a community name.";
+                                ccModalError.style.display = "block";
+                                return;
+                            }
 
-                    if (!await consumeRedeemedKey()) {
-                        alert("Your community was created, but your redeemed key could not be marked as used. Please contact support before creating another community.");
-                        return;
-                    }
+                            ccModalCreate.disabled = true;
+                            closeCCModal();
 
-                    alert("Panel created successfully!");
-                    loadCommunities();
-                    updatePremiumUI();
+                            let community;
+                            if (localSupabase && account.email) {
+                                community = await saveCommunity(name, description, serverId, false);
+                            } else {
+                                const result = await requestDiscordPanelApi("create", {
+                                    name: name,
+                                    description: description,
+                                    discord_guild_id: serverId
+                                });
+                                community = result.community;
+                                if (community) {
+                                    addCommunityCard(community.name, community.description || "Community", false, community.id, true, !!community.verification_requested, !!community.suspended, !!community.members_only, community.banner, !!community.partner);
+                                }
+                            }
+                            if (!community) {
+                                ccModalCreate.disabled = false;
+                                resolve();
+                                return;
+                            }
+
+                            if (!await consumeRedeemedKey()) {
+                                alert("Your community was created, but your redeemed key could not be marked as used. Please contact support before creating another community.");
+                                resolve();
+                                return;
+                            }
+
+                            alert("Panel created successfully!");
+                            loadCommunities();
+                            updatePremiumUI();
+                            resolve();
+                        };
+                    });
                 } catch (err) {
                     console.error("Failed to create community:", err);
                     alert("Failed to create community: " + (err.message || err));
@@ -4982,5 +5168,38 @@ if (joinCommunityCenteredBtn) {
   // toggle display on open/close via class
   var origAdd=DOMTokenList.prototype.add;})();
 </script>
+
+<!-- Create Community Modal -->
+<div class="cc-modal-overlay" id="ccModalOverlay" style="display:none;">
+  <div class="cc-modal">
+    <div class="cc-modal-header">
+      <div class="cc-modal-title">Create Community</div>
+      <button type="button" class="cc-modal-close" id="ccModalClose">&times;</button>
+    </div>
+    <div class="cc-modal-body">
+      <div class="cc-error" id="ccModalError"></div>
+      <div class="cc-modal-field">
+        <label class="cc-modal-label">Discord Server</label>
+        <select class="cc-modal-select" id="ccServerSelect">
+          <option value="">Loading servers...</option>
+        </select>
+        <div class="cc-modal-hint">Select the Discord server this community is for.</div>
+      </div>
+      <div class="cc-modal-field">
+        <label class="cc-modal-label">Community Name</label>
+        <input type="text" class="cc-modal-input" id="ccNameInput" placeholder="e.g. Ocean View RP" />
+      </div>
+      <div class="cc-modal-field">
+        <label class="cc-modal-label">Description</label>
+        <input type="text" class="cc-modal-input" id="ccDescInput" placeholder="Optional description" />
+      </div>
+    </div>
+    <div class="cc-modal-footer">
+      <button type="button" class="cc-btn-cancel" id="ccModalCancel">Cancel</button>
+      <button type="button" class="cc-btn-create" id="ccModalCreate">Create Community</button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
