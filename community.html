@@ -2750,14 +2750,19 @@ if (membersViewClose && membersView) {
                         if (discordGuildIdInput) {
                             discordGuildIdInput.addEventListener("blur", async () => {
                                 const newGuildId = discordGuildIdInput.value.trim();
+                                console.log("[guild] saving guild id:", newGuildId, "community id:", id);
                                 try {
-                                    await localSupabase
+                                    const { error } = await localSupabase
                                         .from("communities")
                                         .update({ discord_guild_id: newGuildId || null })
                                         .eq("id", id);
+                                    console.log("[guild] update result:", { error });
+                                    if (error) {
+                                        alert("Failed to save Discord Guild ID: " + error.message);
+                                    } else {
+                                        alert("Discord Guild ID saved!");
+                                    }
                                 } catch (err) {
-                                    alert("Failed to save Discord Guild ID.");
-                                }
                             });
                         }
 
