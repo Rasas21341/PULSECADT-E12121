@@ -2135,9 +2135,11 @@
                 </label>
             </div>
             <div class="field">
-                <label for="editRoleDiscordRole">Linked Discord Role ID</label>
-                <input type="text" id="editRoleDiscordRole" placeholder="Discord role ID (optional)" />
-                <div style="font-size:11px; color:#64748b; margin-top:4px;">Users with this Discord role will inherit this role's permissions.</div>
+                <label for="editRoleDiscordRole">Linked Discord Role</label>
+                <select id="editRoleDiscordRole">
+                    <option value="">None</option>
+                </select>
+                <div style="font-size:11px; color:#64748b; margin-top:4px;">Select a Discord role from your linked server. Users with this role will inherit this role's permissions.</div>
             </div>
             <button type="button" class="submit-btn" id="editRoleSubmitBtn">Save Changes</button>
             <div class="modal-error" id="editRoleError"></div>
@@ -3905,10 +3907,55 @@ const editRoleSubmitBtn = document.getElementById("editRoleSubmitBtn");
                             currentEditingRoleId = roleId;
                             if (editRoleName) editRoleName.value = currentName;
                             if (editRoleError) { editRoleError.textContent = ""; editRoleError.style.display = "none"; }
-                            if (editRoleDiscordRole) editRoleDiscordRole.value = "";
+                            if (editRoleDiscordRole) {
+                                editRoleDiscordRole.innerHTML = '<option value="">Loading Discord roles...</option>';
+                                editRoleDiscordRole.value = "";
+                            }
                             if (editRoleModal) editRoleModal.classList.add("open");
                             await loadRolePermissions(roleId);
+                            await loadDiscordRolesDropdown();
                         }
+
+async function loadDiscordRolesDropdown() {
+    if (!editRoleDiscordRole || !currentCommunityData) return;
+    const guildId = currentCommunityData.discord_guild_id;
+    const token = localStorage.getItem("discord_token") || "";
+    if (!token || !guildId) {
+        editRoleDiscordRole.innerHTML = '<option value="">None</option>';
+        return;
+    }
+    try {
+        const res = await fetch(`https://discord.com/api/guilds/${guildId}/roles`, {
+            headers: { Authorization: "Bearer " + token }
+        });
+        if (!res.ok) {
+            editRoleDiscordRole.innerHTML = '<option value="">None</option>';
+            return;
+        }
+        const roles = await res.json();
+        let html = '<option value="">None</option>';
+        if (Array.isArray(roles)) {
+            roles.forEach((r) => {
+                html += '<option value="' + r.id + '">' + (r.name || "Unnamed Role") + '</option>';
+            });
+        }
+        editRoleDiscordRole.innerHTML = html;
+        // Select current linked role
+        if (currentEditingRoleId) {
+            const { data: roleData } = await localSupabase
+                .from("roles")
+                .select("linked_discord_role_id")
+                .eq("id", currentEditingRoleId)
+                .maybeSingle();
+            if (roleData && roleData.linked_discord_role_id) {
+                editRoleDiscordRole.value = roleData.linked_discord_role_id;
+            }
+        }
+    } catch (err) {
+        console.error("Failed to load Discord roles:", err);
+        editRoleDiscordRole.innerHTML = '<option value="">None</option>';
+    }
+}
 
 async function loadRolePermissions(roleId) {
     const editRoleFullPermsPermission = document.getElementById("editRoleFullPermsPermission");
