@@ -3941,9 +3941,18 @@ try {
     if (hasFullPermsPermission) perms.push("full");
     const newPermissions = perms.join(",");
 
+    const linkedDiscordRole = editRoleDiscordRole ? editRoleDiscordRole.value.trim() : "";
+
+    const updatePayload: any = { name: newName, permissions: newPermissions };
+    if (linkedDiscordRole) {
+        updatePayload.linked_discord_role_id = linkedDiscordRole;
+    } else {
+        updatePayload.linked_discord_role_id = null;
+    }
+
                                     const { error: updateError } = await localSupabase
                                         .from("roles")
-                                        .update({ name: newName, permissions: newPermissions })
+                                        .update(updatePayload)
                                         .eq("id", currentEditingRoleId);
                                     if (updateError) {
                                         if (editRoleError) { editRoleError.textContent = "Failed to update role: " + updateError.message; editRoleError.style.display = "block"; }
