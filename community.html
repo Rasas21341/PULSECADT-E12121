@@ -2769,7 +2769,7 @@ if (membersViewClose && membersView) {
                             });
                         }
 
-                        if (copyJoinCodeBtn && joinCodeInput) {
+// Join Code handlers
                             copyJoinCodeBtn.addEventListener("click", () => {
                                 navigator.clipboard.writeText(joinCodeInput.value).then(() => {
                                     copyJoinCodeBtn.textContent = "Copied!";
