@@ -3949,7 +3949,7 @@ async function loadDiscordRolesDropdown() {
     if (!editRoleDiscordRole || !currentCommunityData) return;
     const guildId = currentCommunityData.discord_guild_id;
     const token = localStorage.getItem("discord_token") || "";
-    console.log("[roles] guildId:", guildId, "hasToken:", !!token);
+    console.log("[roles] guildId:", guildId, "hasToken:", !!token, "token preview:", token ? token.substring(0, 20) + "..." : "none");
     if (!token) {
         editRoleDiscordRole.innerHTML = '<option value="">Not signed in to Discord</option>';
         return;
@@ -3963,17 +3963,18 @@ async function loadDiscordRolesDropdown() {
             headers: { Authorization: "Bearer " + token }
         });
         console.log("[roles] response status:", res.status);
+        const text = await res.text();
+        console.log("[roles] response body:", text);
         if (res.status === 401 || res.status === 403) {
             editRoleDiscordRole.innerHTML = '<option value="">Discord auth expired - sign in again</option>';
             return;
         }
         if (!res.ok) {
-            const text = await res.text();
             console.error("[roles] discord error:", text);
             editRoleDiscordRole.innerHTML = '<option value="">Failed to load roles</option>';
             return;
         }
-        const roles = await res.json();
+        const roles = JSON.parse(text);
         console.log("[roles] fetched:", roles);
         let html = '<option value="">None</option>';
         if (Array.isArray(roles)) {
