@@ -4133,6 +4133,7 @@ if (action === "leave") {
                 ccNameInput.value = "";
                 ccDescInput.value = "";
                 ccModalCreate.disabled = false;
+                ccModalCreate.replaceWith(ccModalCreate.cloneNode(true));
             }
 
             ccModalClose.addEventListener("click", closeCCModal);
@@ -4164,6 +4165,76 @@ if (action === "leave") {
                 }
             }
 
+            const ccModalCreateBtn = document.getElementById("ccModalCreate");
+            ccModalCreateBtn.addEventListener("click", async () => {
+                ccModalError.style.display = "none";
+                const serverId = ccServerSelect.value;
+                const name = ccNameInput.value.trim();
+                const description = ccDescInput.value.trim();
+
+                if (!serverId) {
+                    ccModalError.textContent = "Please select a Discord server.";
+                    ccModalError.style.display = "block";
+                    return;
+                }
+                if (!name) {
+                    ccModalError.textContent = "Please enter a community name.";
+                    ccModalError.style.display = "block";
+                    return;
+                }
+
+                ccModalCreateBtn.disabled = true;
+                closeCCModal();
+
+                try {
+                    const account = await getCurrentAccount();
+                    if (!account.email) {
+                        alert("Sign in with Discord or an email account before creating a community.");
+                        createCommunityCenteredBtn.disabled = false;
+                        return;
+                    }
+
+                    if (await getUserRedeemedCount() < 1) {
+                        alert("Redeem a key before creating a community.");
+                        createCommunityCenteredBtn.disabled = false;
+                        return;
+                    }
+
+                    let community;
+                    if (localSupabase && account.email) {
+                        community = await saveCommunity(name, description, serverId, false);
+                    } else {
+                        const result = await requestDiscordPanelApi("create", {
+                            name: name,
+                            description: description,
+                            discord_guild_id: serverId
+                        });
+                        community = result.community;
+                        if (community) {
+                            addCommunityCard(community.name, community.description || "Community", false, community.id, true, !!community.verification_requested, !!community.suspended, !!community.members_only, community.banner, !!community.partner);
+                        }
+                    }
+                    if (!community) {
+                        createCommunityCenteredBtn.disabled = false;
+                        return;
+                    }
+
+                    if (!await consumeRedeemedKey()) {
+                        alert("Your community was created, but your redeemed key could not be marked as used. Please contact support before creating another community.");
+                        createCommunityCenteredBtn.disabled = false;
+                        return;
+                    }
+
+                    alert("Panel created successfully!");
+                    loadCommunities();
+                    updatePremiumUI();
+                } catch (err) {
+                    console.error("Failed to create community:", err);
+                    alert("Failed to create community: " + (err.message || err));
+                    createCommunityCenteredBtn.disabled = false;
+                }
+            });
+
             createCommunityCenteredBtn.addEventListener("click", async () => {
                 if (!localSupabase) {
                     alert("Service unavailable.");
@@ -4179,76 +4250,22 @@ if (action === "leave") {
                     const account = await getCurrentAccount();
                     if (!account.email) {
                         alert("Sign in with Discord or an email account before creating a community.");
+                        createCommunityCenteredBtn.disabled = false;
                         return;
                     }
 
                     if (await getUserRedeemedCount() < 1) {
                         alert("Redeem a key before creating a community.");
+                        createCommunityCenteredBtn.disabled = false;
                         return;
                     }
 
                     await loadDiscordGuilds();
                     ccModalOverlay.style.display = "flex";
-
-                    return new Promise((resolve) => {
-                        ccModalCreate.onclick = async () => {
-                            ccModalError.style.display = "none";
-                            const serverId = ccServerSelect.value;
-                            const name = ccNameInput.value.trim();
-                            const description = ccDescInput.value.trim();
-
-                            if (!serverId) {
-                                ccModalError.textContent = "Please select a Discord server.";
-                                ccModalError.style.display = "block";
-                                return;
-                            }
-                            if (!name) {
-                                ccModalError.textContent = "Please enter a community name.";
-                                ccModalError.style.display = "block";
-                                return;
-                            }
-
-                            ccModalCreate.disabled = true;
-                            closeCCModal();
-
-                            let community;
-                            if (localSupabase && account.email) {
-                                community = await saveCommunity(name, description, serverId, false);
-                            } else {
-                                const result = await requestDiscordPanelApi("create", {
-                                    name: name,
-                                    description: description,
-                                    discord_guild_id: serverId
-                                });
-                                community = result.community;
-                                if (community) {
-                                    addCommunityCard(community.name, community.description || "Community", false, community.id, true, !!community.verification_requested, !!community.suspended, !!community.members_only, community.banner, !!community.partner);
-                                }
-                            }
-                            if (!community) {
-                                ccModalCreate.disabled = false;
-                                resolve();
-                                return;
-                            }
-
-                            if (!await consumeRedeemedKey()) {
-                                alert("Your community was created, but your redeemed key could not be marked as used. Please contact support before creating another community.");
-                                resolve();
-                                return;
-                            }
-
-                            alert("Panel created successfully!");
-                            loadCommunities();
-                            updatePremiumUI();
-                            resolve();
-                        };
-                    });
                 } catch (err) {
-                    console.error("Failed to create community:", err);
-                    alert("Failed to create community: " + (err.message || err));
-                } finally {
+                    console.error("Failed to open create dialog:", err);
+                    alert("Failed to open create dialog: " + (err.message || err));
                     createCommunityCenteredBtn.disabled = false;
-                    updatePremiumUI();
                 }
             });
         }
