@@ -3665,12 +3665,14 @@ async function loadRosters() {
                             rolesList.innerHTML = data.map((r) => {
                                 const perms = ((r.permissions || "").split(",").map(p => p.trim()));
                                 const hasRosters = perms.includes("rosters");
+                                const linkedDiscord = r.linked_discord_role_id ? `<span class="member-badge management" style="background:#6366f1; margin-left:6px; font-size:10px;">Discord: ${r.linked_discord_role_id}</span>` : '';
                                 return `
                                 <div class="request-item" draggable="true" data-role-id="${r.id}">
                                     <span class="drag-handle" title="Drag to reorder">&#x2826;</span>
                                     <div>
                                         <strong>${(r.name || 'Role').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</strong>
                                         ${hasRosters ? '<span class="member-badge supervisor" style="background:#2563eb; margin-left:6px;">Rosters</span>' : ''}
+                                        ${linkedDiscord}
                                     </div>
                                     <div style="display:flex; gap:6px;">
                                         <button type="button" class="approve" data-action="edit" data-role-id="${r.id}" data-role-name="${(r.name || '').replace(/"/g, '&quot;')}">Edit</button>
@@ -3805,12 +3807,25 @@ async function createRole(name) {
                                         community_id: id,
                                         name: name,
                                         permissions: "",
+                                        linked_discord_role_id: null,
                                         display_order: nextOrder + 1,
                                         created_at: new Date().toISOString()
                                     }]);
                                 if (error) {
-                                    alert("Failed to create role: " + error.message);
-                                    return;
+                                    // Column may not exist yet; retry without it
+                                    const { error: error2 } = await localSupabase
+                                        .from("roles")
+                                        .insert([{
+                                            community_id: id,
+                                            name: name,
+                                            permissions: "",
+                                            display_order: nextOrder + 1,
+                                            created_at: new Date().toISOString()
+                                        }]);
+                                    if (error2) {
+                                        alert("Failed to create role: " + error2.message);
+                                        return;
+                                    }
                                 }
                                 loadRoles();
                             } catch (err) {
@@ -3923,6 +3938,29 @@ async function loadRolePermissions(roleId) {
             console.error("Failed to load role permissions (fallback):", e2);
         }
     }
+}
+
+// Fetch Discord roles for the logged-in user in a specific guild
+async function getUserDiscordRoles(guildId) {
+    try {
+        const token = localStorage.getItem("discord_token") || "";
+        if (!token || !guildId) return [];
+        const res = await fetch(`https://discord.com/api/users/@me/guilds/${guildId}/member`, {
+            headers: { Authorization: "Bearer " + token }
+        });
+        if (!res.ok) return [];
+        const data = await res.json();
+        return Array.isArray(data.roles) ? data.roles : [];
+    } catch (err) {
+        console.error("Failed to fetch Discord roles:", err);
+        return [];
+    }
+}
+
+// Check if a user has a specific Discord role in a guild
+async function userHasDiscordRole(guildId, roleId) {
+    const roles = await getUserDiscordRoles(guildId);
+    return roles.includes(roleId);
 }
 
                         if (editRoleSubmitBtn) {
