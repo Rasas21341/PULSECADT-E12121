@@ -3920,6 +3920,7 @@ async function loadDiscordRolesDropdown() {
     if (!editRoleDiscordRole || !currentCommunityData) return;
     const guildId = currentCommunityData.discord_guild_id;
     const token = localStorage.getItem("discord_token") || "";
+    console.log("[roles] guildId:", guildId, "hasToken:", !!token);
     if (!token || !guildId) {
         editRoleDiscordRole.innerHTML = '<option value="">None</option>';
         return;
@@ -3928,11 +3929,15 @@ async function loadDiscordRolesDropdown() {
         const res = await fetch(`https://discord.com/api/guilds/${guildId}/roles`, {
             headers: { Authorization: "Bearer " + token }
         });
+        console.log("[roles] response status:", res.status);
         if (!res.ok) {
+            const text = await res.text();
+            console.error("[roles] discord error:", text);
             editRoleDiscordRole.innerHTML = '<option value="">None</option>';
             return;
         }
         const roles = await res.json();
+        console.log("[roles] fetched:", roles);
         let html = '<option value="">None</option>';
         if (Array.isArray(roles)) {
             roles.forEach((r) => {
