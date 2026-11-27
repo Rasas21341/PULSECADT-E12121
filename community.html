@@ -2982,6 +2982,56 @@ if (supervisorInput) {
                                     });
                                 }
 
+                                // Fallback: look up discord_users table for avatar/discord data not in users table
+                                try {
+                                    const discordEmails = Object.values(emailById).filter(Boolean);
+                                    const discordIds = rows
+                                        .map((r) => {
+                                            const uid = r.user_id || "";
+                                            if (uid.startsWith("discord-")) return uid.slice("discord-".length);
+                                            return null;
+                                        })
+                                        .filter(Boolean);
+                                    if (discordEmails.length > 0 || discordIds.length > 0) {
+                                        const { data: discordRows } = await localSupabase
+                                            .from("discord_users")
+                                            .select("discord_id, username, display_name, email, avatar")
+                                            .or(
+                                                (discordEmails.length
+                                                    ? discordEmails.map((e) => `email.eq.${e}`).join(",")
+                                                    : "") +
+                                                (discordIds.length
+                                                    ? (discordEmails.length ? "," : "") +
+                                                      discordIds.map((d) => `discord_id.eq.${d}`).join(",")
+                                                    : "")
+                                            );
+                                        if (discordRows) {
+                                            (discordRows || []).forEach((d) => {
+                                                if (d.email && !emailById[Object.keys(emailById).find((k) => emailById[k] === d.email)]) {
+                                                    // find by email match
+                                                }
+                                                discordDataById[d.discord_id] = {
+                                                    discord_id: d.discord_id,
+                                                    discord_username: d.username || d.display_name || null,
+                                                    avatar: d.avatar || null
+                                                };
+                                                if (d.email) {
+                                                    const uidByEmail = Object.keys(emailById).find((k) => emailById[k] === d.email);
+                                                    if (uidByEmail) {
+                                                        discordDataById[uidByEmail] = {
+                                                            discord_id: d.discord_id,
+                                                            discord_username: d.username || d.display_name || null,
+                                                            avatar: d.avatar || null
+                                                        };
+                                                    }
+                                                }
+                                            });
+                                        }
+                                    }
+                                } catch (e) {
+                                    console.error("Discord users fallback lookup failed:", e);
+                                }
+
                                 const { data: rolesData, error: rolesError } = await localSupabase
                                     .from("roles")
                                     .select("id, name")
