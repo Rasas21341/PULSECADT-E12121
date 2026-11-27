@@ -2358,38 +2358,6 @@ enable-ga="false"
             <p>PulseCAD is currently in development mode and unavailable to the public.</p>
         </div>
     </div>
-<!-- Create Community Modal -->
-<div class="cc-modal-overlay" id="ccModalOverlay" style="display:none;">
-  <div class="cc-modal">
-    <div class="cc-modal-header">
-      <div class="cc-modal-title">Create Community</div>
-      <button type="button" class="cc-modal-close" id="ccModalClose">&times;</button>
-    </div>
-    <div class="cc-modal-body">
-      <div class="cc-error" id="ccModalError"></div>
-      <div class="cc-modal-field">
-        <label class="cc-modal-label">Discord Server</label>
-        <select class="cc-modal-select" id="ccServerSelect">
-          <option value="">Loading servers...</option>
-        </select>
-        <div class="cc-modal-hint">Select the Discord server this community is for.</div>
-      </div>
-      <div class="cc-modal-field">
-        <label class="cc-modal-label">Community Name</label>
-        <input type="text" class="cc-modal-input" id="ccNameInput" placeholder="e.g. Ocean View RP" />
-      </div>
-      <div class="cc-modal-field">
-        <label class="cc-modal-label">Description</label>
-        <input type="text" class="cc-modal-input" id="ccDescInput" placeholder="Optional description" />
-      </div>
-    </div>
-    <div class="cc-modal-footer">
-      <button type="button" class="cc-btn-cancel" id="ccModalCancel">Cancel</button>
-      <button type="button" class="cc-btn-create" id="ccModalCreate">Create Community</button>
-    </div>
-  </div>
-</div>
-
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="announcements.js"></script>
     <script>
@@ -4165,155 +4133,172 @@ if (action === "leave") {
             console.log("[cc] elements:", { ccModalOverlay: !!ccModalOverlay, ccModalClose: !!ccModalClose, ccModalCancel: !!ccModalCancel, ccModalCreate: !!ccModalCreate, ccServerSelect: !!ccServerSelect, ccNameInput: !!ccNameInput, ccDescInput: !!ccDescInput, ccModalError: !!ccModalError });
 
             if (!ccModalOverlay || !ccModalCreate) {
-                console.error("[cc] modal elements missing!");
-                return;
+                console.error("[cc] modal elements missing - will retry on DOMContentLoaded");
+                window.addEventListener("DOMContentLoaded", () => {
+                    setupCreateCommunityModal();
+                });
+            } else {
+                setupCreateCommunityModal();
             }
 
-            function closeCCModal() {
-                ccModalOverlay.style.display = "none";
-                ccModalError.style.display = "none";
-                ccModalError.textContent = "";
-                ccServerSelect.innerHTML = '<option value="">Loading servers...</option>';
-                ccNameInput.value = "";
-                ccDescInput.value = "";
-                ccModalCreate.disabled = false;
-            }
+            function setupCreateCommunityModal() {
+                const overlay = document.getElementById("ccModalOverlay");
+                const closeBtn = document.getElementById("ccModalClose");
+                const cancelBtn = document.getElementById("ccModalCancel");
+                const createBtn = document.getElementById("ccModalCreate");
+                const serverSelect = document.getElementById("ccServerSelect");
+                const nameInput = document.getElementById("ccNameInput");
+                const descInput = document.getElementById("ccDescInput");
+                const errorEl = document.getElementById("ccModalError");
 
-            ccModalClose.addEventListener("click", closeCCModal);
-            ccModalCancel.addEventListener("click", closeCCModal);
-            ccModalOverlay.addEventListener("click", (e) => {
-                if (e.target === ccModalOverlay) closeCCModal();
-            });
+                if (!overlay || !createBtn) return;
 
-            async function loadDiscordGuilds() {
-                const token = localStorage.getItem("discord_token") || "";
-                if (!token) {
-                    ccServerSelect.innerHTML = '<option value="">Not signed in to Discord</option>';
-                    return;
+                function closeModal() {
+                    overlay.style.display = "none";
+                    errorEl.style.display = "none";
+                    errorEl.textContent = "";
+                    serverSelect.innerHTML = '<option value="">Loading servers...</option>';
+                    nameInput.value = "";
+                    descInput.value = "";
+                    createBtn.disabled = false;
                 }
-                try {
-                    const res = await fetch("https://discord.com/api/users/@me/guilds", {
-                        headers: { Authorization: "Bearer " + token }
-                    });
-                    if (!res.ok) {
-                        ccServerSelect.innerHTML = '<option value="">Failed to load servers</option>';
+
+                closeBtn.addEventListener("click", closeModal);
+                cancelBtn.addEventListener("click", closeModal);
+                overlay.addEventListener("click", (e) => {
+                    if (e.target === overlay) closeModal();
+                });
+
+                async function loadDiscordGuilds() {
+                    const token = localStorage.getItem("discord_token") || "";
+                    if (!token) {
+                        serverSelect.innerHTML = '<option value="">Not signed in to Discord</option>';
                         return;
                     }
-                    const guilds = await res.json();
-                    ccServerSelect.innerHTML = '<option value="">Select a server</option>' +
-                        (Array.isArray(guilds) ? guilds.map((g) => '<option value="' + g.id + '">' + (g.name || "Unnamed Server") + '</option>').join("") : "");
-                } catch (err) {
-                    console.error("Failed to load Discord guilds:", err);
-                    ccServerSelect.innerHTML = '<option value="">Error loading servers</option>';
-                }
-            }
-
-            ccModalCreate.addEventListener("click", async () => {
-                console.log("[cc] modal create clicked");
-                ccModalError.style.display = "none";
-                const serverId = ccServerSelect.value;
-                const name = ccNameInput.value.trim();
-                const description = ccDescInput.value.trim();
-
-                if (!serverId) {
-                    ccModalError.textContent = "Please select a Discord server.";
-                    ccModalError.style.display = "block";
-                    return;
-                }
-                if (!name) {
-                    ccModalError.textContent = "Please enter a community name.";
-                    ccModalError.style.display = "block";
-                    return;
-                }
-
-                ccModalCreate.disabled = true;
-                closeCCModal();
-
-                try {
-                    const account = await getCurrentAccount();
-                    if (!account.email) {
-                        alert("Sign in with Discord or an email account before creating a community.");
-                        createCommunityCenteredBtn.disabled = false;
-                        return;
-                    }
-
-                    if (await getUserRedeemedCount() < 1) {
-                        alert("Redeem a key before creating a community.");
-                        createCommunityCenteredBtn.disabled = false;
-                        return;
-                    }
-
-                    let community;
-                    if (localSupabase && account.email) {
-                        community = await saveCommunity(name, description, serverId, false);
-                    } else {
-                        const result = await requestDiscordPanelApi("create", {
-                            name: name,
-                            description: description,
-                            discord_guild_id: serverId
+                    try {
+                        const res = await fetch("https://discord.com/api/users/@me/guilds", {
+                            headers: { Authorization: "Bearer " + token }
                         });
-                        community = result.community;
-                        if (community) {
-                            addCommunityCard(community.name, community.description || "Community", false, community.id, true, !!community.verification_requested, !!community.suspended, !!community.members_only, community.banner, !!community.partner);
+                        if (!res.ok) {
+                            serverSelect.innerHTML = '<option value="">Failed to load servers</option>';
+                            return;
                         }
+                        const guilds = await res.json();
+                        serverSelect.innerHTML = '<option value="">Select a server</option>' +
+                            (Array.isArray(guilds) ? guilds.map((g) => '<option value="' + g.id + '">' + (g.name || "Unnamed Server") + '</option>').join("") : "");
+                    } catch (err) {
+                        console.error("Failed to load Discord guilds:", err);
+                        serverSelect.innerHTML = '<option value="">Error loading servers</option>';
                     }
-                    if (!community) {
-                        createCommunityCenteredBtn.disabled = false;
+                }
+
+                createBtn.addEventListener("click", async () => {
+                    console.log("[cc] modal create clicked");
+                    errorEl.style.display = "none";
+                    const serverId = serverSelect.value;
+                    const name = nameInput.value.trim();
+                    const description = descInput.value.trim();
+
+                    if (!serverId) {
+                        errorEl.textContent = "Please select a Discord server.";
+                        errorEl.style.display = "block";
+                        return;
+                    }
+                    if (!name) {
+                        errorEl.textContent = "Please enter a community name.";
+                        errorEl.style.display = "block";
                         return;
                     }
 
-                    if (!await consumeRedeemedKey()) {
-                        alert("Your community was created, but your redeemed key could not be marked as used. Please contact support before creating another community.");
+                    createBtn.disabled = true;
+                    closeModal();
+
+                    try {
+                        const account = await getCurrentAccount();
+                        if (!account.email) {
+                            alert("Sign in with Discord or an email account before creating a community.");
+                            createCommunityCenteredBtn.disabled = false;
+                            return;
+                        }
+
+                        if (await getUserRedeemedCount() < 1) {
+                            alert("Redeem a key before creating a community.");
+                            createCommunityCenteredBtn.disabled = false;
+                            return;
+                        }
+
+                        let community;
+                        if (localSupabase && account.email) {
+                            community = await saveCommunity(name, description, serverId, false);
+                        } else {
+                            const result = await requestDiscordPanelApi("create", {
+                                name: name,
+                                description: description,
+                                discord_guild_id: serverId
+                            });
+                            community = result.community;
+                            if (community) {
+                                addCommunityCard(community.name, community.description || "Community", false, community.id, true, !!community.verification_requested, !!community.suspended, !!community.members_only, community.banner, !!community.partner);
+                            }
+                        }
+                        if (!community) {
+                            createCommunityCenteredBtn.disabled = false;
+                            return;
+                        }
+
+                        if (!await consumeRedeemedKey()) {
+                            alert("Your community was created, but your redeemed key could not be marked as used. Please contact support before creating another community.");
+                            createCommunityCenteredBtn.disabled = false;
+                            return;
+                        }
+
+                        alert("Panel created successfully!");
+                        loadCommunities();
+                        updatePremiumUI();
+                    } catch (err) {
+                        console.error("Failed to create community:", err);
+                        alert("Failed to create community: " + (err.message || err));
                         createCommunityCenteredBtn.disabled = false;
+                    }
+                });
+
+                createCommunityCenteredBtn.addEventListener("click", async () => {
+                    console.log("[cc] create btn clicked");
+                    if (!localSupabase) {
+                        alert("Service unavailable.");
                         return;
                     }
-
-                    alert("Panel created successfully!");
-                    loadCommunities();
-                    updatePremiumUI();
-                } catch (err) {
-                    console.error("Failed to create community:", err);
-                    alert("Failed to create community: " + (err.message || err));
-                    createCommunityCenteredBtn.disabled = false;
-                }
-            });
-
-            createCommunityCenteredBtn.addEventListener("click", async () => {
-                console.log("[cc] create btn clicked");
-                if (!localSupabase) {
-                    alert("Service unavailable.");
-                    return;
-                }
-                if (createCommunityCenteredBtn.disabled) {
-                    alert("Redeem a key before creating a community.");
-                    return;
-                }
-
-                createCommunityCenteredBtn.disabled = true;
-                try {
-                    const account = await getCurrentAccount();
-                    console.log("[cc] account:", account);
-                    if (!account.email) {
-                        alert("Sign in with Discord or an email account before creating a community.");
-                        createCommunityCenteredBtn.disabled = false;
-                        return;
-                    }
-
-                    if (await getUserRedeemedCount() < 1) {
+                    if (createCommunityCenteredBtn.disabled) {
                         alert("Redeem a key before creating a community.");
-                        createCommunityCenteredBtn.disabled = false;
                         return;
                     }
 
-                    console.log("[cc] opening modal");
-                    await loadDiscordGuilds();
-                    ccModalOverlay.style.display = "flex";
-                } catch (err) {
-                    console.error("Failed to open create dialog:", err);
-                    alert("Failed to open create dialog: " + (err.message || err));
-                    createCommunityCenteredBtn.disabled = false;
-                }
-            });
+                    createCommunityCenteredBtn.disabled = true;
+                    try {
+                        const account = await getCurrentAccount();
+                        console.log("[cc] account:", account);
+                        if (!account.email) {
+                            alert("Sign in with Discord or an email account before creating a community.");
+                            createCommunityCenteredBtn.disabled = false;
+                            return;
+                        }
+
+                        if (await getUserRedeemedCount() < 1) {
+                            alert("Redeem a key before creating a community.");
+                            createCommunityCenteredBtn.disabled = false;
+                            return;
+                        }
+
+                        console.log("[cc] opening modal");
+                        await loadDiscordGuilds();
+                        overlay.style.display = "flex";
+                    } catch (err) {
+                        console.error("Failed to open create dialog:", err);
+                        alert("Failed to open create dialog: " + (err.message || err));
+                        createCommunityCenteredBtn.disabled = false;
+                    }
+                });
+            }
         }
 
         const moderationBtn = document.getElementById("moderationBtn");
@@ -5231,6 +5216,38 @@ if (joinCommunityCenteredBtn) {
   // toggle display on open/close via class
   var origAdd=DOMTokenList.prototype.add;})();
 </script>
+
+<!-- Create Community Modal -->
+<div class="cc-modal-overlay" id="ccModalOverlay" style="display:none;">
+  <div class="cc-modal">
+    <div class="cc-modal-header">
+      <div class="cc-modal-title">Create Community</div>
+      <button type="button" class="cc-modal-close" id="ccModalClose">&times;</button>
+    </div>
+    <div class="cc-modal-body">
+      <div class="cc-error" id="ccModalError"></div>
+      <div class="cc-modal-field">
+        <label class="cc-modal-label">Discord Server</label>
+        <select class="cc-modal-select" id="ccServerSelect">
+          <option value="">Loading servers...</option>
+        </select>
+        <div class="cc-modal-hint">Select the Discord server this community is for.</div>
+      </div>
+      <div class="cc-modal-field">
+        <label class="cc-modal-label">Community Name</label>
+        <input type="text" class="cc-modal-input" id="ccNameInput" placeholder="e.g. Ocean View RP" />
+      </div>
+      <div class="cc-modal-field">
+        <label class="cc-modal-label">Description</label>
+        <input type="text" class="cc-modal-input" id="ccDescInput" placeholder="Optional description" />
+      </div>
+    </div>
+    <div class="cc-modal-footer">
+      <button type="button" class="cc-btn-cancel" id="ccModalCancel">Cancel</button>
+      <button type="button" class="cc-btn-create" id="ccModalCreate">Create Community</button>
+    </div>
+  </div>
+</div>
 
 </body>
 </html>
