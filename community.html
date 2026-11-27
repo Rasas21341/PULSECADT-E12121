@@ -3995,7 +3995,7 @@ try {
 
     const linkedDiscordRole = editRoleDiscordRole ? editRoleDiscordRole.value.trim() : "";
 
-    const updatePayload: any = { name: newName, permissions: newPermissions };
+    const updatePayload = { name: newName, permissions: newPermissions };
     if (linkedDiscordRole) {
         updatePayload.linked_discord_role_id = linkedDiscordRole;
     } else {
