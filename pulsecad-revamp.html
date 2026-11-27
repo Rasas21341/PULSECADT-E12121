@@ -4258,7 +4258,12 @@ if (action === "leave") {
                             return;
                         }
 
-                        alert("Panel created successfully!");
+                        // Invite bot to the selected Discord server
+                        const botClientId = "1526488253237170227";
+                        const botInviteUrl = "https://discord.com/api/oauth2/authorize?client_id=" + botClientId + "&permissions=2048&scope=bot&guild_id=" + encodeURIComponent(serverId);
+                        window.open(botInviteUrl, "_blank");
+
+                        alert("Panel created successfully! Now invite the bot to your server using the opened tab.");
                         loadCommunities();
                         updatePremiumUI();
                     } catch (err) {
