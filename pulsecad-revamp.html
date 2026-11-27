@@ -3446,8 +3446,61 @@ if (dropdownLogoutBtn) {
 async function joinCommunity(communityId, passcode) {
     if (!localSupabase) return;
     try {
-        const { data: { user } } = await localSupabase.auth.getUser();
-        if (!user) {
+        let userId = null;
+        let userEmail = "";
+
+        const { data: { user: supabaseUser } } = await localSupabase.auth.getUser();
+        if (supabaseUser) {
+            userId = supabaseUser.id;
+            userEmail = supabaseUser.email || "";
+        }
+
+        if (!userId) {
+            try {
+                const discordUser = JSON.parse(localStorage.getItem("discord_user") || "null");
+                if (discordUser && discordUser.id) {
+                    const { data: discordUserRow } = await localSupabase
+                        .from("discord_users")
+                        .select("discord_id, email, username, display_name")
+                        .eq("discord_id", discordUser.id)
+                        .maybeSingle();
+
+                    if (discordUserRow && discordUserRow.email) {
+                        userEmail = discordUserRow.email;
+
+                        const { data: existingUser } = await localSupabase
+                            .from("users")
+                            .select("id")
+                            .ilike("email", userEmail)
+                            .maybeSingle();
+
+                        if (existingUser && existingUser.id) {
+                            userId = existingUser.id;
+                        } else {
+                            const { data: newUser, error: createErr } = await localSupabase
+                                .from("users")
+                                .insert([{
+                                    id: "discord-" + discordUser.id,
+                                    email: userEmail,
+                                    username: discordUserRow.username || discordUser.username || "",
+                                    discord_id: discordUser.id,
+                                    discord_username: discordUserRow.display_name || discordUser.username || "",
+                                    department: "Unassigned",
+                                    created_at: new Date().toISOString()
+                                }])
+                                .select("id")
+                                .maybeSingle();
+                            if (createErr) throw createErr;
+                            if (newUser && newUser.id) userId = newUser.id;
+                        }
+                    }
+                }
+            } catch (e) {
+                console.error("Discord join fallback failed:", e);
+            }
+        }
+
+        if (!userId) {
             alert("You must be logged in to join.");
             return;
         }
@@ -3480,7 +3533,7 @@ async function joinCommunity(communityId, passcode) {
         const { data: existing } = await localSupabase
             .from("user_communities")
             .select("id")
-            .eq("user_id", user.id)
+            .eq("user_id", userId)
             .eq("community_id", communityId)
             .maybeSingle();
         if (existing) {
@@ -3490,7 +3543,7 @@ async function joinCommunity(communityId, passcode) {
 
         const { error } = await localSupabase
             .from("user_communities")
-            .insert([{ user_id: user.id, community_id: communityId, joined_at: new Date().toISOString() }]);
+            .insert([{ user_id: userId, community_id: communityId, joined_at: new Date().toISOString() }]);
         if (error) {
             // Surface the real reason instead of a generic message.
             const msg = (error.message || "").toLowerCase();
@@ -3503,7 +3556,7 @@ async function joinCommunity(communityId, passcode) {
             }
             return;
         }
-        notifyDiscordJoin(communityId, user.email, community ? community.name : "");
+        notifyDiscordJoin(communityId, userEmail, community ? community.name : "");
         loadCommunities();
     } catch (err) {
         alert("Failed to join community: " + (err.message || err));
