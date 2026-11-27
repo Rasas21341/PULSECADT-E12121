@@ -2741,6 +2741,12 @@ if (membersViewClose && membersView) {
                             });
                         }
 
+// Join Code handlers
+                        const joinCodeInput = document.getElementById("joinCodeInput");
+                        const discordGuildIdInput = document.getElementById("discordGuildIdInput");
+                        const copyJoinCodeBtn = document.getElementById("copyJoinCodeBtn");
+                        const regenerateJoinCodeBtn = document.getElementById("regenerateJoinCodeBtn");
+
                         if (discordGuildIdInput) {
                             discordGuildIdInput.addEventListener("blur", async () => {
                                 const newGuildId = discordGuildIdInput.value.trim();
@@ -2754,12 +2760,6 @@ if (membersViewClose && membersView) {
                                 }
                             });
                         }
-
-// Join Code handlers
-                        const joinCodeInput = document.getElementById("joinCodeInput");
-                        const discordGuildIdInput = document.getElementById("discordGuildIdInput");
-                        const copyJoinCodeBtn = document.getElementById("copyJoinCodeBtn");
-                        const regenerateJoinCodeBtn = document.getElementById("regenerateJoinCodeBtn");
 
                         if (copyJoinCodeBtn && joinCodeInput) {
                             copyJoinCodeBtn.addEventListener("click", () => {
