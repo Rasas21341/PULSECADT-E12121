@@ -2769,11 +2769,6 @@ if (membersViewClose && membersView) {
                             });
                         }
 
-// Join Code handlers
-                        const joinCodeInput = document.getElementById("joinCodeInput");
-                        const copyJoinCodeBtn = document.getElementById("copyJoinCodeBtn");
-                        const regenerateJoinCodeBtn = document.getElementById("regenerateJoinCodeBtn");
-
                         if (copyJoinCodeBtn && joinCodeInput) {
                             copyJoinCodeBtn.addEventListener("click", () => {
                                 navigator.clipboard.writeText(joinCodeInput.value).then(() => {
