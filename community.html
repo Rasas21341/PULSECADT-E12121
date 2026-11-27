@@ -2964,13 +2964,22 @@ if (supervisorInput) {
                                 const ids = rows.map((r) => r.user_id).filter(Boolean);
                                 let emailById = {};
                                 let deptById = {};
+                                let discordDataById = {};
                                 if (ids.length > 0) {
                                     const { data: users, error: userError } = await localSupabase
                                         .from("users")
-                                        .select("id, email, department")
+                                        .select("id, email, department, discord_id, discord_username, avatar")
                                         .in("id", ids);
                                     if (userError) throw userError;
-                                    (users || []).forEach((u) => { emailById[u.id] = u.email; deptById[u.id] = u.department; });
+                                    (users || []).forEach((u) => {
+                                        emailById[u.id] = u.email;
+                                        deptById[u.id] = u.department;
+                                        discordDataById[u.id] = {
+                                            discord_id: u.discord_id || null,
+                                            discord_username: u.discord_username || null,
+                                            avatar: u.avatar || null
+                                        };
+                                    });
                                 }
 
                                 const { data: rolesData, error: rolesError } = await localSupabase
@@ -3036,6 +3045,16 @@ if (supervisorInput) {
                                         const supBadge = isSupervisor ? ' <span class="member-badge supervisor">Supervisor</span>' : '';
                                         const mgmtBadge = isManagementUser ? ' <span class="member-badge management">Management</span>' : '';
                                         const supportBadge = isSupportUser ? ' <span class="member-badge support">Support</span>' : '';
+
+                                        const dd = discordDataById[r.user_id] || {};
+                                        let memberAvatarHtml = "";
+                                        let memberDisplayName = email;
+                                        if (dd.discord_id && dd.avatar) {
+                                            memberAvatarHtml = `<img src="https://cdn.discordapp.com/avatars/${dd.discord_id}/${dd.avatar}.png?size=64" class="member-avatar" alt="${esc(memberDisplayName)}" />`;
+                                        }
+                                        if (dd.discord_username) {
+                                            memberDisplayName = esc(dd.discord_username);
+                                        }
                                         if (canKickBan) {
                                             const supBtn = `<button type="button" class="supervisor-btn" data-user-id="${esc(r.user_id)}">${isSupervisor ? "Remove Supervisor" : "Make Supervisor"}</button>`;
                                             let roleSelectHtml = '';
@@ -3046,9 +3065,9 @@ if (supervisorInput) {
                                                 ).join('');
                                                 roleSelectHtml = `<select class="role-select" data-user-id="${esc(r.user_id)}"><option value="">No role</option>${options}</select>`;
                                             }
-                                            return `<div class="member-item"><span class="member-email">${email}${supBadge}${mgmtBadge}${supportBadge}</span><div class="member-actions"><button type="button" class="kick-btn" data-user-id="${esc(r.user_id)}">Kick</button><button type="button" class="ban-btn" data-user-id="${esc(r.user_id)}">Ban</button>${supBtn}${roleSelectHtml}</div></div>`;
+                                            return `<div class="member-item">${memberAvatarHtml}<span class="member-email">${memberDisplayName}${supBadge}${mgmtBadge}${supportBadge}</span><div class="member-actions"><button type="button" class="kick-btn" data-user-id="${esc(r.user_id)}">Kick</button><button type="button" class="ban-btn" data-user-id="${esc(r.user_id)}">Ban</button>${supBtn}${roleSelectHtml}</div></div>`;
                                         }
-                                        return `<button type="button" class="member-btn">${email}${supBadge}${mgmtBadge}${supportBadge}</button>`;
+                                        return `<button type="button" class="member-btn">${memberAvatarHtml}${memberDisplayName}${supBadge}${mgmtBadge}${supportBadge}</button>`;
                                     }).join('');
                                 }
                                 targetEl.innerHTML = html;
