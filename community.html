@@ -2120,6 +2120,11 @@
                     <span>Full Dashboard Permissions</span>
                 </label>
             </div>
+            <div class="field">
+                <label for="editRoleDiscordRole">Linked Discord Role ID</label>
+                <input type="text" id="editRoleDiscordRole" placeholder="Discord role ID (optional)" />
+                <div style="font-size:11px; color:#64748b; margin-top:4px;">Users with this Discord role will inherit this role's permissions.</div>
+            </div>
             <button type="button" class="submit-btn" id="editRoleSubmitBtn">Save Changes</button>
             <div class="modal-error" id="editRoleError"></div>
         </div>
@@ -3847,6 +3852,7 @@ if (openAddRoleBtn) {
                         const editRoleName = document.getElementById("editRoleName");
 const editRoleCloseCallPermission = document.getElementById("editRoleCloseCallPermission");
 const editRoleFullPermsPermission = document.getElementById("editRoleFullPermsPermission");
+const editRoleDiscordRole = document.getElementById("editRoleDiscordRole");
 const editRoleSubmitBtn = document.getElementById("editRoleSubmitBtn");
                         const editRoleError = document.getElementById("editRoleError");
 
@@ -3870,6 +3876,7 @@ const editRoleSubmitBtn = document.getElementById("editRoleSubmitBtn");
                             currentEditingRoleId = roleId;
                             if (editRoleName) editRoleName.value = currentName;
                             if (editRoleError) { editRoleError.textContent = ""; editRoleError.style.display = "none"; }
+                            if (editRoleDiscordRole) editRoleDiscordRole.value = "";
                             if (editRoleModal) editRoleModal.classList.add("open");
                             await loadRolePermissions(roleId);
                         }
