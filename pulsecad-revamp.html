@@ -4286,26 +4286,14 @@ if (action === "leave") {
 
                     createCommunityCenteredBtn.disabled = true;
                     try {
-                        const account = await getCurrentAccount();
-                        console.log("[cc] account:", account);
-                        if (!account.email) {
-                            alert("Sign in with Discord or an email account before creating a community.");
-                            createCommunityCenteredBtn.disabled = false;
-                            return;
-                        }
-
-                        if (await getUserRedeemedCount() < 1) {
-                            alert("Redeem a key before creating a community.");
-                            createCommunityCenteredBtn.disabled = false;
-                            return;
-                        }
-
-                        console.log("[cc] opening modal");
+                        console.log("[cc] opening modal immediately");
                         await loadDiscordGuilds();
                         overlay.style.display = "flex";
                     } catch (err) {
                         console.error("Failed to open create dialog:", err);
                         alert("Failed to open create dialog: " + (err.message || err));
+                        createCommunityCenteredBtn.disabled = false;
+                    } finally {
                         createCommunityCenteredBtn.disabled = false;
                     }
                 });
