@@ -2214,6 +2214,15 @@
                         } catch (authErr) {
                             console.error("Auth check failed:", authErr);
                         }
+                        // Discord fallback: signed in via Discord but not Supabase auth
+                        if (!currentEmail) {
+                            try {
+                                const discordUser = JSON.parse(localStorage.getItem("discord_user") || "null");
+                                if (discordUser && discordUser.email) {
+                                    currentEmail = discordUser.email;
+                                }
+                            } catch (e) {}
+                        }
                         const { data: communityData } = await localSupabase
                             .from("communities")
                             .select("*")
@@ -2233,15 +2242,45 @@
                                         .from("roles")
                                         .select("permissions")
                                         .in("id", roleIds);
-hasRostersPermission = (rolesData || []).some(r => {
-    const perms = ((r.permissions || "").split(",").map(p => p.trim()));
-    return perms.includes("rosters") || perms.includes("full");
-});
+                                    hasRostersPermission = (rolesData || []).some(r => {
+                                        const perms = ((r.permissions || "").split(",").map(p => p.trim()));
+                                        return perms.includes("rosters") || perms.includes("full");
+                                    });
                                 }
                             } catch (e) { console.error("Failed to check rosters permission:", e); }
                         }
+                        // Email-based roster lookup for Discord-only users (no Supabase userId)
+                        if (!hasRostersPermission && !currentUserId && currentEmail && communityData) {
+                            try {
+                                const { data: userRow } = await localSupabase
+                                    .from("users")
+                                    .select("id")
+                                    .ilike("email", currentEmail)
+                                    .maybeSingle();
+                                if (userRow && userRow.id) {
+                                    const { data: roleAssignments } = await localSupabase
+                                        .from("member_roles")
+                                        .select("role_id")
+                                        .eq("community_id", id)
+                                        .eq("user_id", userRow.id);
+                                    if (Array.isArray(roleAssignments) && roleAssignments.length > 0) {
+                                        const roleIds = roleAssignments.map(r => r.role_id);
+                                        const { data: rolesData } = await localSupabase
+                                            .from("roles")
+                                            .select("permissions")
+                                            .in("id", roleIds);
+                                        hasRostersPermission = (rolesData || []).some(r => {
+                                            const perms = ((r.permissions || "").split(",").map(p => p.trim()));
+                                            return perms.includes("rosters") || perms.includes("full");
+                                        });
+                                    }
+                                }
+                            } catch (e) { console.error("Failed to check rosters permission (email):", e); }
+                        }
 
-                        const isCreator = communityData && communityData.creator_email === currentEmail;
+                        const isCreator = communityData && currentEmail
+                            ? (communityData.creator_email || "").trim().toLowerCase() === currentEmail.trim().toLowerCase()
+                            : false;
                         const isGod = currentEmail === "oceanviewrp1@gmail.com";
                         const canEditSettings = isCreator || hasRostersPermission || isGod;
                         console.log("Access check:", { isCreator, hasRostersPermission, canEditSettings, currentEmail, creator_email: communityData?.creator_email });
