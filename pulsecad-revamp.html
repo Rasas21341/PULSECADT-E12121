@@ -2337,7 +2337,24 @@ enable-ga="false"
 
             try {
                 const discordUser = JSON.parse(localStorage.getItem("discord_user") || "null");
-                return { userId: null, email: (discordUser?.email || "").trim() };
+                const email = (discordUser?.email || "").trim();
+                if (!email) return { userId: null, email: "" };
+
+                // Look up the users table record for this Discord user (by email or discord_id)
+                try {
+                    const { data: userRow } = await localSupabase
+                        .from("users")
+                        .select("id, email")
+                        .or(`email.eq.${email},discord_id.eq.${discordUser.id || ""}`)
+                        .maybeSingle();
+                    if (userRow && userRow.id) {
+                        return { userId: userRow.id, email: userRow.email || email };
+                    }
+                } catch (e) {
+                    console.error("Failed to look up Discord user in users table:", e);
+                }
+
+                return { userId: null, email };
             } catch (err) {
                 console.error("Failed to read Discord account:", err);
                 return { userId: null, email: "" };
